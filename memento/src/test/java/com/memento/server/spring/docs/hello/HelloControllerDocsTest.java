@@ -22,6 +22,7 @@ import com.memento.server.HelloRequest;
 import com.memento.server.spring.RestDocsSupport;
 
 public class HelloControllerDocsTest extends RestDocsSupport {
+
 	@Override
 	protected Object initController() {
 		return new HelloController();
