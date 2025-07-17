@@ -17,8 +17,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.memento.server.HelloController;
-import com.memento.server.HelloRequest;
+import com.memento.server.hello.HelloController;
+import com.memento.server.hello.HelloRequest;
 import com.memento.server.spring.RestDocsSupport;
 
 public class HelloControllerDocsTest extends RestDocsSupport {
