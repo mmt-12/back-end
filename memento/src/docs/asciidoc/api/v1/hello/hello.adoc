@@ -1,5 +1,5 @@
-[[product-create]]
-=== 신규 상품 등록
+[[hello-test]]
+=== hello test
 
 ==== HTTP Request
 include::{snippets}/hello-test/http-request.adoc[]

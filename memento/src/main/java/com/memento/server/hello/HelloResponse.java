@@ -1,4 +1,4 @@
-package com.memento.server;
+package com.memento.server.hello;
 
 public record HelloResponse(
 	Long id,

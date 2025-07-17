@@ -1,4 +1,4 @@
-package com.memento.server;
+package com.memento.server.hello;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

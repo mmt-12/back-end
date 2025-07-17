@@ -1,4 +1,4 @@
-package com.memento.server;
+package com.memento.server.hello;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
