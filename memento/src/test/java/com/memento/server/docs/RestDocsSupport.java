@@ -1,4 +1,4 @@
-package com.memento.server.spring;
+package com.memento.server.docs;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 

@@ -1,4 +1,4 @@
-package com.memento.server.spring.docs.hello;
+package com.memento.server.docs.hello;
 
 import static org.springframework.http.MediaType.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -12,6 +12,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.DisplayName;
@@ -19,9 +20,9 @@ import org.junit.jupiter.api.Test;
 
 import com.memento.server.hello.HelloController;
 import com.memento.server.hello.HelloRequest;
-import com.memento.server.spring.RestDocsSupport;
+import com.memento.server.docs.RestDocsSupport;
 
-public class HelloControllerDocsTest extends RestDocsSupport {
+public class HelloControllerTestDocsTest extends RestDocsSupport {
 
 	@Override
 	protected Object initController() {
@@ -45,6 +46,9 @@ public class HelloControllerDocsTest extends RestDocsSupport {
 					.contentType(APPLICATION_JSON))
 			.andDo(print())
 			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.id").value(request.id()))
+			.andExpect(jsonPath("$.price").value(request.price() + 100))
+			.andExpect(jsonPath("$.name").value(request.name()))
 			.andDo(document("hello-test",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
