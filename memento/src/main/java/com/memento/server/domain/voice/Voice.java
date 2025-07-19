@@ -37,14 +37,14 @@ public class Voice extends BaseEntity {
 	@GeneratedValue(strategy = IDENTITY)
 	private Long id;
 
-	@Column(name = "name", length = 102, nullable = false)
+	@Column(name = "name", length = 102, nullable = true)
 	private String name;
 
 	@Column(name = "url", length = 255, nullable = false)
 	private String url;
 
-	@Column(name = "is_registerd", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
-	private Boolean isRegisterd;
+	@Column(name = "is_temporary", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+	private Boolean isTemporary;
 
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "associate_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
