@@ -6,14 +6,10 @@ import static lombok.AccessLevel.PROTECTED;
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import com.memento.server.domain.member.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -27,7 +23,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "associate_status")
 @Getter
-@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -38,11 +33,10 @@ public class AssociateStatus {
 	@JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Member member;
 
-	@Column(name = "consecutive_attendance_days", nullable = false, columnDefinition = "INT DEFAULT 1")
-	private int consecutiveAttendanceDays = 1;
+	@Column(name = "consecutive_attendance_days", nullable = false, columnDefinition = "INT DEFAULT 0")
+	private int consecutiveAttendanceDays;
 
-	@CreatedDate
-	@Column(name = "last_attended_at", nullable = false, updatable = false)
+	@Column(name = "last_attended_at", nullable = true)
 	private LocalDateTime lastAttendedAt;
 
 	@Column(name = "uploaded_reaction_count", nullable = false, columnDefinition = "INT DEFAULT 0")
