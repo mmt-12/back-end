@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor
 @Builder
-public class AssociateStatus {
+public class AssociateStats {
 
 	@Id
 	@OneToOne(fetch = LAZY)
