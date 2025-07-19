@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "associate_status")
+@Table(name = "associate_stats")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor
