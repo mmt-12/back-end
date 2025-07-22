@@ -34,6 +34,6 @@ public class Achievement extends BaseEntity {
 	@Column(name = "name", length = 102, nullable = false)
 	private String name;
 
-	@Column(name = "condition", length = 255, nullable = false)
-	private String condition;
+	@Column(name = "criteria", length = 255, nullable = false)
+	private String criteria;
 }

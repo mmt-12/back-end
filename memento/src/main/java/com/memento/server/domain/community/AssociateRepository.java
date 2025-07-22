@@ -1,4 +1,4 @@
-package com.memento.server.domain.group;
+package com.memento.server.domain.community;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

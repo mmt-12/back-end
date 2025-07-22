@@ -9,12 +9,11 @@ import static lombok.AccessLevel.PROTECTED;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.memento.server.common.BaseEntity;
-import com.memento.server.domain.group.Associate;
+import com.memento.server.domain.community.Associate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
