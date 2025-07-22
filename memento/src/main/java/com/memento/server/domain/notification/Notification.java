@@ -45,7 +45,7 @@ public class Notification extends BaseEntity {
 	@Column(name = "content", length = 255, nullable = false)
 	private String content;
 
-	@Column(name = "is_read", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+	@Column(name = "is_read", nullable = false)
 	private Boolean isRead;
 
 	@Column(name = "end_point_id", nullable = true)
