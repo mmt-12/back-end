@@ -8,8 +8,8 @@ import static lombok.AccessLevel.PROTECTED;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.memento.server.common.BaseEntity;
-import com.memento.server.domain.group.Associate;
-import com.memento.server.domain.group.Group;
+import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.community.Community;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -52,8 +52,8 @@ public class Event extends BaseEntity {
 	private Period period;
 
 	@ManyToOne(fetch = LAZY)
-	@JoinColumn(name = "group_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
-	private Group group;
+	@JoinColumn(name = "community_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
+	private Community community;
 
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "associate_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
