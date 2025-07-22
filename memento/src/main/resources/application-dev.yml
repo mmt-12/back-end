@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:mysql://memento-mysql-dev:3306/memento
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  data:
+    redis:
+      host: memento-redis-dev
+      port: 6379

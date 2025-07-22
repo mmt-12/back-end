@@ -1,0 +1,69 @@
+services:
+  memento-mysql:
+    image: mysql:8.0
+    container_name: memento-mysql-local
+    restart: always
+    env_file:
+      - ../env/.env.local
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Asia/Seoul
+    ports:
+      - "3307:3306"
+    volumes:
+      - ../env/.env.local:/env/.env.local
+      - ../db/mysql/local:/docker-entrypoint-initdb.d
+      - mysql_data_local:/var/lib/mysql
+    command: >
+      --skip-character-set-client-handshake
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+    networks:
+      - memento-local-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  memento-redis:
+    image: redis:7.0
+    container_name: memento-redis-local
+    restart: always
+    ports:
+      - "6380:6379"
+    networks:
+      - memento-local-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  memento:
+    container_name: memento-local
+    platform: linux/amd64
+    build:
+      context: ../memento
+      dockerfile: Dockerfile
+    env_file:
+      - ../env/.env.local
+    environment:
+      TZ: Asia/Seoul
+      SPRING_PROFILES_ACTIVE: local
+    depends_on:
+      memento-mysql:
+        condition: service_healthy
+      memento-redis:
+        condition: service_healthy
+    networks:
+      - memento-local-network
+
+volumes:
+  mysql_data_local:
+
+networks:
+  memento-local-network:
+    driver: bridge
