@@ -43,7 +43,7 @@ public class Voice extends BaseEntity {
 	@Column(name = "url", length = 255, nullable = false)
 	private String url;
 
-	@Column(name = "is_temporary", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+	@Column(name = "is_temporary", nullable = false)
 	private Boolean isTemporary;
 
 	@ManyToOne(fetch = LAZY)

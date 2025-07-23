@@ -1,0 +1,39 @@
+services:
+
+  memento-redis:
+    image: redis:7.0
+    container_name: memento-redis-local
+    restart: always
+    ports:
+      - "6380:6379"
+    networks:
+      - memento-local-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  memento:
+    container_name: memento-local
+    platform: linux/amd64
+    build:
+      context: ../memento
+      dockerfile: Dockerfile
+    environment:
+      TZ: Asia/Seoul
+      SPRING_PROFILES_ACTIVE: local
+    ports:
+      - 8080:8080
+    depends_on:
+      memento-redis:
+        condition: service_healthy
+    networks:
+      - memento-local-network
+
+volumes:
+  mysql_data_local:
+
+networks:
+  memento-local-network:
+    driver: bridge

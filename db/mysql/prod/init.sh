@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+ENV_FILE="/env/.env.prod"
+export $(grep -v '^#' "$ENV_FILE" | xargs)
+
+DATABASE="memento"
+
+mysql -u root -p"${MYSQL_ROOT_PASSWORD}" <<EOSQL
+CREATE DATABASE IF NOT EXISTS \`${DATABASE}\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+DROP USER IF EXISTS '${MYSQL_USER}'@'%';
+CREATE USER '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+
+GRANT ALL PRIVILEGES ON \`${DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+FLUSH PRIVILEGES;
+EOSQL

@@ -18,10 +18,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Location {
 
-	@Column(name = "latitude", nullable = true, columnDefinition = "DECIMAL(10, 7)")
+	@Column(name = "latitude", nullable = true)
 	private BigDecimal latitude;
 
-	@Column(name = "longitude", nullable = true, columnDefinition = "DECIMAL(10, 7)")
+	@Column(name = "longitude", nullable = true)
 	private BigDecimal longitude;
 
 	@Column(name = "code", nullable = true)
