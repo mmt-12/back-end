@@ -1,0 +1,10 @@
+[[profileImage-create-test]]
+===  프로필 이미지 등록
+
+==== HTTP Request
+include::{snippets}/profileImage-create-test/http-request.adoc[]
+include::{snippets}/profileImage-create-test/request-parts.adoc[]
+
+==== HTTP Response
+include::{snippets}/profileImage-create-test/http-response.adoc[]
+NOTE: 응답이 존재하지 않습니다.
