@@ -53,6 +53,8 @@ dependencies {
     testImplementation 'com.h2database:h2'
 
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+
+    implementation 'com.auth0:java-jwt:4.5.0'
 }
 
 tasks.named('test') {
