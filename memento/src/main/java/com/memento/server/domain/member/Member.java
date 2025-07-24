@@ -45,6 +45,6 @@ public class Member extends BaseEntity {
 	@Column(name = "brithday", nullable = true)
 	private LocalDate brithday;
 
-	@Column(name = "kakao_id", nullable = false)
-	private Long kakaoId;
+	@Column(name = "kakao_id", length = 50, nullable = false)
+	private String kakaoId;
 }
