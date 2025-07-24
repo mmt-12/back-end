@@ -35,14 +35,14 @@ spring:
       host: memento-redis-local
       port: 6379
 
-  minio:
-    url: http://localhost:9000
-    access-key: minioadmin
-    secret-key: minioadmin
-    bucket: memento-local-bucket
-
 logging:
   level:
     root: debug
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql: trace
+
+minio:
+  url: http://memento-minio-local:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket: memento-local-bucket

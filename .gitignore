@@ -1,4 +1,6 @@
 /env/
 
+/docker/minio/data/
+
 .idea
 .idea/**
