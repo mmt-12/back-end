@@ -1,0 +1,10 @@
+[[mbti-read-test]]
+===  mbti 조회
+
+==== HTTP Request
+include::{snippets}/mbti-read-test/http-request.adoc[]
+NOTE: 요청이 필요하지 않습니다.
+
+==== HTTP Response
+include::{snippets}/mbti-read-test/http-response.adoc[]
+include::{snippets}/mbti-read-test/response-fields.adoc[]
