@@ -1,0 +1,10 @@
+[[guestBook-create-text-test]]
+=== 방명록 텍스트 생성
+
+==== HTTP Request
+include::{snippets}/guestBook-create-text-test/http-request.adoc[]
+include::{snippets}/guestBook-create-text-test/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/guestBook-create-text-test/http-response.adoc[]
+NOTE: 응답이 존재하지 않습니다.

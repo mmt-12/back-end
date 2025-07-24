@@ -1,0 +1,10 @@
+[[guestBook-create-reaction-test]]
+=== 방명록 리액션 생성
+
+==== HTTP Request
+include::{snippets}/guestBook-create-reaction-test/http-request.adoc[]
+include::{snippets}/guestBook-create-reaction-test/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/guestBook-create-reaction-test/http-response.adoc[]
+NOTE: 응답이 존재하지 않습니다.
