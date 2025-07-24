@@ -13,3 +13,29 @@ endif::[]
 == Hello API
 
 include::api/v1/hello/hello.adoc[]
+
+[[guestBook-API]]
+== guestBook API
+
+== profile
+include::api/v1/associate/associate-read.adoc[]
+include::api/v1/associate/associate-update.adoc[]
+
+== mbti
+include::api/v1/mbti/mbti-create.adoc[]
+include::api/v1/mbti/mbti-read.adoc[]
+
+== achievement
+include::api/v1/achievement/achievement-read.adoc[]
+
+== profile image
+include::api/v1/profileImage/profileImage-create.adoc[]
+include::api/v1/profileImage/profileImage-delete.adoc[]
+include::api/v1/profileImage/profileImage-read.adoc[]
+
+== guestBook
+include::api/v1/guestBook/guestBook-create-text.adoc[]
+include::api/v1/guestBook/guestBook-create-reaction.adoc[]
+include::api/v1/guestBook/guestBook-create-bubble.adoc[]
+include::api/v1/guestBook/guestBook-read.adoc[]
+include::api/v1/guestBook/guestBook-delete.adoc[]
