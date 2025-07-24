@@ -28,6 +28,26 @@ services:
       timeout: 5s
       retries: 5
 
+  memento-minio-dev:
+    image: minio/minio:RELEASE.2024-06-25T21-20-07Z
+    container_name: memento-minio-dev
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    volumes:
+      - ./minio/data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - memento-dev-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   memento-redis:
     image: redis:7.0
     container_name: memento-redis-dev
@@ -53,12 +73,20 @@ services:
     environment:
       TZ: Asia/Seoul
       SPRING_PROFILES_ACTIVE: dev
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MINIO_URL: ${MINIO_URL}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
     ports:
-      - 8080:8080
+      - 8081:8080
     depends_on:
       memento-mysql:
         condition: service_healthy
       memento-redis:
+        condition: service_healthy
+      memento-minio-dev:
         condition: service_healthy
     networks:
       - memento-dev-network

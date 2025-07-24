@@ -35,6 +35,12 @@ spring:
       host: memento-redis-local
       port: 6379
 
+  minio:
+    url: http://localhost:9000
+    access-key: minioadmin
+    secret-key: minioadmin
+    bucket: memento-local-bucket
+
 logging:
   level:
     root: debug

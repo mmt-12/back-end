@@ -1,4 +1,7 @@
 spring:
+  config:
+    activate:
+      on-profile: prod
 
   datasource:
     url: jdbc:mysql://memento-mysql-prod:3306/memento
@@ -23,6 +26,11 @@ spring:
       host: memento-redis-prod
       port: 6379
 
+  minio:
+    url: ${MINIO_URL}
+    access-key: ${MINIO_ACCESS_KEY}
+    secret-key: ${MINIO_SECRET_KEY}
+    bucket: ${MINIO_BUCKET_NAME}
 
 logging:
   level:

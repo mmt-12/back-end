@@ -1,28 +1,34 @@
 package com.memento.server.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import io.minio.BucketExistsArgs;
+import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
+@RequiredArgsConstructor
+@Slf4j
 public class MinioConfig {
 
-	@Value("${minio.url}")
-	private String minioUrl;
+	private final MinioClient minioClient;
 
-	@Value("${minio.access-key}")
-	private String accessKey;
+	@Value("${minio.bucket}")
+	private String bucketName;
 
-	@Value("${minio.secret-key}")
-	private String secretKey;
-
-	@Bean
-	public MinioClient minioClient() {
-		return MinioClient.builder()
-			.endpoint(minioUrl)
-			.credentials(accessKey, secretKey)
-			.build();
+	@PostConstruct
+	public void initBucket() {
+		try {
+			boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
+			if (!found) {
+				minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+			}
+		} catch (Exception e) {
+			log.error("Failed to initialize MinIO bucket: {}", e.getMessage(), e);
+		}
 	}
 }
