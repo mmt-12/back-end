@@ -38,6 +38,7 @@ public class KakaoClient {
 			.queryParam("redirect_uri", kakaoProperties.redirectUri())
 			.queryParam("response_type", "code")
 			.queryParam("scope", "openid")
+			.queryParam("prompt", "select_account")
 			.build()
 			.toUriString();
 	}
