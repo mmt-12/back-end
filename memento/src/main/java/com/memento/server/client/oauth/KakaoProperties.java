@@ -10,5 +10,4 @@ public record KakaoProperties(
 	String kapiHost,
 	String redirectUri
 ) {
-
 }
