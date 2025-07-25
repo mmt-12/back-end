@@ -43,7 +43,7 @@ public class KakaoClient {
 	}
 
 	public ResponseEntity<AuthResponse> handleAuthorizationCallback(String code) {
-		KakaoTokenResponse kakaoToken = getKakaoToken(code);
+		KakaoToken kakaoToken = getKakaoToken(code);
 		KakaoOpenId openId = parseOpenIdToken(kakaoToken.id_token());
 		System.out.println(openId);
 
@@ -55,7 +55,7 @@ public class KakaoClient {
 			.orElseGet(() -> ResponseEntity.ok(new AuthResponse(null, openId.sub(), null)));
 	}
 
-	private KakaoTokenResponse getKakaoToken(String code) {
+	private KakaoToken getKakaoToken(String code) {
 		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
 		formData.add("grant_type", "authorization_code");
 		formData.add("client_id", kakaoProperties.clientId());
@@ -68,18 +68,16 @@ public class KakaoClient {
 			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
 			.body(formData)
 			.retrieve()
-			.body(KakaoTokenResponse.class);
+			.body(KakaoToken.class);
 	}
 
 	private KakaoOpenId parseOpenIdToken(String idToken) {
 		try {
 			String[] parts = idToken.split("\\.");
-			if (parts.length != 3)
-				throw new IllegalArgumentException("Invalid ID token format");
 			String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
 			return objectMapper.readValue(payload, KakaoOpenId.class);
 		} catch (Exception e) {
-			throw new IllegalStateException("Failed to parse Kakao OpenID token", e);
+			throw new IllegalStateException("카카오 Open Id 토큰 파싱 실패", e);
 		}
 	}
 }
