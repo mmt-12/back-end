@@ -2,10 +2,9 @@ package com.memento.server.controller.auth;
 
 public record AuthToken(
 	String accessToken,
-	String refreshToken,
-	String grantType
+	String refreshToken
 ) {
-	public static AuthToken of(String accessToken, String refreshToken, String bearerType) {
-		return new AuthToken(accessToken, refreshToken, bearerType);
+	public static AuthToken of(String accessToken, String refreshToken) {
+		return new AuthToken(accessToken, refreshToken);
 	}
 }
