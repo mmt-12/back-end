@@ -9,7 +9,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 
 @Component
-public class JwtTokenProvider {
+public class JwtTokenProvider { // todo: 유틸로 빼기
 
 	@Value("${jwt.secret}")
 	private String secretKey;

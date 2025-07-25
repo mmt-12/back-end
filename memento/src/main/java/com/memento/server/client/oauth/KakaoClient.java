@@ -1,20 +1,11 @@
 package com.memento.server.client.oauth;
 
-import java.util.Base64;
-
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.memento.server.controller.auth.AuthResponse;
-import com.memento.server.controller.auth.AuthToken;
-import com.memento.server.service.auth.AuthTokenGenerator;
-import com.memento.server.service.member.MemberService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,9 +13,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class KakaoClient {
 
-	private final ObjectMapper objectMapper;
-	private final MemberService memberService;
-	private final AuthTokenGenerator authTokenGenerator;
 	private final KakaoProperties kakaoProperties;
 
 	private RestClient restClient() {
@@ -43,20 +31,7 @@ public class KakaoClient {
 			.toUriString();
 	}
 
-	public ResponseEntity<AuthResponse> handleAuthorizationCallback(String code) {
-		KakaoToken kakaoToken = getKakaoToken(code);
-		KakaoOpenId openId = parseOpenIdToken(kakaoToken.id_token());
-		System.out.println(openId);
-
-		return memberService.findMemberWithKakaoId(openId.sub())
-			.map(member -> {
-				AuthToken token = authTokenGenerator.generate(String.valueOf(member.getId()));
-				return ResponseEntity.ok(new AuthResponse(member.getId(), member.getName(), token));
-			})
-			.orElseGet(() -> ResponseEntity.ok(new AuthResponse(null, openId.sub(), null)));
-	}
-
-	private KakaoToken getKakaoToken(String code) {
+	public KakaoToken getKakaoToken(String code) {
 		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
 		formData.add("grant_type", "authorization_code");
 		formData.add("client_id", kakaoProperties.clientId());
@@ -70,15 +45,5 @@ public class KakaoClient {
 			.body(formData)
 			.retrieve()
 			.body(KakaoToken.class);
-	}
-
-	private KakaoOpenId parseOpenIdToken(String idToken) {
-		try {
-			String[] parts = idToken.split("\\.");
-			String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
-			return objectMapper.readValue(payload, KakaoOpenId.class);
-		} catch (Exception e) {
-			throw new IllegalStateException("카카오 Open Id 토큰 파싱 실패", e);
-		}
 	}
 }
