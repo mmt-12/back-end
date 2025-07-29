@@ -1,4 +1,4 @@
-package com.memento.server.utility;
+package com.memento.server.utility.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
