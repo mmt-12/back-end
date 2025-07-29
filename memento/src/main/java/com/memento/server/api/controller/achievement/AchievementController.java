@@ -11,7 +11,7 @@ import com.memento.server.api.controller.achievement.dto.ReadAchievementResponse
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/groups/{groupId}/associates/{associateId}/achivements")
+@RequestMapping("/api/v1/groups/{groupId}/associates/{associateId}/achievements")
 @RequiredArgsConstructor
 public class AchievementController {
 
