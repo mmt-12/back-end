@@ -1,4 +1,4 @@
-package com.memento.server.service.auth;
+package com.memento.server.utility.jwt;
 
 import java.util.Date;
 
@@ -9,7 +9,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 
 @Component
-public class JwtTokenProvider { // todo: 유틸로 빼기
+public class TokenProvider {
 
 	@Value("${jwt.secret}")
 	private String secretKey;
