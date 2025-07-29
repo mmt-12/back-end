@@ -2,7 +2,7 @@ services:
 
   memento-minio-local:
     image: minio/minio:RELEASE.2025-07-23T15-54-02Z-cpuv1
-    container_name: minio-local
+    container_name: memento-minio-local
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -10,8 +10,23 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     volumes:
-      - ./minio/data:/data
+      - minio_data_local:/data
     command: server /data --console-address ":9001"
+    networks:
+      - memento-local-network
+  
+  minio-init-local:
+    image: minio/mc
+    container_name: memento-minio-init-local
+    depends_on:
+      - memento-minio-local
+    entrypoint: >
+      /bin/sh -c "
+        sleep 5;
+        mc alias set local http://memento-minio-local:9000 minioadmin minioadmin;
+        mc mb local/memento-local-bucket || true;
+        mc anonymous set download local/memento-local-bucket;
+      "
     networks:
       - memento-local-network
 
@@ -29,25 +44,8 @@ services:
       timeout: 3s
       retries: 5
 
-  memento:
-    container_name: memento-local
-    platform: linux/amd64
-    build:
-      context: ../memento
-      dockerfile: Dockerfile
-    environment:
-      TZ: Asia/Seoul
-      SPRING_PROFILES_ACTIVE: local
-    ports:
-      - 8080:8080
-    depends_on:
-      memento-redis:
-        condition: service_healthy
-    networks:
-      - memento-local-network
-
 volumes:
-  mysql_data_local:
+  minio_data_local:
 
 networks:
   memento-local-network:

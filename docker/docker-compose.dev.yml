@@ -38,7 +38,7 @@ services:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
     volumes:
-      - ./minio/data:/data
+      - minio_data_dev:/data
     command: server /data --console-address ":9001"
     networks:
       - memento-dev-network
@@ -47,6 +47,21 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  minio-init-dev:
+    image: minio/mc
+    container_name: memento-minio-init-dev
+    depends_on:
+      - memento-minio-dev
+    entrypoint: >
+      /bin/sh -c "
+        sleep 5;
+        mc alias set dev http://memento-minio-dev:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY};
+        mc mb dev/${MINIO_BUCKET_NAME} || true;
+        mc anonymous set download dev/${MINIO_BUCKET_NAME};
+      "
+    networks:
+      - memento-dev-network
 
   memento-redis:
     image: redis:7.0
@@ -93,7 +108,8 @@ services:
 
 volumes:
   mysql_data_dev:
-
+  minio_data_dev:
+  
 networks:
   memento-dev-network:
     driver: bridge

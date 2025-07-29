@@ -49,6 +49,21 @@ services:
       timeout: 5s
       retries: 5
 
+  minio-init-prod:
+    image: minio/mc
+    container_name: memento-minio-init-prod
+    depends_on:
+      - memento-minio-prod
+    entrypoint: >
+      /bin/sh -c "
+        sleep 5;
+        mc alias set prod http://memento-minio-prod:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY};
+        mc mb prod/${MINIO_BUCKET_NAME} || true;
+        mc anonymous set download prod/${MINIO_BUCKET_NAME};
+      "
+    networks:
+      - memento-prod-network
+      
   memento-redis:
     image: redis:7.0
     container_name: memento-redis-prod
@@ -94,6 +109,7 @@ services:
 
 volumes:
   mysql_data_prod:
+  minio_data_prod:
 
 networks:
   memento-prod-network:
