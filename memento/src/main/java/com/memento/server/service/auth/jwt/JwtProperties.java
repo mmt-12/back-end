@@ -7,6 +7,7 @@ public record JwtProperties(
 	String grantType,
 	String secret,
 	Long accessTokenExpireTime,
-	Long refreshTokenExpireTime
+	Long refreshTokenExpireTime,
+	Long tempTime
 ) {
 }
