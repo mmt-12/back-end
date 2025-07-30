@@ -3,9 +3,12 @@ package com.memento.server.config;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import com.memento.server.client.oauth.KakaoProperties;
+import com.memento.server.client.oauth.KakaoClientProperties;
+import com.memento.server.service.auth.jwt.JwtProperties;
 
 @Configuration
-@EnableConfigurationProperties(KakaoProperties.class)
+@EnableConfigurationProperties({
+	KakaoClientProperties.class,
+	JwtProperties.class})
 public class PropertyConfig {
 }

@@ -4,15 +4,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.memento.server.client.oauth.KakaoClient;
-import com.memento.server.client.oauth.KakaoOpenIdPayload;
-import com.memento.server.client.oauth.KakaoToken;
 import com.memento.server.controller.auth.AuthResponse;
-import com.memento.server.controller.auth.AuthToken;
 import com.memento.server.service.member.MemberService;
 import com.memento.server.service.oauth.KakaoOpenIdDecoder;
-import com.memento.server.utility.json.JsonMapper;
-import com.memento.server.utility.jwt.JwtToken;
-import com.memento.server.utility.jwt.TokenDecoder;
+import com.memento.server.service.auth.jwt.JwtToken;
+import com.memento.server.service.auth.jwt.JwtTokenProvider;
+import com.memento.server.service.auth.jwt.MemberClaim;
+import com.memento.server.service.oauth.KakaoOpenIdPayload;
+import com.memento.server.service.oauth.KakaoToken;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +21,7 @@ public class AuthService {
 
 	private final KakaoClient kakaoClient;
 	private final MemberService memberService;
-	private final AuthTokenGenerator authTokenGenerator;
+	private final JwtTokenProvider jwtTokenProvider;
 	private final KakaoOpenIdDecoder kakaoOpenIdDecoder;
 
 	public String getAuthUrl() {
@@ -31,14 +30,13 @@ public class AuthService {
 
 	public ResponseEntity<AuthResponse> handleAuthorizationCallback(String code) {
 		KakaoToken kakaoToken = kakaoClient.getKakaoToken(code);
-		kakaoOpenIdDecoder.verifyOpenIdToken(kakaoToken.idToken());
+		KakaoOpenIdPayload openId = kakaoOpenIdDecoder.validateOpenIdToken(kakaoToken.idToken());
 
-		JwtToken idToken = TokenDecoder.parse(kakaoToken.idToken());
-		String decodedPayload = TokenDecoder.decode(idToken.payload());
-		KakaoOpenIdPayload openId = JsonMapper.readValue(decodedPayload, KakaoOpenIdPayload.class);
 		return memberService.findMemberWithKakaoId(openId.sub())
 			.map(member -> {
-				AuthToken token = authTokenGenerator.generate(String.valueOf(member.getId()));
+				MemberClaim memberClaim = MemberClaim.builder().memberId(member.getId()).build();
+
+				JwtToken token = jwtTokenProvider.createToken(memberClaim);
 				return ResponseEntity.ok(new AuthResponse(member.getId(), member.getName(), token));
 			})
 			.orElseGet(() -> ResponseEntity.ok(new AuthResponse(null, openId.sub(), null)));
