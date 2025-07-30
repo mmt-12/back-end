@@ -15,6 +15,24 @@ public class JwtTokenProvider {
 
 	private final JwtProperties jwtProperties;
 
+	public JwtToken createTempToken(MemberClaim memberClaim) {
+		long now = System.currentTimeMillis();
+		Date accessTokenExpiresAt = new Date(now + jwtProperties.tempTime());
+
+		String accessToken = JWT.create()
+			.withClaim("memberId", memberClaim.memberId())
+			.withClaim("associateId", memberClaim.associateId())
+			.withClaim("communityId", memberClaim.communityId())
+			.withExpiresAt(accessTokenExpiresAt)
+			.sign(Algorithm.HMAC512(jwtProperties.secret()));
+
+		return JwtToken.builder()
+			.grantType(jwtProperties.grantType())
+			.accessToken(accessToken)
+			.accessTokenExpiresAt(accessTokenExpiresAt)
+			.build();
+	}
+
 	public JwtToken createToken(MemberClaim memberClaim) {
 		long now = System.currentTimeMillis();
 		Date accessTokenExpiresAt = new Date(now + jwtProperties.accessTokenExpireTime());

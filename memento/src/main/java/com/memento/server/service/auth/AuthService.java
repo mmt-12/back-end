@@ -35,10 +35,15 @@ public class AuthService {
 		return memberService.findMemberWithKakaoId(openId.sub())
 			.map(member -> {
 				MemberClaim memberClaim = MemberClaim.builder().memberId(member.getId()).build();
-
 				JwtToken token = jwtTokenProvider.createToken(memberClaim);
+
 				return ResponseEntity.ok(new AuthResponse(member.getId(), member.getName(), token));
 			})
-			.orElseGet(() -> ResponseEntity.ok(new AuthResponse(null, openId.sub(), null)));
+			.orElseGet(() -> {
+				MemberClaim memberClaim = MemberClaim.builder().memberId(Long.parseLong(openId.sub())).build();
+				JwtToken token = jwtTokenProvider.createTempToken(memberClaim);
+
+				return ResponseEntity.ok(new AuthResponse(null, openId.sub(), token));
+			});
 	}
 }
