@@ -1,13 +1,7 @@
 package com.memento.server.service.auth.jwt;
 
-import java.util.Base64;
 import java.util.Date;
-import java.util.Map;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
@@ -16,7 +10,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.IncorrectClaimException;
 import com.auth0.jwt.exceptions.MissingClaimException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.Claim;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
