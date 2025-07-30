@@ -11,6 +11,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.memento.server.service.auth.jwt.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+	private final JwtTokenProvider jwtTokenProvider;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -31,6 +36,7 @@ public class SecurityConfig {
 				.requestMatchers(PathRequest.toH2Console()).permitAll()
 				.requestMatchers("/api/v1/sign-in", "/redirect").permitAll()
 				.anyRequest().authenticated())
+			.addFilterBefore(new JwtFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
 			.cors(Customizer.withDefaults())
 			.build();
 	}
