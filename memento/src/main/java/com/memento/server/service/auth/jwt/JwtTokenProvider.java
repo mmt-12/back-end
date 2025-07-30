@@ -1,6 +1,8 @@
 package com.memento.server.service.auth.jwt;
 
+import java.util.Base64;
 import java.util.Date;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -10,6 +12,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.IncorrectClaimException;
 import com.auth0.jwt.exceptions.MissingClaimException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.memento.server.utility.json.JsonMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -79,5 +82,16 @@ public class JwtTokenProvider {
 			log.info("토큰 검증 오류 {}", e);
 		}
 		return false;
+	}
+
+	public MemberClaim extractMemberClaim(String token) { // todo: 개선하기
+		String payloadString = JWT.decode(token).getPayload();
+		String payload = new String(Base64.getUrlDecoder().decode(payloadString));
+		Map map = JsonMapper.readValue(payload, Map.class);
+		return MemberClaim.builder()
+			.memberId(map.get("memberId") != null ? ((Number)map.get("memberId")).longValue() : null)
+			.associateId(map.get("associateId") != null ? ((Number)map.get("associateId")).longValue() : null)
+			.communityId(map.get("communityId") != null ? ((Number)map.get("communityId")).longValue() : null)
+			.build();
 	}
 }
