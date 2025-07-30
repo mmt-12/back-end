@@ -11,7 +11,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       TZ: Asia/Seoul
     ports:
-      - "3308:3306"
+      - "3316:3306"
     volumes:
       - ../env/.env.dev:/env/.env.dev
       - ../db/mysql/dev:/docker-entrypoint-initdb.d
@@ -27,6 +27,41 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  memento-minio-dev:
+    image: minio/minio:RELEASE.2025-07-23T15-54-02Z-cpuv1
+    container_name: memento-minio-dev
+    ports:
+      - "9010:9000"
+      - "9011:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    volumes:
+      - minio_data_dev:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - memento-dev-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio-init-dev:
+    image: minio/mc
+    container_name: memento-minio-init-dev
+    depends_on:
+      - memento-minio-dev
+    entrypoint: >
+      /bin/sh -c "
+        sleep 5;
+        mc alias set dev http://memento-minio-dev:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY};
+        mc mb dev/${MINIO_BUCKET_NAME} || true;
+        mc anonymous set download dev/${MINIO_BUCKET_NAME};
+      "
+    networks:
+      - memento-dev-network
 
   memento-redis:
     image: redis:7.0
@@ -53,19 +88,28 @@ services:
     environment:
       TZ: Asia/Seoul
       SPRING_PROFILES_ACTIVE: dev
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MINIO_URL: ${MINIO_URL}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
     ports:
-      - 8080:8080
+      - 8081:8080
     depends_on:
       memento-mysql:
         condition: service_healthy
       memento-redis:
+        condition: service_healthy
+      memento-minio-dev:
         condition: service_healthy
     networks:
       - memento-dev-network
 
 volumes:
   mysql_data_dev:
-
+  minio_data_dev:
+  
 networks:
   memento-dev-network:
     driver: bridge
