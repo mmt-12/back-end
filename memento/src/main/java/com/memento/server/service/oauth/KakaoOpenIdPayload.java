@@ -1,4 +1,4 @@
-package com.memento.server.client.oauth;
+package com.memento.server.service.oauth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

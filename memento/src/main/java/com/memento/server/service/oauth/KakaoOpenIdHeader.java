@@ -1,4 +1,4 @@
-package com.memento.server.client.oauth;
+package com.memento.server.service.oauth;
 
 public record KakaoOpenIdHeader(
 	String kid,
