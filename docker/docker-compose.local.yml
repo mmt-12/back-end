@@ -35,7 +35,7 @@ services:
     container_name: memento-redis-local
     restart: always
     ports:
-      - "6380:6379"
+      - "6379:6379"
     networks:
       - memento-local-network
     healthcheck:
