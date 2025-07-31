@@ -13,3 +13,12 @@ endif::[]
 == Hello API
 
 include::api/v1/hello/hello.adoc[]
+
+[[Post-API]]
+== Post API
+
+include::api/v1/post/post-read.adoc[]
+include::api/v1/post/post-read-all.adoc[]
+include::api/v1/post/post-create.adoc[]
+include::api/v1/post/post-update.adoc[]
+include::api/v1/post/post-delete.adoc[]
