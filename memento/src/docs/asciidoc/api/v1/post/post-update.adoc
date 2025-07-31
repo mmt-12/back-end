@@ -1,0 +1,10 @@
+[[post-update-test]]
+=== 포스트 수정
+
+==== HTTP Request
+include::{snippets}/post-update-test/http-request.adoc[]
+include::{snippets}/post-update-test/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/post-update-test/http-response.adoc[]
+NOTE: 응답이 존재하지 않습니다.

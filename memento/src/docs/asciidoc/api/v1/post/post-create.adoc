@@ -1,0 +1,10 @@
+[[post-create-test]]
+===  포스트 등록
+
+==== HTTP Request
+include::{snippets}/post-create-test/http-request.adoc[]
+include::{snippets}/post-create-test/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/post-create-test/http-response.adoc[]
+NOTE: 응답이 존재하지 않습니다.
