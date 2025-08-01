@@ -2,6 +2,7 @@ package com.memento.server.spring;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -15,6 +16,7 @@ import com.memento.server.api.service.voice.VoiceService;
 	VoiceController.class,
 	EmojiController.class,
 })
+@Import(TestSecurityConfig.class)
 public abstract class ControllerTestSupport {
 
 	@Autowired
