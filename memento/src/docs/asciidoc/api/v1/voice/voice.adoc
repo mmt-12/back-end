@@ -1,0 +1,14 @@
+[[Voice-API]]
+=== Voice Creat API (보이스 등록)
+
+==== HTTP Request
+include::{snippets}/voice-create/http-request.adoc[]
+
+==== HTTP Request Parts
+include::{snippets}/voice-create/request-parts.adoc[]
+
+==== HTTP data Fields
+include::{snippets}/voice-create/request-part-data-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/voice-create/http-response.adoc[]

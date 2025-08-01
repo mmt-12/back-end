@@ -28,7 +28,7 @@ public class VoiceController {
 	@PostMapping
 	public ResponseEntity<Void> createVoice(@PathVariable Long groupId,
 		// @AssociateId Long associateId,
-		@Valid @RequestPart("request") VoiceCreateRequest request,
+		@Valid @RequestPart("data") VoiceCreateRequest request,
 		@NotNull @RequestPart("voice") MultipartFile voice) {
 		voiceService.createVoice(request.toServiceRequest(voice));
 		return ResponseEntity.status(CREATED).build();

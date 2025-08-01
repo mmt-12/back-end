@@ -13,3 +13,8 @@ endif::[]
 == Hello API
 
 include::api/v1/hello/hello.adoc[]
+
+[[Voice-API]]
+== Voice API
+
+include::api/v1/voice/voice.adoc[]

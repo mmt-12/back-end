@@ -19,26 +19,32 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	@Test
 	@DisplayName("보이스 리액션을 등록한다.")
 	void createVoice() throws Exception {
-	    // given
+		// given
 		long groupId = 1L;
 
-		String request = objectMapper.writeValueAsString(VoiceCreateRequest.builder()
+		String json = objectMapper.writeValueAsString(VoiceCreateRequest.builder()
 			.name("인쥐용")
 			.build());
 
-		MockMultipartFile requestPart = new MockMultipartFile(
-			"request", "request", "application/json", request.getBytes()
+		MockMultipartFile data = new MockMultipartFile(
+			"data",
+			"request",
+			"application/json",
+			json.getBytes()
 		);
 
-		MockMultipartFile voicePart = new MockMultipartFile(
-			"voice", "voice.wav", "audio/wav", "dummy-audio-content".getBytes()
+		MockMultipartFile voice = new MockMultipartFile(
+			"voice",
+			"voice.wav",
+			"audio/wav",
+			"dummy-audio-content".getBytes()
 		);
 
-		// when && then
+		// when & then
 		mockMvc.perform(
 				multipart("/api/v1/groups/{groupId}/voices", groupId)
-					.file(requestPart)
-					.file(voicePart)
+					.file(data)
+					.file(voice)
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isCreated());

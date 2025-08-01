@@ -22,7 +22,7 @@ import com.memento.server.hello.HelloController;
 import com.memento.server.hello.HelloRequest;
 import com.memento.server.docs.RestDocsSupport;
 
-public class HelloControllerTestDocsTest extends RestDocsSupport {
+public class HelloControllerDocsTest extends RestDocsSupport {
 
 	@Override
 	protected Object initController() {
