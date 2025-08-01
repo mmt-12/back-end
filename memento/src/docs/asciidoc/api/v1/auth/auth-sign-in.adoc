@@ -1,0 +1,14 @@
+[[auth-sign-in-test]]
+=== 카카오 로그인
+
+==== HTTP Request
+
+include::{snippets}/auth-sign-in/http-request.adoc[]
+
+NOTE: 요청이 필요하지 않습니다.
+
+==== HTTP Response
+
+include::{snippets}/auth-sign-in/http-response.adoc[]
+
+NOTE: 리다이렉트입니다.

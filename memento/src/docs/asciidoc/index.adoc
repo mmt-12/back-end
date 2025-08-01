@@ -13,3 +13,9 @@ endif::[]
 == Hello API
 
 include::api/v1/hello/hello.adoc[]
+
+[[Auth-API]]
+== Auth API
+
+include::api/v1/auth/auth-sign-in.adoc[]
+include::api/v1/auth/auth-redirect.adoc[]

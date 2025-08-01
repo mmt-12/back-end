@@ -1,9 +1,11 @@
 package com.memento.server.config.filter;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 
 import com.memento.server.service.auth.MemberPrincipal;
@@ -24,6 +26,19 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtFilter extends GenericFilter {
 
 	private final JwtTokenProvider jwtTokenProvider;
+	private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
+	private static final List<String> WHITELIST = List.of(
+		"/api/v1/sign-in",
+		"/redirect",
+		"/h2-console/**",
+		"/error"
+	);
+
+	private boolean isWhitelisted(String path) {
+		log.info("path: {}", path);
+		return WHITELIST.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
+	}
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -31,7 +46,7 @@ public class JwtFilter extends GenericFilter {
 		String token = resolveToken((HttpServletRequest)request);
 		String path = ((HttpServletRequest)request).getRequestURI();
 
-		if (path.equals("/api/v1/sign-in") || path.equals("/redirect") || path.startsWith("/h2-console")) {
+		if (isWhitelisted(path)) {
 			chain.doFilter(request, response);
 			return;
 		}
