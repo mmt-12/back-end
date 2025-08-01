@@ -1,5 +1,7 @@
 package com.memento.server.docs.voice;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -15,6 +17,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -30,6 +33,7 @@ import com.memento.server.api.controller.voice.VoiceController;
 import com.memento.server.api.controller.voice.dto.request.VoiceCreateRequest;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
+import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
 import com.memento.server.docs.RestDocsSupport;
@@ -74,7 +78,7 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
-					parameterWithName("groupId").description("보이스를 생성할 그룹 ID")
+					parameterWithName("groupId").description("그룹 ID")
 				),
 				requestParts(
 					partWithName("data").description("보이스 생성 요청 본문 (JSON)"),
@@ -125,7 +129,7 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
-					parameterWithName("groupId").description("보이스를 조회할 그룹 ID")
+					parameterWithName("groupId").description("그룹 ID")
 				),
 				queryParameters(
 					parameterWithName("cursor").description("현재 페이지의 마지막 보이스 ID (첫 페이지는 null)").optional(),
@@ -143,6 +147,30 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("size").description("요청한 보이스 수"),
 					fieldWithPath("nextCursor").description("다음 페이지 커서 (더 불러올 보이스가 있을 경우)"),
 					fieldWithPath("hasNext").description("다음 페이지 존재 여부")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("등록된 보이스를 삭제한다.")
+	void removeVoice() throws Exception {
+		// given
+		Long groupId = 1L;
+		Long voiceId = 1L;
+
+		doNothing().when(voiceService).removeVoice(any(VoiceRemoveRequest.class));
+
+		// when && then
+		mockMvc.perform(
+				delete("/api/v1/groups/{groupId}/voices/{voiceId}", groupId, voiceId))
+			.andDo(print())
+			.andExpect(status().isNoContent())
+			.andDo(document("voice-remove",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("groupId").description("그룹 ID"),
+					parameterWithName("voiceId").description("삭제할 보이스 ID")
 				)
 			));
 	}

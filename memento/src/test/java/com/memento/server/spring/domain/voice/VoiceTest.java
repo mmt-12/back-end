@@ -1,4 +1,4 @@
-package com.memento.server.domain.voice;
+package com.memento.server.spring.domain.voice;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.voice.Voice;
 import com.memento.server.fixture.associate.AssociateFixtures;
 
 public class VoiceTest {

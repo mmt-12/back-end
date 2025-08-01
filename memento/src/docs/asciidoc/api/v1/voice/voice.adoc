@@ -7,10 +7,13 @@
 ==== HTTP Request
 include::{snippets}/voice-create/http-request.adoc[]
 
-==== HTTP Request Parts
+==== Path Parameters
+include::{snippets}/voice-create/path-parameters.adoc[]
+
+==== Request Parts
 include::{snippets}/voice-create/request-parts.adoc[]
 
-==== HTTP data Fields
+==== Request Part Fields
 include::{snippets}/voice-create/request-part-data-fields.adoc[]
 
 ==== HTTP Response
@@ -24,8 +27,25 @@ include::{snippets}/voice-create/http-response.adoc[]
 ==== HTTP Request
 include::{snippets}/voice-get/http-request.adoc[]
 
+==== Path Parameters
+include::{snippets}/voice-get/path-parameters.adoc[]
+
 ==== HTTP Response
 include::{snippets}/voice-get/http-response.adoc[]
 include::{snippets}/voice-get/response-fields.adoc[]
+
+'''
+
+[[Voice-Remove-API]]
+=== Voice Remove API (보이스 삭제)
+
+==== HTTP Request
+include::{snippets}/voice-remove/http-request.adoc[]
+
+==== Path Parameters
+include::{snippets}/voice-remove/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/voice-remove/http-response.adoc[]
 
 '''

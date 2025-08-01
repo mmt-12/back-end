@@ -1,7 +1,10 @@
 package com.memento.server.spring.api.controller.voice;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -14,6 +17,7 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import com.memento.server.api.controller.voice.dto.request.VoiceCreateRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
+import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
 import com.memento.server.fixture.voice.VoiceFixtures;
@@ -197,5 +201,21 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("$.size").value(response.size()))
 			.andExpect(jsonPath("$.nextCursor").value(response.nextCursor()))
 			.andExpect(jsonPath("$.hasNext").value(response.hasNext()));
+	}
+
+	@Test
+	@DisplayName("등록된 보이스를 삭제한다.")
+	void removeVoice() throws Exception {
+		// given
+		Long groupId = 1L;
+		Long voiceId = 1L;
+
+		doNothing().when(voiceService).removeVoice(any(VoiceRemoveRequest.class));
+
+		// when && then
+		mockMvc.perform(
+				delete("/api/v1/groups/{groupId}/voices/{voiceId}", groupId, voiceId))
+			.andDo(print())
+			.andExpect(status().isNoContent());
 	}
 }

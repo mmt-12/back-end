@@ -1,13 +1,40 @@
 ifndef::snippets[]
 :snippets: ../../build/generated-snippets
 endif::[]
-= Memento REST API 문서
+= REST API Reference
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
 :toc: left
 :toclevels: 2
 :sectlinks:
+
+== Introduction
+본 문서는 시스템에서 제공하는 전체 REST API에 대해 기술합니다.
+각 API는 아래의 세부 목차로 구성되어 있습니다.
+
+[cols="2,9", options="header"]
+|===
+| 구분 | 설명
+
+| *HTTP Request*
+| API 호출 시 사용되는 HTTP 메서드, URL, 헤더 등을 포함한 전체 요청 정보를 기술합니다.
+
+| *Path Parameters*
+| URL 경로에 포함되는 변수 값(`{groupId}`, `{voiceId}` 등)에 대해 설명합니다.
+
+| *Request Parts*
+| `multipart/form-data` 형식의 요청에서 사용하는 각 Part(`data`, `voice` 등)의 명칭과 용도를 설명합니다.
+
+| *Request Part Fields*
+| multipart part 중 JSON 데이터(`data`)로 전달되는 필드들(`name`, `title` 등)의 제약 조건과 타입을 설명합니다.
+
+| *HTTP Response*
+| 요청 결과로 반환되는 응답 메시지의 전체 구조(HTTP 상태 코드, 바디 등)를 설명합니다.
+
+| *Response Fields*
+| 응답 메시지에서 JSON 페이로드에 포함된 필드의 구조 및 의미를 설명합니다.
+|===
 
 [[Voice-API]]
 include::api/v1/voice/voice.adoc[]
