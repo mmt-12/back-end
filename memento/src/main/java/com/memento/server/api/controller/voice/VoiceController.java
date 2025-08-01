@@ -3,6 +3,7 @@ package com.memento.server.api.controller.voice;
 import static org.springframework.http.HttpStatus.*;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.memento.server.api.controller.voice.dto.request.VoiceCreateRequest;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
+import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 
 import jakarta.validation.Valid;
@@ -43,5 +45,13 @@ public class VoiceController {
 		@RequestParam(required = false, defaultValue = "10") int size,
 		@RequestParam(required = false) String keyword) {
 		return ResponseEntity.ok(voiceService.getVoices(VoiceListQueryRequest.of(groupId, cursor, size, keyword)));
+	}
+
+	@DeleteMapping("/{voiceId}")
+	public ResponseEntity<Void> removeVoice(@PathVariable Long groupId, @PathVariable Long voiceId
+		// @AssociateId Long associateId
+		) {
+		voiceService.removeVoice(VoiceRemoveRequest.of(groupId, voiceId));
+		return ResponseEntity.noContent().build();
 	}
 }

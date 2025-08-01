@@ -3,6 +3,7 @@ package com.memento.server.domain.voice;
 import static jakarta.persistence.ConstraintMode.NO_CONSTRAINT;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
+import static java.lang.Boolean.*;
 import static lombok.AccessLevel.PROTECTED;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -50,7 +51,6 @@ public class Voice extends BaseEntity {
 	@JoinColumn(name = "associate_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Associate associate;
 
-	// todo testcode 필요
 	public static Voice createTemporary(String name, String url, Associate associate) {
 		return Voice.builder()
 			.name(name)
@@ -60,7 +60,6 @@ public class Voice extends BaseEntity {
 			.build();
 	}
 
-	// todo testcode 필요
 	public static Voice createPermanent(String name, String url, Associate associate) {
 		return Voice.builder()
 			.name(name)
@@ -68,5 +67,13 @@ public class Voice extends BaseEntity {
 			.isTemporary(false)
 			.associate(associate)
 			.build();
+	}
+
+	public boolean isTemporary() {
+		return isTemporary;
+	}
+
+	public boolean isPermanent() {
+		return FALSE.equals(isTemporary);
 	}
 }
