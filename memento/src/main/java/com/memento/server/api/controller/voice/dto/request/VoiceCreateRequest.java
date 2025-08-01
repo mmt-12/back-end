@@ -11,11 +11,9 @@ import lombok.Builder;
 @Builder
 public record VoiceCreateRequest(
 	@NotBlank(message = "name 값은 필수입니다.")
-	String name,
-	@NotNull(message = "voice는 필수입니다.")
-	MultipartFile voice
+	String name
 ) {
-	public VoiceCreateServiceRequest toServiceRequest() {
+	public VoiceCreateServiceRequest toServiceRequest(MultipartFile voice) {
 		return VoiceCreateServiceRequest.builder()
 			.name(name)
 			.voice(voice)
