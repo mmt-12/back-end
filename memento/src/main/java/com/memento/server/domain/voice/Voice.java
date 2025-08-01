@@ -49,4 +49,24 @@ public class Voice extends BaseEntity {
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "associate_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Associate associate;
+
+	// todo testcode 필요
+	public static Voice createTemporary(String name, String url, Associate associate) {
+		return Voice.builder()
+			.name(name)
+			.url(url)
+			.isTemporary(true)
+			.associate(associate)
+			.build();
+	}
+
+	// todo testcode 필요
+	public static Voice createPermanent(String name, String url, Associate associate) {
+		return Voice.builder()
+			.name(name)
+			.url(url)
+			.isTemporary(false)
+			.associate(associate)
+			.build();
+	}
 }

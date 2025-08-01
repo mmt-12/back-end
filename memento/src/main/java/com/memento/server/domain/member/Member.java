@@ -11,13 +11,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,4 +45,14 @@ public class Member extends BaseEntity {
 
 	@Column(name = "kakao_id", nullable = false)
 	private Long kakaoId;
+
+	// todo test code 필요
+	public static Member create(String name, String email, LocalDate brithday, Long kakaoId) {
+		return Member.builder()
+			.name(name)
+			.email(email)
+			.brithday(brithday)
+			.kakaoId(kakaoId)
+			.build();
+	}
 }

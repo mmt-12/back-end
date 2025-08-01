@@ -5,6 +5,8 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
+import java.time.LocalDate;
+
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.memento.server.common.BaseEntity;
@@ -43,4 +45,12 @@ public class Community extends BaseEntity {
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Member member;
+
+	// todo test code 필요
+	public static Community create(String name, Member member) {
+		return Community.builder()
+			.name(name)
+			.member(member)
+			.build();
+	}
 }

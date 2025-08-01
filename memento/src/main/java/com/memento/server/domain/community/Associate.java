@@ -48,6 +48,7 @@ public class Associate extends BaseEntity {
 	@Column(name = "introduction", length = 255, nullable = true)
 	private String introduction;
 
+	// todo 업적이 associate과 one to one이 맞는가? 말이 안되버린다...
 	@OneToOne(fetch = LAZY)
 	@JoinColumn(name = "achievement_id", nullable = true, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Achievement achievement;
@@ -59,4 +60,17 @@ public class Associate extends BaseEntity {
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "community_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Community community;
+
+	// todo test code 필요
+	public static Associate create(String nickname, String profileImageUrl, String introduction,
+		Achievement achievement, Member member, Community community) {
+		return Associate.builder()
+			.nickname(nickname)
+			.profileImageUrl(profileImageUrl)
+			.introduction(introduction)
+			.achievement(achievement)
+			.member(member)
+			.community(community)
+			.build();
+	}
 }

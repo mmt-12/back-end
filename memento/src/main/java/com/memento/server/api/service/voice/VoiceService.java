@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.memento.server.api.service.voice.dto.request.VoiceCreateServiceRequest;
+import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
+import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.domain.voice.VoiceRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -17,5 +19,9 @@ public class VoiceService {
 
 	public void createVoice(VoiceCreateServiceRequest request) {
 
+	}
+
+	public VoiceListResponse getVoices(VoiceListQueryRequest request) {
+		return null;
 	}
 }

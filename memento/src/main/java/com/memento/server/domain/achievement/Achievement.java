@@ -36,4 +36,12 @@ public class Achievement extends BaseEntity {
 
 	@Column(name = "criteria", length = 255, nullable = false)
 	private String criteria;
+
+	// todo test code 필요
+	public static Achievement create(String name, String criteria) {
+		return Achievement.builder()
+			.name(name)
+			.criteria(criteria)
+			.build();
+	}
 }
