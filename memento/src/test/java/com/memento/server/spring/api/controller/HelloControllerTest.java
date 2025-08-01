@@ -1,6 +1,7 @@
 package com.memento.server.spring.api.controller;
 
 import static org.springframework.http.MediaType.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -11,11 +12,13 @@ import org.junit.jupiter.api.Test;
 
 import com.memento.server.hello.HelloRequest;
 import com.memento.server.spring.ControllerTestSupport;
+import com.memento.server.spring.WithMockCustomUser;
 
 class HelloControllerTest extends ControllerTestSupport {
 
 	@Test
 	@DisplayName("테스트 API")
+	@WithMockCustomUser
 	void helloTest() throws Exception {
 		// given
 		HelloRequest request = HelloRequest.builder()
