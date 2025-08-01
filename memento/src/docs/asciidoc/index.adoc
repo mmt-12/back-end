@@ -87,7 +87,6 @@ include::api/v1/profileImage/profileImage-read.adoc[]
 include::api/v1/profileImage/profileImage-create.adoc[]
 include::api/v1/profileImage/profileImage-delete.adoc[]
 
-
 [[Post-API]]
 == Post API
 
