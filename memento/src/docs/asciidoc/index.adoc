@@ -36,16 +36,6 @@ endif::[]
 | 응답 메시지에서 JSON 페이로드에 포함된 필드의 구조 및 의미를 설명합니다.
 |===
 
-[[Post-API]]
-== Post API
-
-include::api/v1/post/post-read.adoc[]
-include::api/v1/post/post-read-all.adoc[]
-include::api/v1/post/post-create.adoc[]
-include::api/v1/post/post-update.adoc[]
-include::api/v1/post/post-delete.adoc[]
-
-=======
 [[Auth-API]]
 == Auth API
 

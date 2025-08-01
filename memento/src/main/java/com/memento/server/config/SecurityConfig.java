@@ -16,7 +16,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.memento.server.config.filter.JwtFilter;
 import com.memento.server.service.auth.jwt.JwtTokenProvider;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -37,6 +36,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests(authorize -> authorize
 				.requestMatchers(PathRequest.toH2Console()).permitAll()
 				.requestMatchers("/api/v1/sign-in", "/redirect").permitAll()
+				.requestMatchers("/error").permitAll()
 				.anyRequest().authenticated())
 			.addFilterBefore(new JwtFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
 			.cors(Customizer.withDefaults())
