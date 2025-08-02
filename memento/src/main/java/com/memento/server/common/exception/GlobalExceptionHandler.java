@@ -100,6 +100,6 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleException(Exception e) {
 		log.error("Unhandled Exception 발생: {}", e.getMessage(), e);
 		return ResponseEntity.internalServerError()
-			.body(ErrorResponse.of(SERVER_ERROR));
+			.body(ErrorResponse.of(INTERNAL_SERVER_ERROR));
 	}
 }

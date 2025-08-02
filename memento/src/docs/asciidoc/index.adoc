@@ -38,3 +38,6 @@ endif::[]
 
 [[Voice-API]]
 include::api/v1/voice/voice.adoc[]
+
+[[Emoji-API]]
+include::api/v1/emoji/emoji.adoc[]

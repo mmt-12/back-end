@@ -47,5 +47,3 @@ include::{snippets}/voice-remove/path-parameters.adoc[]
 
 ==== HTTP Response
 include::{snippets}/voice-remove/http-response.adoc[]
-
-'''
