@@ -179,6 +179,33 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
+	@DisplayName("보이스를 등록할 때, data는 필수값이다.")
+	void createVoiceWithoutData() throws Exception {
+		// given
+		long groupId = 1L;
+
+		MockMultipartFile voice = new MockMultipartFile(
+			"voice",
+			"voice.wav",
+			"audio/wav",
+			"dummy-audio-content".getBytes()
+		);
+
+		// when & then
+		mockMvc.perform(
+				multipart("/api/v1/groups/{groupId}/voices", groupId)
+					.file(voice)
+					.contentType(MULTIPART_FORM_DATA))
+			.andDo(print())
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+			.andExpect(jsonPath("$.code").value(1002))
+			.andExpect(jsonPath("$.message").value("필수 요청 part 누락"))
+			.andExpect(jsonPath("$.errors[0].field").value("data"))
+			.andExpect(jsonPath("$.errors[0].message").value("data은(는) 필수입니다."));
+	}
+
+	@Test
 	@DisplayName("보이스를 등록할 때, voice는 필수값이다.")
 	void createVoiceWithoutVoice() throws Exception {
 		// given
