@@ -8,6 +8,7 @@ public record KakaoOpenIdPayload(
 	String sub,
 	Integer iat,
 	Integer exp,
-	@JsonProperty("auth_time") Integer authTime
+	@JsonProperty("auth_time") Integer authTime,
+	String email
 ) {
 }

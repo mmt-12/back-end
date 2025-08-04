@@ -1,9 +1,11 @@
 package com.memento.server.domain.member;
 
-import static jakarta.persistence.GenerationType.*;
+import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 import java.time.LocalDate;
+
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.memento.server.common.BaseEntity;
 
@@ -13,9 +15,6 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
