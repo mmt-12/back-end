@@ -3,11 +3,16 @@
 
 ==== HTTP Request
 
-include::{snippets}/auth-redirect-test/http-request.adoc[]
+include::{snippets}/auth-redirect-test-guest/http-request.adoc[]
 
 NOTE: 요청이 필요하지 않습니다.
 
-==== HTTP Response
+==== HTTP Response - 미가입자
 
-include::{snippets}/auth-redirect-test/http-response.adoc[]
-include::{snippets}/auth-redirect-test/response-fields.adoc[]
+include::{snippets}/auth-redirect-test-guest/http-response.adoc[]
+include::{snippets}/auth-redirect-test-guest/response-fields.adoc[]
+
+==== HTTP Response - 가입자
+
+include::{snippets}/auth-redirect-test-member/http-response.adoc[]
+include::{snippets}/auth-redirect-test-member/response-fields.adoc[]
