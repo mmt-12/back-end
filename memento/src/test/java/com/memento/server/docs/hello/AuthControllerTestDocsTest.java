@@ -23,6 +23,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.memento.server.controller.auth.AuthController;
+import com.memento.server.controller.auth.AuthGuestResponse;
+import com.memento.server.controller.auth.AuthMemberResponse;
 import com.memento.server.controller.auth.AuthResponse;
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.service.auth.AuthService;
@@ -54,8 +56,45 @@ public class AuthControllerTestDocsTest extends RestDocsSupport {
 	}
 
 	@Test
-	@DisplayName("카카오 인가 코드 콜백 처리")
-	void handleRedirect() throws Exception {
+	@DisplayName("카카오 인가 코드 콜백 처리 | 미가입자")
+	void handleRedirectWithGuest() throws Exception {
+		// given
+		JwtToken jwtToken = JwtToken.builder()
+			.grantType("Bearer")
+			.accessToken("access-token-123")
+			.accessTokenExpiresAt(new Date())
+			.build();
+		AuthResponse authResponse = new AuthGuestResponse(123L, "email@naver.com", jwtToken);
+
+		when(authService.handleAuthorizationCallback("code123"))
+			.thenReturn(ResponseEntity.status(HttpStatus.OK).body(authResponse));
+
+		// when & then
+		mockMvc.perform(get("/redirect")
+				.param("code", "code123"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.kakaoId").value(123L))
+			.andExpect(jsonPath("$.email").value("email@naver.com"))
+			.andExpect(jsonPath("$.token.grantType").value("Bearer"))
+			.andExpect(jsonPath("$.token.accessToken").value("access-token-123"))
+			.andDo(document("auth-redirect-test-guest",
+				preprocessResponse(prettyPrint()),
+				responseFields(
+					fieldWithPath("kakaoId").description("카카오 아이디"),
+					fieldWithPath("email").description("카카오 이메일"),
+					subsectionWithPath("token").description("JWT 토큰 정보"),
+					fieldWithPath("token.grantType").description("토큰 타입"),
+					fieldWithPath("token.accessToken").description("액세스 토큰"),
+					fieldWithPath("token.accessTokenExpiresAt").description("액세스 토큰 만료 시각"),
+					fieldWithPath("token.refreshToken").description("리프레시 토큰"),
+					fieldWithPath("token.refreshTokenExpiresAt").description("리프레시 토큰 만료 시각")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("카카오 인가 코드 콜백 처리 | 가입자")
+	void handleRedirectWithMember() throws Exception {
 		// given
 		JwtToken jwtToken = JwtToken.builder()
 			.grantType("Bearer")
@@ -64,7 +103,7 @@ public class AuthControllerTestDocsTest extends RestDocsSupport {
 			.refreshToken("refresh-token-456")
 			.refreshTokenExpiresAt(new Date())
 			.build();
-		AuthResponse authResponse = new AuthResponse(123L, "name", jwtToken);
+		AuthResponse authResponse = new AuthMemberResponse(123L, "name", jwtToken);
 
 		when(authService.handleAuthorizationCallback("code123"))
 			.thenReturn(ResponseEntity.status(HttpStatus.OK).body(authResponse));
@@ -78,7 +117,7 @@ public class AuthControllerTestDocsTest extends RestDocsSupport {
 			.andExpect(jsonPath("$.token.grantType").value("Bearer"))
 			.andExpect(jsonPath("$.token.accessToken").value("access-token-123"))
 			.andExpect(jsonPath("$.token.refreshToken").value("refresh-token-456"))
-			.andDo(document("auth-redirect-test",
+			.andDo(document("auth-redirect-test-member",
 				preprocessResponse(prettyPrint()),
 				responseFields(
 					fieldWithPath("memberId").description("사용자 ID"),
