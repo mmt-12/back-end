@@ -17,7 +17,7 @@ public class MemberService {
 
 	private final MemberRepository memberRepository;
 
-	public Optional<Member> findMemberWithKakaoId(String kakaoId) {
+	public Optional<Member> findMemberWithKakaoId(Long kakaoId) {
 		return memberRepository.findByKakaoId(kakaoId);
 	}
 }
