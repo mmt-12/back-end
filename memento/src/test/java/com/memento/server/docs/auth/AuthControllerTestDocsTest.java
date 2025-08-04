@@ -1,4 +1,4 @@
-package com.memento.server.docs.hello;
+package com.memento.server.docs.auth;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
