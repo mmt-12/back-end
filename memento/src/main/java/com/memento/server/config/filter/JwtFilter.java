@@ -18,6 +18,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,25 +30,35 @@ public class JwtFilter extends GenericFilter {
 	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
 	private static final List<String> WHITELIST = List.of(
+		"/favicon.ico",
 		"/api/v1/sign-in",
 		"/redirect",
-		"/h2-console/**",
-		"/error"
+		"/error",
+		"/h2-console/**"
 	);
 
 	private boolean isWhitelisted(String path) {
-		log.info("path: {}", path);
 		return WHITELIST.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
 	}
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
 		throws IOException, ServletException {
-		String token = resolveToken((HttpServletRequest)request);
-		String path = ((HttpServletRequest)request).getRequestURI();
+		HttpServletRequest request = (HttpServletRequest)req;
+		HttpServletResponse response = (HttpServletResponse)res;
+		String token = resolveToken(request);
+		String path = request.getRequestURI();
 
 		if (isWhitelisted(path)) {
 			chain.doFilter(request, response);
+			return;
+		}
+
+		if (path.contains(".well-known") || path.contains("com.chrome.devtools.json")) {
+			response.setStatus(HttpServletResponse.SC_OK);
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().write("{\"status\": \"ok\", \"message\": \"Chrome DevTools auto request ignored\"}");
 			return;
 		}
 

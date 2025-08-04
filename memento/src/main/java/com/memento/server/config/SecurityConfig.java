@@ -35,6 +35,7 @@ public class SecurityConfig {
 			.sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
 			.authorizeHttpRequests(authorize -> authorize
 				.requestMatchers(PathRequest.toH2Console()).permitAll()
+				.requestMatchers("/favicon.ico").permitAll()
 				.requestMatchers("/api/v1/sign-in", "/redirect").permitAll()
 				.requestMatchers("/error").permitAll()
 				.anyRequest().authenticated())
