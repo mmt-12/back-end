@@ -1,0 +1,11 @@
+[[member-update-test]]
+=== 회원 정보 수정
+
+==== HTTP Request
+
+include::{snippets}/member-update-test/http-request.adoc[]
+include::{snippets}/member-update-test/request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/member-update-test/http-response.adoc[]
