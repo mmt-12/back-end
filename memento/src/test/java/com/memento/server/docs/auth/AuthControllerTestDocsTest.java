@@ -19,8 +19,6 @@ import java.util.Date;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import com.memento.server.controller.auth.AuthController;
 import com.memento.server.controller.auth.AuthGuestResponse;
@@ -66,8 +64,7 @@ public class AuthControllerTestDocsTest extends RestDocsSupport {
 			.build();
 		AuthResponse authResponse = new AuthGuestResponse(123L, "email@naver.com", jwtToken);
 
-		when(authService.handleAuthorizationCallback("code123"))
-			.thenReturn(ResponseEntity.status(HttpStatus.OK).body(authResponse));
+		when(authService.handleAuthorizationCallback("code123")).thenReturn(authResponse);
 
 		// when & then
 		mockMvc.perform(get("/redirect")
@@ -105,8 +102,7 @@ public class AuthControllerTestDocsTest extends RestDocsSupport {
 			.build();
 		AuthResponse authResponse = new AuthMemberResponse(123L, "name", jwtToken);
 
-		when(authService.handleAuthorizationCallback("code123"))
-			.thenReturn(ResponseEntity.status(HttpStatus.OK).body(authResponse));
+		when(authService.handleAuthorizationCallback("code123")).thenReturn(authResponse);
 
 		// when & then
 		mockMvc.perform(get("/redirect")
