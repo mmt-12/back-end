@@ -7,7 +7,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.memento.server.controller.member.SignUpResponse;
+import com.memento.server.controller.member.MemberSignUpResponse;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
 import com.memento.server.service.auth.jwt.JwtToken;
@@ -28,7 +28,7 @@ public class MemberService {
 		return memberRepository.findByKakaoId(kakaoId);
 	}
 
-	public SignUpResponse signUp(Long kakaoId, String name, String email, LocalDate birthday) {
+	public MemberSignUpResponse signUp(Long kakaoId, String name, String email, LocalDate birthday) {
 		Optional<Member> memberOptional = memberRepository.findByKakaoId(kakaoId);
 
 		if (memberOptional.isPresent()) {
@@ -44,7 +44,7 @@ public class MemberService {
 
 		MemberClaim memberClaim = MemberClaim.builder().memberId(member.getId()).build();
 		JwtToken token = jwtTokenProvider.createToken(memberClaim);
-		return SignUpResponse.builder()
+		return MemberSignUpResponse.builder()
 			.memberId(member.getId())
 			.name(member.getName())
 			.token(token)
