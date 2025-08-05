@@ -74,7 +74,6 @@ public class AssociateControllerTestDocsTest extends RestDocsSupport {
 				.param("keyword", "")
 				.param("cursor", "")
 				.param("size", ""))
-			.andDo(print())
 			.andExpect(status().isOk())
 			.andDo(document("associate-list-test",
 				preprocessRequest(prettyPrint()),
