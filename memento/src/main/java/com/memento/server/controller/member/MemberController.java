@@ -2,6 +2,7 @@ package com.memento.server.controller.member;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,5 +23,11 @@ public class MemberController {
 	public ResponseEntity<SignUpResponse> signUp(@MemberId Long kakaoId, @RequestBody SignUpRequest signUpRequest) {
 		return ResponseEntity.ok(
 			memberService.signUp(kakaoId, signUpRequest.name(), signUpRequest.email(), signUpRequest.birthday()));
+	}
+
+	@PutMapping
+	public ResponseEntity<Void> update(@MemberId Long memberId, @RequestBody MemberUpdateRequest request) {
+		memberService.update(memberId, request.name(), request.email());
+		return ResponseEntity.ok().build();
 	}
 }

@@ -1,6 +1,7 @@
 package com.memento.server.docs.member;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -14,17 +15,21 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
 import com.memento.server.controller.member.MemberController;
+import com.memento.server.controller.member.MemberUpdateRequest;
 import com.memento.server.controller.member.SignUpRequest;
 import com.memento.server.controller.member.SignUpResponse;
 import com.memento.server.docs.RestDocsSupport;
@@ -83,6 +88,32 @@ public class MemberControllerTestDocsTest extends RestDocsSupport {
 					fieldWithPath("token.accessTokenExpiresAt").description("액세스 토큰 만료 시각"),
 					fieldWithPath("token.refreshToken").description("리프레시 토큰"),
 					fieldWithPath("token.refreshTokenExpiresAt").description("리프레시 토큰 만료 시각")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("회원 정보 수정")
+	void update() throws Exception {
+		// given
+		setAuthentication(1L, null, null);
+		MemberUpdateRequest request = MemberUpdateRequest.builder()
+			.name("name2")
+			.email("email2@naver.com")
+			.build();
+		doNothing().when(memberService).update(any(), any(), any());
+
+		// when & then
+		mockMvc.perform(put("/api/v1/members")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andDo(document("member-update-test",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestFields(
+					fieldWithPath("name").type(STRING).description("이름"),
+					fieldWithPath("email").type(STRING).description("이메일")
 				)
 			));
 	}
