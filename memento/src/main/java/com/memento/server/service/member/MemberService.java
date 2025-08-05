@@ -50,4 +50,7 @@ public class MemberService {
 			.token(token)
 			.build();
 	}
+
+	public void update(Long memberId, String name, String email) {
+	}
 }
