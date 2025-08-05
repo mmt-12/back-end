@@ -8,14 +8,14 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import com.memento.server.annotation.MemberId;
+import com.memento.server.annotation.AssociateId;
 import com.memento.server.service.auth.MemberPrincipal;
 
 public class AssociateIdArgumentResolver implements HandlerMethodArgumentResolver {
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
-		return parameter.hasParameterAnnotation(MemberId.class) &&
+		return parameter.hasParameterAnnotation(AssociateId.class) &&
 			parameter.getParameterType().equals(Long.class);
 	}
 
