@@ -62,9 +62,9 @@ public class AuthControllerTestDocsTest extends RestDocsSupport {
 			.accessToken("access-token-123")
 			.accessTokenExpiresAt(new Date())
 			.build();
-		AuthResponse authResponse = new AuthGuestResponse(123L, "email@naver.com", jwtToken);
+		AuthResponse response = new AuthGuestResponse(123L, "email@naver.com", jwtToken);
 
-		when(authService.handleAuthorizationCallback("code123")).thenReturn(authResponse);
+		when(authService.handleAuthorizationCallback("code123")).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(get("/redirect")
@@ -100,9 +100,9 @@ public class AuthControllerTestDocsTest extends RestDocsSupport {
 			.refreshToken("refresh-token-456")
 			.refreshTokenExpiresAt(new Date())
 			.build();
-		AuthResponse authResponse = new AuthMemberResponse(123L, "name", jwtToken);
+		AuthResponse response = new AuthMemberResponse(123L, "name", jwtToken);
 
-		when(authService.handleAuthorizationCallback("code123")).thenReturn(authResponse);
+		when(authService.handleAuthorizationCallback("code123")).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(get("/redirect")

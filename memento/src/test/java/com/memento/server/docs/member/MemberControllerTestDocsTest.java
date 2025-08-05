@@ -21,17 +21,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDate;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
 import com.memento.server.controller.member.MemberController;
+import com.memento.server.controller.member.MemberSignUpRequest;
+import com.memento.server.controller.member.MemberSignUpResponse;
 import com.memento.server.controller.member.MemberUpdateRequest;
-import com.memento.server.controller.member.SignUpRequest;
-import com.memento.server.controller.member.SignUpResponse;
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.service.auth.jwt.JwtToken;
 import com.memento.server.service.member.MemberService;
@@ -50,7 +48,8 @@ public class MemberControllerTestDocsTest extends RestDocsSupport {
 	void signUp() throws Exception {
 		// given
 		setAuthentication(1L, null, null);
-		SignUpRequest signUpRequest = new SignUpRequest("name", "email@naver.com", LocalDate.of(2025, 8, 4));
+		MemberSignUpRequest request = new MemberSignUpRequest("name", "email@naver.com",
+			LocalDate.of(2025, 8, 4));
 		JwtToken jwtToken = JwtToken.builder()
 			.grantType("Bearer")
 			.accessToken("access-token-123")
@@ -58,13 +57,13 @@ public class MemberControllerTestDocsTest extends RestDocsSupport {
 			.refreshToken("refresh-token-456")
 			.refreshTokenExpiresAt(new Date())
 			.build();
-		SignUpResponse signUpResponse = new SignUpResponse(1L, "name", jwtToken);
-		when(memberService.signUp(any(), any(), any(), any())).thenReturn(signUpResponse);
+		MemberSignUpResponse response = new MemberSignUpResponse(1L, "name", jwtToken);
+		when(memberService.signUp(any(), any(), any(), any())).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(post("/api/v1/members")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(signUpRequest)))
+				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.memberId").value(1L))
 			.andExpect(jsonPath("$.name").value("name"))

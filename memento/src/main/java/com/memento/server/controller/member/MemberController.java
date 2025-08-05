@@ -20,9 +20,10 @@ public class MemberController {
 	private final MemberService memberService;
 
 	@PostMapping
-	public ResponseEntity<SignUpResponse> signUp(@MemberId Long kakaoId, @RequestBody SignUpRequest signUpRequest) {
+	public ResponseEntity<MemberSignUpResponse> signUp(@MemberId Long kakaoId,
+		@RequestBody MemberSignUpRequest request) {
 		return ResponseEntity.ok(
-			memberService.signUp(kakaoId, signUpRequest.name(), signUpRequest.email(), signUpRequest.birthday()));
+			memberService.signUp(kakaoId, request.name(), request.email(), request.birthday()));
 	}
 
 	@PutMapping

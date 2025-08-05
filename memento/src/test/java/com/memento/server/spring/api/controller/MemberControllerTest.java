@@ -17,8 +17,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.memento.server.controller.member.MemberController;
-import com.memento.server.controller.member.SignUpRequest;
-import com.memento.server.controller.member.SignUpResponse;
+import com.memento.server.controller.member.MemberSignUpRequest;
+import com.memento.server.controller.member.MemberSignUpResponse;
 import com.memento.server.service.auth.jwt.JwtToken;
 import com.memento.server.service.member.MemberService;
 import com.memento.server.spring.ControllerTestSupport;
@@ -35,7 +35,7 @@ public class MemberControllerTest extends ControllerTestSupport {
 	@DisplayName("회원가입 API 파라미터 매핑 테스트")
 	void signup() throws Exception {
 		// given
-		SignUpRequest request = SignUpRequest.builder()
+		MemberSignUpRequest request = MemberSignUpRequest.builder()
 			.name("name")
 			.email("email@naver.com")
 			.birthday(LocalDate.of(2025, 8, 4))
@@ -47,9 +47,9 @@ public class MemberControllerTest extends ControllerTestSupport {
 			.refreshToken("refresh-token-456")
 			.refreshTokenExpiresAt(new Date())
 			.build();
-		SignUpResponse signUpResponse = new SignUpResponse(1L, "name", jwtToken);
+		MemberSignUpResponse memberSignUpResponse = new MemberSignUpResponse(1L, "name", jwtToken);
 
-		when(memberService.signUp(any(), any(), any(), any())).thenReturn(signUpResponse);
+		when(memberService.signUp(any(), any(), any(), any())).thenReturn(memberSignUpResponse);
 
 		// when && then
 		mockMvc.perform(
