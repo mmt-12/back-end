@@ -15,7 +15,7 @@ import com.memento.server.service.auth.jwt.MemberClaim;
 import com.memento.server.spring.config.TestSecurityConfig;
 
 @WebMvcTest({
-	HelloController.class,
+	HelloController.class
 })
 @Import({TestSecurityConfig.class, JwtTokenProvider.class})
 @EnableConfigurationProperties(JwtProperties.class)

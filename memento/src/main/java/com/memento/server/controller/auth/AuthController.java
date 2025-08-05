@@ -24,6 +24,6 @@ public class AuthController {
 
 	@GetMapping("/redirect")
 	public ResponseEntity<AuthResponse> handleRedirect(@RequestParam String code) {
-		return authService.handleAuthorizationCallback(code);
+		return ResponseEntity.ok(authService.handleAuthorizationCallback(code));
 	}
 }

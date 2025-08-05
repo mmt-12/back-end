@@ -1,6 +1,5 @@
 package com.memento.server.service.auth;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.memento.server.client.oauth.KakaoClient;
@@ -30,21 +29,35 @@ public class AuthService {
 		return kakaoClient.getAuthUrl();
 	}
 
-	public ResponseEntity<AuthResponse> handleAuthorizationCallback(String code) {
+	public AuthResponse handleAuthorizationCallback(String code) {
 		KakaoToken kakaoToken = kakaoClient.getKakaoToken(code);
 		KakaoOpenIdPayload openIdPayload = kakaoOpenIdDecoder.validateOpenIdToken(kakaoToken.idToken());
-		Long openId = Long.parseLong(openIdPayload.sub());
+		Long kakaoId = Long.parseLong(openIdPayload.sub());
 
-		return memberService.findMemberWithKakaoId(openId)
-			.<ResponseEntity<AuthResponse>>map(member -> {
-				MemberClaim memberClaim = MemberClaim.builder().memberId(member.getId()).build();
+		return memberService.findMemberWithKakaoId(kakaoId)
+			.<AuthResponse>map(member -> {
+				MemberClaim memberClaim = MemberClaim.builder()
+					.memberId(member.getId())
+					.build();
 				JwtToken token = jwtTokenProvider.createToken(memberClaim);
-				return ResponseEntity.ok(new AuthMemberResponse(member.getId(), member.getName(), token));
+
+				return AuthMemberResponse.builder()
+					.memberId(member.getId())
+					.name(member.getName())
+					.token(token)
+					.build();
 			})
 			.orElseGet(() -> {
-				MemberClaim memberClaim = MemberClaim.builder().memberId(openId).build();
+				MemberClaim memberClaim = MemberClaim.builder()
+					.memberId(kakaoId)
+					.build();
 				JwtToken token = jwtTokenProvider.createTempToken(memberClaim);
-				return ResponseEntity.ok(new AuthGuestResponse(openId, openIdPayload.email(), token));
+
+				return AuthGuestResponse.builder()
+					.kakaoId(kakaoId)
+					.email(openIdPayload.email())
+					.token(token)
+					.build();
 			});
 	}
 }
