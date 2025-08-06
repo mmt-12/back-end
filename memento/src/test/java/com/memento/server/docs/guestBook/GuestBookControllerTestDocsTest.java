@@ -40,7 +40,7 @@ import com.memento.server.domain.guestBook.GuestBookType;
 
 public class GuestBookControllerTestDocsTest extends RestDocsSupport {
 
-	public static final String PATH = "/api/v1/groups/{groupId}/associates/{associateId}/guest-books";
+	public static final String PATH = "/api/v1/groups/{communityId}/associates/{associateId}/guest-books";
 	public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
 	@Override
@@ -52,7 +52,7 @@ public class GuestBookControllerTestDocsTest extends RestDocsSupport {
 	@DisplayName("텍스트 방명록 생성")
 	void createTextTest() throws Exception {
 		// given
-		Long groupId = 1L;
+		Long communityId = 1L;
 		Long associateId = 1L;
 
 		CreateGuestBookRequest request = CreateGuestBookRequest.builder()
@@ -63,7 +63,7 @@ public class GuestBookControllerTestDocsTest extends RestDocsSupport {
 
 		// when & then
 		mockMvc.perform(
-				post(PATH, groupId, associateId)
+				post(PATH, communityId, associateId)
 					.content(objectMapper.writeValueAsString(request))
 					.contentType(APPLICATION_JSON))
 			.andDo(print())

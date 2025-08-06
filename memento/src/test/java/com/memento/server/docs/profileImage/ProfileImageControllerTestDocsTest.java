@@ -32,7 +32,7 @@ import com.memento.server.docs.RestDocsSupport;
 
 public class ProfileImageControllerTestDocsTest extends RestDocsSupport {
 
-	public static final String PATH = "/api/v1/groups/{groupId}/associates/{associateId}/profile-images";
+	public static final String PATH = "/api/v1/groups/{communityId}/associates/{associateId}/profile-images";
 	@Override
 	protected Object initController() {
 		return new ProfileImageController();
@@ -42,7 +42,7 @@ public class ProfileImageControllerTestDocsTest extends RestDocsSupport {
 	@DisplayName("프로필 이미지 등록")
 	void createTest() throws Exception{
 		// given
-		Long groupId = 1L;
+		Long communityId = 1L;
 		Long associateId = 1L;
 
 		MockMultipartFile file = new MockMultipartFile(
@@ -54,7 +54,7 @@ public class ProfileImageControllerTestDocsTest extends RestDocsSupport {
 
 		// when & then
 		mockMvc.perform(
-			multipart(PATH, groupId, associateId)
+			multipart(PATH, communityId, associateId)
 				.file(file)
 				.contentType(MULTIPART_FORM_DATA)
 				.with(request -> {
@@ -76,13 +76,13 @@ public class ProfileImageControllerTestDocsTest extends RestDocsSupport {
 	@DisplayName("프로필 이미지 등록 취소")
 	void deleteTest() throws Exception{
 		// given
-		Long groupId = 1L;
+		Long communityId = 1L;
 		Long associateId = 1L;
 		Long profileImageId = 1L;
 
 		// when & then
 		mockMvc.perform(
-				delete(PATH + "/{profileImageId}", groupId, associateId, profileImageId))
+				delete(PATH + "/{profileImageId}", communityId, associateId, profileImageId))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andDo(document("profileImage-delete-test"));

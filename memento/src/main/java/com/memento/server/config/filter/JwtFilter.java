@@ -8,9 +8,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 
-import com.memento.server.service.auth.MemberPrincipal;
-import com.memento.server.service.auth.jwt.JwtTokenProvider;
-import com.memento.server.service.auth.jwt.MemberClaim;
+import com.memento.server.api.service.auth.MemberPrincipal;
+import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
+import com.memento.server.api.service.auth.jwt.MemberClaim;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.GenericFilter;

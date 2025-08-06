@@ -14,7 +14,7 @@ import com.memento.server.api.controller.mbti.dto.ReadMbtiResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/groups/{groupId}/associates/{associateId}/mbti-tests")
+@RequestMapping("/api/v1/communities/{communityId}/associates/{associateId}/mbti-tests")
 @RequiredArgsConstructor
 public class MbtiController {
 
