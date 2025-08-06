@@ -39,7 +39,7 @@ import com.memento.server.docs.RestDocsSupport;
 
 public class PostControllerTestDocsTest extends RestDocsSupport {
 
-	public static final String PATH = "/api/v1/groups/{groupId}/memories/{memoryId}/posts";
+	public static final String PATH = "/api/v1/communities/{communityId}/memories/{memoryId}/posts";
 	public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
 	@Override

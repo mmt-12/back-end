@@ -27,7 +27,7 @@ import com.memento.server.docs.RestDocsSupport;
 
 public class MbtiControllerTestDocsTest extends RestDocsSupport {
 
-	public static final String PATH = "/api/v1/groups/{communityId}/associates/{associateId}/mbti-tests";
+	public static final String PATH = "/api/v1/communities/{communityId}/associates/{associateId}/mbti-tests";
 
 	@Override
 	protected Object initController() {

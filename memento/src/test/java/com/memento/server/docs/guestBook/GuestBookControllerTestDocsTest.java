@@ -40,7 +40,7 @@ import com.memento.server.domain.guestBook.GuestBookType;
 
 public class GuestBookControllerTestDocsTest extends RestDocsSupport {
 
-	public static final String PATH = "/api/v1/groups/{communityId}/associates/{associateId}/guest-books";
+	public static final String PATH = "/api/v1/communities/{communityId}/associates/{associateId}/guest-books";
 	public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
 	@Override
