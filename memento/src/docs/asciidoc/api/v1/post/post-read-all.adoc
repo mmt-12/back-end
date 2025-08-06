@@ -1,0 +1,10 @@
+[[post-read-all-test]]
+=== 포스트 목록 조회
+
+==== HTTP Request
+include::{snippets}/post-read-all-test/http-request.adoc[]
+NOTE: 요청이 필요하지 않습니다.
+
+==== HTTP Response
+include::{snippets}/post-read-all-test/http-response.adoc[]
+include::{snippets}/post-read-all-test/response-fields.adoc[]

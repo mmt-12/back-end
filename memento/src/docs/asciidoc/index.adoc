@@ -9,11 +9,6 @@ endif::[]
 :toclevels: 2
 :sectlinks:
 
-[[Hello-API]]
-== Hello API
-
-include::api/v1/hello/hello.adoc[]
-
 [[Auth-API]]
 == Auth API
 
@@ -65,7 +60,11 @@ include::api/v1/profileImage/profileImage-read.adoc[]
 include::api/v1/profileImage/profileImage-create.adoc[]
 include::api/v1/profileImage/profileImage-delete.adoc[]
 
+[[Post-API]]
+== Post API
 
-
-
-
+include::api/v1/post/post-read.adoc[]
+include::api/v1/post/post-read-all.adoc[]
+include::api/v1/post/post-create.adoc[]
+include::api/v1/post/post-update.adoc[]
+include::api/v1/post/post-delete.adoc[]
