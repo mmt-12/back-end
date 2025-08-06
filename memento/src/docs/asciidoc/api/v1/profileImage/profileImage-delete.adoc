@@ -1,0 +1,10 @@
+[[profileImage-delete-test]]
+===  프로필 이미지 등록 취소
+
+==== HTTP Request
+include::{snippets}/profileImage-delete-test/http-request.adoc[]
+NOTE: 요청이 필요하지 않습니다.
+
+==== HTTP Response
+include::{snippets}/profileImage-delete-test/http-response.adoc[]
+NOTE: 응답이 존재하지 않습니다.

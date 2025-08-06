@@ -26,13 +26,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
-import com.memento.server.controller.member.MemberController;
-import com.memento.server.controller.member.MemberSignUpRequest;
-import com.memento.server.controller.member.MemberSignUpResponse;
-import com.memento.server.controller.member.MemberUpdateRequest;
+import com.memento.server.api.controller.member.MemberController;
+import com.memento.server.api.controller.member.MemberSignUpRequest;
+import com.memento.server.api.controller.member.MemberSignUpResponse;
+import com.memento.server.api.controller.member.MemberUpdateRequest;
 import com.memento.server.docs.RestDocsSupport;
-import com.memento.server.service.auth.jwt.JwtToken;
-import com.memento.server.service.member.MemberService;
+import com.memento.server.api.service.auth.jwt.JwtToken;
+import com.memento.server.api.service.member.MemberService;
 
 public class MemberControllerTestDocsTest extends RestDocsSupport {
 

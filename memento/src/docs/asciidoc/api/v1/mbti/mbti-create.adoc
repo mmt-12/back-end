@@ -1,0 +1,10 @@
+[[mbti-create-test]]
+===  mbti 등록
+
+==== HTTP Request
+include::{snippets}/mbti-create-test/http-request.adoc[]
+include::{snippets}/mbti-create-test/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/mbti-create-test/http-response.adoc[]
+NOTE: 응답이 존재하지 않습니다.

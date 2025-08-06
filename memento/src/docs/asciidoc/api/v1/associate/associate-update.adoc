@@ -1,0 +1,10 @@
+[[associate-update-test]]
+=== 프로필 수정
+
+==== HTTP Request
+include::{snippets}/associate-update-test/http-request.adoc[]
+include::{snippets}/associate-update-test/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/associate-update-test/http-response.adoc[]
+NOTE: 응답이 존재하지 않습니다.

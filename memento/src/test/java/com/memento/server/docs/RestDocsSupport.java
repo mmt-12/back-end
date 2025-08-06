@@ -18,7 +18,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.memento.server.config.argumentResolver.AssociateIdArgumentResolver;
 import com.memento.server.config.argumentResolver.CommunityIdArgumentResolver;
 import com.memento.server.config.argumentResolver.MemberIdArgumentResolver;
-import com.memento.server.service.auth.MemberPrincipal;
+import com.memento.server.api.service.auth.MemberPrincipal;
 
 @ExtendWith(RestDocumentationExtension.class)
 public abstract class RestDocsSupport {

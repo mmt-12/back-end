@@ -34,4 +34,38 @@ include::api/v1/community/community-list.adoc[]
 [[Associate-API]]
 == Associate API
 
+include::api/v1/associate/associate-read.adoc[]
 include::api/v1/associate/associate-list.adoc[]
+include::api/v1/associate/associate-update.adoc[]
+
+[[Achievement-API]]
+== Achievement API
+
+include::api/v1/achievement/Achievement-read.adoc[]
+
+[[GuestBook-API]]
+== GuestBook API
+
+include::api/v1/guestBook/guestBook-read.adoc[]
+include::api/v1/guestBook/guestBook-create-bubble.adoc[]
+include::api/v1/guestBook/guestBook-create-reaction.adoc[]
+include::api/v1/guestBook/guestBook-create-text.adoc[]
+include::api/v1/guestBook/guestBook-delete.adoc[]
+
+[[Mbti-API]]
+== Mbti API
+
+include::api/v1/mbti/mbti-read.adoc[]
+include::api/v1/mbti/mbti-create.adoc[]
+
+[[ProfileImage-API]]
+== ProfileImage API
+
+include::api/v1/profileImage/profileImage-read.adoc[]
+include::api/v1/profileImage/profileImage-create.adoc[]
+include::api/v1/profileImage/profileImage-delete.adoc[]
+
+
+
+
+
