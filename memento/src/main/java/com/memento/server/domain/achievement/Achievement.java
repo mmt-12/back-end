@@ -1,5 +1,6 @@
 package com.memento.server.domain.achievement;
 
+import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -10,6 +11,7 @@ import com.memento.server.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -36,4 +38,8 @@ public class Achievement extends BaseEntity {
 
 	@Column(name = "criteria", length = 255, nullable = false)
 	private String criteria;
+
+	@Enumerated(STRING)
+	@Column(name = "type", nullable = false)
+	private AchievementType type;
 }

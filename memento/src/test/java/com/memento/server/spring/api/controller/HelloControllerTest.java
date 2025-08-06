@@ -1,6 +1,6 @@
 package com.memento.server.spring.api.controller;
 
-import static org.springframework.http.MediaType.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -27,6 +27,7 @@ class HelloControllerTest extends ControllerTestSupport {
 		// when && then
 		mockMvc.perform(
 				post("/api/v1/hello")
+					.with(withJwt(1L, 1L, 1L))
 					.content(objectMapper.writeValueAsString(request))
 					.contentType(APPLICATION_JSON))
 			.andDo(print())

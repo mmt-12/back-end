@@ -1,0 +1,10 @@
+[[guestBook-create-bubble-test]]
+=== 방명록 일회용 보이스 생성
+
+==== HTTP Request
+include::{snippets}/guestBook-create-bubble-test/http-request.adoc[]
+include::{snippets}/guestBook-create-bubble-test/request-parts.adoc[]
+
+==== HTTP Response
+include::{snippets}/guestBook-create-bubble-test/http-response.adoc[]
+NOTE: 응답이 존재하지 않습니다.

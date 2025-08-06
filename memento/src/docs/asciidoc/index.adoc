@@ -9,16 +9,6 @@ endif::[]
 :toclevels: 2
 :sectlinks:
 
-[[Post-API]]
-== Post API
-
-include::api/v1/post/post-read.adoc[]
-include::api/v1/post/post-read-all.adoc[]
-include::api/v1/post/post-create.adoc[]
-include::api/v1/post/post-update.adoc[]
-include::api/v1/post/post-delete.adoc[]
-
-=======
 [[Auth-API]]
 == Auth API
 
