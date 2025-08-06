@@ -21,7 +21,7 @@ import com.memento.server.api.controller.post.dto.UpdatePostRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/groups/{groupId}/memories/{memoryId}/posts")
+@RequestMapping("/api/v1/communities/{communityId}/memories/{memoryId}/posts")
 @RequiredArgsConstructor
 public class PostController {
 
