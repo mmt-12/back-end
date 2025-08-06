@@ -22,7 +22,7 @@ import com.memento.server.docs.RestDocsSupport;
 
 public class AchievementControllerTestDocsTest extends RestDocsSupport {
 
-	public static final String PATH = "/api/v1/groups/{groupId}/associates/{associateId}/achievements";
+	public static final String PATH = "/api/v1/communities/{communityId}/associates/{associateId}/achievements";
 
 	@Override
 	protected Object initController() {

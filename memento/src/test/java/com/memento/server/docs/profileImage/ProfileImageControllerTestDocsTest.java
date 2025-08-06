@@ -32,7 +32,7 @@ import com.memento.server.docs.RestDocsSupport;
 
 public class ProfileImageControllerTestDocsTest extends RestDocsSupport {
 
-	public static final String PATH = "/api/v1/groups/{communityId}/associates/{associateId}/profile-images";
+	public static final String PATH = "/api/v1/communities/{communityId}/associates/{associateId}/profile-images";
 	@Override
 	protected Object initController() {
 		return new ProfileImageController();
