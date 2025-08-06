@@ -14,28 +14,24 @@ endif::[]
 
 include::api/v1/hello/hello.adoc[]
 
-[[guestBook-API]]
-== guestBook API
+[[Auth-API]]
+== Auth API
 
-== profile
-include::api/v1/associate/associate-read.adoc[]
-include::api/v1/associate/associate-update.adoc[]
+include::api/v1/auth/auth-sign-in.adoc[]
+include::api/v1/auth/auth-redirect.adoc[]
 
-== mbti
-include::api/v1/mbti/mbti-create.adoc[]
-include::api/v1/mbti/mbti-read.adoc[]
+[[Member-API]]
+== Member API
 
-== achievement
-include::api/v1/achievement/achievement-read.adoc[]
+include::api/v1/member/signup.adoc[]
+include::api/v1/member/update.adoc[]
 
-== profile image
-include::api/v1/profileImage/profileImage-create.adoc[]
-include::api/v1/profileImage/profileImage-delete.adoc[]
-include::api/v1/profileImage/profileImage-read.adoc[]
+[[Community-API]]
+== Community API
 
-== guestBook
-include::api/v1/guestBook/guestBook-create-text.adoc[]
-include::api/v1/guestBook/guestBook-create-reaction.adoc[]
-include::api/v1/guestBook/guestBook-create-bubble.adoc[]
-include::api/v1/guestBook/guestBook-read.adoc[]
-include::api/v1/guestBook/guestBook-delete.adoc[]
+include::api/v1/community/community-list.adoc[]
+
+[[Associate-API]]
+== Associate API
+
+include::api/v1/associate/associate-list.adoc[]

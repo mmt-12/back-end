@@ -1,0 +1,18 @@
+[[auth-sign-in-test]]
+=== 카카오 로그인 리다이렉트
+
+==== HTTP Request
+
+include::{snippets}/auth-redirect-test-guest/http-request.adoc[]
+
+NOTE: 요청이 필요하지 않습니다.
+
+==== HTTP Response - 미가입자
+
+include::{snippets}/auth-redirect-test-guest/http-response.adoc[]
+include::{snippets}/auth-redirect-test-guest/response-fields.adoc[]
+
+==== HTTP Response - 가입자
+
+include::{snippets}/auth-redirect-test-member/http-response.adoc[]
+include::{snippets}/auth-redirect-test-member/response-fields.adoc[]
