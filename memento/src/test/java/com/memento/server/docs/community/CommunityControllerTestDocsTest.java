@@ -18,10 +18,10 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.memento.server.controller.community.CommunityController;
-import com.memento.server.controller.community.CommunityListResponse.CommunityResponse;
+import com.memento.server.api.controller.community.CommunityController;
+import com.memento.server.api.controller.community.dto.CommunityListResponse.CommunityResponse;
 import com.memento.server.docs.RestDocsSupport;
-import com.memento.server.service.community.CommunityService;
+import com.memento.server.api.service.community.CommunityService;
 
 public class CommunityControllerTestDocsTest extends RestDocsSupport {
 

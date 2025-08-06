@@ -7,6 +7,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -188,3 +192,35 @@ public class AssociateControllerTestDocsTest extends RestDocsSupport {
 	}
 
 }
+
+
+	@Test
+	@DisplayName("associate 수정 API")
+	void updateTest() throws Exception {
+		// given
+		Long communityId = 1L;
+
+		UpdateAssociateRequest request = UpdateAssociateRequest.builder()
+			.profileImageUrl("www.example.com/ohjs")
+			.nickname("오준수")
+			.achievement(2L)
+			.introduction("오준수 뤼전드")
+			.build();
+
+		// when & then
+		mockMvc.perform(
+				put(PATH, communityId)
+					.content(objectMapper.writeValueAsString(request))
+					.contentType(APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andDo(document("associate-update-test",
+				preprocessRequest(prettyPrint()),
+				requestFields(
+					fieldWithPath("profileImageUrl").type(STRING).description("프로필 이미지"),
+					fieldWithPath("nickname").type(STRING).description("이름"),
+					fieldWithPath("achievement").type(NUMBER).description("업적"),
+					fieldWithPath("introduction").type(STRING).description("한 줄 소개")
+				)
+			));
+	}

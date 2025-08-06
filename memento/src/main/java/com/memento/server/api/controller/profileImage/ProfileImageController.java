@@ -16,7 +16,7 @@ import com.memento.server.api.controller.profileImage.dto.ReadProfileImageRespon
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/groups/{groupId}/associates/{associateId}/profile-images")
+@RequestMapping("/api/v1/communities/{communityId}/associates/{associateId}/profile-images")
 @RequiredArgsConstructor
 public class ProfileImageController {
 
@@ -37,7 +37,7 @@ public class ProfileImageController {
 
 	@GetMapping()
 	public ResponseEntity<ReadProfileImageResponse> read(
-		@PathVariable Long groupId,
+		@PathVariable Long communityId,
 		@PathVariable Long associateId,
 		@RequestParam(required = false, defaultValue = "10") Long size,
 		@RequestParam(required = false) Long cursor

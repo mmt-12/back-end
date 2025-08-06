@@ -18,7 +18,7 @@ import com.memento.server.api.controller.guestBook.dto.ReadGuestBookResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/groups/{groupId}/associates/{associateId}/guest-books")
+@RequestMapping("/api/v1/communities/{communityId}/associates/{associateId}/guest-books")
 @RequiredArgsConstructor
 public class GuestBookController {
 

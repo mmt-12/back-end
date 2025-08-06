@@ -14,7 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.memento.server.config.filter.JwtFilter;
-import com.memento.server.service.auth.jwt.JwtTokenProvider;
+import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 

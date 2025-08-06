@@ -9,7 +9,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import com.memento.server.annotation.CommunityId;
-import com.memento.server.service.auth.MemberPrincipal;
+import com.memento.server.api.service.auth.MemberPrincipal;
 
 public class CommunityIdArgumentResolver implements HandlerMethodArgumentResolver {
 

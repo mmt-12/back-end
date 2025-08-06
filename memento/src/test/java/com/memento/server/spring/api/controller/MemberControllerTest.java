@@ -16,11 +16,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import com.memento.server.controller.member.MemberController;
-import com.memento.server.controller.member.MemberSignUpRequest;
-import com.memento.server.controller.member.MemberSignUpResponse;
-import com.memento.server.service.auth.jwt.JwtToken;
-import com.memento.server.service.member.MemberService;
+import com.memento.server.api.controller.member.MemberController;
+import com.memento.server.api.controller.member.MemberSignUpRequest;
+import com.memento.server.api.controller.member.MemberSignUpResponse;
+import com.memento.server.api.service.auth.jwt.JwtToken;
+import com.memento.server.api.service.member.MemberService;
 import com.memento.server.spring.ControllerTestSupport;
 
 @WebMvcTest({

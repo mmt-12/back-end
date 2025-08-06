@@ -20,13 +20,13 @@ import java.util.Date;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.memento.server.controller.auth.AuthController;
-import com.memento.server.controller.auth.AuthGuestResponse;
-import com.memento.server.controller.auth.AuthMemberResponse;
-import com.memento.server.controller.auth.AuthResponse;
+import com.memento.server.api.controller.auth.AuthController;
+import com.memento.server.api.controller.auth.AuthGuestResponse;
+import com.memento.server.api.controller.auth.AuthMemberResponse;
+import com.memento.server.api.controller.auth.AuthResponse;
 import com.memento.server.docs.RestDocsSupport;
-import com.memento.server.service.auth.AuthService;
-import com.memento.server.service.auth.jwt.JwtToken;
+import com.memento.server.api.service.auth.AuthService;
+import com.memento.server.api.service.auth.jwt.JwtToken;
 
 public class AuthControllerTestDocsTest extends RestDocsSupport {
 

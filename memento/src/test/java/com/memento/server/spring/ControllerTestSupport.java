@@ -14,9 +14,9 @@ import com.memento.server.api.controller.voice.VoiceController;
 import com.memento.server.api.service.emoji.EmojiService;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.hello.HelloController;
-import com.memento.server.service.auth.jwt.JwtProperties;
-import com.memento.server.service.auth.jwt.JwtTokenProvider;
-import com.memento.server.service.auth.jwt.MemberClaim;
+import com.memento.server.api.service.auth.jwt.JwtProperties;
+import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
+import com.memento.server.api.service.auth.jwt.MemberClaim;
 import com.memento.server.spring.config.TestSecurityConfig;
 
 @WebMvcTest({

@@ -27,7 +27,7 @@ import com.memento.server.docs.RestDocsSupport;
 
 public class MbtiControllerTestDocsTest extends RestDocsSupport {
 
-	public static final String PATH = "/api/v1/groups/{groupId}/associates/{associateId}/mbti-tests";
+	public static final String PATH = "/api/v1/groups/{communityId}/associates/{associateId}/mbti-tests";
 
 	@Override
 	protected Object initController() {
@@ -38,7 +38,7 @@ public class MbtiControllerTestDocsTest extends RestDocsSupport {
 	@DisplayName("mbti 등록")
 	void createTest() throws Exception {
 		// given
-		Long groupId = 1L;
+		Long communityId = 1L;
 		Long associateId = 1L;
 		CreateMbtiRequest request = CreateMbtiRequest.builder()
 			.mbti("ENTP")
@@ -46,7 +46,7 @@ public class MbtiControllerTestDocsTest extends RestDocsSupport {
 
 		//when & then
 		mockMvc.perform(
-				post(PATH, groupId, associateId)
+				post(PATH, communityId, associateId)
 					.content(objectMapper.writeValueAsString(request))
 					.contentType(APPLICATION_JSON))
 			.andDo(print())
@@ -63,7 +63,7 @@ public class MbtiControllerTestDocsTest extends RestDocsSupport {
 	@DisplayName("mbti 조회")
 	void readTest() throws Exception {
 		// given
-		Long groupId = 1L;
+		Long communityId = 1L;
 		Long associateId = 1L;
 
 		//when & then
@@ -87,7 +87,7 @@ public class MbtiControllerTestDocsTest extends RestDocsSupport {
 			.build();
 
 		mockMvc.perform(
-				get(PATH, groupId, associateId))
+				get(PATH, communityId, associateId))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.INFP").value(response.INFP()))

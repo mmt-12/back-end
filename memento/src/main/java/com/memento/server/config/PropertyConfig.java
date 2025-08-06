@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration;
 
 import com.memento.server.client.oauth.KakaoClientProperties;
-import com.memento.server.service.auth.jwt.JwtProperties;
+import com.memento.server.api.service.auth.jwt.JwtProperties;
 
 @Configuration
 @EnableConfigurationProperties({
