@@ -25,4 +25,9 @@ public class MemoryService {
 	public CreateMemoryResponse create(Long communityId, CreateMemoryRequest request) {
 		return null;
 	}
+
+	public CreateMemoryResponse update(Long communityId, CreateMemoryRequest request, Long currentAssociateId,
+		Long memoryId) {
+		return null;
+	}
 }
