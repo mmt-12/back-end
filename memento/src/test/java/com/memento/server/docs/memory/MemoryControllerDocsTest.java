@@ -26,6 +26,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.memento.server.api.controller.memory.MemoryController;
 import com.memento.server.api.controller.memory.dto.CreateMemoryRequest;
@@ -169,7 +170,6 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 		mockMvc.perform(post(PATH, 1L)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
-			.andDo(print())
 			.andExpect(status().isOk())
 			.andDo(document("memory-create-test",
 				preprocessRequest(prettyPrint()),
@@ -228,7 +228,6 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 		mockMvc.perform(put(PATH + "/{memoryId}", 1L, 1L)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
-			.andDo(print())
 			.andExpect(status().isOk())
 			.andDo(document("memory-update-test",
 				preprocessRequest(prettyPrint()),
@@ -253,6 +252,26 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 				),
 				responseFields(
 					fieldWithPath("memoryId").description("생성된 기억의 아이디")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("기억 삭제")
+	void delete() throws Exception {
+		// given
+		setAuthentication(1L, 1L, 1L);
+
+		// when & then
+		mockMvc.perform(MockMvcRequestBuilders.delete(PATH + "/{memoryId}", 1L, 1L)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(document("memory-delete-test",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("communityId").description("그룹 아이디"),
+					parameterWithName("memoryId").description("기억 아이디")
 				)
 			));
 	}
