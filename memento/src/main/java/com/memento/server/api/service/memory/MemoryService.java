@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.memento.server.api.controller.memory.dto.CreateMemoryRequest;
 import com.memento.server.api.controller.memory.dto.CreateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
 import com.memento.server.domain.memory.MemoryRepository;
 
@@ -32,5 +33,9 @@ public class MemoryService {
 	}
 
 	public void delete(Long communityId, Long memoryId, Long currentAssociateId) {
+	}
+
+	public DownloadImagesResponse downloadImages(Long communityId, Long memoryId) {
+		return null;
 	}
 }

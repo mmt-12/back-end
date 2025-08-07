@@ -14,6 +14,7 @@ import com.memento.server.annotation.CommunityId;
 import com.memento.server.annotation.MemberId;
 import com.memento.server.api.controller.memory.dto.CreateMemoryRequest;
 import com.memento.server.api.controller.memory.dto.CreateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
 import com.memento.server.api.service.memory.MemoryService;
@@ -82,5 +83,18 @@ public class MemoryController {
 		}
 		memoryService.delete(communityId, memoryId, currentAssociateId);
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/{memoryId}")
+	public ResponseEntity<DownloadImagesResponse> downloadImages(
+		@CommunityId Long currentCommunityId,
+		@PathVariable Long communityId,
+		@PathVariable Long memoryId
+	) {
+		if (!currentCommunityId.equals(communityId)) {
+			throw new IllegalArgumentException("다른 그룹의 요청입니다.");
+		}
+
+		return ResponseEntity.ok(memoryService.downloadImages(communityId, memoryId));
 	}
 }
