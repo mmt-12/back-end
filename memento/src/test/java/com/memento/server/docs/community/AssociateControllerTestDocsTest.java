@@ -4,18 +4,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
-import static org.springframework.restdocs.payload.JsonFieldType.STRING;
-import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
-import static org.springframework.restdocs.payload.JsonFieldType.STRING;
-import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -35,13 +31,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.memento.server.api.controller.community.AssociateController;
+import com.memento.server.api.controller.community.dto.AssociateListResponse;
 import com.memento.server.api.controller.community.dto.ReadAssociateResponse;
 import com.memento.server.api.controller.community.dto.UpdateAssociateRequest;
-import com.memento.server.api.controller.community.dto.AssociateListResponse;
-import com.memento.server.api.controller.community.dto.AssociateListResponse.AssociateResponse;
-import com.memento.server.api.controller.community.dto.AssociateListResponse.AssociateResponse.AchievementResponse;
-import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.api.service.community.AssociateService;
+import com.memento.server.docs.RestDocsSupport;
 
 public class AssociateControllerTestDocsTest extends RestDocsSupport {
 
@@ -97,7 +91,6 @@ public class AssociateControllerTestDocsTest extends RestDocsSupport {
 			));
 	}
 
-
 	@Test
 	@DisplayName("그룹 참여자 목록 조회")
 	void searchAll() throws Exception {
@@ -108,13 +101,13 @@ public class AssociateControllerTestDocsTest extends RestDocsSupport {
 				.communityName("SSAFY 12기 12반")
 				.associates(
 					List.of(
-						AssociateResponse.builder()
+						AssociateListResponse.AssociateResponse.builder()
 							.id(1L)
 							.nickname("nickname")
 							.imageUrl("https://...")
 							.introduction("introduction")
 							.achievement(
-								AchievementResponse.builder()
+								AssociateListResponse.AssociateResponse.AchievementResponse.builder()
 									.id(1L)
 									.name("achievement name")
 									.build()
@@ -192,35 +185,3 @@ public class AssociateControllerTestDocsTest extends RestDocsSupport {
 	}
 
 }
-
-
-	@Test
-	@DisplayName("associate 수정 API")
-	void updateTest() throws Exception {
-		// given
-		Long communityId = 1L;
-
-		UpdateAssociateRequest request = UpdateAssociateRequest.builder()
-			.profileImageUrl("www.example.com/ohjs")
-			.nickname("오준수")
-			.achievement(2L)
-			.introduction("오준수 뤼전드")
-			.build();
-
-		// when & then
-		mockMvc.perform(
-				put(PATH, communityId)
-					.content(objectMapper.writeValueAsString(request))
-					.contentType(APPLICATION_JSON))
-			.andDo(print())
-			.andExpect(status().isOk())
-			.andDo(document("associate-update-test",
-				preprocessRequest(prettyPrint()),
-				requestFields(
-					fieldWithPath("profileImageUrl").type(STRING).description("프로필 이미지"),
-					fieldWithPath("nickname").type(STRING).description("이름"),
-					fieldWithPath("achievement").type(NUMBER).description("업적"),
-					fieldWithPath("introduction").type(STRING).description("한 줄 소개")
-				)
-			));
-	}
