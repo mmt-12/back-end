@@ -30,4 +30,7 @@ public class MemoryService {
 		Long memoryId) {
 		return null;
 	}
+
+	public void delete(Long communityId, Long memoryId, Long currentAssociateId) {
+	}
 }

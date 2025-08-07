@@ -1,6 +1,7 @@
 package com.memento.server.api.controller.memory;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -66,5 +67,20 @@ public class MemoryController {
 		}
 
 		return ResponseEntity.ok(memoryService.update(communityId, request, currentAssociateId, memoryId));
+	}
+
+	@DeleteMapping("/{memoryId}")
+	public ResponseEntity<Void> delete(
+		@CommunityId Long currentCommunityId,
+		@AssociateId Long currentAssociateId,
+		@PathVariable Long communityId,
+		@PathVariable Long memoryId
+	) {
+
+		if (!currentCommunityId.equals(communityId)) {
+			throw new IllegalArgumentException("다른 그룹의 요청입니다.");
+		}
+		memoryService.delete(communityId, memoryId, currentAssociateId);
+		return ResponseEntity.ok().build();
 	}
 }
