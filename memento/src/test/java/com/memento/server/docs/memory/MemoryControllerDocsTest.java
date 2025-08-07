@@ -16,6 +16,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -175,6 +176,66 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 				preprocessResponse(prettyPrint()),
 				pathParameters(
 					parameterWithName("communityId").description("그룹 아이디")
+				),
+				requestFields(
+					fieldWithPath("title").description("제목"),
+					subsectionWithPath("period").description("기간"),
+					fieldWithPath("period.startTime").description("시작 시간"),
+					fieldWithPath("period.endTime").description("종료 시간"),
+					fieldWithPath("description").description("설명"),
+					fieldWithPath("associates").description("참여자 아이디 목록"),
+					subsectionWithPath("location").description("지역"),
+					fieldWithPath("location.address").description("주소"),
+					fieldWithPath("location.name").description("장소 이름"),
+					fieldWithPath("location.latitude").description("위도 (소수점 포함 총 10자리 숫자, 소수점 아래 7자리까지)"),
+					fieldWithPath("location.longitude").description("경도 (소수점 포함 총 10자리 숫자, 소수점 아래 7자리까지)"),
+					fieldWithPath("location.code").description("지도 API의 지점 코드 (지점 아이디)")
+				),
+				responseFields(
+					fieldWithPath("memoryId").description("생성된 기억의 아이디")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("기억 수정")
+	void update() throws Exception {
+		// given
+		setAuthentication(1L, 1L, 1L);
+		CreateMemoryRequest request = CreateMemoryRequest.builder()
+			.title("양평 MT!")
+			.period(CreateMemoryRequest.Period.builder()
+				.startTime(LocalDateTime.of(2024, 6, 20, 10, 30, 0))
+				.endTime(LocalDateTime.of(2024, 6, 20, 10, 30, 0))
+				.build())
+			.description("우리가 함께 마신 소주와 수영장 물을 기억하며")
+			.associates(List.of(1L, 2L, 3L, 4L))
+			.location(CreateMemoryRequest.Location.builder()
+				.latitude(36.34512323f)
+				.longitude(138.7712322f)
+				.code("16335")
+				.name("양평 서종풀팬션")
+				.address("경기도 양평시 양평군")
+				.build())
+			.build();
+		when(memoryService.update(any(), any(), any(), any())).thenReturn(
+			CreateMemoryResponse.builder()
+				.memoryId(1L)
+				.build()
+		);
+
+		// when & then
+		mockMvc.perform(put(PATH + "/{memoryId}", 1L, 1L)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andDo(document("memory-update-test",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("communityId").description("그룹 아이디"),
+					parameterWithName("memoryId").description("기억 아이디")
 				),
 				requestFields(
 					fieldWithPath("title").description("제목"),
