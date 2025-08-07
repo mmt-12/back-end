@@ -25,13 +25,13 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/groups/{groupId}/voices")
+@RequestMapping("/api/v1/communities/{communityId}/voices")
 public class VoiceController {
 
 	private final VoiceService voiceService;
 
 	@PostMapping
-	public ResponseEntity<Void> createVoice(@PathVariable Long groupId,
+	public ResponseEntity<Void> createVoice(@PathVariable("communityId") Long communityId,
 		// @AssociateId Long associateId,
 		@Valid @RequestPart("data") VoiceCreateRequest request,
 		@NotNull(message = "voice 값은 필수입니다.") @RequestPart("voice") MultipartFile voice) {
@@ -40,18 +40,19 @@ public class VoiceController {
 	}
 
 	@GetMapping
-	public ResponseEntity<VoiceListResponse> getVoices(@PathVariable Long groupId,
+	public ResponseEntity<VoiceListResponse> getVoices(@PathVariable("communityId") Long communityId,
 		@RequestParam(required = false) Long cursor,
 		@RequestParam(required = false, defaultValue = "10") int size,
 		@RequestParam(required = false) String keyword) {
-		return ResponseEntity.ok(voiceService.getVoices(VoiceListQueryRequest.of(groupId, cursor, size, keyword)));
+		return ResponseEntity.ok(voiceService.getVoices(VoiceListQueryRequest.of(communityId, cursor, size, keyword)));
 	}
 
 	@DeleteMapping("/{voiceId}")
-	public ResponseEntity<Void> removeVoice(@PathVariable Long groupId, @PathVariable Long voiceId
+	public ResponseEntity<Void> removeVoice(@PathVariable("communityId") Long communityId,
+		@PathVariable("voiceId") Long voiceId
 		// @AssociateId Long associateId
-		) {
-		voiceService.removeVoice(VoiceRemoveRequest.of(groupId, voiceId));
+	) {
+		voiceService.removeVoice(VoiceRemoveRequest.of(communityId, voiceId));
 		return ResponseEntity.noContent().build();
 	}
 }

@@ -5,58 +5,47 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.memento.server.associate.AssociateFixtures;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.voice.Voice;
-import com.memento.server.fixture.associate.AssociateFixtures;
 
 public class VoiceTest {
+
+	private static final String NAME = "voice";
+	private static final String URL = "https://example.com/audio.wav";
+	private static final Associate DEFAULT_ASSOCIATE = AssociateFixtures.associate();
 
 	@Test
 	@DisplayName("일회용 보이스를 생성한다.")
 	void createTemporary() {
-		// given
-		String name = "인쥐용";
-		String url = "https://example.com/audio.wav";
-		Associate associate = AssociateFixtures.associate();
-
 		// when
-		Voice voice = Voice.createTemporary(name, url, associate);
+		Voice voice = Voice.createTemporary(NAME, URL, DEFAULT_ASSOCIATE);
 
 		// then
 		assertThat(voice.getIsTemporary()).isTrue();
-		assertThat(voice.getName()).isEqualTo(name);
-		assertThat(voice.getUrl()).isEqualTo(url);
-		assertThat(voice.getAssociate()).isEqualTo(associate);
+		assertThat(voice.getName()).isEqualTo(NAME);
+		assertThat(voice.getUrl()).isEqualTo(URL);
+		assertThat(voice.getAssociate()).isEqualTo(DEFAULT_ASSOCIATE);
 	}
 
 	@Test
 	@DisplayName("등록될 보이스를 생성한다.")
 	void createPermanent() {
-		// given
-		String name = "인쥐용";
-		String url = "https://example.com/audio.wav";
-		Associate associate = AssociateFixtures.associate();
-
 		// when
-		Voice voice = Voice.createPermanent(name, url, associate);
+		Voice voice = Voice.createPermanent(NAME, URL, DEFAULT_ASSOCIATE);
 
 		// then
 		assertThat(voice.getIsTemporary()).isFalse();
-		assertThat(voice.getName()).isEqualTo(name);
-		assertThat(voice.getUrl()).isEqualTo(url);
-		assertThat(voice.getAssociate()).isEqualTo(associate);
+		assertThat(voice.getName()).isEqualTo(NAME);
+		assertThat(voice.getUrl()).isEqualTo(URL);
+		assertThat(voice.getAssociate()).isEqualTo(DEFAULT_ASSOCIATE);
 	}
 
 	@Test
 	@DisplayName("임시 보이스는 isTemporary()가 true이고 isPermanent()가 false이다.")
 	void isTemporaryVoice() {
-		// given
-		String name = "인쥐용";
-		String url = "https://example.com/audio.wav";
-		Associate associate = AssociateFixtures.associate();
-
 		// when
-		Voice voice = Voice.createTemporary(name, url, associate);
+		Voice voice = Voice.createTemporary(NAME, URL, DEFAULT_ASSOCIATE);
 
 		// then
 		assertThat(voice.isTemporary()).isTrue();
@@ -66,13 +55,8 @@ public class VoiceTest {
 	@Test
 	@DisplayName("영구 보이스는 isPermanent()가 true이고 isTemporary()가 false이다.")
 	void isPermanentVoice() {
-		// given
-		String name = "인쥐용";
-		String url = "https://example.com/audio.wav";
-		Associate associate = AssociateFixtures.associate();
-
 		// when
-		Voice voice = Voice.createPermanent(name, url, associate);
+		Voice voice = Voice.createPermanent(NAME, URL, DEFAULT_ASSOCIATE);
 
 		// then
 		assertThat(voice.isTemporary()).isFalse();

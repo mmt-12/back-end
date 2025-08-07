@@ -21,7 +21,7 @@ endif::[]
 | API 호출 시 사용되는 HTTP 메서드, URL, 헤더 등을 포함한 전체 요청 정보를 기술합니다.
 
 | *Path Parameters*
-| URL 경로에 포함되는 변수 값(`{groupId}`, `{voiceId}` 등)에 대해 설명합니다.
+| URL 경로에 포함되는 변수 값(`{communityId}`, `{voiceId}` 등)에 대해 설명합니다.
 
 | *Request Parts*
 | `multipart/form-data` 형식의 요청에서 사용하는 각 Part(`data`, `voice` 등)의 명칭과 용도를 설명합니다.

@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.5.3'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'java-test-fixtures'
 }
 
 group = 'com.memento'
@@ -68,10 +69,10 @@ asciidoctor {
     inputs.dir snippetsDir
     configurations 'asciidoctorExt'
 
-    sources { // 특정 파일만 html로 만든다.
+    sources {
         include("**/index.adoc")
     }
-    baseDirFollowsSourceFile() // 다른 adoc 파일을 include 할 때 경로를 baseDir로 맞춘다.
+    baseDirFollowsSourceFile()
     dependsOn test
 }
 

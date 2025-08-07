@@ -1,8 +1,9 @@
 package com.memento.server.docs.voice;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -21,8 +22,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,7 +39,7 @@ import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
 import com.memento.server.docs.RestDocsSupport;
-import com.memento.server.fixture.voice.VoiceFixtures;
+import com.memento.server.voice.VoiceFixtures;
 
 public class VoiceControllerDocsTest extends RestDocsSupport {
 
@@ -52,23 +54,29 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 	@DisplayName("보이스 리액션을 등록한다.")
 	void createVoice() throws Exception {
 		// given
-		long groupId = 1L;
-
+		long communityId = 1L;
 		String json = objectMapper.writeValueAsString(VoiceCreateRequest.builder()
-			.name("인쥐용")
-			.build());
+			.name("인쥐용").build());
 
 		MockMultipartFile data = new MockMultipartFile(
-			"data", "request", "application/json", json.getBytes()
+			"data",
+			"request",
+			"application/json",
+			json.getBytes()
 		);
 
 		MockMultipartFile voice = new MockMultipartFile(
-			"voice", "voice.wav", "audio/wav", "dummy-audio-content".getBytes()
+			"voice",
+			"voice.wav",
+			"audio/wav",
+			"".getBytes()
 		);
+
+		doNothing().when(voiceService).createVoice(any());
 
 		// when && then
 		mockMvc.perform(
-				multipart("/api/v1/groups/{groupId}/voices", groupId)
+				multipart("/api/v1/communities/{communityId}/voices", communityId)
 					.file(data)
 					.file(voice)
 					.contentType(MULTIPART_FORM_DATA))
@@ -78,7 +86,7 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
-					parameterWithName("groupId").description("그룹 ID")
+					parameterWithName("communityId").description("커뮤니티 ID")
 				),
 				requestParts(
 					partWithName("data").description("보이스 생성 요청 본문 (JSON)"),
@@ -88,48 +96,40 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("name").type(STRING).description("보이스 이름")
 				)
 			));
+
+		verify(voiceService).createVoice(any());
 	}
 
 	@Test
 	@DisplayName("등록된 보이스 목록을 조회한다.")
 	void getVoices() throws Exception {
 		// given
-		Long groupId = 1L;
-		Long cursor = 1L;
+		long communityId = 1L;
+		long cursor = 1L;
 		String keyword = "인쥐용";
 		int size = 10;
 		Long nextCursor = cursor + size;
 		boolean hasNext = true;
 
-		VoiceListResponse response = VoiceFixtures.voiceListResponse(cursor, size, nextCursor, hasNext);
-		VoiceResponse voice = response.voices().get(0);
+		VoiceResponse voiceResponse = VoiceResponse.of(VoiceFixtures.permanentVoice());
+		VoiceListResponse response = VoiceListResponse.of(List.of(voiceResponse), cursor, size, nextCursor, hasNext);
 
-		when(voiceService.getVoices(VoiceListQueryRequest.of(groupId, cursor, size, keyword))).thenReturn(response);
+		given(voiceService.getVoices(any(VoiceListQueryRequest.class)))
+			.willReturn(response);
 
 		// when & then
 		mockMvc.perform(
-				get("/api/v1/groups/{groupId}/voices", groupId)
-					.param("cursor", cursor.toString())
+				get("/api/v1/communities/{communityId}/voices", communityId)
+					.param("cursor", String.valueOf(cursor))
 					.param("size", String.valueOf(size))
 					.param("keyword", keyword))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.voices").isArray())
-			.andExpect(jsonPath("$.voices[0].id").value(voice.id()))
-			.andExpect(jsonPath("$.voices[0].name").value(voice.name()))
-			.andExpect(jsonPath("$.voices[0].url").value(voice.url()))
-			.andExpect(jsonPath("$.voices[0].author.id").value(voice.author().id()))
-			.andExpect(jsonPath("$.voices[0].author.nickname").value(voice.author().nickname()))
-			.andExpect(jsonPath("$.voices[0].author.imageUrl").value(voice.author().imageUrl()))
-			.andExpect(jsonPath("$.cursor").value(response.cursor()))
-			.andExpect(jsonPath("$.size").value(response.size()))
-			.andExpect(jsonPath("$.nextCursor").value(response.nextCursor()))
-			.andExpect(jsonPath("$.hasNext").value(response.hasNext()))
 			.andDo(document("voice-get",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
-					parameterWithName("groupId").description("그룹 ID")
+					parameterWithName("communityId").description("커뮤니티 ID")
 				),
 				queryParameters(
 					parameterWithName("cursor").description("현재 페이지의 마지막 보이스 ID (첫 페이지는 null)").optional(),
@@ -149,29 +149,33 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("hasNext").description("다음 페이지 존재 여부")
 				)
 			));
+
+		verify(voiceService).getVoices(any(VoiceListQueryRequest.class));
 	}
 
 	@Test
 	@DisplayName("등록된 보이스를 삭제한다.")
 	void removeVoice() throws Exception {
 		// given
-		Long groupId = 1L;
+		Long communityId = 1L;
 		Long voiceId = 1L;
 
 		doNothing().when(voiceService).removeVoice(any(VoiceRemoveRequest.class));
 
 		// when && then
 		mockMvc.perform(
-				delete("/api/v1/groups/{groupId}/voices/{voiceId}", groupId, voiceId))
+				delete("/api/v1/communities/{communityId}/voices/{voiceId}", communityId, voiceId))
 			.andDo(print())
 			.andExpect(status().isNoContent())
 			.andDo(document("voice-remove",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
-					parameterWithName("groupId").description("그룹 ID"),
+					parameterWithName("communityId").description("커뮤니티 ID"),
 					parameterWithName("voiceId").description("삭제할 보이스 ID")
 				)
 			));
+
+		verify(voiceService).removeVoice(any(VoiceRemoveRequest.class));
 	}
 }

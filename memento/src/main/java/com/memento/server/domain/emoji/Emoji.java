@@ -46,4 +46,12 @@ public class Emoji extends BaseEntity {
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "associate_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Associate associate;
+
+	public static Emoji create(String name, String url, Associate associate) {
+		return Emoji.builder()
+			.name(name)
+			.url(url)
+			.associate(associate)
+			.build();
+	}
 }
