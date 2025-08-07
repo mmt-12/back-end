@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.memento.server.api.controller.memory.MemoryController;
 import com.memento.server.api.controller.memory.dto.CreateMemoryRequest;
 import com.memento.server.api.controller.memory.dto.CreateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.Memory;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.Memory.Location;
@@ -272,6 +273,41 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 				pathParameters(
 					parameterWithName("communityId").description("그룹 아이디"),
 					parameterWithName("memoryId").description("기억 아이디")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("기억 이미지 다운로드")
+	void downloadImages() throws Exception {
+		// given
+		setAuthentication(1L, 1L, 1L);
+		when(memoryService.downloadImages(any(), any())).thenReturn(
+			DownloadImagesResponse.builder()
+				.pictures(List.of(
+					"www.example.com/aws/s3/seonwoo/1",
+					"www.example.com/aws/s3/seonwoo/2",
+					"www.example.com/aws/s3/seonwoo/3",
+					"www.example.com/aws/s3/seonwoo/4",
+					"www.example.com/aws/s3/seonwoo/5",
+					"www.example.com/aws/s3/seonwoo/6",
+					"www.example.com/aws/s3/seonwoo/7"
+				))
+				.build()
+		);
+
+		// when & then
+		mockMvc.perform(MockMvcRequestBuilders.get(PATH + "/{memoryId}", 1L, 1L))
+			.andExpect(status().isOk())
+			.andDo(document("memory-download-test",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("communityId").description("그룹 아이디"),
+					parameterWithName("memoryId").description("기억 아이디")
+				),
+				responseFields(
+					fieldWithPath("pictures").description("해당 기억에 업로드된 모든 이미지 경로")
 				)
 			));
 	}
