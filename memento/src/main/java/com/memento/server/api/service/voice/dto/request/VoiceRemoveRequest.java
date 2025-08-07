@@ -4,11 +4,11 @@ import lombok.Builder;
 
 @Builder
 public record VoiceRemoveRequest(
-	Long communityId,
+	Long associateId,
 	Long voiceId
 ) {
 
-	public static VoiceRemoveRequest of(Long communityId, Long voiceId) {
-		return VoiceRemoveRequest.builder().communityId(communityId).voiceId(voiceId).build();
+	public static VoiceRemoveRequest of(Long associateId, Long voiceId) {
+		return VoiceRemoveRequest.builder().associateId(associateId).voiceId(voiceId).build();
 	}
 }

@@ -1,10 +1,13 @@
 package com.memento.server.domain.voice;
 
+import static com.memento.server.utility.validation.voice.VoiceValidator.*;
 import static jakarta.persistence.ConstraintMode.NO_CONSTRAINT;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static java.lang.Boolean.*;
 import static lombok.AccessLevel.PROTECTED;
+
+import java.util.Objects;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -44,36 +47,58 @@ public class Voice extends BaseEntity {
 	@Column(name = "url", length = 255, nullable = false)
 	private String url;
 
-	@Column(name = "is_temporary", nullable = false)
-	private Boolean isTemporary;
+	@Column(name = "temporary", nullable = false)
+	private Boolean temporary;
 
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "associate_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Associate associate;
 
-	public static Voice createTemporary(String name, String url, Associate associate) {
+	public static Voice createTemporary(String url, Associate associate) {
+		validateUrl(url);
+		validateAssociate(associate);
+
 		return Voice.builder()
-			.name(name)
 			.url(url)
-			.isTemporary(true)
+			.temporary(true)
 			.associate(associate)
 			.build();
 	}
 
 	public static Voice createPermanent(String name, String url, Associate associate) {
+		validateName(name);
+		validateUrl(url);
+		validateAssociate(associate);
+
 		return Voice.builder()
 			.name(name)
 			.url(url)
-			.isTemporary(false)
+			.temporary(false)
 			.associate(associate)
 			.build();
 	}
 
 	public boolean isTemporary() {
-		return isTemporary;
+		return temporary;
 	}
 
 	public boolean isPermanent() {
-		return FALSE.equals(isTemporary);
+		return FALSE.equals(temporary);
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+		if (!(object instanceof Voice voice)) {
+			return false;
+		}
+		return getId() != null && Objects.equals(getId(), voice.getId());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 }

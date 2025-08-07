@@ -1,12 +1,16 @@
 package com.memento.server.domain.achievement;
 
+import static com.memento.server.common.error.ErrorCodes.*;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
+import java.util.Objects;
+
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.memento.server.common.BaseEntity;
+import com.memento.server.common.exception.MementoException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,11 +47,65 @@ public class Achievement extends BaseEntity {
 	@Column(name = "type", nullable = false)
 	private AchievementType type;
 
-	// todo test code 필요
-	public static Achievement create(String name, String criteria) {
+	public static Achievement create(String name, String criteria, AchievementType type) {
+		validateName(name);
+		validateCriteria(criteria);
+		validateType(type);
+
 		return Achievement.builder()
 			.name(name)
 			.criteria(criteria)
+			.type(type)
 			.build();
+	}
+
+	private static void validateName(String name) {
+		if (name == null) {
+			throw new MementoException(ACHIEVEMENT_NAME_REQUIRED);
+		}
+
+		if (name.isBlank()) {
+			throw new MementoException(ACHIEVEMENT_NAME_BLANK);
+		}
+
+		if (name.length() > 102) {
+			throw new MementoException(ACHIEVEMENT_NAME_TOO_LONG);
+		}
+	}
+
+	private static void validateCriteria(String criteria) {
+		if (criteria == null) {
+			throw new MementoException(ACHIEVEMENT_CRITERIA_REQUIRED);
+		}
+
+		if (criteria.isBlank()) {
+			throw new MementoException(ACHIEVEMENT_CRITERIA_BLANK);
+		}
+
+		if (criteria.length() > 255) {
+			throw new MementoException(ACHIEVEMENT_CRITERIA_TOO_LONG);
+		}
+	}
+
+	private static void validateType(AchievementType type) {
+		if (type == null) {
+			throw new MementoException(ACHIEVEMENT_TYPE_REQUIRED);
+		}
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+		if (!(object instanceof Achievement achievement)) {
+			return false;
+		}
+		return getId() != null && Objects.equals(getId(), achievement.getId());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
 	}
 }

@@ -1,9 +1,11 @@
 package com.memento.server.domain.member;
 
+import static com.memento.server.utility.validation.member.MemberValidator.*;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -39,19 +41,39 @@ public class Member extends BaseEntity {
 	@Column(name = "email", length = 255, nullable = false)
 	private String email;
 
-	@Column(name = "brithday", nullable = true)
-	private LocalDate brithday;
+	@Column(name = "birthday", nullable = true)
+	private LocalDate birthday;
 
 	@Column(name = "kakao_id", nullable = false)
 	private Long kakaoId;
 
-	// todo test code 필요
-	public static Member create(String name, String email, LocalDate brithday, Long kakaoId) {
+	public static Member create(String name, String email, LocalDate birthday, Long kakaoId) {
+		validateName(name);
+		validateEmail(email);
+		validateBirthday(birthday);
+		validateKakaoId(kakaoId);
+
 		return Member.builder()
 			.name(name)
 			.email(email)
-			.brithday(brithday)
+			.birthday(birthday)
 			.kakaoId(kakaoId)
 			.build();
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+		if (!(object instanceof Member member)) {
+			return false;
+		}
+		return id != null && Objects.equals(id, member.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(id);
 	}
 }

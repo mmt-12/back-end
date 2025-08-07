@@ -51,9 +51,11 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 	}
 
 	@Test
-	@DisplayName("보이스 리액션을 등록한다.")
+	@DisplayName("보이스 리액션을 생성한다.")
 	void createVoice() throws Exception {
 		// given
+		setAuthentication(1L, 1L, 1L);
+
 		long communityId = 1L;
 		String json = objectMapper.writeValueAsString(VoiceCreateRequest.builder()
 			.name("인쥐용").build());
@@ -101,9 +103,11 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 	}
 
 	@Test
-	@DisplayName("등록된 보이스 목록을 조회한다.")
+	@DisplayName("보이스 목록을 조회한다.")
 	void getVoices() throws Exception {
 		// given
+		setAuthentication(1L, 1L, 1L);
+
 		long communityId = 1L;
 		long cursor = 1L;
 		String keyword = "인쥐용";
@@ -154,9 +158,11 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 	}
 
 	@Test
-	@DisplayName("등록된 보이스를 삭제한다.")
+	@DisplayName("보이스를 삭제한다.")
 	void removeVoice() throws Exception {
 		// given
+		setAuthentication(1L, 1L, 1L);
+
 		Long communityId = 1L;
 		Long voiceId = 1L;
 

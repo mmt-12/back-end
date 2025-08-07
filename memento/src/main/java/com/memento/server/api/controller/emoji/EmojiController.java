@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.memento.server.annotation.AssociateId;
 import com.memento.server.api.controller.emoji.dto.request.EmojiCreateRequest;
 import com.memento.server.api.service.emoji.EmojiService;
 import com.memento.server.api.service.emoji.dto.request.EmojiListQueryRequest;
@@ -31,10 +32,11 @@ public class EmojiController {
 	private final EmojiService emojiService;
 
 	@PostMapping
-	public ResponseEntity<Void> createEmoji(@PathVariable("communityId") Long communityId,
+	public ResponseEntity<Void> createEmoji(@AssociateId Long associateId,
+		@PathVariable("communityId") Long communityId,
 		@Valid @RequestPart("data") EmojiCreateRequest request,
 		@NotNull(message = "emoji 값은 필수입니다.") @RequestPart("emoji") MultipartFile emoji) {
-		emojiService.createEmoji(request.toServiceRequest(emoji));
+		emojiService.createEmoji(request.toServiceRequest(associateId, emoji));
 		return ResponseEntity.status(CREATED).build();
 	}
 
@@ -47,11 +49,8 @@ public class EmojiController {
 	}
 
 	@DeleteMapping("/{emojiId}")
-	public ResponseEntity<Void> removeEmoji(@PathVariable("communityId") Long communityId,
-		@PathVariable("emojiId") Long emojiId
-		// @AssociateId Long associateId
-	) {
-		emojiService.removeEmoji(EmojiRemoveRequest.of(communityId, emojiId));
+	public ResponseEntity<Void> removeEmoji(@AssociateId Long associateId, @PathVariable("emojiId") Long emojiId) {
+		emojiService.removeEmoji(EmojiRemoveRequest.of(associateId, emojiId));
 		return ResponseEntity.noContent().build();
 	}
 }

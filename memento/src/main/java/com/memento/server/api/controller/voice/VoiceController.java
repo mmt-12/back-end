@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.memento.server.annotation.AssociateId;
 import com.memento.server.api.controller.voice.dto.request.VoiceCreateRequest;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
@@ -31,11 +32,11 @@ public class VoiceController {
 	private final VoiceService voiceService;
 
 	@PostMapping
-	public ResponseEntity<Void> createVoice(@PathVariable("communityId") Long communityId,
-		// @AssociateId Long associateId,
+	public ResponseEntity<Void> createVoice(@AssociateId Long associateId,
+		@PathVariable("communityId") Long communityId,
 		@Valid @RequestPart("data") VoiceCreateRequest request,
 		@NotNull(message = "voice 값은 필수입니다.") @RequestPart("voice") MultipartFile voice) {
-		voiceService.createVoice(request.toServiceRequest(voice));
+		voiceService.createVoice(request.toServiceRequest(associateId, voice));
 		return ResponseEntity.status(CREATED).build();
 	}
 
@@ -48,11 +49,8 @@ public class VoiceController {
 	}
 
 	@DeleteMapping("/{voiceId}")
-	public ResponseEntity<Void> removeVoice(@PathVariable("communityId") Long communityId,
-		@PathVariable("voiceId") Long voiceId
-		// @AssociateId Long associateId
-	) {
-		voiceService.removeVoice(VoiceRemoveRequest.of(communityId, voiceId));
+	public ResponseEntity<Void> removeVoice(@AssociateId Long associateId, @PathVariable("voiceId") Long voiceId) {
+		voiceService.removeVoice(VoiceRemoveRequest.of(associateId, voiceId));
 		return ResponseEntity.noContent().build();
 	}
 }

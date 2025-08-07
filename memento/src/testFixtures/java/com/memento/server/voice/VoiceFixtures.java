@@ -14,9 +14,8 @@ public class VoiceFixtures {
 	public static Voice temporaryVoice() {
 		return Voice.builder()
 			.id(idGenerator.getAndIncrement())
-			.name(NAME)
 			.url(URL)
-			.isTemporary(true)
+			.temporary(true)
 			.associate(AssociateFixtures.associate())
 			.build();
 	}
@@ -26,7 +25,7 @@ public class VoiceFixtures {
 			.id(idGenerator.getAndIncrement())
 			.name(NAME)
 			.url(URL)
-			.isTemporary(false)
+			.temporary(false)
 			.associate(AssociateFixtures.associate())
 			.build();
 	}

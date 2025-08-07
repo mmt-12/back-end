@@ -14,9 +14,10 @@ public record VoiceCreateRequest(
 	@Size(max = 34, message = "name은 최대 34자(한글 기준)까지 입력 가능합니다.")
 	String name
 ) {
-	public VoiceCreateServiceRequest toServiceRequest(MultipartFile voice) {
+	public VoiceCreateServiceRequest toServiceRequest(Long associateId, MultipartFile voice) {
 		return VoiceCreateServiceRequest.builder()
 			.name(name)
+			.associateId(associateId)
 			.voice(voice)
 			.build();
 	}

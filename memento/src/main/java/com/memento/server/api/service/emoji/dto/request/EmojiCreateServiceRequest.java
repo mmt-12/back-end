@@ -7,6 +7,7 @@ import lombok.Builder;
 @Builder
 public record EmojiCreateServiceRequest(
 	String name,
+	Long associateId,
 	MultipartFile emoji
 ) {
 }

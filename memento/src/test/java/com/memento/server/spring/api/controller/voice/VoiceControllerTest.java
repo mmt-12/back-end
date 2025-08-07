@@ -30,7 +30,7 @@ import com.memento.server.voice.VoiceFixtures;
 public class VoiceControllerTest extends ControllerTestSupport {
 
 	@Test
-	@DisplayName("보이스 리액션을 등록한다.")
+	@DisplayName("보이스 리액션을 생성한다.")
 	void createVoice() throws Exception {
 		// given
 		long communityId = 1L;
@@ -58,6 +58,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/voices", communityId)
 					.file(data)
 					.file(voice)
+					.with(withJwt(1L, 1L, 1L))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isCreated());
@@ -66,7 +67,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
-	@DisplayName("보이스를 등록할 때, name은 필수값이다.")
+	@DisplayName("보이스 생성 시 name은 필수값이다.")
 	void createVoiceWithoutName() throws Exception {
 		// given
 		long communityId = 1L;
@@ -92,6 +93,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/voices", communityId)
 					.file(data)
 					.file(voice)
+					.with(withJwt(1L, 1L, 1L))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -105,7 +107,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
-	@DisplayName("보이스를 등록할 때, name은 최대 34자(한글 기준)까지 입력 가능하다.")
+	@DisplayName("보이스 생성 시 name은 최대 34자(한글 기준)까지 입력 가능하다.")
 	void createVoiceWithTooLongName() throws Exception {
 		// given
 		long communityId = 1L;
@@ -135,6 +137,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/voices", communityId)
 					.file(data)
 					.file(voice)
+					.with(withJwt(1L, 1L, 1L))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -148,7 +151,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
-	@DisplayName("보이스를 등록할 때, data는 필수값이다.")
+	@DisplayName("보이스 생성 시 data는 필수값이다.")
 	void createVoiceWithoutData() throws Exception {
 		// given
 		long communityId = 1L;
@@ -166,6 +169,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 		mockMvc.perform(
 				multipart("/api/v1/communities/{communityId}/voices", communityId)
 					.file(voice)
+					.with(withJwt(1L, 1L, 1L))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -179,34 +183,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
-	@DisplayName("보이스를 등록할 때, data는 필수값이다.")
-	void createVoiceWithoutData() throws Exception {
-		// given
-		long groupId = 1L;
-
-		MockMultipartFile voice = new MockMultipartFile(
-			"voice",
-			"voice.wav",
-			"audio/wav",
-			"dummy-audio-content".getBytes()
-		);
-
-		// when & then
-		mockMvc.perform(
-				multipart("/api/v1/groups/{groupId}/voices", groupId)
-					.file(voice)
-					.contentType(MULTIPART_FORM_DATA))
-			.andDo(print())
-			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-			.andExpect(jsonPath("$.code").value(1002))
-			.andExpect(jsonPath("$.message").value("필수 요청 part 누락"))
-			.andExpect(jsonPath("$.errors[0].field").value("data"))
-			.andExpect(jsonPath("$.errors[0].message").value("data은(는) 필수입니다."));
-	}
-
-	@Test
-	@DisplayName("보이스를 등록할 때, voice는 필수값이다.")
+	@DisplayName("보이스 생성 시 voice는 필수값이다.")
 	void createVoiceWithoutVoice() throws Exception {
 		// given
 		long communityId = 1L;
@@ -226,6 +203,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 		mockMvc.perform(
 				multipart("/api/v1/communities/{communityId}/voices", communityId)
 					.file(data)
+					.with(withJwt(1L, 1L, 1L))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -239,7 +217,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
-	@DisplayName("등록된 보이스 목록을 조회한다.")
+	@DisplayName("보이스 목록을 조회한다.")
 	void getVoices() throws Exception {
 		// given
 		long communityId = 1L;
@@ -256,17 +234,19 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.willReturn(response);
 
 		// when & then
-		mockMvc.perform(get("/api/v1/communities/{communityId}/voices", communityId)
-				.param("cursor", String.valueOf(cursor))
-				.param("size", String.valueOf(size))
-				.param("keyword", keyword))
+		mockMvc.perform(
+				get("/api/v1/communities/{communityId}/voices", communityId)
+					.param("cursor", String.valueOf(cursor))
+					.param("size", String.valueOf(size))
+					.param("keyword", keyword)
+					.with(withJwt(1L, 1L, 1L)))
 			.andExpect(status().isOk());
 
 		verify(voiceService).getVoices(any(VoiceListQueryRequest.class));
 	}
 
 	@Test
-	@DisplayName("등록된 보이스를 삭제한다.")
+	@DisplayName("보이스를 삭제한다.")
 	void removeVoice() throws Exception {
 		// given
 		long communityId = 1L;
@@ -276,7 +256,8 @@ public class VoiceControllerTest extends ControllerTestSupport {
 
 		// when && then
 		mockMvc.perform(
-				delete("/api/v1/communities/{communityId}/voices/{voiceId}", communityId, voiceId))
+				delete("/api/v1/communities/{communityId}/voices/{voiceId}", communityId, voiceId)
+					.with(withJwt(1L, 1L, 1L)))
 			.andDo(print())
 			.andExpect(status().isNoContent());
 

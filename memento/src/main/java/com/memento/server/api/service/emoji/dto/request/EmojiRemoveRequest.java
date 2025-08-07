@@ -4,11 +4,11 @@ import lombok.Builder;
 
 @Builder
 public record EmojiRemoveRequest(
-	Long communityId,
+	Long associateId,
 	Long emojiId
 ) {
 
-	public static EmojiRemoveRequest of(Long communityId, Long emojiId) {
-		return EmojiRemoveRequest.builder().communityId(communityId).emojiId(emojiId).build();
+	public static EmojiRemoveRequest of(Long associateId, Long emojiId) {
+		return EmojiRemoveRequest.builder().associateId(associateId).emojiId(emojiId).build();
 	}
 }

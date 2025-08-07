@@ -1,5 +1,7 @@
 package com.memento.server.achievement;
 
+import static com.memento.server.domain.achievement.AchievementType.*;
+
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.memento.server.domain.achievement.Achievement;
@@ -15,6 +17,7 @@ public class AchievementFixtures {
 			.id(idGenerator.getAndIncrement())
 			.name(NAME)
 			.criteria(CRITERIA)
+			.type(OPEN)
 			.build();
 	}
 }

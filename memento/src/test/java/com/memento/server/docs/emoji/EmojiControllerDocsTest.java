@@ -51,9 +51,11 @@ public class EmojiControllerDocsTest extends RestDocsSupport {
 	}
 
 	@Test
-	@DisplayName("이모지 리액션을 등록한다.")
+	@DisplayName("이모지 리액션을 생성한다.")
 	void createEmoji() throws Exception {
 		// given
+		setAuthentication(1L, 1L, 1L);
+
 		long communityId = 1L;
 		String json = objectMapper.writeValueAsString(EmojiCreateRequest.builder()
 			.name("인쥐용")
@@ -102,9 +104,11 @@ public class EmojiControllerDocsTest extends RestDocsSupport {
 	}
 
 	@Test
-	@DisplayName("등록된 이모지 목록을 조회한다.")
+	@DisplayName("이모지 목록을 조회한다.")
 	void getEmoji() throws Exception {
 		// given
+		setAuthentication(1L, 1L, 1L);
+
 		long communityId = 1L;
 		long cursor = 1L;
 		String keyword = "인쥐용";
@@ -155,9 +159,11 @@ public class EmojiControllerDocsTest extends RestDocsSupport {
 	}
 
 	@Test
-	@DisplayName("등록된 이모지를 삭제한다.")
+	@DisplayName("이모지를 삭제한다.")
 	void removeEmoji() throws Exception {
 		// given
+		setAuthentication(1L, 1L, 1L);
+
 		long communityId = 1L;
 		long emojiId = 1L;
 

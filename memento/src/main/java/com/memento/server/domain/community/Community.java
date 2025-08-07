@@ -1,11 +1,12 @@
 package com.memento.server.domain.community;
 
+import static com.memento.server.utility.validation.community.CommunityValidator.*;
 import static jakarta.persistence.ConstraintMode.*;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
-import java.time.LocalDate;
+import java.util.Objects;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -46,11 +47,29 @@ public class Community extends BaseEntity {
 	@JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Member member;
 
-	// todo test code 필요
 	public static Community create(String name, Member member) {
+		validateName(name);
+		validateMember(member);
+
 		return Community.builder()
 			.name(name)
 			.member(member)
 			.build();
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+		if (!(object instanceof Community community)) {
+			return false;
+		}
+		return id != null && Objects.equals(id, community.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(id);
 	}
 }

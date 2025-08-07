@@ -10,7 +10,7 @@ public class MemberFixtures {
 	private static final AtomicLong idGenerator = new AtomicLong();
 	private static final String NAME = "김싸피";
 	private static final String EMAIL = "example@naver.com";
-	private static final LocalDate BIRTH_DATE = LocalDate.of(2000, 1, 1);
+	private static final LocalDate BIRTHDAY = LocalDate.of(1999, 1, 1);
 	private static final Long KAKAO_ID = 1L;
 
 	public static Member member() {
@@ -18,7 +18,7 @@ public class MemberFixtures {
 			.id(idGenerator.getAndIncrement())
 			.name(NAME)
 			.email(EMAIL)
-			.brithday(BIRTH_DATE)
+			.birthday(BIRTHDAY)
 			.kakaoId(KAKAO_ID)
 			.build();
 	}

@@ -30,7 +30,7 @@ import com.memento.server.spring.ControllerTestSupport;
 public class EmojiControllerTest extends ControllerTestSupport {
 
 	@Test
-	@DisplayName("이모지 리액션을 등록한다.")
+	@DisplayName("이모지 리액션을 생성한다.")
 	void createEmoji() throws Exception {
 		// given
 		long communityId = 1L;
@@ -49,7 +49,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 			"emoji",
 			"emoji.png",
 			"image/png",
-			new byte[] {(byte) 0x89, 'P', 'N', 'G'}
+			new byte[] {(byte)0x89, 'P', 'N', 'G'}
 		);
 
 		doNothing().when(emojiService).createEmoji(any());
@@ -59,6 +59,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/emoji", communityId)
 					.file(data)
 					.file(emoji)
+					.with(withJwt(1L, 1L, 1L))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isCreated());
@@ -67,7 +68,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
-	@DisplayName("이모지를 등록할 때, name은 필수값이다.")
+	@DisplayName("이모지 생성 시 name은 필수값이다.")
 	void createEmojiWithoutName() throws Exception {
 		// given
 		long communityId = 1L;
@@ -85,7 +86,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 			"emoji",
 			"emoji.png",
 			"image/png",
-			new byte[] {(byte) 0x89, 'P', 'N', 'G'}
+			new byte[] {(byte)0x89, 'P', 'N', 'G'}
 		);
 
 		doNothing().when(emojiService).createEmoji(any());
@@ -95,6 +96,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/emoji", communityId)
 					.file(data)
 					.file(emoji)
+					.with(withJwt(1L, 1L, 1L))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -108,7 +110,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
-	@DisplayName("이모지를 등록할 때, name은 최대 34자(한글 기준)까지 입력 가능하다.")
+	@DisplayName("이모지 생성 시 name은 최대 34자(한글 기준)까지 입력 가능하다.")
 	void createEmojiWithTooLongName() throws Exception {
 		// given
 		long communityId = 1L;
@@ -128,7 +130,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 			"emoji",
 			"emoji.png",
 			"image/png",
-			new byte[] {(byte) 0x89, 'P', 'N', 'G'}
+			new byte[] {(byte)0x89, 'P', 'N', 'G'}
 		);
 
 		doNothing().when(emojiService).createEmoji(any());
@@ -138,6 +140,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/emoji", communityId)
 					.file(data)
 					.file(emoji)
+					.with(withJwt(1L, 1L, 1L))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -151,7 +154,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
-	@DisplayName("이모지를 등록할 때, data는 필수값이다.")
+	@DisplayName("이모지 생성 시 data는 필수값이다.")
 	void createEmojiWithoutData() throws Exception {
 		// given
 		long communityId = 1L;
@@ -160,7 +163,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 			"emoji",
 			"emoji.png",
 			"image/png",
-			new byte[] {(byte) 0x89, 'P', 'N', 'G'}
+			new byte[] {(byte)0x89, 'P', 'N', 'G'}
 		);
 
 		doNothing().when(emojiService).createEmoji(any());
@@ -169,6 +172,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 		mockMvc.perform(
 				multipart("/api/v1/communities/{communityId}/emoji", communityId)
 					.file(emoji)
+					.with(withJwt(1L, 1L, 1L))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -182,7 +186,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
-	@DisplayName("이모지를 등록할 때, emoji는 필수값이다.")
+	@DisplayName("이모지 생성 시 emoji는 필수값이다.")
 	void createEmojiWithoutEmoji() throws Exception {
 		// given
 		long communityId = 1L;
@@ -190,7 +194,6 @@ public class EmojiControllerTest extends ControllerTestSupport {
 		String json = objectMapper.writeValueAsString(EmojiCreateRequest.builder()
 			.name("인쥐용")
 			.build());
-
 
 		MockMultipartFile data = new MockMultipartFile(
 			"data",
@@ -205,6 +208,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 		mockMvc.perform(
 				multipart("/api/v1/communities/{communityId}/emoji", communityId)
 					.file(data)
+					.with(withJwt(1L, 1L, 1L))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -218,7 +222,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
-	@DisplayName("등록된 이모지 목록을 조회한다.")
+	@DisplayName("이모지 목록을 조회한다.")
 	void getEmoji() throws Exception {
 		// given
 		long communityId = 1L;
@@ -239,7 +243,8 @@ public class EmojiControllerTest extends ControllerTestSupport {
 				get("/api/v1/communities/{communityId}/emoji", communityId)
 					.param("cursor", String.valueOf(cursor))
 					.param("size", String.valueOf(size))
-					.param("keyword", keyword))
+					.param("keyword", keyword)
+					.with(withJwt(1L, 1L, 1L)))
 			.andDo(print())
 			.andExpect(status().isOk());
 
@@ -247,7 +252,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
-	@DisplayName("등록된 이모지를 삭제한다.")
+	@DisplayName("이모지를 삭제한다.")
 	void removeEmoji() throws Exception {
 		// given
 		long communityId = 1L;
@@ -257,7 +262,8 @@ public class EmojiControllerTest extends ControllerTestSupport {
 
 		// when && then
 		mockMvc.perform(
-				delete("/api/v1/communities/{communityId}/emoji/{emojiId}", communityId, emojiId))
+				delete("/api/v1/communities/{communityId}/emoji/{emojiId}", communityId, emojiId)
+					.with(withJwt(1L, 1L, 1L)))
 			.andDo(print())
 			.andExpect(status().isNoContent());
 
