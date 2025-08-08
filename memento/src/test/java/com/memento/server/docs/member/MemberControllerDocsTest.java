@@ -34,7 +34,7 @@ import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.api.service.member.MemberService;
 
-public class MemberControllerTestDocsTest extends RestDocsSupport {
+public class MemberControllerDocsTest extends RestDocsSupport {
 
 	private final MemberService memberService = mock(MemberService.class);
 

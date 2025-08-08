@@ -28,7 +28,7 @@ import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.api.service.auth.AuthService;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 
-public class AuthControllerTestDocsTest extends RestDocsSupport {
+public class AuthControllerDocsTest extends RestDocsSupport {
 
 	private final AuthService authService = mock(AuthService.class);
 

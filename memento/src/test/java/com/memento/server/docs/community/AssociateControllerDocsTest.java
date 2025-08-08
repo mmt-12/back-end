@@ -39,7 +39,7 @@ import com.memento.server.api.controller.community.dto.AssociateListResponse.Ass
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.api.service.community.AssociateService;
 
-public class AssociateControllerTestDocsTest extends RestDocsSupport {
+public class AssociateControllerDocsTest extends RestDocsSupport {
 
 	public static final String PATH = "/api/v1/communities/{communityId}/associates";
 
@@ -92,7 +92,6 @@ public class AssociateControllerTestDocsTest extends RestDocsSupport {
 				)
 			));
 	}
-
 
 	@Test
 	@DisplayName("그룹 참여자 목록 조회")
