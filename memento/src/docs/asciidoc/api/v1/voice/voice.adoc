@@ -1,0 +1,49 @@
+[[Voice-API]]
+== Voice API
+
+[[Voice-Create-API]]
+=== Voice Create API (보이스 등록)
+
+==== HTTP Request
+include::{snippets}/voice-create/http-request.adoc[]
+
+==== Path Parameters
+include::{snippets}/voice-create/path-parameters.adoc[]
+
+==== Request Parts
+include::{snippets}/voice-create/request-parts.adoc[]
+
+==== Request Part Fields
+include::{snippets}/voice-create/request-part-data-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/voice-create/http-response.adoc[]
+
+'''
+
+[[Voice-Get-API]]
+=== Voice Get API (보이스 목록 조회)
+
+==== HTTP Request
+include::{snippets}/voice-get/http-request.adoc[]
+
+==== Path Parameters
+include::{snippets}/voice-get/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/voice-get/http-response.adoc[]
+include::{snippets}/voice-get/response-fields.adoc[]
+
+'''
+
+[[Voice-Remove-API]]
+=== Voice Remove API (보이스 삭제)
+
+==== HTTP Request
+include::{snippets}/voice-remove/http-request.adoc[]
+
+==== Path Parameters
+include::{snippets}/voice-remove/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/voice-remove/http-response.adoc[]

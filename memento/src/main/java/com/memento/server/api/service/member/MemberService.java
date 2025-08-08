@@ -38,7 +38,7 @@ public class MemberService {
 		Member member = memberRepository.save(Member.builder()
 			.name(name)
 			.email(email)
-			.brithday(birthday)
+			.birthday(birthday)
 			.kakaoId(kakaoId)
 			.build());
 

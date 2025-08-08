@@ -1,8 +1,11 @@
 package com.memento.server.domain.achievement;
 
+import static com.memento.server.utility.validation.achievement.AchievementValidator.*;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+
+import java.util.Objects;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -42,4 +45,32 @@ public class Achievement extends BaseEntity {
 	@Enumerated(STRING)
 	@Column(name = "type", nullable = false)
 	private AchievementType type;
+
+	public static Achievement create(String name, String criteria, AchievementType type) {
+		validateName(name);
+		validateCriteria(criteria);
+		validateType(type);
+
+		return Achievement.builder()
+			.name(name)
+			.criteria(criteria)
+			.type(type)
+			.build();
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+		if (!(object instanceof Achievement achievement)) {
+			return false;
+		}
+		return getId() != null && Objects.equals(getId(), achievement.getId());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getId());
+	}
 }
