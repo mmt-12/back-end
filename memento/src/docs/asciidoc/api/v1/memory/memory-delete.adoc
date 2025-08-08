@@ -1,0 +1,16 @@
+[[memory-delete-test]]
+=== 기억 삭제
+
+==== HTTP Request
+
+include::{snippets}/memory-delete-test/http-request.adoc[]
+
+==== Path Parameters
+
+include::{snippets}/memory-delete-test/path-parameters.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/memory-delete-test/http-response.adoc[]
+
+NOTE: 응답이 없습니다.
