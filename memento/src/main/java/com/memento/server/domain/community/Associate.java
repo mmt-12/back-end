@@ -1,9 +1,12 @@
 package com.memento.server.domain.community;
 
+import static com.memento.server.utility.validation.associate.AssociateValidator.*;
 import static jakarta.persistence.ConstraintMode.NO_CONSTRAINT;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+
+import java.util.Objects;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -59,4 +62,32 @@ public class Associate extends BaseEntity {
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "community_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Community community;
+
+	public static Associate create(String nickname, Member member, Community community) {
+		validateNickname(nickname);
+		validateMember(member);
+		validateCommunity(community);
+
+		return Associate.builder()
+			.nickname(nickname)
+			.member(member)
+			.community(community)
+			.build();
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+		if (!(object instanceof Associate associate)) {
+			return false;
+		}
+		return id != null && Objects.equals(id, associate.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(id);
+	}
 }
