@@ -1,4 +1,4 @@
-[[auth-sign-in-test]]
+[[auth-redirect-test]]
 === 카카오 로그인 리다이렉트
 
 ==== HTTP Request

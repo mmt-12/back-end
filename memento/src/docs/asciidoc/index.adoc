@@ -9,16 +9,12 @@ endif::[]
 :toclevels: 2
 :sectlinks:
 
-<<<<<<< HEAD
-[[Auth-API]]
-== Auth API
-
-=======
 == Introduction
+
 본 문서는 시스템에서 제공하는 전체 REST API에 대해 기술합니다.
 각 API는 아래의 세부 목차로 구성되어 있습니다.
 
-[cols="2,9", options="header"]
+[cols="2,9",options="header"]
 |===
 | 구분 | 설명
 
@@ -44,7 +40,6 @@ endif::[]
 [[Auth-API]]
 == Auth API
 
->>>>>>> feature/24
 include::api/v1/auth/auth-sign-in.adoc[]
 include::api/v1/auth/auth-redirect.adoc[]
 
