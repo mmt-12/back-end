@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import com.memento.server.api.controller.achievement.AchievementController;
 import com.memento.server.docs.RestDocsSupport;
 
-public class AchievementControllerTestDocsTest extends RestDocsSupport {
+public class AchievementControllerDocsTest extends RestDocsSupport {
 
 	public static final String PATH = "/api/v1/communities/{communityId}/associates/{associateId}/achievements";
 

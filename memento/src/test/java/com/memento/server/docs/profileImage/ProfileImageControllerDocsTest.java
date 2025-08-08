@@ -30,9 +30,10 @@ import com.memento.server.api.controller.profileImage.ProfileImageController;
 import com.memento.server.api.controller.profileImage.dto.ReadProfileImageResponse;
 import com.memento.server.docs.RestDocsSupport;
 
-public class ProfileImageControllerTestDocsTest extends RestDocsSupport {
+public class ProfileImageControllerDocsTest extends RestDocsSupport {
 
 	public static final String PATH = "/api/v1/communities/{communityId}/associates/{associateId}/profile-images";
+
 	@Override
 	protected Object initController() {
 		return new ProfileImageController();
@@ -40,7 +41,7 @@ public class ProfileImageControllerTestDocsTest extends RestDocsSupport {
 
 	@Test
 	@DisplayName("프로필 이미지 등록")
-	void createTest() throws Exception{
+	void createTest() throws Exception {
 		// given
 		Long communityId = 1L;
 		Long associateId = 1L;
@@ -54,13 +55,13 @@ public class ProfileImageControllerTestDocsTest extends RestDocsSupport {
 
 		// when & then
 		mockMvc.perform(
-			multipart(PATH, communityId, associateId)
-				.file(file)
-				.contentType(MULTIPART_FORM_DATA)
-				.with(request -> {
-					request.setMethod("POST");     // 명시적 POST 설정
-					return request;
-				})
+				multipart(PATH, communityId, associateId)
+					.file(file)
+					.contentType(MULTIPART_FORM_DATA)
+					.with(request -> {
+						request.setMethod("POST");     // 명시적 POST 설정
+						return request;
+					})
 			)
 			.andDo(print())
 			.andExpect(status().isOk())
@@ -74,7 +75,7 @@ public class ProfileImageControllerTestDocsTest extends RestDocsSupport {
 
 	@Test
 	@DisplayName("프로필 이미지 등록 취소")
-	void deleteTest() throws Exception{
+	void deleteTest() throws Exception {
 		// given
 		Long communityId = 1L;
 		Long associateId = 1L;
@@ -90,7 +91,7 @@ public class ProfileImageControllerTestDocsTest extends RestDocsSupport {
 
 	@Test
 	@DisplayName("프로필 이미지 조회")
-	void readTest() throws Exception{
+	void readTest() throws Exception {
 		// given
 		Long groupId = 1L;
 		Long associateId = 1L;
@@ -115,9 +116,9 @@ public class ProfileImageControllerTestDocsTest extends RestDocsSupport {
 			.build();
 
 		mockMvc.perform(
-			get(PATH, groupId, associateId)
-				.param("size", String.valueOf(size))
-				.param("cursor", String.valueOf(cursor)))
+				get(PATH, groupId, associateId)
+					.param("size", String.valueOf(size))
+					.param("cursor", String.valueOf(cursor)))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.profileImages[0].id").value(response.profileImages().get(0).getId()))
@@ -135,9 +136,7 @@ public class ProfileImageControllerTestDocsTest extends RestDocsSupport {
 					fieldWithPath("cursor").type(NUMBER).description("커서 값"),
 					fieldWithPath("hasNext").type(BOOLEAN).description("다음 값 존재 여부")
 				)
-				));
-
-
+			));
 
 	}
 }

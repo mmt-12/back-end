@@ -38,7 +38,7 @@ import com.memento.server.api.controller.guestBook.dto.ReadGuestBookResponse;
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.domain.guestBook.GuestBookType;
 
-public class GuestBookControllerTestDocsTest extends RestDocsSupport {
+public class GuestBookControllerDocsTest extends RestDocsSupport {
 
 	public static final String PATH = "/api/v1/communities/{communityId}/associates/{associateId}/guest-books";
 	public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
@@ -126,13 +126,13 @@ public class GuestBookControllerTestDocsTest extends RestDocsSupport {
 
 		// when & then
 		mockMvc.perform(
-			multipart(PATH + "/bubble", groupId, associateId)
-				.file(file)
-				.contentType(MULTIPART_FORM_DATA)
-				.with(request -> {
-					request.setMethod("POST");
-					return request;
-				})
+				multipart(PATH + "/bubble", groupId, associateId)
+					.file(file)
+					.contentType(MULTIPART_FORM_DATA)
+					.with(request -> {
+						request.setMethod("POST");
+						return request;
+					})
 			)
 			.andDo(print())
 			.andExpect(status().isOk())
@@ -156,11 +156,11 @@ public class GuestBookControllerTestDocsTest extends RestDocsSupport {
 		// when & then
 		ReadGuestBookResponse response = ReadGuestBookResponse.builder()
 			.guestBooks(List.of(ReadGuestBookResponse.GuestBook.builder()
-				.id(101L)
-				.type(GuestBookType.TEXT)
-				.content("쑤야 처세 함하자!")
-				.createdAt(LocalDateTime.of(2024, 6, 21, 10, 30, 0))
-				.build(),
+					.id(101L)
+					.type(GuestBookType.TEXT)
+					.content("쑤야 처세 함하자!")
+					.createdAt(LocalDateTime.of(2024, 6, 21, 10, 30, 0))
+					.build(),
 				ReadGuestBookResponse.GuestBook.builder()
 					.id(102L)
 					.type(GuestBookType.EMOJI)
@@ -172,21 +172,22 @@ public class GuestBookControllerTestDocsTest extends RestDocsSupport {
 			.hasNext(false)
 			.build();
 
-
 		mockMvc.perform(
-			get(PATH, groupId, associateId)
-				.param("size", String.valueOf(size))
-				.param("cursor", String.valueOf(cursor)))
+				get(PATH, groupId, associateId)
+					.param("size", String.valueOf(size))
+					.param("cursor", String.valueOf(cursor)))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.guestBooks[0].id").value(response.guestBooks().get(0).getId()))
 			.andExpect(jsonPath("$.guestBooks[0].type").value("TEXT"))
 			.andExpect(jsonPath("$.guestBooks[0].content").value(response.guestBooks().get(0).getContent()))
-			.andExpect(jsonPath("$.guestBooks[0].createdAt").value(response.guestBooks().get(0).getCreatedAt().format(formatter)))
+			.andExpect(jsonPath("$.guestBooks[0].createdAt").value(
+				response.guestBooks().get(0).getCreatedAt().format(formatter)))
 			.andExpect(jsonPath("$.guestBooks[1].id").value(response.guestBooks().get(1).getId()))
 			.andExpect(jsonPath("$.guestBooks[1].type").value("EMOJI"))
 			.andExpect(jsonPath("$.guestBooks[1].content").value(response.guestBooks().get(1).getContent()))
-			.andExpect(jsonPath("$.guestBooks[1].createdAt").value(response.guestBooks().get(1).getCreatedAt().format(formatter)))
+			.andExpect(jsonPath("$.guestBooks[1].createdAt").value(
+				response.guestBooks().get(1).getCreatedAt().format(formatter)))
 			.andExpect(jsonPath("$.cursor").value(response.cursor()))
 			.andExpect(jsonPath("$.hasNext").value(response.hasNext()))
 			.andDo(document("guestBook-read-test",

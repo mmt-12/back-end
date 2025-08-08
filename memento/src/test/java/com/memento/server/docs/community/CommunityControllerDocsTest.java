@@ -23,7 +23,7 @@ import com.memento.server.api.controller.community.dto.CommunityListResponse.Com
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.api.service.community.CommunityService;
 
-public class CommunityControllerTestDocsTest extends RestDocsSupport {
+public class CommunityControllerDocsTest extends RestDocsSupport {
 
 	private final CommunityService communityService = mock(CommunityService.class);
 
