@@ -54,6 +54,9 @@ include::api/v1/member/update.adoc[]
 
 include::api/v1/community/community-list.adoc[]
 
+[[Memeory-API]]
+include::api/v1/memory/memory.adoc[]
+
 [[Associate-API]]
 == Associate API
 
