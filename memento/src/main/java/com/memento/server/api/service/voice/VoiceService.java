@@ -5,10 +5,14 @@ import static org.apache.commons.io.FilenameUtils.getExtension;
 import java.io.InputStream;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.memento.server.api.service.voice.dto.request.VoiceCreateServiceRequest;
+import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
+import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
+import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.config.MinioProperties;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.voice.Voice;
@@ -18,8 +22,9 @@ import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
 
-@Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Service
 public class VoiceService {
 
 	private final VoiceRepository voiceRepository;
@@ -29,6 +34,19 @@ public class VoiceService {
 
 	private final String bucket = minioProperties.getBucket();
 	private final String baseUrl = minioProperties.getUrl();
+
+
+	public void createVoice(VoiceCreateServiceRequest request) {
+
+	}
+
+	public VoiceListResponse getVoices(VoiceListQueryRequest request) {
+		return null;
+	}
+
+	public void removeVoice(VoiceRemoveRequest request) {
+
+	}
 
 	public Long saveVoice(Associate associate, MultipartFile voice) {
 
@@ -54,12 +72,11 @@ public class VoiceService {
 		}
 
 		Voice saveVoice = voiceRepository.save(Voice.builder()
-				.associate(associate)
-				.url(baseUrl + "/" + filename)
-				.isTemporary(true)
-				.build());
+			.associate(associate)
+			.url(baseUrl + "/" + filename)
+			.isTemporary(true)
+			.build());
 
 		return saveVoice.getId();
 	}
-
 }
