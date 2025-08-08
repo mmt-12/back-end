@@ -25,7 +25,7 @@ import com.memento.server.api.controller.mbti.dto.CreateMbtiRequest;
 import com.memento.server.api.controller.mbti.dto.ReadMbtiResponse;
 import com.memento.server.docs.RestDocsSupport;
 
-public class MbtiControllerTestDocsTest extends RestDocsSupport {
+public class MbtiControllerDocsTest extends RestDocsSupport {
 
 	public static final String PATH = "/api/v1/communities/{communityId}/associates/{associateId}/mbti-tests";
 
@@ -126,6 +126,6 @@ public class MbtiControllerTestDocsTest extends RestDocsSupport {
 					fieldWithPath("ESTP").type(NUMBER).description("ESTP"),
 					fieldWithPath("ESTJ").type(NUMBER).description("ESTJ")
 				)
-				));
+			));
 	}
 }

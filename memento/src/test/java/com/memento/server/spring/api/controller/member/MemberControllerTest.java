@@ -1,4 +1,4 @@
-package com.memento.server.spring.api.controller;
+package com.memento.server.spring.api.controller.member;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
