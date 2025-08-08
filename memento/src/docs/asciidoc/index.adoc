@@ -69,7 +69,7 @@ include::api/v1/associate/associate-update.adoc[]
 [[Achievement-API]]
 == Achievement API
 
-include::api/v1/achievement/Achievement-read.adoc[]
+include::api/v1/achievement/achievement-read.adoc[]
 
 [[GuestBook-API]]
 == GuestBook API
