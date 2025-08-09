@@ -1,0 +1,12 @@
+[[ProfileImage-API]]
+== ProfileImage API
+
+include::profileImage-read.adoc[]
+
+'''
+
+include::profileImage-create.adoc[]
+
+'''
+
+include::profileImage-delete.adoc[]

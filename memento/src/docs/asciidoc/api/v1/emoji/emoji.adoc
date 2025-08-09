@@ -1,49 +1,12 @@
 [[Emoji-API]]
 == Emoji API
 
-[[Emoji-Create-API]]
-=== Emoji Create API (이모지 등록)
-
-==== HTTP Request
-include::{snippets}/emoji-create/http-request.adoc[]
-
-==== Path Parameters
-include::{snippets}/emoji-create/path-parameters.adoc[]
-
-==== Request Parts
-include::{snippets}/emoji-create/request-parts.adoc[]
-
-==== Request Part Fields
-include::{snippets}/emoji-create/request-part-data-fields.adoc[]
-
-==== HTTP Response
-include::{snippets}/emoji-create/http-response.adoc[]
+include::emoji-create.adoc[]
 
 '''
 
-[[Emoji-Get-API]]
-=== Emoji Get API (이모지 목록 조회)
-
-==== HTTP Request
-include::{snippets}/emoji-get/http-request.adoc[]
-
-==== Path Parameters
-include::{snippets}/emoji-get/path-parameters.adoc[]
-
-==== HTTP Response
-include::{snippets}/emoji-get/http-response.adoc[]
-include::{snippets}/emoji-get/response-fields.adoc[]
+include::emoji-get.adoc[]
 
 '''
 
-[[Emoji-Remove-API]]
-=== Emoji Remove API (이모지 삭제)
-
-==== HTTP Request
-include::{snippets}/emoji-remove/http-request.adoc[]
-
-==== Path Parameters
-include::{snippets}/emoji-remove/path-parameters.adoc[]
-
-==== HTTP Response
-include::{snippets}/emoji-remove/http-response.adoc[]
+include::emoji-remove.adoc[]

@@ -1,0 +1,17 @@
+[[Voice-Create-API]]
+=== 보이스 등록
+
+==== HTTP Request
+include::{snippets}/voice-create/http-request.adoc[]
+
+==== Path Parameters
+include::{snippets}/voice-create/path-parameters.adoc[]
+
+==== Request Parts
+include::{snippets}/voice-create/request-parts.adoc[]
+
+==== Request Part Fields
+include::{snippets}/voice-create/request-part-data-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/voice-create/http-response.adoc[]

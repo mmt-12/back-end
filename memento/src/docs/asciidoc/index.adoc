@@ -37,74 +37,28 @@ endif::[]
 | 응답 메시지에서 JSON 페이로드에 포함된 필드의 구조 및 의미를 설명합니다.
 |===
 
-[[Auth-API]]
-== Auth API
+include::api/v1/auth/auth.adoc[]
 
-include::api/v1/auth/auth-sign-in.adoc[]
-include::api/v1/auth/auth-redirect.adoc[]
+include::api/v1/member/member.adoc[]
 
-[[Member-API]]
-== Member API
+include::api/v1/community/community.adoc[]
 
-include::api/v1/member/signup.adoc[]
-include::api/v1/member/update.adoc[]
-
-[[Community-API]]
-== Community API
-
-include::api/v1/community/community-list.adoc[]
-
-[[Memeory-API]]
 include::api/v1/memory/memory.adoc[]
 
-[[Associate-API]]
-== Associate API
+include::api/v1/associate/associate.adoc[]
 
-include::api/v1/associate/associate-read.adoc[]
-include::api/v1/associate/associate-list.adoc[]
-include::api/v1/associate/associate-update.adoc[]
+include::api/v1/achievement/achievement.adoc[]
 
-[[Achievement-API]]
-== Achievement API
+include::api/v1/guestBook/guestBook.adoc[]
 
-include::api/v1/achievement/achievement-read.adoc[]
+include::api/v1/mbti/mbti.adoc[]
 
-[[GuestBook-API]]
-== GuestBook API
+include::api/v1/profileImage/profileImage.adoc[]
 
-include::api/v1/guestBook/guestBook-read.adoc[]
-include::api/v1/guestBook/guestBook-create-bubble.adoc[]
-include::api/v1/guestBook/guestBook-create-reaction.adoc[]
-include::api/v1/guestBook/guestBook-create-text.adoc[]
-include::api/v1/guestBook/guestBook-delete.adoc[]
+include::api/v1/post/post.adoc[]
 
-[[Mbti-API]]
-== Mbti API
-
-include::api/v1/mbti/mbti-read.adoc[]
-include::api/v1/mbti/mbti-create.adoc[]
-
-[[ProfileImage-API]]
-== ProfileImage API
-
-include::api/v1/profileImage/profileImage-read.adoc[]
-include::api/v1/profileImage/profileImage-create.adoc[]
-include::api/v1/profileImage/profileImage-delete.adoc[]
-
-[[Post-API]]
-== Post API
-
-include::api/v1/post/post-read.adoc[]
-include::api/v1/post/post-read-all.adoc[]
-include::api/v1/post/post-create.adoc[]
-include::api/v1/post/post-update.adoc[]
-include::api/v1/post/post-delete.adoc[]
-
-[[Comment-API]]
 include::api/v1/comment/comment.adoc[]
 
-[[Voice-API]]
 include::api/v1/voice/voice.adoc[]
 
-[[Emoji-API]]
 include::api/v1/emoji/emoji.adoc[]
