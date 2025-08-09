@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
 import com.memento.server.api.service.voice.VoiceService;
+import com.memento.server.common.error.ErrorCodes;
+import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.guestBook.GuestBook;
@@ -26,9 +28,9 @@ public class GuestBookService {
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 참여자 입니다."));
+			.orElseThrow(() -> new MementoException(ErrorCodes.ASSOCIATE_NOT_EXISTENCE));
 		if(!communityId.equals(associate.getCommunity().getId())){
-			throw new IllegalArgumentException("해당 커뮤니티의 참가자가 아닙니다.");
+			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
 		}
 
 		return associate;
@@ -61,7 +63,7 @@ public class GuestBookService {
 		Long contentId = voiceService.saveVoice(associate, voice);
 
 		if (contentId == null) {
-			throw new IllegalStateException("음성파일 저장 중 문제가 생겼습니다.");
+			throw new MementoException(ErrorCodes.VOICE_SAVE_FAIL);
 		}
 
 		guestBookRepository.save(GuestBook.builder()
@@ -107,7 +109,7 @@ public class GuestBookService {
 		Associate associate = validAssociate(communityId, associateId);
 
 		GuestBook guestBook = guestBookRepository.findByIdAndDeletedAtNull(guestBookId)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 방명록입니다."));
+			.orElseThrow(() -> new MementoException(ErrorCodes.GUESTBOOK_NOT_EXISTENCE));
 
 		guestBook.markDeleted();
 	}

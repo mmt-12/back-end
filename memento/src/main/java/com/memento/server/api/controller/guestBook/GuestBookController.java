@@ -39,7 +39,7 @@ public class GuestBookController {
 		@RequestBody CreateGuestBookRequest request
 	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
 		guestBookService.create(communityId, associateId, request.type(), request.contentId(), request.content());
@@ -54,7 +54,7 @@ public class GuestBookController {
 		@RequestPart MultipartFile voice
 	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
 		guestBookService.createBubble(communityId, associateId, voice);
@@ -70,7 +70,7 @@ public class GuestBookController {
 		@RequestParam(required = false) Long cursor
 	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
 		Pageable pageable = PageRequest.of(0, size);
@@ -87,7 +87,7 @@ public class GuestBookController {
 		@PathVariable Long guestBookId
 	){
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 		if(!currentAssociateId.equals(associateId)) {
 			throw new MementoException(ErrorCodes.ASSOCIATE_NOT_AUTHORITY);

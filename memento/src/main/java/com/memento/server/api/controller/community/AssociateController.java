@@ -33,7 +33,7 @@ public class AssociateController {
 		@PathVariable Long associateId
 	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
 		return ResponseEntity.ok(associateService.search(communityId, associateId));
@@ -48,7 +48,7 @@ public class AssociateController {
 		@RequestParam(defaultValue = "10") Integer size) {
 
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
 		return ResponseEntity.ok(associateService.searchAll(communityId, keyword, cursor, size));
@@ -62,7 +62,7 @@ public class AssociateController {
 		UpdateAssociateRequest request
 	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 		associateService.update(
 			communityId,

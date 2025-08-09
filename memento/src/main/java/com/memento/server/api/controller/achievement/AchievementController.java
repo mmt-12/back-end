@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.memento.server.annotation.AssociateId;
 import com.memento.server.annotation.CommunityId;
 import com.memento.server.api.controller.achievement.dto.SearchAchievementResponse;
 import com.memento.server.api.service.achievement.AchievementService;
@@ -29,7 +28,7 @@ public class AchievementController {
 		@PathVariable Long associateId
 	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 		return ResponseEntity.ok(achievementService.search(currentCommunityId, associateId));
 	}

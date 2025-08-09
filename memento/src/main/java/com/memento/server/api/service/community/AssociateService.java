@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 
 import com.memento.server.api.controller.community.dto.AssociateListResponse;
 import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
+import com.memento.server.common.error.ErrorCodes;
+import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.achievement.Achievement;
 import com.memento.server.domain.achievement.AchievementRepository;
 import com.memento.server.domain.community.Associate;
@@ -20,9 +22,9 @@ public class AssociateService {
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = repository.findByIdAndDeletedAtNull(associateId)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 참여자 입니다."));
+			.orElseThrow(() -> new MementoException(ErrorCodes.ASSOCIATE_NOT_EXISTENCE));
 		if(!communityId.equals(associate.getCommunity().getId())){
-			throw new IllegalArgumentException("해당 커뮤니티의 참가자가 아닙니다.");
+			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
 		}
 
 		return associate;
@@ -58,7 +60,7 @@ public class AssociateService {
 		if (nickname != null) {newNickname = nickname;}
 		if (achievementId != null) {
 			newAchievement = achievementRepository.findById(achievementId)
-				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 업적입니다."));}
+				.orElseThrow(() -> new MementoException(ErrorCodes.ACHIEVEMENT_NOT_EXISTENCE));}
 		if (introduction != null) {newIntroduction = introduction;}
 
 		associate.updateProfile(newProfileImageUrl, newNickname, newAchievement, newIntroduction);

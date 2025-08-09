@@ -38,7 +38,7 @@ public class ProfileImageController {
 		@RequestPart MultipartFile image
 	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 		if(currentAssociateId.equals(associateId)) {
 			throw new MementoException(ErrorCodes.ASSOCIATE_NOT_AUTHORITY);
@@ -56,7 +56,7 @@ public class ProfileImageController {
 		@PathVariable Long profileImageId
 	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
 		profileImageService.delete(communityId, associateId, profileImageId);
@@ -72,7 +72,7 @@ public class ProfileImageController {
 		@RequestParam(required = false) Long cursor
 	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
 		Pageable pageable = PageRequest.of(0, size);

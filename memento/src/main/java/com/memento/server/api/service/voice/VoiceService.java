@@ -13,6 +13,8 @@ import com.memento.server.api.service.voice.dto.request.VoiceCreateServiceReques
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
+import com.memento.server.common.error.ErrorCodes;
+import com.memento.server.common.exception.MementoException;
 import com.memento.server.config.MinioProperties;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.voice.Voice;
@@ -65,7 +67,7 @@ public class VoiceService {
 			);
 
 		} catch (Exception e) {
-			throw new RuntimeException("음성 파일 저장에 실패하였습니다.", e);
+			throw new MementoException(ErrorCodes.VOICE_SAVE_FAIL);
 		}
 
 		Voice saveVoice = voiceRepository.save(Voice.builder()

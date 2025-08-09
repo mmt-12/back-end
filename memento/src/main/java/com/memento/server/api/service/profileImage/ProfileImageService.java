@@ -10,8 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
 import com.memento.server.api.controller.profileImage.dto.SearchProfileImageResponse;
+import com.memento.server.common.error.ErrorCodes;
+import com.memento.server.common.exception.MementoException;
 import com.memento.server.config.MinioProperties;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
@@ -34,9 +35,9 @@ public class ProfileImageService {
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 참여자 입니다."));
+			.orElseThrow(() -> new MementoException(ErrorCodes.ASSOCIATE_NOT_EXISTENCE));
 		if(!communityId.equals(associate.getCommunity().getId())){
-			throw new IllegalArgumentException("해당 커뮤니티의 참가자가 아닙니다.");
+			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
 		}
 
 		return associate;
@@ -58,10 +59,10 @@ public class ProfileImageService {
 		Associate registrant = validAssociate(communityId, registrantId);
 
 		ProfileImage profileImage = profileImageRepository.findByIdAndCreatedAtIsNull(profileImageId)
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로필 이미지입니다."));
+			.orElseThrow(() -> new MementoException(ErrorCodes.PROFILEIMAGE_NOT_EXISTENCE));
 
 		if(!profileImage.getRegistrant().equals(registrant)){
-			throw new IllegalArgumentException("삭제 권한이 없는 프로필 이미지입니다.");
+			throw new MementoException(ErrorCodes.ASSOCIATE_NOT_AUTHORITY);
 		}
 
 		profileImage.markDeleted();
@@ -115,7 +116,7 @@ public class ProfileImageService {
 			);
 
 		} catch (Exception e) {
-			throw new RuntimeException("프로필 이미지 저장에 실패하였습니다.", e);
+			throw new MementoException(ErrorCodes.PROFILEIMAGE_SAVE_FAIL);
 		}
 
 		return baseUrl + "/" + filename;
