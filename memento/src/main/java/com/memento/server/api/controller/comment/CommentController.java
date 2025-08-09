@@ -17,9 +17,7 @@ import com.memento.server.api.controller.comment.dto.EmojiCommentCreateRequest;
 import com.memento.server.api.controller.comment.dto.VoiceCommentCreateRequest;
 import com.memento.server.api.service.comment.CommentService;
 import com.memento.server.api.service.comment.dto.request.CommentDeleteServiceRequest;
-import com.memento.server.api.service.comment.dto.request.VoiceCommentCreateServiceRequest;
-import com.memento.server.api.service.voice.VoiceService;
-import com.memento.server.api.service.voice.dto.request.TemporaryVoiceCreateServiceRequest;
+import com.memento.server.api.service.comment.dto.request.TemporaryVoiceCommentCreateServiceRequest;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -31,7 +29,6 @@ import lombok.RequiredArgsConstructor;
 public class CommentController {
 
 	private final CommentService commentService;
-	private final VoiceService voiceService;
 
 	@PostMapping("/emoji")
 	public ResponseEntity<Void> createEmojiComment(@PathVariable("postId") Long postId,
@@ -56,9 +53,8 @@ public class CommentController {
 		@PathVariable("communityId") Long communityId,
 		@NotNull(message = "voice 값은 필수입니다.") @RequestPart("voice") MultipartFile voice,
 		@AssociateId Long associateId) {
-		final Long voiceId = voiceService.createTemporaryVoice(
-			TemporaryVoiceCreateServiceRequest.of(associateId, voice));
-		commentService.createVoiceComment(VoiceCommentCreateServiceRequest.of(voiceId, postId, associateId));
+		commentService.createTemporaryVoiceComment(
+			TemporaryVoiceCommentCreateServiceRequest.of(postId, associateId, voice));
 		return ResponseEntity.status(CREATED).build();
 	}
 

@@ -1,10 +1,16 @@
 package com.memento.server.domain.comment;
 
+import static com.memento.server.domain.comment.CommentType.*;
+import static com.memento.server.utility.validation.comment.CommentValidator.validateAssociate;
+import static com.memento.server.utility.validation.comment.CommentValidator.validatePost;
+import static com.memento.server.utility.validation.comment.CommentValidator.validateUrl;
 import static jakarta.persistence.ConstraintMode.NO_CONSTRAINT;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+
+import java.util.Objects;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -53,4 +59,46 @@ public class Comment extends BaseEntity {
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "associate_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Associate associate;
+
+	public static Comment createVoiceComment(String url, Post post, Associate associate) {
+		validateUrl(url);
+		validatePost(post);
+		validateAssociate(associate);
+
+		return Comment.builder()
+			.url(url)
+			.type(VOICE)
+			.post(post)
+			.associate(associate)
+			.build();
+	}
+
+	public static Comment createEmojiComment(String url, Post post, Associate associate) {
+		validateUrl(url);
+		validatePost(post);
+		validateAssociate(associate);
+
+		return Comment.builder()
+			.url(url)
+			.type(EMOJI)
+			.post(post)
+			.associate(associate)
+			.build();
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+		if (!(object instanceof Comment comment)) {
+			return false;
+		}
+		return id != null && Objects.equals(id, comment.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(id);
+	}
 }

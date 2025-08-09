@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.memento.server.api.service.comment.dto.request.CommentDeleteServiceRequest;
 import com.memento.server.api.service.comment.dto.request.EmojiCommentCreateServiceRequest;
+import com.memento.server.api.service.comment.dto.request.TemporaryVoiceCommentCreateServiceRequest;
 import com.memento.server.api.service.comment.dto.request.VoiceCommentCreateServiceRequest;
 import com.memento.server.domain.comment.CommentRepository;
 
@@ -22,6 +23,10 @@ public class CommentService {
 	}
 
 	public void createVoiceComment(VoiceCommentCreateServiceRequest request) {
+
+	}
+
+	public void createTemporaryVoiceComment(TemporaryVoiceCommentCreateServiceRequest request) {
 
 	}
 
