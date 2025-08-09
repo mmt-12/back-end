@@ -109,6 +109,6 @@ public class GuestBookService {
 		GuestBook guestBook = guestBookRepository.findByIdAndDeletedAtNull(guestBookId)
 			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 방명록입니다."));
 
-		guestBook.delete();
+		guestBook.markDeleted();
 	}
 }

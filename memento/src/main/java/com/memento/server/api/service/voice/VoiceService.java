@@ -31,11 +31,6 @@ public class VoiceService {
 	private final MinioClient minioClient;
 	private final MinioProperties minioProperties;
 
-
-	private final String bucket = minioProperties.getBucket();
-	private final String baseUrl = minioProperties.getUrl();
-
-
 	public void createVoice(VoiceCreateServiceRequest request) {
 
 	}
@@ -49,6 +44,8 @@ public class VoiceService {
 	}
 
 	public Long saveVoice(Associate associate, MultipartFile voice) {
+		String bucket = minioProperties.getBucket();
+		String baseUrl = minioProperties.getUrl();
 
 		String originalFilename = voice.getOriginalFilename();
 		String extension = getExtension(originalFilename);
@@ -74,7 +71,7 @@ public class VoiceService {
 		Voice saveVoice = voiceRepository.save(Voice.builder()
 			.associate(associate)
 			.url(baseUrl + "/" + filename)
-			.isTemporary(true)
+			.temporary(true)
 			.build());
 
 		return saveVoice.getId();

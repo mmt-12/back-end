@@ -11,18 +11,18 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Builder
-public record ReadGuestBookResponse(
+public record SearchGuestBookResponse(
 	List<GuestBook> guestBooks,
 	Long cursor,
 	boolean hasNext
 ) {
-	public static ReadGuestBookResponse from() {
+	public static SearchGuestBookResponse from() {
 		GuestBook gb1 = new GuestBook(101L, GuestBookType.TEXT, "쑤야 처세 함하자!",
 			LocalDateTime.of(2024, 6, 21, 10, 30, 0));
 		GuestBook gb2 = new GuestBook(102L, GuestBookType.EMOJI, "www.example.com/emojis/smile.png",
 			LocalDateTime.of(2024, 6, 21, 10, 45, 0));
 
-		return new ReadGuestBookResponse(List.of(gb1, gb2), 102L, false);
+		return new SearchGuestBookResponse(List.of(gb1, gb2), 102L, false);
 	}
 
 	@Getter

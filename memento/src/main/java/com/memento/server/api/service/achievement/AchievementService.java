@@ -1,14 +1,11 @@
 package com.memento.server.api.service.achievement;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.memento.server.api.controller.achievement.dto.ReadAchievementResponse;
+import com.memento.server.api.controller.achievement.dto.SearchAchievementResponse;
 import com.memento.server.api.service.achievement.dto.SearchAchievementDto;
-import com.memento.server.domain.achievement.Achievement;
 import com.memento.server.domain.achievement.AchievementRepository;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
@@ -31,13 +28,13 @@ public class AchievementService {
 		return associate;
 	}
 
-	public ReadAchievementResponse search(Long communityId, Long associateId) {
+	public SearchAchievementResponse search(Long communityId, Long associateId) {
 		Associate associate = validAssociate(communityId, associateId);
 
 		List<SearchAchievementDto> achievements = achievementRepository.findAllWithObtainedRecord(associate.getId());
 
-		List<ReadAchievementResponse.Achievement> achievementList = achievements.stream()
-			.map(dto -> ReadAchievementResponse.Achievement.builder()
+		List<SearchAchievementResponse.Achievement> achievementList = achievements.stream()
+			.map(dto -> SearchAchievementResponse.Achievement.builder()
 					.id(dto.id())
 					.name(dto.name())
 					.criteria(dto.criteria())
@@ -47,7 +44,7 @@ public class AchievementService {
 			)
 			.toList();
 
-		return ReadAchievementResponse.builder()
+		return SearchAchievementResponse.builder()
 			.achievements(achievementList)
 			.build();
 	}

@@ -31,7 +31,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.memento.server.api.controller.community.AssociateController;
-import com.memento.server.api.controller.community.dto.ReadAssociateResponse;
+import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
 import com.memento.server.api.controller.community.dto.UpdateAssociateRequest;
 import com.memento.server.api.controller.community.dto.AssociateListResponse;
 import com.memento.server.api.controller.community.dto.AssociateListResponse.AssociateResponse;
@@ -58,9 +58,9 @@ public class AssociateControllerDocsTest extends RestDocsSupport {
 		Long associateId = 1L;
 
 		// when & then
-		ReadAssociateResponse response = ReadAssociateResponse.builder()
+		SearchAssociateResponse response = SearchAssociateResponse.builder()
 			.nickname("오큰수")
-			.achievement(ReadAssociateResponse.Achievement.builder()
+			.achievement(SearchAssociateResponse.Achievement.builder()
 				.id(1L)
 				.name("뤼전드")
 				.build())

@@ -1,4 +1,123 @@
 package com.memento.server.api.service.profileImage;
 
+import static org.apache.commons.io.FilenameUtils.getExtension;
+
+import java.io.InputStream;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
+import com.memento.server.api.controller.profileImage.dto.SearchProfileImageResponse;
+import com.memento.server.config.MinioProperties;
+import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.community.AssociateRepository;
+import com.memento.server.domain.profileImage.ProfileImage;
+import com.memento.server.domain.profileImage.ProfileImageRepository;
+import com.memento.server.domain.voice.Voice;
+
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
 public class ProfileImageService {
+
+	private final AssociateRepository associateRepository;
+	private final ProfileImageRepository profileImageRepository;
+	private final MinioClient minioClient;
+	private final MinioProperties minioProperties;
+
+	public Associate validAssociate(Long communityId, Long associateId){
+		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 참여자 입니다."));
+		if(!communityId.equals(associate.getCommunity().getId())){
+			throw new IllegalArgumentException("해당 커뮤니티의 참가자가 아닙니다.");
+		}
+
+		return associate;
+	}
+
+	public void create(Long communityId, Long associateId, Long registrantId, MultipartFile image) {
+		Associate associate = validAssociate(communityId, associateId);
+		Associate registrant = validAssociate(communityId, registrantId);
+
+		String url = saveImage(associate, image);
+		profileImageRepository.save(ProfileImage.builder()
+				.url(url)
+				.associate(associate)
+				.registrant(registrant)
+				.build());
+	}
+
+	public void delete(Long communityId, Long registrantId, Long profileImageId) {
+		Associate registrant = validAssociate(communityId, registrantId);
+
+		ProfileImage profileImage = profileImageRepository.findByIdAndCreatedAtIsNull(profileImageId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로필 이미지입니다."));
+
+		if(!profileImage.getRegistrant().equals(registrant)){
+			throw new IllegalArgumentException("삭제 권한이 없는 프로필 이미지입니다.");
+		}
+
+		profileImage.markDeleted();
+	}
+
+	public SearchProfileImageResponse search(Long communityId, Long associateId, Pageable pageable, Long cursor) {
+		Associate associate = validAssociate(communityId, associateId);
+
+		List<ProfileImage> profileImageList = profileImageRepository.findProfileImageByAssociateId(associate.getId(), cursor, pageable);
+
+		Long lastCursor = null;
+		boolean hasNext = false;
+		if(profileImageList.size() == pageable.getPageSize()){
+			lastCursor = profileImageList.get(profileImageList.size() - 1).getId();
+			hasNext = true;
+		}
+
+		List<SearchProfileImageResponse.ProfileImage> profileImages = profileImageList.stream()
+			.map(p -> SearchProfileImageResponse.ProfileImage.builder()
+				.id(p.getId())
+				.url(p.getUrl())
+				.build())
+			.toList();
+
+		return SearchProfileImageResponse.builder()
+			.profileImages(profileImages)
+			.cursor(lastCursor)
+			.hasNext(hasNext)
+			.build();
+	}
+
+	public String saveImage(Associate associate, MultipartFile image) {
+		String bucket = minioProperties.getBucket();
+		String baseUrl = minioProperties.getUrl();
+
+		String originalFilename = image.getOriginalFilename();
+		String extension = getExtension(originalFilename);
+		String filename = "profileImage/"+ associate.getId() +"/" + UUID.randomUUID() + "." + extension;
+		String expectedContentType = "image/" + extension;
+
+		try (InputStream inputStream = image.getInputStream()) {
+			long contentLength = image.getSize();
+
+			minioClient.putObject(
+				PutObjectArgs.builder()
+					.bucket(bucket)
+					.object(filename)
+					.stream(inputStream, contentLength, -1)
+					.contentType(expectedContentType)
+					.build()
+			);
+
+		} catch (Exception e) {
+			throw new RuntimeException("프로필 이미지 저장에 실패하였습니다.", e);
+		}
+
+		return baseUrl + "/" + filename;
+	}
 }

@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import com.memento.server.api.controller.mbti.MbtiController;
 import com.memento.server.api.controller.mbti.dto.CreateMbtiRequest;
-import com.memento.server.api.controller.mbti.dto.ReadMbtiResponse;
+import com.memento.server.api.controller.mbti.dto.SearchMbtiResponse;
 import com.memento.server.docs.RestDocsSupport;
 
 public class MbtiControllerDocsTest extends RestDocsSupport {
@@ -67,7 +67,7 @@ public class MbtiControllerDocsTest extends RestDocsSupport {
 		Long associateId = 1L;
 
 		//when & then
-		ReadMbtiResponse response = ReadMbtiResponse.builder()
+		SearchMbtiResponse response = SearchMbtiResponse.builder()
 			.INFP(0)
 			.INFJ(0)
 			.INTP(4)

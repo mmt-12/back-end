@@ -60,6 +60,9 @@ public enum ErrorCodes implements ErrorCode {
 	ASSOCIATE_NICKNAME_TOO_LONG(BAD_REQUEST, 7002, "그룹 참여자 닉네임은 51자 이하로 입력해야 합니다."),
 	ASSOCIATE_MEMBER_REQUIRED(BAD_REQUEST, 7003, "그룹 참여자 회원은 필수입니다."),
 	ASSOCIATE_COMMUNITY_REQUIRED(BAD_REQUEST, 7004, "그룹 참여자 커뮤니티는 필수입니다."),
+	ASSOCIATE_COMMUNITY_NOT_MATCH(BAD_REQUEST, 7005, "다른 그룹의 요청입니다."),
+	ASSOCIATE_INVALID(BAD_REQUEST, 7006, "그룹 참여자 커뮤니티는 필수입니다."),
+	ASSOCIATE_NOT_AUTHORITY(BAD_REQUEST, 7007, "권한이 없는 참여자입니다."),
 
 	;
 	private final HttpStatus status;

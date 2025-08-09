@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.memento.server.api.controller.profileImage.ProfileImageController;
-import com.memento.server.api.controller.profileImage.dto.ReadProfileImageResponse;
+import com.memento.server.api.controller.profileImage.dto.SearchProfileImageResponse;
 import com.memento.server.docs.RestDocsSupport;
 
 public class ProfileImageControllerDocsTest extends RestDocsSupport {
@@ -100,13 +100,13 @@ public class ProfileImageControllerDocsTest extends RestDocsSupport {
 		Long cursor = 0L;
 
 		// when & then
-		ReadProfileImageResponse response = ReadProfileImageResponse.builder()
+		SearchProfileImageResponse response = SearchProfileImageResponse.builder()
 			.profileImages(List.of(
-				ReadProfileImageResponse.ProfileImage.builder()
+				SearchProfileImageResponse.ProfileImage.builder()
 					.id(1L)
 					.url("www.example.com/s3/seonwoo/1")
 					.build(),
-				ReadProfileImageResponse.ProfileImage.builder()
+				SearchProfileImageResponse.ProfileImage.builder()
 					.id(2L)
 					.url("www.example.com/s3/seonwoo/2")
 					.build()

@@ -34,7 +34,7 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import com.memento.server.api.controller.guestBook.GuestBookController;
 import com.memento.server.api.controller.guestBook.dto.CreateGuestBookRequest;
-import com.memento.server.api.controller.guestBook.dto.ReadGuestBookResponse;
+import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.domain.guestBook.GuestBookType;
 
@@ -154,14 +154,14 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 		Long cursor = 100L;
 
 		// when & then
-		ReadGuestBookResponse response = ReadGuestBookResponse.builder()
-			.guestBooks(List.of(ReadGuestBookResponse.GuestBook.builder()
+		SearchGuestBookResponse response = SearchGuestBookResponse.builder()
+			.guestBooks(List.of(SearchGuestBookResponse.GuestBook.builder()
 					.id(101L)
 					.type(GuestBookType.TEXT)
 					.content("쑤야 처세 함하자!")
 					.createdAt(LocalDateTime.of(2024, 6, 21, 10, 30, 0))
 					.build(),
-				ReadGuestBookResponse.GuestBook.builder()
+				SearchGuestBookResponse.GuestBook.builder()
 					.id(102L)
 					.type(GuestBookType.EMOJI)
 					.content("www.example.com/emojis/smile.png")

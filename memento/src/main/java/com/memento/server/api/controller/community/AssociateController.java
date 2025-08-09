@@ -8,11 +8,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.memento.server.annotation.AssociateId;
 import com.memento.server.annotation.CommunityId;
-import com.memento.server.api.controller.community.dto.ReadAssociateResponse;
+import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
 import com.memento.server.api.controller.community.dto.UpdateAssociateRequest;
 import com.memento.server.api.controller.community.dto.AssociateListResponse;
 import com.memento.server.api.service.community.AssociateService;
+import com.memento.server.common.error.ErrorCodes;
+import com.memento.server.common.exception.MementoException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,10 +27,16 @@ public class AssociateController {
 	private final AssociateService associateService;
 
 	@GetMapping("/{associateId}")
-	public ResponseEntity<ReadAssociateResponse> read(
+	public ResponseEntity<SearchAssociateResponse> search(
+		@CommunityId Long currentCommunityId,
+		@PathVariable Long communityId,
 		@PathVariable Long associateId
 	) {
-		return ResponseEntity.ok(ReadAssociateResponse.from());
+		if (!currentCommunityId.equals(communityId)) {
+			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
+		}
+
+		return ResponseEntity.ok(associateService.search(communityId, associateId));
 	}
 
 	@GetMapping
@@ -39,7 +48,7 @@ public class AssociateController {
 		@RequestParam(defaultValue = "10") Integer size) {
 
 		if (!currentCommunityId.equals(communityId)) {
-			throw new IllegalArgumentException("다른 그룹의 요청입니다.");
+			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
 		}
 
 		return ResponseEntity.ok(associateService.searchAll(communityId, keyword, cursor, size));
@@ -47,8 +56,21 @@ public class AssociateController {
 
 	@PutMapping()
 	public ResponseEntity<Void> update(
+		@CommunityId Long currentCommunityId,
+		@AssociateId Long currentAssociateId,
+		@PathVariable Long communityId,
 		UpdateAssociateRequest request
 	) {
+		if (!currentCommunityId.equals(communityId)) {
+			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
+		}
+		associateService.update(
+			communityId,
+			currentAssociateId,
+			request.profileImageUrl(),
+			request.nickname(),
+			request.achievement(),
+			request.introduction());
 		return ResponseEntity.ok().build();
 	}
 }
