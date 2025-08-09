@@ -1,65 +1,16 @@
 [[Comment-API]]
 == Comment API
 
-[[Comment-Emoji-Create-API]]
-=== Comment Emoji Create API (이모지 코멘트 등록)
-
-==== HTTP Request
-include::{snippets}/comment-emoji-create/http-request.adoc[]
-
-==== Path Parameters
-include::{snippets}/comment-emoji-create/path-parameters.adoc[]
-
-==== Request Fields
-include::{snippets}/comment-emoji-create/request-fields.adoc[]
-
-==== HTTP Response
-include::{snippets}/comment-emoji-create/http-response.adoc[]
+include::comment-emoji-create.adoc[]
 
 '''
 
-[[Comment-Voice-Create-API]]
-=== Comment Voice Create API (보이스 코멘트 등록)
-
-==== HTTP Request
-include::{snippets}/comment-voice-create/http-request.adoc[]
-
-==== Path Parameters
-include::{snippets}/comment-voice-create/path-parameters.adoc[]
-
-==== Request Fields
-include::{snippets}/comment-voice-create/request-fields.adoc[]
-
-==== HTTP Response
-include::{snippets}/comment-voice-create/http-response.adoc[]
+include::comment-voice-create.adoc[]
 
 '''
 
-[[Comment-Temporary-Voice-Create-API]]
-=== Comment Temporary Voice Create API (일회용 보이스 코멘트 등록)
-
-==== HTTP Request
-include::{snippets}/comment-temporary-voice-create/http-request.adoc[]
-
-==== Path Parameters
-include::{snippets}/comment-temporary-voice-create/path-parameters.adoc[]
-
-==== Request Parts
-include::{snippets}/comment-temporary-voice-create/request-parts.adoc[]
-
-==== HTTP Response
-include::{snippets}/comment-temporary-voice-create/http-response.adoc[]
+include::comment-temporary-voice-create.adoc[]
 
 '''
 
-[[Comment-Delete-API]]
-=== Comment Delete API (코멘트 삭제)
-
-==== HTTP Request
-include::{snippets}/comment-delete/http-request.adoc[]
-
-==== Path Parameters
-include::{snippets}/comment-delete/path-parameters.adoc[]
-
-==== HTTP Response
-include::{snippets}/comment-delete/http-response.adoc[]
+include::comment-delete.adoc[]

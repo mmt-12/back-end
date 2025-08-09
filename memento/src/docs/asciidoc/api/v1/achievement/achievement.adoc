@@ -1,0 +1,4 @@
+[[Achievement-API]]
+== Achievement API
+
+include::achievement-read.adoc[]

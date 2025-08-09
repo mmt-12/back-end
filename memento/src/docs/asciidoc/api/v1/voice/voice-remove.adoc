@@ -1,0 +1,11 @@
+[[Voice-Remove-API]]
+=== 보이스 삭제
+
+==== HTTP Request
+include::{snippets}/voice-remove/http-request.adoc[]
+
+==== Path Parameters
+include::{snippets}/voice-remove/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/voice-remove/http-response.adoc[]

@@ -1,0 +1,17 @@
+[[Emoji-Create-API]]
+=== 이모지 등록
+
+==== HTTP Request
+include::{snippets}/emoji-create/http-request.adoc[]
+
+==== Path Parameters
+include::{snippets}/emoji-create/path-parameters.adoc[]
+
+==== Request Parts
+include::{snippets}/emoji-create/request-parts.adoc[]
+
+==== Request Part Fields
+include::{snippets}/emoji-create/request-part-data-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/emoji-create/http-response.adoc[]

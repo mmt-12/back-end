@@ -1,0 +1,14 @@
+[[Comment-Emoji-Create-API]]
+=== 이모지 코멘트 등록
+
+==== HTTP Request
+include::{snippets}/comment-emoji-create/http-request.adoc[]
+
+==== Path Parameters
+include::{snippets}/comment-emoji-create/path-parameters.adoc[]
+
+==== Request Fields
+include::{snippets}/comment-emoji-create/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/comment-emoji-create/http-response.adoc[]

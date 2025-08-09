@@ -1,0 +1,14 @@
+[[Comment-Temporary-Voice-Create-API]]
+=== 일회용 보이스 코멘트 등록
+
+==== HTTP Request
+include::{snippets}/comment-temporary-voice-create/http-request.adoc[]
+
+==== Path Parameters
+include::{snippets}/comment-temporary-voice-create/path-parameters.adoc[]
+
+==== Request Parts
+include::{snippets}/comment-temporary-voice-create/request-parts.adoc[]
+
+==== HTTP Response
+include::{snippets}/comment-temporary-voice-create/http-response.adoc[]
