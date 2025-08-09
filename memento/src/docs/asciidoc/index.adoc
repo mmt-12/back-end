@@ -100,6 +100,9 @@ include::api/v1/post/post-create.adoc[]
 include::api/v1/post/post-update.adoc[]
 include::api/v1/post/post-delete.adoc[]
 
+[[Comment-API]]
+include::api/v1/comment/comment.adoc[]
+
 [[Voice-API]]
 include::api/v1/voice/voice.adoc[]
 
