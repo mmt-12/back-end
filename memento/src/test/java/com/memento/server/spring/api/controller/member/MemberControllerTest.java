@@ -21,7 +21,7 @@ import com.memento.server.api.controller.member.MemberSignUpRequest;
 import com.memento.server.api.controller.member.MemberSignUpResponse;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.api.service.member.MemberService;
-import com.memento.server.spring.ControllerTestSupport;
+import com.memento.server.spring.api.controller.ControllerTestSupport;
 
 @WebMvcTest({
 	MemberController.class

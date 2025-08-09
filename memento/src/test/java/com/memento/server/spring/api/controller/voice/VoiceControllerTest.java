@@ -24,7 +24,7 @@ import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
-import com.memento.server.spring.ControllerTestSupport;
+import com.memento.server.spring.api.controller.ControllerTestSupport;
 import com.memento.server.voice.VoiceFixtures;
 
 public class VoiceControllerTest extends ControllerTestSupport {
