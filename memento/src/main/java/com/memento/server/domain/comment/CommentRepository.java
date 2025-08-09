@@ -1,4 +1,4 @@
-package com.memento.server.domain.post;
+package com.memento.server.domain.comment;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

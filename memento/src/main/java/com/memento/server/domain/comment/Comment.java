@@ -1,4 +1,4 @@
-package com.memento.server.domain.post;
+package com.memento.server.domain.comment;
 
 import static jakarta.persistence.ConstraintMode.NO_CONSTRAINT;
 import static jakarta.persistence.EnumType.STRING;
@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.memento.server.common.BaseEntity;
 import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.post.Post;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

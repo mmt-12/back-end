@@ -36,7 +36,7 @@ public class VoiceController {
 		@PathVariable("communityId") Long communityId,
 		@Valid @RequestPart("data") VoiceCreateRequest request,
 		@NotNull(message = "voice 값은 필수입니다.") @RequestPart("voice") MultipartFile voice) {
-		voiceService.createVoice(request.toServiceRequest(associateId, voice));
+		voiceService.createPermanentVoice(request.toServiceRequest(associateId, voice));
 		return ResponseEntity.status(CREATED).build();
 	}
 
