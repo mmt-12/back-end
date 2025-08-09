@@ -1,4 +1,4 @@
-package com.memento.server.spring;
+package com.memento.server.spring.api.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -9,8 +9,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.memento.server.api.controller.comment.CommentController;
 import com.memento.server.api.controller.emoji.EmojiController;
 import com.memento.server.api.controller.voice.VoiceController;
+import com.memento.server.api.service.comment.CommentService;
 import com.memento.server.api.service.emoji.EmojiService;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.api.service.auth.jwt.JwtProperties;
@@ -21,6 +23,7 @@ import com.memento.server.spring.config.TestSecurityConfig;
 @WebMvcTest({
 	VoiceController.class,
 	EmojiController.class,
+	CommentController.class,
 })
 @Import({TestSecurityConfig.class, JwtTokenProvider.class})
 @EnableConfigurationProperties(JwtProperties.class)
@@ -37,6 +40,9 @@ public abstract class ControllerTestSupport {
 
 	@MockitoBean
 	protected EmojiService emojiService;
+
+	@MockitoBean
+	protected CommentService commentService;
 
 	@Autowired
 	protected JwtTokenProvider jwtTokenProvider;

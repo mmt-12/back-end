@@ -2,7 +2,7 @@ package com.memento.server.api.controller.voice.dto.request;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.memento.server.api.service.voice.dto.request.VoiceCreateServiceRequest;
+import com.memento.server.api.service.voice.dto.request.PermanentVoiceCreateServiceRequest;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -14,8 +14,8 @@ public record VoiceCreateRequest(
 	@Size(max = 34, message = "name은 최대 34자(한글 기준)까지 입력 가능합니다.")
 	String name
 ) {
-	public VoiceCreateServiceRequest toServiceRequest(Long associateId, MultipartFile voice) {
-		return VoiceCreateServiceRequest.builder()
+	public PermanentVoiceCreateServiceRequest toServiceRequest(Long associateId, MultipartFile voice) {
+		return PermanentVoiceCreateServiceRequest.builder()
 			.name(name)
 			.associateId(associateId)
 			.voice(voice)

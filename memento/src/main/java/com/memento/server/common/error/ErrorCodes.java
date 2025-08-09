@@ -61,6 +61,11 @@ public enum ErrorCodes implements ErrorCode {
 	ASSOCIATE_MEMBER_REQUIRED(BAD_REQUEST, 7003, "그룹 참여자 회원은 필수입니다."),
 	ASSOCIATE_COMMUNITY_REQUIRED(BAD_REQUEST, 7004, "그룹 참여자 커뮤니티는 필수입니다."),
 
+	COMMENT_URL_REQUIRED(BAD_REQUEST, 8000, "코멘트 URL은 필수입니다."),
+	COMMENT_URL_BLANK(BAD_REQUEST, 8001, "코멘트 URL은 공백일 수 없습니다."),
+	COMMENT_URL_TOO_LONG(BAD_REQUEST, 8002, "코멘트 URL은 최대 255자까지 입력할 수 있습니다."),
+	COMMENT_POST_REQUIRED(BAD_REQUEST, 8003, "코멘트 게시글은 필수입니다."),
+	COMMENT_ASSOCIATE_REQUIRED(BAD_REQUEST, 8004, "코멘트 작성자는 필수입니다."),
 	;
 	private final HttpStatus status;
 	private final int code;
