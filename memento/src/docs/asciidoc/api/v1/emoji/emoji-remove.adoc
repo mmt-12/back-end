@@ -1,0 +1,11 @@
+[[Emoji-Remove-API]]
+=== 이모지 삭제
+
+==== HTTP Request
+include::{snippets}/emoji-remove/http-request.adoc[]
+
+==== Path Parameters
+include::{snippets}/emoji-remove/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/emoji-remove/http-response.adoc[]

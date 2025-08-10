@@ -24,7 +24,7 @@ import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
-import com.memento.server.spring.ControllerTestSupport;
+import com.memento.server.spring.api.controller.ControllerTestSupport;
 import com.memento.server.voice.VoiceFixtures;
 
 public class VoiceControllerTest extends ControllerTestSupport {
@@ -51,7 +51,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			"".getBytes()
 		);
 
-		doNothing().when(voiceService).createVoice(any());
+		doNothing().when(voiceService).createPermanentVoice(any());
 
 		// when & then
 		mockMvc.perform(
@@ -63,7 +63,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andDo(print())
 			.andExpect(status().isCreated());
 
-		verify(voiceService).createVoice(any());
+		verify(voiceService).createPermanentVoice(any());
 	}
 
 	@Test
@@ -86,7 +86,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			"audio/wav",
 			"".getBytes()
 		);
-		doNothing().when(voiceService).createVoice(any());
+		doNothing().when(voiceService).createPermanentVoice(any());
 
 		// when & then
 		mockMvc.perform(
@@ -103,7 +103,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("$.errors[0].field").value("name"))
 			.andExpect(jsonPath("$.errors[0].message").value("name 값은 필수입니다."));
 
-		verify(voiceService, never()).createVoice(any());
+		verify(voiceService, never()).createPermanentVoice(any());
 	}
 
 	@Test
@@ -130,7 +130,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			"".getBytes()
 		);
 
-		doNothing().when(voiceService).createVoice(any());
+		doNothing().when(voiceService).createPermanentVoice(any());
 
 		// when & then
 		mockMvc.perform(
@@ -147,7 +147,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("$.errors[0].field").value("name"))
 			.andExpect(jsonPath("$.errors[0].message").value("name은 최대 34자(한글 기준)까지 입력 가능합니다."));
 
-		verify(voiceService, never()).createVoice(any());
+		verify(voiceService, never()).createPermanentVoice(any());
 	}
 
 	@Test
@@ -163,7 +163,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			"".getBytes()
 		);
 
-		doNothing().when(voiceService).createVoice(any());
+		doNothing().when(voiceService).createPermanentVoice(any());
 
 		// when & then
 		mockMvc.perform(
@@ -179,7 +179,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("$.errors[0].field").value("data"))
 			.andExpect(jsonPath("$.errors[0].message").value("data은(는) 필수입니다."));
 
-		verify(voiceService, never()).createVoice(any());
+		verify(voiceService, never()).createPermanentVoice(any());
 	}
 
 	@Test
@@ -197,7 +197,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			json.getBytes()
 		);
 
-		doNothing().when(voiceService).createVoice(any());
+		doNothing().when(voiceService).createPermanentVoice(any());
 
 		// when & then
 		mockMvc.perform(
@@ -213,7 +213,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("$.errors[0].field").value("voice"))
 			.andExpect(jsonPath("$.errors[0].message").value("voice은(는) 필수입니다."));
 
-		verify(voiceService, never()).createVoice(any());
+		verify(voiceService, never()).createPermanentVoice(any());
 	}
 
 	@Test

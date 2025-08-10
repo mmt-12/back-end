@@ -1,0 +1,22 @@
+[[memory-update-test]]
+=== 기억 수정
+
+==== HTTP Request
+
+include::{snippets}/memory-update-test/http-request.adoc[]
+
+==== Path Parameters
+
+include::{snippets}/memory-update-test/path-parameters.adoc[]
+
+==== Request Fields
+
+include::{snippets}/memory-update-test/request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/memory-update-test/http-response.adoc[]
+
+==== Response Fields
+
+include::{snippets}/memory-update-test/response-fields.adoc[]

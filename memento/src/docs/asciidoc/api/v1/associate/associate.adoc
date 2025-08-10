@@ -1,0 +1,12 @@
+[[Associate-API]]
+== Associate API
+
+include::associate-read.adoc[]
+
+'''
+
+include::associate-list.adoc[]
+
+'''
+
+include::associate-update.adoc[]

@@ -1,0 +1,20 @@
+[[Memory-API]]
+== Memory API
+
+include::memory-create.adoc[]
+
+'''
+
+include::memory-read.adoc[]
+
+'''
+
+include::memory-update.adoc[]
+
+'''
+
+include::memory-delete.adoc[]
+
+'''
+
+include::memory-download.adoc[]

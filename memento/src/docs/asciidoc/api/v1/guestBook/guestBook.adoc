@@ -1,0 +1,20 @@
+[[GuestBook-API]]
+== GuestBook API
+
+include::guestBook-read.adoc[]
+
+'''
+
+include::guestBook-create-bubble.adoc[]
+
+'''
+
+include::guestBook-create-reaction.adoc[]
+
+'''
+
+include::guestBook-create-text.adoc[]
+
+'''
+
+include::guestBook-delete.adoc[]

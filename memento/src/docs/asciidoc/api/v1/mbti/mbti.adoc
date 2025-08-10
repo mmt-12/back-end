@@ -1,0 +1,8 @@
+[[Mbti-API]]
+== Mbti API
+
+include::mbti-read.adoc[]
+
+'''
+
+include::mbti-create.adoc[]

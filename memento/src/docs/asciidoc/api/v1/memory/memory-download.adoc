@@ -1,0 +1,18 @@
+[[memory-download-test]]
+=== 기억 이미지 다운로드
+
+==== HTTP Request
+
+include::{snippets}/memory-download-test/http-request.adoc[]
+
+==== Path Parameters
+
+include::{snippets}/memory-download-test/path-parameters.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/memory-download-test/http-response.adoc[]
+
+==== Response Fields
+
+include::{snippets}/memory-download-test/response-fields.adoc[]

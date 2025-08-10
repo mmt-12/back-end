@@ -1,4 +1,4 @@
-package com.memento.server.domain.post;
+package com.memento.server.domain.comment;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

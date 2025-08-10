@@ -1,0 +1,11 @@
+[[Comment-Delete-API]]
+=== 코멘트 삭제
+
+==== HTTP Request
+include::{snippets}/comment-delete/http-request.adoc[]
+
+==== Path Parameters
+include::{snippets}/comment-delete/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/comment-delete/http-response.adoc[]

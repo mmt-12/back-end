@@ -1,4 +1,4 @@
-package com.memento.server.spring;
+package com.memento.server.spring.api.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -9,9 +9,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.memento.server.api.controller.achievement.AchievementController;
+import com.memento.server.api.controller.comment.CommentController;
+import com.memento.server.api.controller.community.AssociateController;
 import com.memento.server.api.controller.emoji.EmojiController;
 import com.memento.server.api.controller.voice.VoiceController;
 import com.memento.server.api.service.achievement.AchievementService;
+import com.memento.server.api.service.comment.CommentService;
+import com.memento.server.api.service.community.AssociateService;
 import com.memento.server.api.service.emoji.EmojiService;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.api.service.auth.jwt.JwtProperties;
@@ -22,6 +27,9 @@ import com.memento.server.spring.config.TestSecurityConfig;
 @WebMvcTest({
 	VoiceController.class,
 	EmojiController.class,
+	CommentController.class,
+	AchievementController.class,
+	AssociateController.class,
 })
 @Import({TestSecurityConfig.class, JwtTokenProvider.class})
 @EnableConfigurationProperties(JwtProperties.class)
@@ -41,6 +49,12 @@ public abstract class ControllerTestSupport {
 
 	@MockitoBean
 	protected AchievementService achievementService;
+
+	@MockitoBean
+	protected AssociateService associateService;
+
+	@MockitoBean
+	protected CommentService commentService;
 
 	@Autowired
 	protected JwtTokenProvider jwtTokenProvider;

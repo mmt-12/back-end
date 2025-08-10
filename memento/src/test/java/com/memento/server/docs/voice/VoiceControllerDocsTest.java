@@ -74,7 +74,7 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 			"".getBytes()
 		);
 
-		doNothing().when(voiceService).createVoice(any());
+		doNothing().when(voiceService).createPermanentVoice(any());
 
 		// when && then
 		mockMvc.perform(
@@ -99,7 +99,7 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 				)
 			));
 
-		verify(voiceService).createVoice(any());
+		verify(voiceService).createPermanentVoice(any());
 	}
 
 	@Test

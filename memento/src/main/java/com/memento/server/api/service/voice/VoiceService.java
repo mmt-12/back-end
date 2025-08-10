@@ -9,7 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.memento.server.api.service.voice.dto.request.VoiceCreateServiceRequest;
+import com.memento.server.api.service.voice.dto.request.PermanentVoiceCreateServiceRequest;
+import com.memento.server.api.service.voice.dto.request.TemporaryVoiceCreateServiceRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
@@ -33,7 +34,11 @@ public class VoiceService {
 	private final MinioClient minioClient;
 	private final MinioProperties minioProperties;
 
-	public void createVoice(VoiceCreateServiceRequest request) {
+	public Long createTemporaryVoice(TemporaryVoiceCreateServiceRequest request) {
+		return null;
+	}
+
+	public void createPermanentVoice(PermanentVoiceCreateServiceRequest request) {
 
 	}
 

@@ -1,0 +1,22 @@
+[[memory-create-test]]
+=== 기억 생성
+
+==== HTTP Request
+
+include::{snippets}/memory-create-test/http-request.adoc[]
+
+==== Path Parameters
+
+include::{snippets}/memory-create-test/path-parameters.adoc[]
+
+==== Request Fields
+
+include::{snippets}/memory-create-test/request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/memory-create-test/http-response.adoc[]
+
+==== Response Fields
+
+include::{snippets}/memory-create-test/response-fields.adoc[]

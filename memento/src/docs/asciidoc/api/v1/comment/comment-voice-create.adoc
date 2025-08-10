@@ -1,0 +1,14 @@
+[[Comment-Voice-Create-API]]
+=== 보이스 코멘트 등록
+
+==== HTTP Request
+include::{snippets}/comment-voice-create/http-request.adoc[]
+
+==== Path Parameters
+include::{snippets}/comment-voice-create/path-parameters.adoc[]
+
+==== Request Fields
+include::{snippets}/comment-voice-create/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/comment-voice-create/http-response.adoc[]

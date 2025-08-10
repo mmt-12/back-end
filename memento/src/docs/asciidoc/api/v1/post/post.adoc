@@ -1,0 +1,20 @@
+[[Post-API]]
+== Post API
+
+include::post-read.adoc[]
+
+'''
+
+include::post-read-all.adoc[]
+
+'''
+
+include::post-create.adoc[]
+
+'''
+
+include::post-update.adoc[]
+
+'''
+
+include::post-delete.adoc[]
