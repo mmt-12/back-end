@@ -30,21 +30,26 @@ public class MbtiService {
 		return associate;
 	}
 
-	public void create(Long communityId, Long from, Long to, Mbti mbti) {
+	public void create(Long communityId, Long from, Long to, String mbti) {
 		Associate fromAssociate = validAssociate(communityId, from);
 		Associate toAssociate = validAssociate(communityId, to);
 
 		MbtiTest existing = mbtiTestRepository.findByFromAssociateIdAndToAssociateId(fromAssociate.getId(), toAssociate.getId());
-
+		Mbti mbtiEnum;
+		try {
+			mbtiEnum = Mbti.valueOf(mbti);
+		} catch (IllegalArgumentException e) {
+			throw new MementoException(ErrorCodes.MBTI_NOT_EXISTENCE);
+		}
 		if (existing != null) {
-			existing.updateMbti(mbti);
+			existing.updateMbti(mbtiEnum);
 			return;
 		}
 
 		mbtiTestRepository.save(MbtiTest.builder()
 			.fromAssociate(fromAssociate)
 			.toAssociate(toAssociate)
-			.mbti(mbti)
+			.mbti(mbtiEnum)
 			.build());
 	}
 

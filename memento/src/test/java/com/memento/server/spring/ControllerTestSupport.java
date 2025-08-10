@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.memento.server.api.controller.emoji.EmojiController;
 import com.memento.server.api.controller.voice.VoiceController;
+import com.memento.server.api.service.achievement.AchievementService;
 import com.memento.server.api.service.emoji.EmojiService;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.api.service.auth.jwt.JwtProperties;
@@ -37,6 +38,9 @@ public abstract class ControllerTestSupport {
 
 	@MockitoBean
 	protected EmojiService emojiService;
+
+	@MockitoBean
+	protected AchievementService achievementService;
 
 	@Autowired
 	protected JwtTokenProvider jwtTokenProvider;

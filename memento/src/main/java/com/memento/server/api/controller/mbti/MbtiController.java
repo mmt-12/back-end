@@ -36,6 +36,9 @@ public class MbtiController {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
 		}
+		if(currentAssociateId.equals(associateId)) {
+			throw new MementoException(ErrorCodes.ASSOCIATE_NOT_AUTHORITY);
+		}
 
 		mbtiService.create(communityId, currentAssociateId, associateId, request.mbti());
 		return ResponseEntity.ok().build();

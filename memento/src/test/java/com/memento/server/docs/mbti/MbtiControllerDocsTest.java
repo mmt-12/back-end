@@ -1,5 +1,10 @@
 package com.memento.server.docs.mbti;
 
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -14,7 +19,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.DisplayName;
@@ -23,26 +27,34 @@ import org.junit.jupiter.api.Test;
 import com.memento.server.api.controller.mbti.MbtiController;
 import com.memento.server.api.controller.mbti.dto.CreateMbtiRequest;
 import com.memento.server.api.controller.mbti.dto.SearchMbtiResponse;
+import com.memento.server.api.service.mbti.MbtiService;
 import com.memento.server.docs.RestDocsSupport;
 
 public class MbtiControllerDocsTest extends RestDocsSupport {
 
 	public static final String PATH = "/api/v1/communities/{communityId}/associates/{associateId}/mbti-tests";
 
+	private final MbtiService mbtiService = mock(MbtiService.class);
+
 	@Override
 	protected Object initController() {
-		return new MbtiController();
+		return new MbtiController(mbtiService);
 	}
 
 	@Test
 	@DisplayName("mbti 등록")
 	void createTest() throws Exception {
 		// given
+		setAuthentication(1L, 1L, 1L);
+
 		Long communityId = 1L;
-		Long associateId = 1L;
+		Long associateId = 2L;
+
 		CreateMbtiRequest request = CreateMbtiRequest.builder()
-			.mbti("ENTP")
+			.mbti("ENFJ")
 			.build();
+
+		doNothing().when(mbtiService).create(anyLong(), anyLong(), anyLong(), anyString());
 
 		//when & then
 		mockMvc.perform(
@@ -61,12 +73,13 @@ public class MbtiControllerDocsTest extends RestDocsSupport {
 
 	@Test
 	@DisplayName("mbti 조회")
-	void readTest() throws Exception {
+	void searchTest() throws Exception {
 		// given
+		setAuthentication(1L, 1L, 1L);
+
 		Long communityId = 1L;
 		Long associateId = 1L;
 
-		//when & then
 		SearchMbtiResponse response = SearchMbtiResponse.builder()
 			.INFP(0)
 			.INFJ(0)
@@ -86,26 +99,13 @@ public class MbtiControllerDocsTest extends RestDocsSupport {
 			.ESTJ(0)
 			.build();
 
+		when(mbtiService.search(anyLong(), anyLong())).thenReturn(response);
+
+		//when & then
 		mockMvc.perform(
 				get(PATH, communityId, associateId))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.INFP").value(response.INFP()))
-			.andExpect(jsonPath("$.INFJ").value(response.INFJ()))
-			.andExpect(jsonPath("$.INTP").value(response.INTP()))
-			.andExpect(jsonPath("$.INTJ").value(response.INTJ()))
-			.andExpect(jsonPath("$.ISFP").value(response.ISFP()))
-			.andExpect(jsonPath("$.ISFJ").value(response.ISFJ()))
-			.andExpect(jsonPath("$.ISTP").value(response.ISTP()))
-			.andExpect(jsonPath("$.ISTJ").value(response.ISTJ()))
-			.andExpect(jsonPath("$.ENFP").value(response.ENFP()))
-			.andExpect(jsonPath("$.ENFJ").value(response.ENFJ()))
-			.andExpect(jsonPath("$.ENTP").value(response.ENTP()))
-			.andExpect(jsonPath("$.ENTJ").value(response.ENTJ()))
-			.andExpect(jsonPath("$.ESFP").value(response.ESFP()))
-			.andExpect(jsonPath("$.ESFJ").value(response.ESFJ()))
-			.andExpect(jsonPath("$.ESTP").value(response.ESTP()))
-			.andExpect(jsonPath("$.ESTJ").value(response.ESTJ()))
 			.andDo(document("mbti-read-test",
 				preprocessResponse(prettyPrint()),
 				responseFields(

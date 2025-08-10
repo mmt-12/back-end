@@ -73,6 +73,9 @@ public enum ErrorCodes implements ErrorCode {
 
 	PROFILEIMAGE_NOT_EXISTENCE(BAD_REQUEST, 9000, "존재하지 않는 프로필 이미지입니다."),
 	PROFILEIMAGE_SAVE_FAIL(BAD_REQUEST, 9001, "프로필 이미지 저장에 실패하였습니다."),
+
+	MBTI_NOT_EXISTENCE(BAD_REQUEST, 10000, "존재 하지 않는 MBTI입니다."),
+
 	;
 	private final HttpStatus status;
 	private final int code;

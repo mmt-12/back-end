@@ -74,8 +74,7 @@ public class GuestBookController {
 		}
 
 		Pageable pageable = PageRequest.of(0, size);
-		guestBookService.search(communityId, associateId, pageable, cursor);
-		return ResponseEntity.ok(SearchGuestBookResponse.from());
+		return ResponseEntity.ok(guestBookService.search(communityId, associateId, pageable, cursor));
 	}
 
 	@DeleteMapping("/{guestBookId}")

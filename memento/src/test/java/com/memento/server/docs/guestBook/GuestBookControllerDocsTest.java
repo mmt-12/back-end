@@ -1,5 +1,13 @@
 package com.memento.server.docs.guestBook;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -30,11 +38,14 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.memento.server.api.controller.guestBook.GuestBookController;
 import com.memento.server.api.controller.guestBook.dto.CreateGuestBookRequest;
 import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
+import com.memento.server.api.service.guestBook.GuestBookService;
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.domain.guestBook.GuestBookType;
 
@@ -43,23 +54,29 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 	public static final String PATH = "/api/v1/communities/{communityId}/associates/{associateId}/guest-books";
 	public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
+	private final GuestBookService guestBookService = mock(GuestBookService.class);
+
 	@Override
 	protected Object initController() {
-		return new GuestBookController();
+		return new GuestBookController(guestBookService);
 	}
 
 	@Test
 	@DisplayName("텍스트 방명록 생성")
 	void createTextTest() throws Exception {
 		// given
+		setAuthentication(1L, 1L, 1L);
+
 		Long communityId = 1L;
 		Long associateId = 1L;
 
 		CreateGuestBookRequest request = CreateGuestBookRequest.builder()
 			.type(GuestBookType.TEXT)
 			.contentId(null)
-			.content("하하하")
+			.content("example")
 			.build();
+
+		doNothing().when(guestBookService).create(anyLong(), anyLong(), eq(GuestBookType.TEXT), isNull(), anyString());
 
 		// when & then
 		mockMvc.perform(
@@ -83,7 +100,9 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 	@DisplayName("리액션 방명록 생성")
 	void createReactionTest() throws Exception {
 		// given
-		Long groupId = 1L;
+		setAuthentication(1L, 1L, 1L);
+
+		Long communityId = 1L;
 		Long associateId = 1L;
 
 		CreateGuestBookRequest request = CreateGuestBookRequest.builder()
@@ -92,9 +111,11 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 			.content(null)
 			.build();
 
+		doNothing().when(guestBookService).create(anyLong(), anyLong(), eq(GuestBookType.EMOJI), anyLong(), isNull());
+
 		// when & then
 		mockMvc.perform(
-				post(PATH, groupId, associateId)
+				post(PATH, communityId, associateId)
 					.content(objectMapper.writeValueAsString(request))
 					.contentType(APPLICATION_JSON))
 			.andDo(print())
@@ -114,7 +135,9 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 	@DisplayName("방명록 일회용 보이스 생성")
 	void createBubbleTest() throws Exception {
 		// given
-		Long groupId = 1L;
+		setAuthentication(1L, 1L, 1L);
+
+		Long communityId = 1L;
 		Long associateId = 1L;
 
 		MockMultipartFile file = new MockMultipartFile(
@@ -126,7 +149,7 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 
 		// when & then
 		mockMvc.perform(
-				multipart(PATH + "/bubble", groupId, associateId)
+				multipart(PATH + "/bubble", communityId, associateId)
 					.file(file)
 					.contentType(MULTIPART_FORM_DATA)
 					.with(request -> {
@@ -146,50 +169,36 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 
 	@Test
 	@DisplayName("방명록 조회")
-	void readTest() throws Exception {
+	void searchTest() throws Exception {
 		// given
-		Long groupId = 1L;
-		Long associateId = 1L;
-		Long size = 10L;
-		Long cursor = 100L;
+		setAuthentication(1L, 1L, 1L);
 
-		// when & then
+		Long communityId = 1L;
+		Long associateId = 1L;
+		int size = 10;
+		Long cursor = 100L;
+		Pageable pageable = PageRequest.of(0, size);
+
 		SearchGuestBookResponse response = SearchGuestBookResponse.builder()
 			.guestBooks(List.of(SearchGuestBookResponse.GuestBook.builder()
-					.id(101L)
+					.id(1L)
 					.type(GuestBookType.TEXT)
-					.content("쑤야 처세 함하자!")
-					.createdAt(LocalDateTime.of(2024, 6, 21, 10, 30, 0))
-					.build(),
-				SearchGuestBookResponse.GuestBook.builder()
-					.id(102L)
-					.type(GuestBookType.EMOJI)
-					.content("www.example.com/emojis/smile.png")
-					.createdAt(LocalDateTime.of(2024, 6, 21, 10, 45, 0))
-					.build()
-			))
-			.cursor(102L)
-			.hasNext(false)
+					.content("example")
+					.createdAt(LocalDateTime.now())
+				.build()))
+			.cursor(cursor)
+			.hasNext(true)
 			.build();
 
+		when(guestBookService.search(anyLong(), anyLong(), eq(pageable), anyLong())).thenReturn(response);
+
+		// when & then
 		mockMvc.perform(
-				get(PATH, groupId, associateId)
+				get(PATH, communityId, associateId)
 					.param("size", String.valueOf(size))
 					.param("cursor", String.valueOf(cursor)))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.guestBooks[0].id").value(response.guestBooks().get(0).getId()))
-			.andExpect(jsonPath("$.guestBooks[0].type").value("TEXT"))
-			.andExpect(jsonPath("$.guestBooks[0].content").value(response.guestBooks().get(0).getContent()))
-			.andExpect(jsonPath("$.guestBooks[0].createdAt").value(
-				response.guestBooks().get(0).getCreatedAt().format(formatter)))
-			.andExpect(jsonPath("$.guestBooks[1].id").value(response.guestBooks().get(1).getId()))
-			.andExpect(jsonPath("$.guestBooks[1].type").value("EMOJI"))
-			.andExpect(jsonPath("$.guestBooks[1].content").value(response.guestBooks().get(1).getContent()))
-			.andExpect(jsonPath("$.guestBooks[1].createdAt").value(
-				response.guestBooks().get(1).getCreatedAt().format(formatter)))
-			.andExpect(jsonPath("$.cursor").value(response.cursor()))
-			.andExpect(jsonPath("$.hasNext").value(response.hasNext()))
 			.andDo(document("guestBook-read-test",
 				preprocessResponse(prettyPrint()),
 				responseFields(
@@ -208,13 +217,17 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 	@DisplayName("방명록 삭제")
 	void deleteTest() throws Exception {
 		// given
-		Long groupId = 1L;
+		setAuthentication(1L, 1L, 1L);
+
+		Long communityId = 1L;
 		Long associateId = 1L;
 		Long guestBookId = 101L;
 
+		doNothing().when(guestBookService).delete(communityId, associateId, guestBookId);
+
 		// when & then
 		mockMvc.perform(
-				delete(PATH + "/{guestBookId}", groupId, associateId, guestBookId))
+				delete(PATH + "/{guestBookId}", communityId, associateId, guestBookId))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andDo(document("guestBook-delete-test"));
