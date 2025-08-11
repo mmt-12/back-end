@@ -1,6 +1,7 @@
 package com.memento.server.common.error;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE;
 
 import org.springframework.http.HttpStatus;
 
@@ -41,6 +42,8 @@ public enum ErrorCodes implements ErrorCode {
 	MEMBER_EMAIL_INVALID_FORMAT(BAD_REQUEST, 4006, "이메일 형식이 올바르지 않습니다."),
 	MEMBER_BIRTHDAY_IN_FUTURE(BAD_REQUEST, 4007, "생년월일은 미래일 수 없습니다."),
 	MEMBER_KAKAO_ID_REQUIRED(BAD_REQUEST, 4008, "카카오 ID는 필수입니다."),
+	MEMBER_NOT_FOUND(BAD_REQUEST, 4009, "존재하지 않는 회원입니다."),
+	MEMBER_DUPLICATE(BAD_REQUEST, 4009, "이미 가입된 회원입니다."),
 
 	COMMUNITY_NAME_REQUIRED(BAD_REQUEST, 5000, "커뮤니티 이름은 필수입니다."),
 	COMMUNITY_NAME_BLANK(BAD_REQUEST, 5001, "커뮤니티 이름은 공백일 수 없습니다."),
