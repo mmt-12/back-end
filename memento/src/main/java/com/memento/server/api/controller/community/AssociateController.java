@@ -37,9 +37,9 @@ public class AssociateController {
 	public ResponseEntity<AssociateListResponse> searchAll(
 		@CommunityId Long currentCommunityId,
 		@PathVariable Long communityId,
-		@RequestParam(defaultValue = "") String keyword,
-		@RequestParam Long cursor,
-		@RequestParam(defaultValue = "10") Integer size
+		@RequestParam(required = false, defaultValue = "") String keyword,
+		@RequestParam(required = false) Long cursor,
+		@RequestParam(required = false, defaultValue = "10") Integer size
 	) {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(COMMUNITY_NOT_CURRENT);
