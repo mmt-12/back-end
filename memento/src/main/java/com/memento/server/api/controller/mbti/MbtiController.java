@@ -16,6 +16,7 @@ import com.memento.server.api.service.mbti.MbtiService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -31,10 +32,10 @@ public class MbtiController {
 		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long associateId,
-		@RequestBody CreateMbtiRequest request
+		@RequestBody @Valid CreateMbtiRequest request
 	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 		if(currentAssociateId.equals(associateId)) {
 			throw new MementoException(ErrorCodes.ASSOCIATE_NOT_AUTHORITY);
@@ -51,7 +52,7 @@ public class MbtiController {
 		@PathVariable Long associateId
 	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 		return ResponseEntity.ok(mbtiService.search(communityId, associateId));
 	}

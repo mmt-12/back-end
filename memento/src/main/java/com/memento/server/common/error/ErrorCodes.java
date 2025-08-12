@@ -69,18 +69,17 @@ public enum ErrorCodes implements ErrorCode {
 	ASSOCIATE_NOT_EXISTENCE(BAD_REQUEST, 7007, "존재하지 않는 참여자 입니다."),
 	ASSOCIATE_COMMUNITY_NOT_MATCH(BAD_REQUEST, 7008, "해당 커뮤니티의 참가자가 아닙니다."),
 
-	GUESTBOOK_NOT_EXISTENCE(BAD_REQUEST, 8000, "존재하지 않는 방명록입니다."),
-
-	PROFILEIMAGE_NOT_EXISTENCE(BAD_REQUEST, 9000, "존재하지 않는 프로필 이미지입니다."),
-	PROFILEIMAGE_SAVE_FAIL(BAD_REQUEST, 9001, "프로필 이미지 저장에 실패하였습니다."),
-
-	MBTI_NOT_EXISTENCE(BAD_REQUEST, 10000, "존재 하지 않는 MBTI입니다."),
-
 	COMMENT_URL_REQUIRED(BAD_REQUEST, 8000, "코멘트 URL은 필수입니다."),
 	COMMENT_URL_BLANK(BAD_REQUEST, 8001, "코멘트 URL은 공백일 수 없습니다."),
 	COMMENT_URL_TOO_LONG(BAD_REQUEST, 8002, "코멘트 URL은 최대 255자까지 입력할 수 있습니다."),
 	COMMENT_POST_REQUIRED(BAD_REQUEST, 8003, "코멘트 게시글은 필수입니다."),
 	COMMENT_ASSOCIATE_REQUIRED(BAD_REQUEST, 8004, "코멘트 작성자는 필수입니다."),
+
+	GUESTBOOK_NOT_EXISTENCE(BAD_REQUEST, 9000, "존재하지 않는 방명록입니다."),
+
+	PROFILEIMAGE_NOT_EXISTENCE(BAD_REQUEST, 10000, "존재하지 않는 프로필 이미지입니다."),
+	PROFILEIMAGE_SAVE_FAIL(BAD_REQUEST, 10001, "프로필 이미지 저장에 실패하였습니다."),
+
 	;
 	private final HttpStatus status;
 	private final int code;

@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +18,7 @@ import com.memento.server.api.service.community.AssociateService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -59,7 +61,7 @@ public class AssociateController {
 		@CommunityId Long currentCommunityId,
 		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
-		UpdateAssociateRequest request
+		@Valid @RequestBody UpdateAssociateRequest request
 	) {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);

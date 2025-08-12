@@ -1,5 +1,7 @@
 package com.memento.server.api.controller.profileImage;
 
+import javax.annotation.Nullable;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import com.memento.server.api.service.profileImage.ProfileImageService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -35,7 +38,7 @@ public class ProfileImageController {
 		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long associateId,
-		@RequestPart MultipartFile image
+		@RequestPart @NotNull(message = "image는 null일 수 없습니다.") MultipartFile image
 	) {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
@@ -51,6 +54,7 @@ public class ProfileImageController {
 	@DeleteMapping("/{profileImageId}")
 	public ResponseEntity<Void> delete(
 		@CommunityId Long currentCommunityId,
+		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long associateId,
 		@PathVariable Long profileImageId
@@ -59,7 +63,7 @@ public class ProfileImageController {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
-		profileImageService.delete(communityId, associateId, profileImageId);
+		profileImageService.delete(communityId, currentAssociateId, associateId, profileImageId);
 		return ResponseEntity.ok().build();
 	}
 

@@ -12,10 +12,12 @@ import com.memento.server.domain.achievement.AchievementRepository;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AchievementService {
 	private final AssociateRepository associateRepository;
 	private final AchievementRepository achievementRepository;

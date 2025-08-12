@@ -223,7 +223,7 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 		Long associateId = 1L;
 		Long guestBookId = 101L;
 
-		doNothing().when(guestBookService).delete(communityId, associateId, guestBookId);
+		doNothing().when(guestBookService).delete(guestBookId);
 
 		// when & then
 		mockMvc.perform(

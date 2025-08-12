@@ -22,6 +22,7 @@ import com.memento.server.api.service.guestBook.GuestBookService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -34,12 +35,16 @@ public class GuestBookController {
 	@PostMapping()
 	public ResponseEntity<Void> create(
 		@CommunityId Long currentCommunityId,
+		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long associateId,
-		@RequestBody CreateGuestBookRequest request
+		@Valid @RequestBody CreateGuestBookRequest request
 	) {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
+		}
+		if(currentAssociateId.equals(associateId)) {
+			throw new MementoException(ErrorCodes.ASSOCIATE_NOT_AUTHORITY);
 		}
 
 		guestBookService.create(communityId, associateId, request.type(), request.contentId(), request.content());
@@ -49,12 +54,16 @@ public class GuestBookController {
 	@PostMapping("/bubble")
 	public ResponseEntity<Void> creatBubble(
 		@CommunityId Long currentCommunityId,
+		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long associateId,
 		@RequestPart MultipartFile voice
 	) {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
+		}
+		if(currentAssociateId.equals(associateId)) {
+			throw new MementoException(ErrorCodes.ASSOCIATE_NOT_AUTHORITY);
 		}
 
 		guestBookService.createBubble(communityId, associateId, voice);
@@ -92,7 +101,7 @@ public class GuestBookController {
 			throw new MementoException(ErrorCodes.ASSOCIATE_NOT_AUTHORITY);
 		}
 
-		guestBookService.delete(communityId, associateId, guestBookId);
+		guestBookService.delete(guestBookId);
 		return ResponseEntity.ok().build();
 	}
 }

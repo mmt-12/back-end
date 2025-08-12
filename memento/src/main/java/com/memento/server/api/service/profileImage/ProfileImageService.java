@@ -18,7 +18,6 @@ import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.profileImage.ProfileImage;
 import com.memento.server.domain.profileImage.ProfileImageRepository;
-import com.memento.server.domain.voice.Voice;
 
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -55,13 +54,14 @@ public class ProfileImageService {
 				.build());
 	}
 
-	public void delete(Long communityId, Long registrantId, Long profileImageId) {
+	public void delete(Long communityId, Long associateId, Long registrantId, Long profileImageId) {
 		Associate registrant = validAssociate(communityId, registrantId);
+		Associate associate = validAssociate(communityId, associateId);
 
 		ProfileImage profileImage = profileImageRepository.findByIdAndCreatedAtIsNull(profileImageId)
 			.orElseThrow(() -> new MementoException(ErrorCodes.PROFILEIMAGE_NOT_EXISTENCE));
 
-		if(!profileImage.getRegistrant().equals(registrant)){
+		if(!profileImage.getRegistrant().equals(registrant) && !profileImage.getAssociate().equals(associate)){
 			throw new MementoException(ErrorCodes.ASSOCIATE_NOT_AUTHORITY);
 		}
 

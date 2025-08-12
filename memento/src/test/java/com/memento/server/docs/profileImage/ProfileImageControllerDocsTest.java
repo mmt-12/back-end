@@ -96,7 +96,7 @@ public class ProfileImageControllerDocsTest extends RestDocsSupport {
 		Long associateId = 1L;
 		Long profileImageId = 1L;
 
-		doNothing().when(profileImageService).delete(anyLong(), anyLong(), anyLong());
+		doNothing().when(profileImageService).delete(anyLong(), anyLong(), anyLong(), anyLong());
 
 		// when & then
 		mockMvc.perform(

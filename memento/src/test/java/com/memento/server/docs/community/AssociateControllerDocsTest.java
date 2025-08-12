@@ -193,5 +193,4 @@ public class AssociateControllerDocsTest extends RestDocsSupport {
 				)
 			));
 	}
-
 }

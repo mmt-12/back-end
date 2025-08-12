@@ -105,9 +105,7 @@ public class GuestBookService {
 			.build();
 	}
 
-	public void delete(Long communityId, Long associateId, Long guestBookId) {
-		Associate associate = validAssociate(communityId, associateId);
-
+	public void delete(Long guestBookId) {
 		GuestBook guestBook = guestBookRepository.findByIdAndDeletedAtNull(guestBookId)
 			.orElseThrow(() -> new MementoException(ErrorCodes.GUESTBOOK_NOT_EXISTENCE));
 
