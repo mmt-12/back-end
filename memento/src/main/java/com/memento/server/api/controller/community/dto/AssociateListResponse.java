@@ -32,6 +32,10 @@ public record AssociateListResponse(
 			String name
 		) {
 			public static AchievementResponse from(Achievement achievement) {
+				if (achievement == null) {
+					return null;
+				}
+
 				return AchievementResponse.builder()
 					.id(achievement.getId())
 					.name(achievement.getName())
@@ -51,18 +55,23 @@ public record AssociateListResponse(
 	}
 
 	public static AssociateListResponse from(List<Associate> associates, Community community, Integer size) {
+		boolean hasNext = false;
+		if (associates.size() > size) {
+			hasNext = true;
+			associates = associates.subList(0, size);
+		}
+		Long nextCursor = associates.isEmpty() ? null : associates.getLast().getId();
+
 		List<AssociateResponse> associatesResult = new ArrayList<>();
 		for (Associate associate : associates) {
-			associatesResult.add(
-				AssociateResponse.from(associate)
-			);
+			associatesResult.add(AssociateResponse.from(associate));
 		}
 
 		return AssociateListResponse.builder()
 			.communityName(community.getName())
 			.associates(associatesResult)
-			.cursor(associates.size() > size ? associates.get(size).getId() : associates.getLast().getId())
-			.hasNext(associates.size() > size)
+			.cursor(nextCursor)
+			.hasNext(hasNext)
 			.build();
 	}
 }

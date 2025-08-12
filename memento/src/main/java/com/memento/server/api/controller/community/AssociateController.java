@@ -38,7 +38,7 @@ public class AssociateController {
 		@CommunityId Long currentCommunityId,
 		@PathVariable Long communityId,
 		@RequestParam(defaultValue = "") String keyword,
-		@RequestParam(defaultValue = "0") Long cursor,
+		@RequestParam Long cursor,
 		@RequestParam(defaultValue = "10") Integer size
 	) {
 		if (!currentCommunityId.equals(communityId)) {
