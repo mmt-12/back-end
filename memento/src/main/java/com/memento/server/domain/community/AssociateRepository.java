@@ -23,4 +23,6 @@ public interface AssociateRepository extends JpaRepository<Associate, Long> {
 		@Param("cursor") Long cursor,
 		Pageable pageable
 	);
+
+	List<Associate> findAllByMemberId(Long memberId);
 }

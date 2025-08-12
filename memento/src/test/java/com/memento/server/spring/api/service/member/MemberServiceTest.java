@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.memento.server.api.controller.member.MemberSignUpResponse;
+import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
 import com.memento.server.api.service.member.MemberService;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.member.Member;

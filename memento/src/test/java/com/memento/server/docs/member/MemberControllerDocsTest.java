@@ -14,6 +14,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,26 +22,67 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
 import com.memento.server.api.controller.member.MemberController;
-import com.memento.server.api.controller.member.MemberSignUpRequest;
-import com.memento.server.api.controller.member.MemberSignUpResponse;
-import com.memento.server.api.controller.member.MemberUpdateRequest;
-import com.memento.server.docs.RestDocsSupport;
+import com.memento.server.api.controller.member.dto.CommunityListResponse;
+import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
+import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
+import com.memento.server.api.controller.member.dto.MemberUpdateRequest;
 import com.memento.server.api.service.auth.jwt.JwtToken;
+import com.memento.server.api.service.community.AssociateService;
 import com.memento.server.api.service.member.MemberService;
+import com.memento.server.docs.RestDocsSupport;
 
 public class MemberControllerDocsTest extends RestDocsSupport {
 
 	private final MemberService memberService = mock(MemberService.class);
+	private final AssociateService associateService = mock(AssociateService.class);
 
 	@Override
 	protected Object initController() {
-		return new MemberController(memberService);
+		return new MemberController(memberService, associateService);
+	}
+
+	@Test
+	@DisplayName("그룹 목록 조회")
+	void searchAll() throws Exception {
+		// given
+		setAuthentication(1L, null, null);
+		when(associateService.searchAllMyAssociate(any())).thenReturn(
+			CommunityListResponse.builder()
+				.communities(List.of(
+					CommunityListResponse.CommunityResponse.builder()
+						.id(1L)
+						.name("SSAFY 12기 12반")
+						.associateId(1L)
+						.build(),
+					CommunityListResponse.CommunityResponse.builder()
+						.id(2L)
+						.name("SSAFY 13기 12반")
+						.associateId(5L)
+						.build()
+				))
+				.build()
+		);
+
+		// when & then
+		mockMvc.perform(get("/api/v1/members/associates"))
+			.andExpect(status().isOk())
+			.andDo(document("member-community-list-test",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				responseFields(
+					subsectionWithPath("communities").description("그룹 목록"),
+					fieldWithPath("communities[].id").description("그룹 아이디"),
+					fieldWithPath("communities[].name").description("그룹 이름"),
+					fieldWithPath("communities[].associateId").description("그룹 내 자신의 아이디")
+				)
+			));
 	}
 
 	@Test

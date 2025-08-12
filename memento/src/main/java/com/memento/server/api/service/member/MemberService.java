@@ -9,7 +9,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.memento.server.api.controller.member.MemberSignUpResponse;
+import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
 import com.memento.server.api.service.auth.jwt.MemberClaim;

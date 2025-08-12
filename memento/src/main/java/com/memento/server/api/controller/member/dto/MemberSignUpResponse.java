@@ -1,4 +1,4 @@
-package com.memento.server.api.controller.member;
+package com.memento.server.api.controller.member.dto;
 
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.domain.member.Member;

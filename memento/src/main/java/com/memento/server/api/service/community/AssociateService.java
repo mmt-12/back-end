@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.memento.server.api.controller.community.dto.AssociateListResponse;
+import com.memento.server.api.controller.member.dto.CommunityListResponse;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
@@ -45,5 +46,11 @@ public class AssociateService {
 		);
 
 		return AssociateListResponse.from(associates, communityOptional.get(), size);
+	}
+
+	public CommunityListResponse searchAllMyAssociate(Long memberId) {
+		List<Associate> associates = repository.findAllByMemberId(memberId);
+
+		return CommunityListResponse.from(associates);
 	}
 }
