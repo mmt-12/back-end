@@ -14,6 +14,10 @@ import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
 import com.memento.server.api.service.auth.jwt.MemberClaim;
 import com.memento.server.common.exception.MementoException;
+import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.community.AssociateRepository;
+import com.memento.server.domain.community.Community;
+import com.memento.server.domain.community.CommunityRepository;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
 
@@ -25,6 +29,8 @@ import lombok.RequiredArgsConstructor;
 public class MemberService {
 
 	private final MemberRepository memberRepository;
+	private final CommunityRepository communityRepository;
+	private final AssociateRepository associateRepository;
 	private final JwtTokenProvider jwtTokenProvider;
 
 	public Optional<Member> findMemberWithKakaoId(Long kakaoId) {
@@ -40,7 +46,13 @@ public class MemberService {
 
 		Member member = memberRepository.save(Member.create(name, email, birthday, kakaoId));
 
-		MemberClaim memberClaim = MemberClaim.from(member);
+		// 커뮤니티 자동 가입
+		Optional<Community> communityOptional = communityRepository.findById(1L);
+		Community community = communityOptional.orElse(
+			communityRepository.save(Community.create("SSAFY 12기 12반", member)));
+		Associate associate = associateRepository.save(Associate.create(name, member, community));
+
+		MemberClaim memberClaim = MemberClaim.from(member, associate);
 		JwtToken token = jwtTokenProvider.createToken(memberClaim);
 		return MemberSignUpResponse.from(member, token);
 	}
