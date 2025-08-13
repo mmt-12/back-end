@@ -21,9 +21,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.memento.server.api.controller.auth.AuthController;
-import com.memento.server.api.controller.auth.AuthGuestResponse;
-import com.memento.server.api.controller.auth.AuthMemberResponse;
-import com.memento.server.api.controller.auth.AuthResponse;
+import com.memento.server.api.controller.auth.dto.AuthGuestResponse;
+import com.memento.server.api.controller.auth.dto.AuthMemberResponse;
+import com.memento.server.api.controller.auth.dto.AuthResponse;
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.api.service.auth.AuthService;
 import com.memento.server.api.service.auth.jwt.JwtToken;

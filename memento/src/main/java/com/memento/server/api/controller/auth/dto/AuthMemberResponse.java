@@ -1,4 +1,4 @@
-package com.memento.server.api.controller.auth;
+package com.memento.server.api.controller.auth.dto;
 
 import com.memento.server.api.service.auth.jwt.JwtToken;
 

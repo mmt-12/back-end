@@ -3,9 +3,9 @@ package com.memento.server.api.service.auth;
 import org.springframework.stereotype.Service;
 
 import com.memento.server.client.oauth.KakaoClient;
-import com.memento.server.api.controller.auth.AuthGuestResponse;
-import com.memento.server.api.controller.auth.AuthMemberResponse;
-import com.memento.server.api.controller.auth.AuthResponse;
+import com.memento.server.api.controller.auth.dto.AuthGuestResponse;
+import com.memento.server.api.controller.auth.dto.AuthMemberResponse;
+import com.memento.server.api.controller.auth.dto.AuthResponse;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
 import com.memento.server.api.service.auth.jwt.MemberClaim;
