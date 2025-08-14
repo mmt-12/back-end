@@ -1,10 +1,14 @@
 package com.memento.server.spring.api.service.memory;
 
+import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
+import static com.memento.server.common.error.ErrorCodes.COMMUNITY_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,9 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.memento.server.api.controller.memory.dto.CreateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.CreateMemoryResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
 import com.memento.server.api.service.memory.MemoryService;
+import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
@@ -67,7 +74,7 @@ class MemoryServiceTest {
 	private EventRepository eventRepository;
 
 	@Test
-	@DisplayName("모든 추억을 조회한다.")
+	@DisplayName("모든 기억을 조회한다.")
 	void readAll() {
 		// given
 		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
@@ -176,7 +183,7 @@ class MemoryServiceTest {
 	}
 
 	@Test
-	@DisplayName("커서 기반으로 추억을 조회한다.")
+	@DisplayName("커서 기반으로 기억을 조회한다.")
 	void readAll_withCursor() {
 		// given
 		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1001L));
@@ -322,7 +329,7 @@ class MemoryServiceTest {
 	}
 
 	@Test
-	@DisplayName("키워드로 추억을 조회한다.")
+	@DisplayName("키워드로 기억을 조회한다.")
 	void readAll_withKeyword() {
 		// given
 		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1002L));
@@ -394,7 +401,7 @@ class MemoryServiceTest {
 	}
 
 	@Test
-	@DisplayName("기간으로 추억을 조회한다.")
+	@DisplayName("기간으로 기억을 조회한다.")
 	void readAll_withDateRange() throws NoSuchFieldException, IllegalAccessException {
 		// given
 		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1003L));
@@ -493,5 +500,134 @@ class MemoryServiceTest {
 		assertThat(response.memories().get(0).title()).isEqualTo("추억3");
 		assertThat(response.memories().get(1).title()).isEqualTo("추억2");
 		assertThat(response.memories().get(2).title()).isEqualTo("추억1");
+	}
+
+	@Test
+	@DisplayName("기억을 생성한다.")
+	void createMemory_success() {
+		// given
+		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1004L));
+		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
+		Associate otherAssociate = associateRepository.save(Associate.create("다른어소시에이트", member, community));
+
+		CreateMemoryRequest.LocationRequest locationRequest = CreateMemoryRequest.LocationRequest.builder()
+			.address("테스트 주소")
+			.name("테스트 장소")
+			.latitude(10.0F)
+			.longitude(20.0F)
+			.code(1)
+			.build();
+
+		CreateMemoryRequest.PeriodRequest periodRequest = CreateMemoryRequest.PeriodRequest.builder()
+			.startTime(LocalDateTime.of(2024, 8, 1, 10, 0))
+			.endTime(LocalDateTime.of(2024, 8, 1, 11, 0))
+			.build();
+
+		CreateMemoryRequest request = CreateMemoryRequest.builder()
+			.title("새로운 추억")
+			.description("새로운 추억에 대한 설명입니다.")
+			.location(locationRequest)
+			.period(periodRequest)
+			.associates(List.of(otherAssociate.getId()))
+			.build();
+
+		// when
+		CreateMemoryResponse response = memoryService.create(community.getId(), associate.getId(), request);
+
+		// then
+		assertThat(response).isNotNull();
+		assertThat(response.memoryId()).isNotNull();
+
+		Memory foundMemory = memoryRepository.findById(response.memoryId()).orElseThrow();
+		assertThat(foundMemory.getEvent().getTitle()).isEqualTo("새로운 추억");
+		assertThat(foundMemory.getEvent().getDescription()).isEqualTo("새로운 추억에 대한 설명입니다.");
+		assertThat(foundMemory.getEvent().getLocation().getAddress()).isEqualTo("테스트 주소");
+		assertThat(foundMemory.getEvent().getPeriod().getStartTime()).isEqualTo(LocalDateTime.of(2024, 8, 1, 10, 0));
+
+		List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemory(foundMemory);
+		assertThat(memoryAssociates).hasSize(2); // original associate + otherAssociate
+		assertThat(memoryAssociates).extracting(MemoryAssociate::getAssociate)
+			.containsExactlyInAnyOrder(associate, otherAssociate);
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 참여자로 기억을 생성하면 예외가 발생한다.")
+	void createMemory_associateNotFound() {
+		// given
+		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1005L));
+		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
+
+		CreateMemoryRequest.LocationRequest locationRequest = CreateMemoryRequest.LocationRequest.builder()
+			.address("테스트 주소")
+			.name("테스트 장소")
+			.latitude(10.0F)
+			.longitude(20.0F)
+			.code(1)
+			.build();
+
+		CreateMemoryRequest.PeriodRequest periodRequest = CreateMemoryRequest.PeriodRequest.builder()
+			.startTime(LocalDateTime.of(2024, 8, 1, 10, 0))
+			.endTime(LocalDateTime.of(2024, 8, 1, 11, 0))
+			.build();
+
+		CreateMemoryRequest request = CreateMemoryRequest.builder()
+			.title("새로운 추억")
+			.description("새로운 추억에 대한 설명입니다.")
+			.location(locationRequest)
+			.period(periodRequest)
+			.associates(List.of())
+			.build();
+
+		Long nonExistentAssociateId = 9999L;
+
+		// when // then
+		assertThatThrownBy(() -> memoryService.create(community.getId(), nonExistentAssociateId, request))
+			.isInstanceOf(MementoException.class)
+			.satisfies(ex -> {
+				MementoException e = (MementoException)ex;
+				assertThat(e.getErrorCode()).isEqualTo(ASSOCIATE_NOT_FOUND);
+			});
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 커뮤니티로 기억을 생성하면 예외가 발생한다.")
+	void createMemory_communityNotFound() {
+		// given
+		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1006L));
+		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
+
+		CreateMemoryRequest.LocationRequest locationRequest = CreateMemoryRequest.LocationRequest.builder()
+			.address("테스트 주소")
+			.name("테스트 장소")
+			.latitude(10.0F)
+			.longitude(20.0F)
+			.code(1)
+			.build();
+
+		CreateMemoryRequest.PeriodRequest periodRequest = CreateMemoryRequest.PeriodRequest.builder()
+			.startTime(LocalDateTime.of(2024, 8, 1, 10, 0))
+			.endTime(LocalDateTime.of(2024, 8, 1, 11, 0))
+			.build();
+
+		CreateMemoryRequest request = CreateMemoryRequest.builder()
+			.title("새로운 추억")
+			.description("새로운 추억에 대한 설명입니다.")
+			.location(locationRequest)
+			.period(periodRequest)
+			.associates(List.of())
+			.build();
+
+		Long nonExistentCommunityId = 9999L;
+
+		// when // then
+		assertThatThrownBy(() -> memoryService.create(nonExistentCommunityId, associate.getId(), request))
+			.isInstanceOf(MementoException.class)
+			.satisfies(ex -> {
+				MementoException e = (MementoException)ex;
+				assertThat(e.getErrorCode()).isEqualTo(COMMUNITY_NOT_FOUND);
+			});
 	}
 }
