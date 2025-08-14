@@ -17,7 +17,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.queryPar
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
@@ -33,9 +32,9 @@ import com.memento.server.api.controller.memory.dto.CreateMemoryRequest;
 import com.memento.server.api.controller.memory.dto.CreateMemoryResponse;
 import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.Memory;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.Memory.Location;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.Memory.Period;
+import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse;
+import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse.LocationResponse;
+import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse.PeriodResponse;
 import com.memento.server.api.service.memory.MemoryService;
 import com.memento.server.docs.RestDocsSupport;
 
@@ -61,15 +60,15 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 				.hasNext(true)
 				.memories(
 					List.of(
-						Memory.builder()
+						MemoryResponse.builder()
 							.id(1L)
 							.title("일평 mt")
 							.description("우리가 함께 마신 소주와 수영장 물을 추억하며")
-							.period(Period.builder()
+							.period(PeriodResponse.builder()
 								.startDate(LocalDateTime.of(2025, 6, 20, 10, 30))
 								.endDate(LocalDateTime.of(2025, 6, 21, 12, 30))
 								.build())
-							.location(Location.builder()
+							.location(LocationResponse.builder()
 								.latitude(36.34512323F)
 								.longitude(138.7712322F)
 								.code("16335")

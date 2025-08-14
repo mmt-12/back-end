@@ -1,0 +1,456 @@
+package com.memento.server.spring.api.service.memory;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
+import com.memento.server.api.service.memory.MemoryService;
+import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.community.AssociateRepository;
+import com.memento.server.domain.community.Community;
+import com.memento.server.domain.community.CommunityRepository;
+import com.memento.server.domain.event.Event;
+import com.memento.server.domain.event.EventRepository;
+import com.memento.server.domain.event.Location;
+import com.memento.server.domain.event.Period;
+import com.memento.server.domain.member.Member;
+import com.memento.server.domain.member.MemberRepository;
+import com.memento.server.domain.memory.Memory;
+import com.memento.server.domain.memory.MemoryAssociate;
+import com.memento.server.domain.memory.MemoryAssociateRepository;
+import com.memento.server.domain.memory.MemoryRepository;
+import com.memento.server.domain.post.Hash;
+import com.memento.server.domain.post.Post;
+import com.memento.server.domain.post.PostImage;
+import com.memento.server.domain.post.PostImageRepository;
+import com.memento.server.domain.post.PostRepository;
+
+@SpringBootTest
+@Transactional
+class MemoryServiceTest {
+
+	@Autowired
+	private MemoryService memoryService;
+
+	@Autowired
+	private MemoryRepository memoryRepository;
+
+	@Autowired
+	private MemoryAssociateRepository memoryAssociateRepository;
+
+	@Autowired
+	private PostImageRepository postImageRepository;
+
+	@Autowired
+	private PostRepository postRepository;
+
+	@Autowired
+	private MemberRepository memberRepository;
+
+	@Autowired
+	private CommunityRepository communityRepository;
+
+	@Autowired
+	private AssociateRepository associateRepository;
+
+	@Autowired
+	private EventRepository eventRepository;
+
+	@Test
+	@DisplayName("모든 추억을 조회한다.")
+	void readAll() {
+		// given
+		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
+		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
+
+		Event event1 = eventRepository.save(
+			Event.builder()
+				.title("추억1")
+				.description("내용1")
+				.location(Location.builder()
+					.address("주소1")
+					.name("장소1")
+					.latitude(BigDecimal.valueOf(1.0))
+					.longitude(BigDecimal.valueOf(1.0))
+					.code(1)
+					.build())
+				.period(Period.builder()
+					.startTime(LocalDateTime.now().minusDays(2))
+					.endTime(LocalDateTime.now().minusDays(1))
+					.build())
+				.community(community)
+				.associate(associate)
+				.build());
+		Event event2 = eventRepository.save(Event.builder()
+			.title("추억2")
+			.description("내용2")
+			.location(Location.builder()
+				.address("주소2")
+				.name("장소2")
+				.latitude(BigDecimal.valueOf(2.0))
+				.longitude(BigDecimal.valueOf(2.0))
+				.code(2)
+				.build())
+			.period(Period.builder()
+				.startTime(LocalDateTime.now().minusDays(4))
+				.endTime(LocalDateTime.now().minusDays(3))
+				.build())
+			.community(community)
+			.associate(associate)
+			.build());
+		Event event3 = eventRepository.save(Event.builder()
+			.title("추억3")
+			.description("내용3")
+			.location(Location.builder()
+				.address("주소3")
+				.name("장소3")
+				.latitude(BigDecimal.valueOf(3.0))
+				.longitude(BigDecimal.valueOf(3.0))
+				.code(3)
+				.build())
+			.period(Period.builder()
+				.startTime(LocalDateTime.now().minusDays(6))
+				.endTime(LocalDateTime.now().minusDays(5))
+				.build())
+			.community(community)
+			.associate(associate)
+			.build());
+
+		Memory memory1 = memoryRepository.save(Memory.builder().event(event1).build());
+		Memory memory2 = memoryRepository.save(Memory.builder().event(event2).build());
+		Memory memory3 = memoryRepository.save(Memory.builder().event(event3).build());
+
+		Post post1 = postRepository.save(Post.builder().content("포스트1").memory(memory1).associate(associate).build());
+		Post post2 = postRepository.save(Post.builder().content("포스트2").memory(memory2).associate(associate).build());
+		Post post3 = postRepository.save(Post.builder().content("포스트3").memory(memory3).associate(associate).build());
+
+		postImageRepository.save(
+			PostImage.builder().url("image1.jpg").hash(Hash.builder().hash("hash1").build()).post(post1).build());
+		postImageRepository.save(
+			PostImage.builder().url("image2.jpg").hash(Hash.builder().hash("hash2").build()).post(post1).build());
+		postImageRepository.save(
+			PostImage.builder().url("image3.jpg").hash(Hash.builder().hash("hash3").build()).post(post2).build());
+
+		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory1).associate(associate).build());
+		memoryAssociateRepository.save(
+			MemoryAssociate.builder().memory(memory1).associate(associate).build()); // Duplicate to test count
+		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory2).associate(associate).build());
+
+		// when
+		ReadAllMemoryResponse response = memoryService.readAll(community.getId(), null, 10, null, null, null);
+
+		// then
+		assertThat(response.memories()).hasSize(3);
+		assertThat(response.memories().get(0).title()).isEqualTo("추억3");
+		assertThat(response.memories().get(0).pictures()).isEmpty();
+		assertThat(response.memories().get(0).memberAmount()).isEqualTo(0);
+
+		assertThat(response.memories().get(1).title()).isEqualTo("추억2");
+		assertThat(response.memories().get(1).pictures()).hasSize(1);
+		assertThat(response.memories().get(1).memberAmount()).isEqualTo(1);
+
+		assertThat(response.memories().get(2).title()).isEqualTo("추억1");
+		assertThat(response.memories().get(2).pictures()).hasSize(2);
+		assertThat(response.memories().get(2).memberAmount()).isEqualTo(2);
+
+		assertThat(response.hasNext()).isFalse();
+		assertThat(response.cursor()).isEqualTo(memory1.getId());
+	}
+
+	@Test
+	@DisplayName("커서 기반으로 추억을 조회한다.")
+	void readAll_withCursor() {
+		// given
+		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1001L));
+		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
+
+		Event event1 = eventRepository.save(
+			Event.builder()
+				.title("추억1")
+				.description("내용1")
+				.location(Location.builder()
+					.address("a")
+					.name("n")
+					.latitude(BigDecimal.valueOf(1.0))
+					.longitude(BigDecimal.valueOf(1.0))
+					.code(1)
+					.build())
+				.period(Period.builder()
+					.startTime(LocalDateTime.now().minusDays(2))
+					.endTime(LocalDateTime.now().minusDays(1))
+					.build())
+				.community(community)
+				.associate(associate)
+				.build());
+		Event event2 = eventRepository.save(Event.builder()
+			.title("추억2")
+			.description("내용2")
+			.location(Location.builder()
+				.address("a")
+				.name("n")
+				.latitude(BigDecimal.valueOf(1.0))
+				.longitude(BigDecimal.valueOf(1.0))
+				.code(2)
+				.build())
+			.period(Period.builder()
+				.startTime(LocalDateTime.now().minusDays(4))
+				.endTime(LocalDateTime.now().minusDays(3))
+				.build())
+			.community(community)
+			.associate(associate)
+			.build());
+		Event event3 = eventRepository.save(Event.builder()
+			.title("추억3")
+			.description("내용3")
+			.location(Location.builder()
+				.address("a")
+				.name("n")
+				.latitude(BigDecimal.valueOf(1.0))
+				.longitude(BigDecimal.valueOf(1.0))
+				.code(3)
+				.build())
+			.period(Period.builder()
+				.startTime(LocalDateTime.now().minusDays(6))
+				.endTime(LocalDateTime.now().minusDays(5))
+				.build())
+			.community(community)
+			.associate(associate)
+			.build());
+		Event event4 = eventRepository.save(Event.builder()
+			.title("추억4")
+			.description("내용4")
+			.location(Location.builder()
+				.address("a")
+				.name("n")
+				.latitude(BigDecimal.valueOf(1.0))
+				.longitude(BigDecimal.valueOf(1.0))
+				.code(4)
+				.build())
+			.period(Period.builder().startTime(LocalDateTime.now()).endTime(LocalDateTime.now()).build())
+			.community(community)
+			.associate(associate)
+			.build());
+		Event event5 = eventRepository.save(Event.builder()
+			.title("추억5")
+			.description("내용5")
+			.location(Location.builder()
+				.address("a")
+				.name("n")
+				.latitude(BigDecimal.valueOf(1.0))
+				.longitude(BigDecimal.valueOf(1.0))
+				.code(5)
+				.build())
+			.period(Period.builder().startTime(LocalDateTime.now()).endTime(LocalDateTime.now()).build())
+			.community(community)
+			.associate(associate)
+			.build());
+
+		Memory memory1 = memoryRepository.save(Memory.builder().event(event1).build());
+		Memory memory2 = memoryRepository.save(Memory.builder().event(event2).build());
+		Memory memory3 = memoryRepository.save(Memory.builder().event(event3).build());
+		Memory memory4 = memoryRepository.save(Memory.builder().event(event4).build());
+		Memory memory5 = memoryRepository.save(Memory.builder().event(event5).build());
+
+		// when
+		ReadAllMemoryResponse response1 = memoryService.readAll(community.getId(), null, 2, null, null, null);
+
+		// then
+		assertThat(response1.memories()).hasSize(2);
+		assertThat(response1.memories().get(0).title()).isEqualTo("추억5");
+		assertThat(response1.memories().get(1).title()).isEqualTo("추억4");
+		assertThat(response1.hasNext()).isTrue();
+		assertThat(response1.cursor()).isEqualTo(memory4.getId());
+
+		// when
+		ReadAllMemoryResponse response2 = memoryService.readAll(community.getId(), response1.cursor(), 2, null, null,
+			null);
+
+		// then
+		assertThat(response2.memories()).hasSize(2);
+		assertThat(response2.memories().get(0).title()).isEqualTo("추억3");
+		assertThat(response2.memories().get(1).title()).isEqualTo("추억2");
+		assertThat(response2.hasNext()).isTrue();
+		assertThat(response2.cursor()).isEqualTo(memory2.getId());
+
+		// when
+		ReadAllMemoryResponse response3 = memoryService.readAll(community.getId(), response2.cursor(), 2, null, null,
+			null);
+
+		// then
+		assertThat(response3.memories()).hasSize(1);
+		assertThat(response3.memories().get(0).title()).isEqualTo("추억1");
+		assertThat(response3.hasNext()).isFalse();
+		assertThat(response3.cursor()).isEqualTo(memory1.getId());
+	}
+
+	@Test
+	@DisplayName("키워드로 추억을 조회한다.")
+	void readAll_withKeyword() {
+		// given
+		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1002L));
+		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
+
+		Event event1 = eventRepository.save(
+			Event.builder()
+				.title("여행 추억")
+				.description("제주도 여행")
+				.location(Location.builder()
+					.address("a")
+					.name("n")
+					.latitude(BigDecimal.valueOf(1.0))
+					.longitude(BigDecimal.valueOf(1.0))
+					.code(1)
+					.build())
+				.period(Period.builder().startTime(LocalDateTime.now()).endTime(LocalDateTime.now()).build())
+				.community(community)
+				.associate(associate)
+				.build());
+		Event event2 = eventRepository.save(Event.builder()
+			.title("친구들과의 추억")
+			.description("강릉 바다")
+			.location(Location.builder()
+				.address("a")
+				.name("n")
+				.latitude(BigDecimal.valueOf(1.0))
+				.longitude(BigDecimal.valueOf(1.0))
+				.code(2)
+				.build())
+			.period(Period.builder().startTime(LocalDateTime.now()).endTime(LocalDateTime.now()).build())
+			.community(community)
+			.associate(associate)
+			.build());
+		Event event3 = eventRepository.save(Event.builder()
+			.title("가족 여행")
+			.description("부산 해운대")
+			.location(Location.builder()
+				.address("a")
+				.name("n")
+				.latitude(BigDecimal.valueOf(1.0))
+				.longitude(BigDecimal.valueOf(1.0))
+				.code(3)
+				.build())
+			.period(Period.builder().startTime(LocalDateTime.now()).endTime(LocalDateTime.now()).build())
+			.community(community)
+			.associate(associate)
+			.build());
+
+		memoryRepository.save(Memory.builder().event(event1).build());
+		memoryRepository.save(Memory.builder().event(event2).build());
+		memoryRepository.save(Memory.builder().event(event3).build());
+
+		// when
+		ReadAllMemoryResponse response = memoryService.readAll(community.getId(), null, 10, "여행", null, null);
+
+		// then
+		assertThat(response.memories()).hasSize(2);
+		assertThat(response.memories().get(0).title()).isEqualTo("가족 여행");
+		assertThat(response.memories().get(1).title()).isEqualTo("여행 추억");
+	}
+
+	@Test
+	@DisplayName("기간으로 추억을 조회한다.")
+	void readAll_withDateRange() throws NoSuchFieldException, IllegalAccessException {
+		// given
+		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1003L));
+		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
+
+		Event event1 = eventRepository.save(
+			Event.builder()
+				.title("추억1")
+				.description("내용1")
+				.location(Location.builder()
+					.address("a")
+					.name("n")
+					.latitude(BigDecimal.valueOf(1.0))
+					.longitude(BigDecimal.valueOf(1.0))
+					.code(1)
+					.build())
+				.period(Period.builder()
+					.startTime(LocalDate.now().atStartOfDay())
+					.endTime(LocalDate.now().atStartOfDay().plusHours(1))
+					.build())
+				.community(community)
+				.associate(associate)
+				.build());
+		Event event2 = eventRepository.save(Event.builder()
+			.title("추억2")
+			.description("내용2")
+			.location(Location.builder()
+				.address("a")
+				.name("n")
+				.latitude(BigDecimal.valueOf(1.0))
+				.longitude(BigDecimal.valueOf(1.0))
+				.code(2)
+				.build())
+			.period(Period.builder()
+				.startTime(LocalDate.now().atStartOfDay())
+				.endTime(LocalDate.now().atStartOfDay().plusHours(1))
+				.build())
+			.community(community)
+			.associate(associate)
+			.build());
+		Event event3 = eventRepository.save(Event.builder()
+			.title("추억3")
+			.description("내용3")
+			.location(Location.builder()
+				.address("a")
+				.name("n")
+				.latitude(BigDecimal.valueOf(1.0))
+				.longitude(BigDecimal.valueOf(1.0))
+				.code(3)
+				.build())
+			.period(Period.builder()
+				.startTime(LocalDate.now().minusDays(1).atStartOfDay())
+				.endTime(LocalDate.now().minusDays(1).atStartOfDay().plusHours(1))
+				.build())
+			.community(community)
+			.associate(associate)
+			.build());
+		Event event4 = eventRepository.save(Event.builder()
+			.title("추억4")
+			.description("내용4")
+			.location(Location.builder()
+				.address("a")
+				.name("n")
+				.latitude(BigDecimal.valueOf(1.0))
+				.longitude(BigDecimal.valueOf(1.0))
+				.code(4)
+				.build())
+			.period(Period.builder()
+				.startTime(LocalDate.now().minusDays(2).atStartOfDay())
+				.endTime(LocalDate.now().minusDays(2).atStartOfDay().plusHours(1))
+				.build())
+			.community(community)
+			.associate(associate)
+			.build());
+
+		Memory memory1 = memoryRepository.save(Memory.builder().event(event1).build());
+		Memory memory2 = memoryRepository.save(Memory.builder().event(event2).build());
+		Memory memory3 = memoryRepository.save(Memory.builder().event(event3).build());
+		Memory memory4 = memoryRepository.save(Memory.builder().event(event4).build());
+
+		// when
+		LocalDate startDate = LocalDate.now().minusDays(1);
+		LocalDate endDate = LocalDate.now();
+		ReadAllMemoryResponse response = memoryService.readAll(community.getId(), null, 10, null, startDate, endDate);
+
+		// then
+		assertThat(response.memories()).hasSize(3);
+		assertThat(response.memories().get(0).title()).isEqualTo("추억3");
+		assertThat(response.memories().get(1).title()).isEqualTo("추억2");
+		assertThat(response.memories().get(2).title()).isEqualTo("추억1");
+	}
+}
