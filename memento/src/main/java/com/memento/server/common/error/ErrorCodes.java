@@ -65,6 +65,7 @@ public enum ErrorCodes implements ErrorCode {
 	ASSOCIATE_NICKNAME_TOO_LONG(BAD_REQUEST, 7002, "그룹 참여자 닉네임은 51자 이하로 입력해야 합니다."),
 	ASSOCIATE_MEMBER_REQUIRED(BAD_REQUEST, 7003, "그룹 참여자 회원은 필수입니다."),
 	ASSOCIATE_COMMUNITY_REQUIRED(BAD_REQUEST, 7004, "그룹 참여자 커뮤니티는 필수입니다."),
+	ASSOCIATE_NOT_FOUND(BAD_REQUEST, 7004, "존재하지 않는 참여자입니다."),
 
 	COMMENT_URL_REQUIRED(BAD_REQUEST, 8000, "코멘트 URL은 필수입니다."),
 	COMMENT_URL_BLANK(BAD_REQUEST, 8001, "코멘트 URL은 공백일 수 없습니다."),

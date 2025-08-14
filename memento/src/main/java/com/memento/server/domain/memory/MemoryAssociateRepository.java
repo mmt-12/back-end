@@ -17,4 +17,6 @@ public interface MemoryAssociateRepository extends JpaRepository<MemoryAssociate
 		    GROUP BY ma.memory.id
 		""")
 	List<MemoryAssociateCount> countAssociatesByMemoryIds(@Param("memoryIds") List<Long> memoryIds);
+
+	List<MemoryAssociate> findAllByMemory(Memory memory);
 }
