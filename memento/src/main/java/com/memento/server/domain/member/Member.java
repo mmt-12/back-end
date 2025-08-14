@@ -1,6 +1,9 @@
 package com.memento.server.domain.member;
 
-import static com.memento.server.utility.validation.member.MemberValidator.*;
+import static com.memento.server.utility.validation.member.MemberValidator.validateBirthday;
+import static com.memento.server.utility.validation.member.MemberValidator.validateEmail;
+import static com.memento.server.utility.validation.member.MemberValidator.validateKakaoId;
+import static com.memento.server.utility.validation.member.MemberValidator.validateName;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -75,5 +78,10 @@ public class Member extends BaseEntity {
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(id);
+	}
+
+	public void update(String name, String email) {
+		this.name = name;
+		this.email = email;
 	}
 }

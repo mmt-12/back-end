@@ -1,5 +1,7 @@
 package com.memento.server.api.controller.community;
 
+import static com.memento.server.common.error.ErrorCodes.COMMUNITY_NOT_CURRENT;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,10 +11,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.memento.server.annotation.CommunityId;
+import com.memento.server.api.controller.community.dto.AssociateListResponse;
 import com.memento.server.api.controller.community.dto.ReadAssociateResponse;
 import com.memento.server.api.controller.community.dto.UpdateAssociateRequest;
-import com.memento.server.api.controller.community.dto.AssociateListResponse;
 import com.memento.server.api.service.community.AssociateService;
+import com.memento.server.common.exception.MementoException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,12 +37,12 @@ public class AssociateController {
 	public ResponseEntity<AssociateListResponse> searchAll(
 		@CommunityId Long currentCommunityId,
 		@PathVariable Long communityId,
-		@RequestParam(defaultValue = "") String keyword,
-		@RequestParam(defaultValue = "0") Long cursor,
-		@RequestParam(defaultValue = "10") Integer size) {
-
+		@RequestParam(required = false, defaultValue = "") String keyword,
+		@RequestParam(required = false) Long cursor,
+		@RequestParam(required = false, defaultValue = "10") Integer size
+	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new IllegalArgumentException("다른 그룹의 요청입니다.");
+			throw new MementoException(COMMUNITY_NOT_CURRENT);
 		}
 
 		return ResponseEntity.ok(associateService.searchAll(communityId, keyword, cursor, size));
