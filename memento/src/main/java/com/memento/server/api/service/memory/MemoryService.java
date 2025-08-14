@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.memento.server.api.controller.memory.dto.CreateMemoryRequest;
 import com.memento.server.api.controller.memory.dto.CreateMemoryResponse;
 import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
+import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
 import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.memory.MemoryAssociateRepository;
@@ -29,14 +30,13 @@ public class MemoryService {
 	private final MemoryAssociateRepository memoryAssociateRepository;
 	private final PostImageRepository postImageRepository;
 
-	public ReadAllMemoryResponse readAll(
-		Long communityId,
-		Long cursor,
-		Integer size,
-		String keyword,
-		LocalDate startDate,
-		LocalDate endDate
-	) {
+	public ReadAllMemoryResponse readAll(Long communityId, ReadAllMemoryRequest request) {
+		Long cursor = request.cursor();
+		Integer size = request.size();
+		String keyword = request.keyword();
+		LocalDate startDate = request.startDate();
+		LocalDate endDate = request.endDate();
+
 		LocalDateTime startDateTime = null;
 		LocalDateTime endDateTime = null;
 

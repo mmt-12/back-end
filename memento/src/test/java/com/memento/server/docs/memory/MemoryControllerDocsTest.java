@@ -54,7 +54,7 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 	void read() throws Exception {
 		// given
 		setAuthentication(1L, 1L, 1L);
-		when(memoryService.readAll(any(), any(), any(), any(), any(), any())).thenReturn(
+		when(memoryService.readAll(any(), any())).thenReturn(
 			ReadAllMemoryResponse.builder()
 				.cursor(3L)
 				.hasNext(true)

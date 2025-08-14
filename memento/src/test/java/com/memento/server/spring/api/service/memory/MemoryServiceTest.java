@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
 import com.memento.server.api.service.memory.MemoryService;
 import com.memento.server.domain.community.Associate;
@@ -147,7 +148,14 @@ class MemoryServiceTest {
 		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory2).associate(associate).build());
 
 		// when
-		ReadAllMemoryResponse response = memoryService.readAll(community.getId(), null, 10, null, null, null);
+		ReadAllMemoryRequest request = ReadAllMemoryRequest.builder()
+			.cursor(null)
+			.size(10)
+			.keyword(null)
+			.startDate(null)
+			.endDate(null)
+			.build();
+		ReadAllMemoryResponse response = memoryService.readAll(community.getId(), request);
 
 		// then
 		assertThat(response.memories()).hasSize(3);
@@ -263,7 +271,14 @@ class MemoryServiceTest {
 		Memory memory5 = memoryRepository.save(Memory.builder().event(event5).build());
 
 		// when
-		ReadAllMemoryResponse response1 = memoryService.readAll(community.getId(), null, 2, null, null, null);
+		ReadAllMemoryRequest request1 = ReadAllMemoryRequest.builder()
+			.cursor(null)
+			.size(2)
+			.keyword(null)
+			.startDate(null)
+			.endDate(null)
+			.build();
+		ReadAllMemoryResponse response1 = memoryService.readAll(community.getId(), request1);
 
 		// then
 		assertThat(response1.memories()).hasSize(2);
@@ -273,8 +288,14 @@ class MemoryServiceTest {
 		assertThat(response1.cursor()).isEqualTo(memory4.getId());
 
 		// when
-		ReadAllMemoryResponse response2 = memoryService.readAll(community.getId(), response1.cursor(), 2, null, null,
-			null);
+		ReadAllMemoryRequest request2 = ReadAllMemoryRequest.builder()
+			.cursor(response1.cursor())
+			.size(2)
+			.keyword(null)
+			.startDate(null)
+			.endDate(null)
+			.build();
+		ReadAllMemoryResponse response2 = memoryService.readAll(community.getId(), request2);
 
 		// then
 		assertThat(response2.memories()).hasSize(2);
@@ -284,8 +305,14 @@ class MemoryServiceTest {
 		assertThat(response2.cursor()).isEqualTo(memory2.getId());
 
 		// when
-		ReadAllMemoryResponse response3 = memoryService.readAll(community.getId(), response2.cursor(), 2, null, null,
-			null);
+		ReadAllMemoryRequest request3 = ReadAllMemoryRequest.builder()
+			.cursor(response2.cursor())
+			.size(2)
+			.keyword(null)
+			.startDate(null)
+			.endDate(null)
+			.build();
+		ReadAllMemoryResponse response3 = memoryService.readAll(community.getId(), request3);
 
 		// then
 		assertThat(response3.memories()).hasSize(1);
@@ -351,7 +378,14 @@ class MemoryServiceTest {
 		memoryRepository.save(Memory.builder().event(event3).build());
 
 		// when
-		ReadAllMemoryResponse response = memoryService.readAll(community.getId(), null, 10, "여행", null, null);
+		ReadAllMemoryRequest request = ReadAllMemoryRequest.builder()
+			.cursor(null)
+			.size(10)
+			.keyword("여행")
+			.startDate(null)
+			.endDate(null)
+			.build();
+		ReadAllMemoryResponse response = memoryService.readAll(community.getId(), request);
 
 		// then
 		assertThat(response.memories()).hasSize(2);
@@ -445,7 +479,14 @@ class MemoryServiceTest {
 		// when
 		LocalDate startDate = LocalDate.now().minusDays(1);
 		LocalDate endDate = LocalDate.now();
-		ReadAllMemoryResponse response = memoryService.readAll(community.getId(), null, 10, null, startDate, endDate);
+		ReadAllMemoryRequest request = ReadAllMemoryRequest.builder()
+			.cursor(null)
+			.size(10)
+			.keyword(null)
+			.startDate(startDate)
+			.endDate(endDate)
+			.build();
+		ReadAllMemoryResponse response = memoryService.readAll(community.getId(), request);
 
 		// then
 		assertThat(response.memories()).hasSize(3);

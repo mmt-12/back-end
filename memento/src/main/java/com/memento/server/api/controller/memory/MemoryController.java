@@ -36,10 +36,7 @@ public class MemoryController {
 			throw new IllegalArgumentException("다른 그룹의 요청입니다.");
 		}
 
-		return ResponseEntity.ok(
-			memoryService.readAll(communityId, request.cursor(), request.size(), request.keyword(), request.startDate(),
-				request.endDate())
-		);
+		return ResponseEntity.ok(memoryService.readAll(communityId, request));
 	}
 
 	@PostMapping
