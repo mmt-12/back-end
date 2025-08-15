@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.memento.server.api.controller.comment.CommentController;
 import com.memento.server.api.controller.emoji.EmojiController;
+import com.memento.server.api.controller.notification.NotificationController;
 import com.memento.server.api.controller.voice.VoiceController;
 import com.memento.server.api.service.comment.CommentService;
 import com.memento.server.api.service.emoji.EmojiService;
@@ -24,6 +25,7 @@ import com.memento.server.spring.config.TestSecurityConfig;
 	VoiceController.class,
 	EmojiController.class,
 	CommentController.class,
+	NotificationController.class,
 })
 @Import({TestSecurityConfig.class, JwtTokenProvider.class})
 @EnableConfigurationProperties(JwtProperties.class)
