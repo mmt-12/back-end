@@ -128,10 +128,7 @@ public class AssociateControllerDocsTest extends RestDocsSupport {
 		);
 
 		// when & then
-		mockMvc.perform(get(PATH, 1L)
-				.param("keyword", "")
-				.param("cursor", "")
-				.param("size", ""))
+		mockMvc.perform(get(PATH, 1L))
 			.andExpect(status().isOk())
 			.andDo(document("associate-list-test",
 				preprocessRequest(prettyPrint()),
@@ -140,9 +137,9 @@ public class AssociateControllerDocsTest extends RestDocsSupport {
 					parameterWithName("communityId").description("그룹 아이디")
 				),
 				queryParameters(
-					parameterWithName("keyword").description("키워드"),
-					parameterWithName("cursor").description("커서값"),
-					parameterWithName("size").description("검색 크기")
+					parameterWithName("keyword").optional().description("키워드"),
+					parameterWithName("cursor").optional().description("커서값"),
+					parameterWithName("size").optional().description("검색 크기")
 				),
 				responseFields(
 					fieldWithPath("communityName").description("그룹 이름"),

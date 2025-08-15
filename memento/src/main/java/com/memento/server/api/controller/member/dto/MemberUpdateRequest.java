@@ -1,4 +1,4 @@
-package com.memento.server.api.controller.member;
+package com.memento.server.api.controller.member.dto;
 
 import lombok.Builder;
 

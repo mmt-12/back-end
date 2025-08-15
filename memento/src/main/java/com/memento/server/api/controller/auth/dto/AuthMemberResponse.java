@@ -1,13 +1,13 @@
-package com.memento.server.api.controller.member;
+package com.memento.server.api.controller.auth.dto;
 
 import com.memento.server.api.service.auth.jwt.JwtToken;
 
 import lombok.Builder;
 
 @Builder
-public record MemberSignUpResponse(
+public record AuthMemberResponse(
 	Long memberId,
 	String name,
 	JwtToken token
-) {
+) implements AuthResponse {
 }

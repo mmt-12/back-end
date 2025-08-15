@@ -15,8 +15,8 @@ import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
 import com.memento.server.api.controller.community.dto.UpdateAssociateRequest;
 import com.memento.server.api.controller.community.dto.AssociateListResponse;
 import com.memento.server.api.service.community.AssociateService;
-import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
+import com.memento.server.common.error.ErrorCodes;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,12 +45,12 @@ public class AssociateController {
 	public ResponseEntity<AssociateListResponse> searchAll(
 		@CommunityId Long currentCommunityId,
 		@PathVariable Long communityId,
-		@RequestParam(defaultValue = "") String keyword,
-		@RequestParam(defaultValue = "0") Long cursor,
-		@RequestParam(defaultValue = "10") Integer size) {
-
+		@RequestParam(required = false, defaultValue = "") String keyword,
+		@RequestParam(required = false) Long cursor,
+		@RequestParam(required = false, defaultValue = "10") Integer size
+	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
+			throw new MementoException(COMMUNITY_NOT_CURRENT);
 		}
 
 		return ResponseEntity.ok(associateService.searchAll(communityId, keyword, cursor, size));
