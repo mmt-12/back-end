@@ -15,6 +15,7 @@ import com.memento.server.api.controller.notification.NotificationController;
 import com.memento.server.api.controller.voice.VoiceController;
 import com.memento.server.api.service.comment.CommentService;
 import com.memento.server.api.service.emoji.EmojiService;
+import com.memento.server.api.service.notification.NotificationService;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.api.service.auth.jwt.JwtProperties;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
@@ -45,6 +46,9 @@ public abstract class ControllerTestSupport {
 
 	@MockitoBean
 	protected CommentService commentService;
+
+	@MockitoBean
+	protected NotificationService notificationService;
 
 	@Autowired
 	protected JwtTokenProvider jwtTokenProvider;

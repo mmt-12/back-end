@@ -1,0 +1,4 @@
+[[Notification-API]]
+== Notification API
+
+include::notification-get.adoc[]
