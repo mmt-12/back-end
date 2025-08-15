@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.memento.server.api.controller.community.dto.AssociateListResponse;
-import com.memento.server.api.controller.community.dto.CommunityListResponse;
+import com.memento.server.api.controller.member.dto.CommunityListResponse;
 import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;

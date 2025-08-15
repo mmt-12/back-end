@@ -81,7 +81,7 @@ public class AssociateControllerTest extends ControllerTestSupport {
 			.andDo(print())
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-			.andExpect(jsonPath("$.code").value(7005))
+			.andExpect(jsonPath("$.code").value(5006))
 			.andExpect(jsonPath("$.message").value("다른 그룹의 요청입니다."));
 	}
 
@@ -132,7 +132,7 @@ public class AssociateControllerTest extends ControllerTestSupport {
 			.andDo(print())
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-			.andExpect(jsonPath("$.code").value(7005))
+			.andExpect(jsonPath("$.code").value(5006))
 			.andExpect(jsonPath("$.message").value("다른 그룹의 요청입니다."));
 	}
 

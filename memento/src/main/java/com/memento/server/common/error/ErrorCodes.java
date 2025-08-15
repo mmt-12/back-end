@@ -51,7 +51,7 @@ public enum ErrorCodes implements ErrorCode {
 	COMMUNITY_MEMBER_REQUIRED(BAD_REQUEST, 5003, "커뮤니티 생성자는 필수입니다."),
 	COMMUNITY_NOT_CURRENT(BAD_REQUEST, 5004, "현재 커뮤니티에 대한 요청이 아닙니다."),
 	COMMUNITY_NOT_FOUND(BAD_REQUEST, 5005, "존재하지 않는 커뮤니티입니다."),
-	COMMUNITY_NOT_MATCH(BAD_REQUEST, 7005, "다른 그룹의 요청입니다."),
+	COMMUNITY_NOT_MATCH(BAD_REQUEST, 5006, "다른 그룹의 요청입니다."),
 
 	ACHIEVEMENT_NAME_REQUIRED(BAD_REQUEST, 6000, "업적 이름은 필수입니다."),
 	ACHIEVEMENT_NAME_BLANK(BAD_REQUEST, 6001, "업적 이름은 공백일 수 없습니다."),
