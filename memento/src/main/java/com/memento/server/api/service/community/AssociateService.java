@@ -73,18 +73,23 @@ public class AssociateService {
 	public SearchAssociateResponse search(Long communityId, Long associateId) {
 		Associate associate = validAssociate(communityId, associateId);
 
+		Achievement achievement = associate.getAchievement();
+
 		return SearchAssociateResponse.builder()
 			.nickname(associate.getNickname())
-			.achievement(SearchAssociateResponse.Achievement.builder()
-				.id(associate.getAchievement().getId())
-				.name(associate.getAchievement().getName())
-				.build())
+			.achievement(achievement != null ?
+				SearchAssociateResponse.Achievement.builder()
+					.id(achievement.getId())
+					.name(achievement.getName())
+					.build()
+				: null)
 			.imageUrl(associate.getProfileImageUrl())
 			.introduction(associate.getIntroduction())
 			.birthday(associate.getMember().getBirthday())
 			.build();
 	}
 
+	@Transactional
 	public void update(Long communityId, Long associateId, String profileImageUrl, String nickname, Long achievementId, String introduction) {
 		Associate associate = validAssociate(communityId, associateId);
 		String newProfileImageUrl = associate.getProfileImageUrl();

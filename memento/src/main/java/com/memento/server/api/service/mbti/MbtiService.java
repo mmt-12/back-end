@@ -1,8 +1,10 @@
 package com.memento.server.api.service.mbti;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.memento.server.api.controller.mbti.dto.SearchMbtiResponse;
+import com.memento.server.api.service.mbti.dto.MbtiSearchDto;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MbtiService {
 
 	private final AssociateRepository associateRepository;
@@ -30,6 +33,7 @@ public class MbtiService {
 		return associate;
 	}
 
+	@Transactional
 	public void create(Long communityId, Long from, Long to, Mbti mbti) {
 		Associate fromAssociate = validAssociate(communityId, from);
 		Associate toAssociate = validAssociate(communityId, to);
@@ -51,7 +55,7 @@ public class MbtiService {
 	public SearchMbtiResponse search(Long communityId, Long associateId) {
 		Associate associate = validAssociate(communityId, associateId);
 
-		Object[] counts = mbtiTestRepository.countMbtiByToAssociate(associate.getId());
+		MbtiSearchDto counts = mbtiTestRepository.countMbtiByToAssociate(associate.getId());
 
 		return SearchMbtiResponse.from(counts);
 	}

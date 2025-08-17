@@ -1,48 +1,50 @@
 package com.memento.server.api.controller.mbti.dto;
 
+import com.memento.server.api.service.mbti.dto.MbtiSearchDto;
+
 import lombok.Builder;
 
 @Builder
 public record SearchMbtiResponse(
-	int INFP,
-	int INFJ,
-	int INTP,
-	int INTJ,
-	int ISFP,
-	int ISFJ,
-	int ISTP,
-	int ISTJ,
-	int ENFP,
-	int ENFJ,
-	int ENTP,
-	int ENTJ,
-	int ESFP,
-	int ESFJ,
-	int ESTP,
-	int ESTJ
+	Long INFP,
+	Long INFJ,
+	Long INTP,
+	Long INTJ,
+	Long ISFP,
+	Long ISFJ,
+	Long ISTP,
+	Long ISTJ,
+	Long ENFP,
+	Long ENFJ,
+	Long ENTP,
+	Long ENTJ,
+	Long ESFP,
+	Long ESFJ,
+	Long ESTP,
+	Long ESTJ
 ) {
-	public static SearchMbtiResponse from(Object[] counts) {
-		if (counts == null || counts.length != 16) {
+	public static SearchMbtiResponse from(MbtiSearchDto counts) {
+		if (counts == null) {
 			throw new IllegalStateException("MBTI count 결과가 올바르지 않습니다.");
 		}
 
 		return SearchMbtiResponse.builder()
-			.INFP(((Number) counts[0]).intValue())
-			.INFJ(((Number) counts[1]).intValue())
-			.INTP(((Number) counts[2]).intValue())
-			.INTJ(((Number) counts[3]).intValue())
-			.ISFP(((Number) counts[4]).intValue())
-			.ISFJ(((Number) counts[5]).intValue())
-			.ISTP(((Number) counts[6]).intValue())
-			.ISTJ(((Number) counts[7]).intValue())
-			.ENFP(((Number) counts[8]).intValue())
-			.ENFJ(((Number) counts[9]).intValue())
-			.ENTP(((Number) counts[10]).intValue())
-			.ENTJ(((Number) counts[11]).intValue())
-			.ESFP(((Number) counts[12]).intValue())
-			.ESFJ(((Number) counts[13]).intValue())
-			.ESTP(((Number) counts[14]).intValue())
-			.ESTJ(((Number) counts[15]).intValue())
+			.INFP(counts.INFP())
+			.INFJ(counts.INFJ())
+			.INTP(counts.INTP())
+			.INTJ(counts.INTJ())
+			.ISFP(counts.ISFP())
+			.ISFJ(counts.ISFJ())
+			.ISTP(counts.ISTP())
+			.ISTJ(counts.ISTJ())
+			.ENFP(counts.ENFP())
+			.ENFJ(counts.ENFJ())
+			.ENTP(counts.ENTP())
+			.ENTJ(counts.ENTJ())
+			.ESFP(counts.ESFP())
+			.ESFJ(counts.ESFJ())
+			.ESTP(counts.ESTP())
+			.ESTJ(counts.ESTJ())
 			.build();
 	}
 }

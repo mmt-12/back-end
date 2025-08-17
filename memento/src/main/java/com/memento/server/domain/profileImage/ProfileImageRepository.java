@@ -8,11 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.memento.server.domain.guestBook.GuestBook;
-
 public interface ProfileImageRepository extends JpaRepository<ProfileImage, Long> {
-	Optional<ProfileImage> findByIdAndCreatedAtIsNull(Long profileImageId);
-
 	@Query("""
 	SELECT p FROM ProfileImage p
 	WHERE p.associate.id = :associateId
@@ -25,4 +21,6 @@ public interface ProfileImageRepository extends JpaRepository<ProfileImage, Long
 		@Param("cursor") Long cursor,
 		Pageable pageable
 	);
+
+	Optional<ProfileImage> findByIdAndDeletedAtIsNull(Long profileImageId);
 }

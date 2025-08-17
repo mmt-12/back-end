@@ -50,7 +50,7 @@ public class VoiceService {
 
 	}
 
-	public Long saveVoice(Associate associate, MultipartFile voice) {
+	public Voice saveVoice(Associate associate, MultipartFile voice) {
 		String bucket = minioProperties.getBucket();
 		String baseUrl = minioProperties.getUrl();
 
@@ -81,6 +81,6 @@ public class VoiceService {
 			.temporary(true)
 			.build());
 
-		return saveVoice.getId();
+		return saveVoice;
 	}
 }

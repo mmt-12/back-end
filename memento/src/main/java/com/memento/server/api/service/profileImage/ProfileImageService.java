@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.profileImage.dto.SearchProfileImageResponse;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProfileImageService {
 
 	private final AssociateRepository associateRepository;
@@ -42,6 +44,7 @@ public class ProfileImageService {
 		return associate;
 	}
 
+	@Transactional
 	public void create(Long communityId, Long associateId, Long registrantId, MultipartFile image) {
 		Associate associate = validAssociate(communityId, associateId);
 		Associate registrant = validAssociate(communityId, registrantId);
@@ -54,11 +57,12 @@ public class ProfileImageService {
 				.build());
 	}
 
+	@Transactional
 	public void delete(Long communityId, Long associateId, Long registrantId, Long profileImageId) {
 		Associate registrant = validAssociate(communityId, registrantId);
 		Associate associate = validAssociate(communityId, associateId);
 
-		ProfileImage profileImage = profileImageRepository.findByIdAndCreatedAtIsNull(profileImageId)
+		ProfileImage profileImage = profileImageRepository.findByIdAndDeletedAtIsNull(profileImageId)
 			.orElseThrow(() -> new MementoException(ErrorCodes.PROFILEIMAGE_NOT_EXISTENCE));
 
 		if(!profileImage.getRegistrant().equals(registrant) && !profileImage.getAssociate().equals(associate)){

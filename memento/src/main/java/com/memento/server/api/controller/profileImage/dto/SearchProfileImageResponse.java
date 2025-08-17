@@ -9,7 +9,7 @@ import lombok.Getter;
 @Builder
 public record SearchProfileImageResponse(
 	List<ProfileImage> profileImages,
-	long cursor,
+	Long cursor,
 	boolean hasNext
 ) {
 	@Getter

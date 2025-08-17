@@ -35,16 +35,12 @@ public class GuestBookController {
 	@PostMapping()
 	public ResponseEntity<Void> create(
 		@CommunityId Long currentCommunityId,
-		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long associateId,
 		@Valid @RequestBody CreateGuestBookRequest request
 	) {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
-		}
-		if(currentAssociateId.equals(associateId)) {
-			throw new MementoException(ErrorCodes.ASSOCIATE_NOT_AUTHORITY);
 		}
 
 		guestBookService.create(communityId, associateId, request.type(), request.contentId(), request.content());
@@ -54,16 +50,12 @@ public class GuestBookController {
 	@PostMapping("/bubble")
 	public ResponseEntity<Void> creatBubble(
 		@CommunityId Long currentCommunityId,
-		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long associateId,
 		@RequestPart MultipartFile voice
 	) {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
-		}
-		if(currentAssociateId.equals(associateId)) {
-			throw new MementoException(ErrorCodes.ASSOCIATE_NOT_AUTHORITY);
 		}
 
 		guestBookService.createBubble(communityId, associateId, voice);

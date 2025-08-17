@@ -4,27 +4,36 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
+import com.memento.server.config.MinioProperties;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
+import com.memento.server.domain.emoji.Emoji;
+import com.memento.server.domain.emoji.EmojiRepository;
 import com.memento.server.domain.guestBook.GuestBook;
 import com.memento.server.domain.guestBook.GuestBookRepository;
 import com.memento.server.domain.guestBook.GuestBookType;
+import com.memento.server.domain.voice.Voice;
+import com.memento.server.domain.voice.VoiceRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class GuestBookService {
 
 	private final AssociateRepository associateRepository;
 	private final GuestBookRepository guestBookRepository;
 	private final VoiceService voiceService;
+	private final VoiceRepository voiceRepository;
+	private final EmojiRepository emojiRepository;
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -36,6 +45,7 @@ public class GuestBookService {
 		return associate;
 	}
 
+	@Transactional
 	public void create(Long communityId, Long associateId, GuestBookType type, Long contentId, String content) {
 		Associate associate = validAssociate(communityId, associateId);
 
@@ -46,10 +56,18 @@ public class GuestBookService {
 				.content(content)
 				.type(type)
 				.build();
-		}else{
+		}else if(type.equals(GuestBookType.VOICE)){
+			Voice voice = voiceRepository.findByIdAndDeletedAtNull(contentId);
 			guestBook = GuestBook.builder()
 				.associate(associate)
-				.content(String.valueOf(contentId))
+				.content(voice.getUrl())
+				.type(type)
+				.build();
+		}else{
+			Emoji emoji = emojiRepository.findByIdAndDeletedAtNull(contentId);
+			guestBook = GuestBook.builder()
+				.associate(associate)
+				.content(emoji.getUrl())
 				.type(type)
 				.build();
 		}
@@ -57,18 +75,19 @@ public class GuestBookService {
 		guestBookRepository.save(guestBook);
 	}
 
+	@Transactional
 	public void createBubble(Long communityId, Long associateId, MultipartFile voice) {
 		Associate associate = validAssociate(communityId, associateId);
 
-		Long contentId = voiceService.saveVoice(associate, voice);
+		Voice saveVoice = voiceService.saveVoice(associate, voice);
 
-		if (contentId == null) {
+		if (saveVoice == null) {
 			throw new MementoException(ErrorCodes.VOICE_SAVE_FAIL);
 		}
 
 		guestBookRepository.save(GuestBook.builder()
 				.associate(associate)
-				.content(String.valueOf(contentId))
+				.content(saveVoice.getUrl())
 				.type(GuestBookType.VOICE)
 				.build());
 	}
@@ -105,6 +124,7 @@ public class GuestBookService {
 			.build();
 	}
 
+	@Transactional
 	public void delete(Long guestBookId) {
 		GuestBook guestBook = guestBookRepository.findByIdAndDeletedAtNull(guestBookId)
 			.orElseThrow(() -> new MementoException(ErrorCodes.GUESTBOOK_NOT_EXISTENCE));
