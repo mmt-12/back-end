@@ -1,6 +1,6 @@
 package com.memento.server.api.service.memory;
 
-import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
+import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_EXISTENCE;
 import static com.memento.server.common.error.ErrorCodes.COMMUNITY_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.MEMORY_NOT_AUTHOR;
 import static com.memento.server.common.error.ErrorCodes.MEMORY_NOT_FOUND;
@@ -21,7 +21,6 @@ import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
 import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
-import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
@@ -36,7 +35,6 @@ import com.memento.server.domain.memory.MemoryAssociate;
 import com.memento.server.domain.memory.MemoryAssociateRepository;
 import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.domain.memory.dto.MemoryAssociateCount;
-import com.memento.server.domain.post.Post;
 import com.memento.server.domain.post.PostImage;
 import com.memento.server.domain.post.PostImageRepository;
 import com.memento.server.domain.post.PostRepository;
@@ -99,7 +97,7 @@ public class MemoryService {
 	@Transactional
 	public CreateUpdateMemoryResponse create(Long communityId, Long associateId, CreateUpdateMemoryRequest request) {
 		Associate associate = associateRepository.findById(associateId)
-			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_FOUND));
+			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
 		Community community = communityRepository.findById(communityId)
 			.orElseThrow(() -> new MementoException(COMMUNITY_NOT_FOUND));
 

@@ -1,6 +1,6 @@
 package com.memento.server.spring.api.service.memory;
 
-import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
+import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_EXISTENCE;
 import static com.memento.server.common.error.ErrorCodes.COMMUNITY_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.MEMORY_NOT_AUTHOR;
 import static com.memento.server.common.error.ErrorCodes.MEMORY_NOT_FOUND;
@@ -590,7 +590,7 @@ class MemoryServiceTest {
 			.isInstanceOf(MementoException.class)
 			.satisfies(ex -> {
 				MementoException e = (MementoException)ex;
-				assertThat(e.getErrorCode()).isEqualTo(ASSOCIATE_NOT_FOUND);
+				assertThat(e.getErrorCode()).isEqualTo(ASSOCIATE_NOT_EXISTENCE);
 			});
 	}
 

@@ -1,5 +1,7 @@
 package com.memento.server.api.controller.memory;
 
+import static com.memento.server.common.error.ErrorCodes.COMMUNITY_NOT_MATCH;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,7 @@ import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
 import com.memento.server.api.service.memory.MemoryService;
+import com.memento.server.common.exception.MementoException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,11 +32,13 @@ public class MemoryController {
 	private final MemoryService memoryService;
 
 	@GetMapping
-	public ResponseEntity<ReadAllMemoryResponse> read(@CommunityId Long currentCommunityId,
-		@PathVariable Long communityId, ReadAllMemoryRequest request) {
-
+	public ResponseEntity<ReadAllMemoryResponse> read(
+		@CommunityId Long currentCommunityId,
+		@PathVariable Long communityId,
+		ReadAllMemoryRequest request
+	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new IllegalArgumentException("다른 그룹의 요청입니다.");
+			throw new MementoException(COMMUNITY_NOT_MATCH);
 		}
 
 		return ResponseEntity.ok(memoryService.readAll(communityId, request));
@@ -44,10 +49,10 @@ public class MemoryController {
 		@CommunityId Long currentCommunityId,
 		@AssociateId Long associateId,
 		@PathVariable Long communityId,
-		@RequestBody CreateUpdateMemoryRequest request) {
-
+		@RequestBody CreateUpdateMemoryRequest request
+	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new IllegalArgumentException("다른 그룹의 요청입니다.");
+			throw new MementoException(COMMUNITY_NOT_MATCH);
 		}
 
 		return ResponseEntity.ok(memoryService.create(communityId, associateId, request));
@@ -59,10 +64,10 @@ public class MemoryController {
 		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long memoryId,
-		CreateUpdateMemoryRequest request) {
-
+		CreateUpdateMemoryRequest request
+	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new IllegalArgumentException("다른 그룹의 요청입니다.");
+			throw new MementoException(COMMUNITY_NOT_MATCH);
 		}
 
 		return ResponseEntity.ok(memoryService.update(request, currentAssociateId, memoryId));
@@ -75,9 +80,8 @@ public class MemoryController {
 		@PathVariable Long communityId,
 		@PathVariable Long memoryId
 	) {
-
 		if (!currentCommunityId.equals(communityId)) {
-			throw new IllegalArgumentException("다른 그룹의 요청입니다.");
+			throw new MementoException(COMMUNITY_NOT_MATCH);
 		}
 		memoryService.delete(memoryId, currentAssociateId);
 		return ResponseEntity.ok().build();
@@ -90,7 +94,7 @@ public class MemoryController {
 		@PathVariable Long memoryId
 	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new IllegalArgumentException("다른 그룹의 요청입니다.");
+			throw new MementoException(COMMUNITY_NOT_MATCH);
 		}
 
 		return ResponseEntity.ok(memoryService.downloadImages(memoryId));
