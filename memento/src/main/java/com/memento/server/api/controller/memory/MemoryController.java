@@ -65,7 +65,7 @@ public class MemoryController {
 			throw new IllegalArgumentException("다른 그룹의 요청입니다.");
 		}
 
-		return ResponseEntity.ok(memoryService.update(communityId, request, currentAssociateId, memoryId));
+		return ResponseEntity.ok(memoryService.update(request, currentAssociateId, memoryId));
 	}
 
 	@DeleteMapping("/{memoryId}")
