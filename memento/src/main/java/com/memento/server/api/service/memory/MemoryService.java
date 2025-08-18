@@ -124,13 +124,7 @@ public class MemoryService {
 
 		List<Associate> associates = associateRepository.findAllById(request.associates());
 		List<MemoryAssociate> memoryAssociates = new ArrayList<>();
-		memoryAssociates.add(MemoryAssociate.builder() // todo 빼기
-			.memory(memory)
-			.associate(associate)
-			.build());
 		for (Associate other : associates) {
-			if (associate.equals(other))
-				continue;
 			memoryAssociates.add(MemoryAssociate.builder()
 				.memory(memory)
 				.associate(other)
