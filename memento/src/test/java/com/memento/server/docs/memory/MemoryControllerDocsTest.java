@@ -281,7 +281,7 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 	void downloadImages() throws Exception {
 		// given
 		setAuthentication(1L, 1L, 1L);
-		when(memoryService.downloadImages(any(), any())).thenReturn(
+		when(memoryService.downloadImages(any())).thenReturn(
 			DownloadImagesResponse.builder()
 				.pictures(List.of(
 					"www.example.com/aws/s3/seonwoo/1",

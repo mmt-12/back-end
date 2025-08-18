@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
 import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
 import com.memento.server.api.service.memory.MemoryService;
@@ -954,6 +955,65 @@ class MemoryServiceTest {
 			.satisfies(ex -> {
 				MementoException e = (MementoException)ex;
 				assertThat(e.getErrorCode()).isEqualTo(MEMORY_NOT_AUTHOR);
+			});
+	}
+
+	@Test
+	@DisplayName("기억에 연결된 이미지를 다운로드한다.")
+	void downloadImages_success() {
+		// given
+		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1012L));
+		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
+
+		Event event = eventRepository.save(Event.builder()
+			.title("이미지 다운로드 추억")
+			.description("이미지 다운로드 테스트입니다.")
+			.location(Location.builder()
+				.address("이미지 주소")
+				.name("이미지 장소")
+				.latitude(BigDecimal.valueOf(10.0F))
+				.longitude(BigDecimal.valueOf(20.0F))
+				.code(1)
+				.build())
+			.period(Period.builder()
+				.startTime(LocalDateTime.of(2023, 1, 1, 10, 0))
+				.endTime(LocalDateTime.of(2023, 1, 1, 11, 0))
+				.build())
+			.community(community)
+			.associate(associate)
+			.build());
+		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
+
+		Post post = postRepository.save(Post.builder().content("이미지 포스트").memory(memory).associate(associate).build());
+
+		PostImage postImage1 = postImageRepository.save(
+			PostImage.builder().url("image_url_1.jpg").hash(Hash.builder().hash("hash1").build()).post(post).build());
+		PostImage postImage2 = postImageRepository.save(
+			PostImage.builder().url("image_url_2.png").hash(Hash.builder().hash("hash2").build()).post(post).build());
+
+		// when
+		DownloadImagesResponse response = memoryService.downloadImages(memory.getId());
+
+		// then
+		assertThat(response).isNotNull();
+		assertThat(response.pictures()).hasSize(2);
+		assertThat(response.pictures().get(0)).isEqualTo("image_url_2.png");
+		assertThat(response.pictures().get(1)).isEqualTo("image_url_1.jpg");
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 기억의 이미지를 다운로드하면 예외가 발생한다.")
+	void downloadImages_memoryNotFound() {
+		// given
+		Long nonExistentMemoryId = 9999L;
+
+		// when // then
+		assertThatThrownBy(() -> memoryService.downloadImages(nonExistentMemoryId))
+			.isInstanceOf(MementoException.class)
+			.satisfies(ex -> {
+				MementoException e = (MementoException)ex;
+				assertThat(e.getErrorCode()).isEqualTo(MEMORY_NOT_FOUND);
 			});
 	}
 }
