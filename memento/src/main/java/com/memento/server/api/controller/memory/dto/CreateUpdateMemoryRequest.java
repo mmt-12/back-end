@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.Builder;
 
 @Builder
-public record CreateMemoryRequest(
+public record CreateUpdateMemoryRequest(
 	String title,
 	PeriodRequest period,
 	String description,

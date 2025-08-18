@@ -16,8 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.memento.server.api.controller.memory.dto.CreateMemoryRequest;
-import com.memento.server.api.controller.memory.dto.CreateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
 import com.memento.server.api.service.memory.MemoryService;
@@ -511,7 +511,7 @@ class MemoryServiceTest {
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 		Associate otherAssociate = associateRepository.save(Associate.create("다른어소시에이트", member, community));
 
-		CreateMemoryRequest.LocationRequest locationRequest = CreateMemoryRequest.LocationRequest.builder()
+		CreateUpdateMemoryRequest.LocationRequest locationRequest = CreateUpdateMemoryRequest.LocationRequest.builder()
 			.address("테스트 주소")
 			.name("테스트 장소")
 			.latitude(10.0F)
@@ -519,12 +519,12 @@ class MemoryServiceTest {
 			.code(1)
 			.build();
 
-		CreateMemoryRequest.PeriodRequest periodRequest = CreateMemoryRequest.PeriodRequest.builder()
+		CreateUpdateMemoryRequest.PeriodRequest periodRequest = CreateUpdateMemoryRequest.PeriodRequest.builder()
 			.startTime(LocalDateTime.of(2024, 8, 1, 10, 0))
 			.endTime(LocalDateTime.of(2024, 8, 1, 11, 0))
 			.build();
 
-		CreateMemoryRequest request = CreateMemoryRequest.builder()
+		CreateUpdateMemoryRequest request = CreateUpdateMemoryRequest.builder()
 			.title("새로운 추억")
 			.description("새로운 추억에 대한 설명입니다.")
 			.location(locationRequest)
@@ -533,7 +533,7 @@ class MemoryServiceTest {
 			.build();
 
 		// when
-		CreateMemoryResponse response = memoryService.create(community.getId(), associate.getId(), request);
+		CreateUpdateMemoryResponse response = memoryService.create(community.getId(), associate.getId(), request);
 
 		// then
 		assertThat(response).isNotNull();
@@ -559,7 +559,7 @@ class MemoryServiceTest {
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
-		CreateMemoryRequest.LocationRequest locationRequest = CreateMemoryRequest.LocationRequest.builder()
+		CreateUpdateMemoryRequest.LocationRequest locationRequest = CreateUpdateMemoryRequest.LocationRequest.builder()
 			.address("테스트 주소")
 			.name("테스트 장소")
 			.latitude(10.0F)
@@ -567,12 +567,12 @@ class MemoryServiceTest {
 			.code(1)
 			.build();
 
-		CreateMemoryRequest.PeriodRequest periodRequest = CreateMemoryRequest.PeriodRequest.builder()
+		CreateUpdateMemoryRequest.PeriodRequest periodRequest = CreateUpdateMemoryRequest.PeriodRequest.builder()
 			.startTime(LocalDateTime.of(2024, 8, 1, 10, 0))
 			.endTime(LocalDateTime.of(2024, 8, 1, 11, 0))
 			.build();
 
-		CreateMemoryRequest request = CreateMemoryRequest.builder()
+		CreateUpdateMemoryRequest request = CreateUpdateMemoryRequest.builder()
 			.title("새로운 추억")
 			.description("새로운 추억에 대한 설명입니다.")
 			.location(locationRequest)
@@ -599,7 +599,7 @@ class MemoryServiceTest {
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
-		CreateMemoryRequest.LocationRequest locationRequest = CreateMemoryRequest.LocationRequest.builder()
+		CreateUpdateMemoryRequest.LocationRequest locationRequest = CreateUpdateMemoryRequest.LocationRequest.builder()
 			.address("테스트 주소")
 			.name("테스트 장소")
 			.latitude(10.0F)
@@ -607,12 +607,12 @@ class MemoryServiceTest {
 			.code(1)
 			.build();
 
-		CreateMemoryRequest.PeriodRequest periodRequest = CreateMemoryRequest.PeriodRequest.builder()
+		CreateUpdateMemoryRequest.PeriodRequest periodRequest = CreateUpdateMemoryRequest.PeriodRequest.builder()
 			.startTime(LocalDateTime.of(2024, 8, 1, 10, 0))
 			.endTime(LocalDateTime.of(2024, 8, 1, 11, 0))
 			.build();
 
-		CreateMemoryRequest request = CreateMemoryRequest.builder()
+		CreateUpdateMemoryRequest request = CreateUpdateMemoryRequest.builder()
 			.title("새로운 추억")
 			.description("새로운 추억에 대한 설명입니다.")
 			.location(locationRequest)

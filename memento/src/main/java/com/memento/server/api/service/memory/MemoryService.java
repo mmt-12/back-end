@@ -2,6 +2,7 @@ package com.memento.server.api.service.memory;
 
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.COMMUNITY_NOT_FOUND;
+import static com.memento.server.common.error.ErrorCodes.MEMORY_NOT_FOUND;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,11 +15,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.memento.server.api.controller.memory.dto.CreateMemoryRequest;
-import com.memento.server.api.controller.memory.dto.CreateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
 import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
+import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
@@ -91,7 +93,7 @@ public class MemoryService {
 	}
 
 	@Transactional
-	public CreateMemoryResponse create(Long communityId, Long associateId, CreateMemoryRequest request) {
+	public CreateUpdateMemoryResponse create(Long communityId, Long associateId, CreateUpdateMemoryRequest request) {
 		Associate associate = associateRepository.findById(associateId)
 			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_FOUND));
 		Community community = communityRepository.findById(communityId)
@@ -135,11 +137,15 @@ public class MemoryService {
 		}
 		memoryAssociateRepository.saveAll(memoryAssociates);
 
-		return CreateMemoryResponse.from(memory);
+		return CreateUpdateMemoryResponse.from(memory);
 	}
 
-	public CreateMemoryResponse update(Long communityId, CreateMemoryRequest request, Long currentAssociateId,
-		Long memoryId) {
+	public CreateUpdateMemoryResponse update(
+		Long communityId,
+		CreateUpdateMemoryRequest request,
+		Long currentAssociateId,
+		Long memoryId
+	) {
 		return null;
 	}
 

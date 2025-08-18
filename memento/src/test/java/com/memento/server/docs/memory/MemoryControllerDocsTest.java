@@ -28,8 +28,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.memento.server.api.controller.memory.MemoryController;
-import com.memento.server.api.controller.memory.dto.CreateMemoryRequest;
-import com.memento.server.api.controller.memory.dto.CreateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
 import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse;
@@ -144,15 +144,15 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 	void create() throws Exception {
 		// given
 		setAuthentication(1L, 1L, 1L);
-		CreateMemoryRequest request = CreateMemoryRequest.builder()
+		CreateUpdateMemoryRequest request = CreateUpdateMemoryRequest.builder()
 			.title("양평 MT!")
-			.period(CreateMemoryRequest.PeriodRequest.builder()
+			.period(CreateUpdateMemoryRequest.PeriodRequest.builder()
 				.startTime(LocalDateTime.of(2024, 6, 20, 10, 30, 0))
 				.endTime(LocalDateTime.of(2024, 6, 20, 10, 30, 0))
 				.build())
 			.description("우리가 함께 마신 소주와 수영장 물을 기억하며")
 			.associates(List.of(1L, 2L, 3L, 4L))
-			.location(CreateMemoryRequest.LocationRequest.builder()
+			.location(CreateUpdateMemoryRequest.LocationRequest.builder()
 				.latitude(36.34512323f)
 				.longitude(138.7712322f)
 				.code(16335)
@@ -161,7 +161,7 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 				.build())
 			.build();
 		when(memoryService.create(any(), any(), any())).thenReturn(
-			CreateMemoryResponse.builder()
+			CreateUpdateMemoryResponse.builder()
 				.memoryId(1L)
 				.build()
 		);
@@ -202,15 +202,15 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 	void update() throws Exception {
 		// given
 		setAuthentication(1L, 1L, 1L);
-		CreateMemoryRequest request = CreateMemoryRequest.builder()
+		CreateUpdateMemoryRequest request = CreateUpdateMemoryRequest.builder()
 			.title("양평 MT!")
-			.period(CreateMemoryRequest.PeriodRequest.builder()
+			.period(CreateUpdateMemoryRequest.PeriodRequest.builder()
 				.startTime(LocalDateTime.of(2024, 6, 20, 10, 30, 0))
 				.endTime(LocalDateTime.of(2024, 6, 20, 10, 30, 0))
 				.build())
 			.description("우리가 함께 마신 소주와 수영장 물을 기억하며")
 			.associates(List.of(1L, 2L, 3L, 4L))
-			.location(CreateMemoryRequest.LocationRequest.builder()
+			.location(CreateUpdateMemoryRequest.LocationRequest.builder()
 				.latitude(36.34512323f)
 				.longitude(138.7712322f)
 				.code(16335)
@@ -219,7 +219,7 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 				.build())
 			.build();
 		when(memoryService.update(any(), any(), any(), any())).thenReturn(
-			CreateMemoryResponse.builder()
+			CreateUpdateMemoryResponse.builder()
 				.memoryId(1L)
 				.build()
 		);

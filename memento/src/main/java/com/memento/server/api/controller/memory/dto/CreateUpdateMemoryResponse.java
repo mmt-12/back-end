@@ -5,12 +5,12 @@ import com.memento.server.domain.memory.Memory;
 import lombok.Builder;
 
 @Builder
-public record CreateMemoryResponse(
+public record CreateUpdateMemoryResponse(
 	Long memoryId
 ) {
-	
-	public static CreateMemoryResponse from(Memory memory) {
-		return CreateMemoryResponse.builder()
+
+	public static CreateUpdateMemoryResponse from(Memory memory) {
+		return CreateUpdateMemoryResponse.builder()
 			.memoryId(memory.getId())
 			.build();
 	}

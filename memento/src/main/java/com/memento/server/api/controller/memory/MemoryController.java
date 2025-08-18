@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.memento.server.annotation.AssociateId;
 import com.memento.server.annotation.CommunityId;
-import com.memento.server.api.controller.memory.dto.CreateMemoryRequest;
-import com.memento.server.api.controller.memory.dto.CreateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
 import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
@@ -40,11 +40,11 @@ public class MemoryController {
 	}
 
 	@PostMapping
-	public ResponseEntity<CreateMemoryResponse> create(
+	public ResponseEntity<CreateUpdateMemoryResponse> create(
 		@CommunityId Long currentCommunityId,
 		@AssociateId Long associateId,
 		@PathVariable Long communityId,
-		@RequestBody CreateMemoryRequest request) {
+		@RequestBody CreateUpdateMemoryRequest request) {
 
 		if (!currentCommunityId.equals(communityId)) {
 			throw new IllegalArgumentException("다른 그룹의 요청입니다.");
@@ -54,12 +54,12 @@ public class MemoryController {
 	}
 
 	@PutMapping("/{memoryId}")
-	public ResponseEntity<CreateMemoryResponse> update(
+	public ResponseEntity<CreateUpdateMemoryResponse> update(
 		@CommunityId Long currentCommunityId,
 		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long memoryId,
-		CreateMemoryRequest request) {
+		CreateUpdateMemoryRequest request) {
 
 		if (!currentCommunityId.equals(communityId)) {
 			throw new IllegalArgumentException("다른 그룹의 요청입니다.");
