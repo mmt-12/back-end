@@ -36,8 +36,10 @@ import com.memento.server.domain.memory.MemoryAssociate;
 import com.memento.server.domain.memory.MemoryAssociateRepository;
 import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.domain.memory.dto.MemoryAssociateCount;
+import com.memento.server.domain.post.Post;
 import com.memento.server.domain.post.PostImage;
 import com.memento.server.domain.post.PostImageRepository;
+import com.memento.server.domain.post.PostRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,6 +54,7 @@ public class MemoryService {
 	private final CommunityRepository communityRepository;
 	private final EventRepository eventRepository;
 	private final AssociateRepository associateRepository;
+	private final PostRepository postRepository;
 
 	public ReadAllMemoryResponse readAll(Long communityId, ReadAllMemoryRequest request) {
 		Long cursor = request.cursor();
@@ -192,7 +195,10 @@ public class MemoryService {
 		memoryRepository.delete(memory);
 	}
 
-	public DownloadImagesResponse downloadImages(Long communityId, Long memoryId) {
-		return null;
+	public DownloadImagesResponse downloadImages(Long memoryId) {
+		Memory memory = memoryRepository.findById(memoryId).orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
+		List<PostImage> postImages = postImageRepository.findAllByMemory(memory);
+
+		return DownloadImagesResponse.from(postImages);
 	}
 }

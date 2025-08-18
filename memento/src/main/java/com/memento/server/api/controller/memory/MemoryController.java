@@ -93,6 +93,6 @@ public class MemoryController {
 			throw new IllegalArgumentException("다른 그룹의 요청입니다.");
 		}
 
-		return ResponseEntity.ok(memoryService.downloadImages(communityId, memoryId));
+		return ResponseEntity.ok(memoryService.downloadImages(memoryId));
 	}
 }
