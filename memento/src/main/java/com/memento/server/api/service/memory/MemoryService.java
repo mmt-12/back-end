@@ -2,6 +2,7 @@ package com.memento.server.api.service.memory;
 
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.COMMUNITY_NOT_FOUND;
+import static com.memento.server.common.error.ErrorCodes.MEMORY_NOT_AUTHOR;
 import static com.memento.server.common.error.ErrorCodes.MEMORY_NOT_FOUND;
 
 import java.math.BigDecimal;
@@ -123,7 +124,7 @@ public class MemoryService {
 
 		List<Associate> associates = associateRepository.findAllById(request.associates());
 		List<MemoryAssociate> memoryAssociates = new ArrayList<>();
-		memoryAssociates.add(MemoryAssociate.builder()
+		memoryAssociates.add(MemoryAssociate.builder() // todo 빼기
 			.memory(memory)
 			.associate(associate)
 			.build());
@@ -140,13 +141,51 @@ public class MemoryService {
 		return CreateUpdateMemoryResponse.from(memory);
 	}
 
+	@Transactional
 	public CreateUpdateMemoryResponse update(
-		Long communityId,
 		CreateUpdateMemoryRequest request,
 		Long currentAssociateId,
 		Long memoryId
 	) {
-		return null;
+		Memory memory = memoryRepository.findById(memoryId).orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
+		Event event = memory.getEvent();
+		if (!event.getAssociate().getId().equals(currentAssociateId)) {
+			throw new MementoException(MEMORY_NOT_AUTHOR);
+		}
+
+		event.update(request);
+
+		List<MemoryAssociate> associates = memoryAssociateRepository.findAllByMemory(memory);
+		List<Long> checked = new ArrayList<>();
+
+		List<MemoryAssociate> deleteList = new ArrayList<>();
+		for (MemoryAssociate associate : associates) {
+			Long associateId = associate.getId();
+			checked.add(associateId);
+			if (request.associates().contains(associateId))
+				continue;
+			deleteList.add(associate);
+		}
+		memoryAssociateRepository.deleteAll(deleteList);
+
+		List<Long> newList = new ArrayList<>();
+		for (Long associateId : request.associates()) {
+			if (checked.contains(associateId))
+				continue;
+			newList.add(associateId);
+		}
+		List<Associate> newAssociates = associateRepository.findAllById(newList);
+
+		List<MemoryAssociate> newMemoryAssociates = new ArrayList<>();
+		for (Associate associate : newAssociates) {
+			newMemoryAssociates.add(MemoryAssociate.builder()
+				.memory(memory)
+				.associate(associate)
+				.build());
+		}
+		memoryAssociateRepository.saveAll(newMemoryAssociates);
+
+		return CreateUpdateMemoryResponse.from(memory);
 	}
 
 	public void delete(Long communityId, Long memoryId, Long currentAssociateId) {

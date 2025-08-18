@@ -2,6 +2,8 @@ package com.memento.server.spring.api.service.memory;
 
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.COMMUNITY_NOT_FOUND;
+import static com.memento.server.common.error.ErrorCodes.MEMORY_NOT_AUTHOR;
+import static com.memento.server.common.error.ErrorCodes.MEMORY_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -628,6 +630,243 @@ class MemoryServiceTest {
 			.satisfies(ex -> {
 				MementoException e = (MementoException)ex;
 				assertThat(e.getErrorCode()).isEqualTo(COMMUNITY_NOT_FOUND);
+			});
+	}
+
+	@Test
+	@DisplayName("기억을 수정한다. - 참여자 추가")
+	void updateMemory_success_associate_add() {
+		// given
+		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
+		Associate otherAssociate = associateRepository.save(Associate.create("다른어소시에이트", member, community));
+
+		Event event = eventRepository.save(Event.builder()
+			.title("기존 추억")
+			.description("기존 추억에 대한 설명입니다.")
+			.location(Location.builder()
+				.address("기존 주소")
+				.name("기존 장소")
+				.latitude(BigDecimal.valueOf(10.0F))
+				.longitude(BigDecimal.valueOf(20.0F))
+				.code(1)
+				.build())
+			.period(Period.builder()
+				.startTime(LocalDateTime.of(2023, 1, 1, 10, 0))
+				.endTime(LocalDateTime.of(2023, 1, 1, 11, 0))
+				.build())
+			.community(community)
+			.associate(associate)
+			.build());
+		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
+		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate).build());
+
+		CreateUpdateMemoryRequest.LocationRequest updatedLocationRequest = CreateUpdateMemoryRequest.LocationRequest.builder()
+			.address("수정된 주소")
+			.name("수정된 장소")
+			.latitude(30.0F)
+			.longitude(40.0F)
+			.code(2)
+			.build();
+
+		CreateUpdateMemoryRequest.PeriodRequest updatedPeriodRequest = CreateUpdateMemoryRequest.PeriodRequest.builder()
+			.startTime(LocalDateTime.of(2024, 9, 1, 10, 0))
+			.endTime(LocalDateTime.of(2024, 9, 1, 11, 0))
+			.build();
+
+		CreateUpdateMemoryRequest request = CreateUpdateMemoryRequest.builder()
+			.title("수정된 추억")
+			.description("수정된 추억에 대한 설명입니다.")
+			.location(updatedLocationRequest)
+			.period(updatedPeriodRequest)
+			.associates(List.of(associate.getId(), otherAssociate.getId()))
+			.build();
+
+		// when
+		CreateUpdateMemoryResponse response = memoryService.update(request, associate.getId(), memory.getId());
+
+		// then
+		assertThat(response).isNotNull();
+		assertThat(response.memoryId()).isEqualTo(memory.getId());
+
+		Memory foundMemory = memoryRepository.findById(response.memoryId()).orElseThrow();
+		assertThat(foundMemory.getEvent().getTitle()).isEqualTo("수정된 추억");
+		assertThat(foundMemory.getEvent().getDescription()).isEqualTo("수정된 추억에 대한 설명입니다.");
+		assertThat(foundMemory.getEvent().getLocation().getAddress()).isEqualTo("수정된 주소");
+		assertThat(foundMemory.getEvent().getPeriod().getStartTime()).isEqualTo(LocalDateTime.of(2024, 9, 1, 10, 0));
+
+		List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemory(foundMemory);
+		assertThat(memoryAssociates).hasSize(2);
+		assertThat(memoryAssociates).extracting(MemoryAssociate::getAssociate)
+			.containsExactlyInAnyOrder(associate, otherAssociate);
+	}
+
+	@Test
+	@DisplayName("기억을 수정한다. - 참여자 감소")
+	void updateMemory_success_associate_remove() {
+		// given
+		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
+		Associate otherAssociate = associateRepository.save(Associate.create("다른어소시에이트", member, community));
+
+		Event event = eventRepository.save(Event.builder()
+			.title("기존 추억")
+			.description("기존 추억에 대한 설명입니다.")
+			.location(Location.builder()
+				.address("기존 주소")
+				.name("기존 장소")
+				.latitude(BigDecimal.valueOf(10.0F))
+				.longitude(BigDecimal.valueOf(20.0F))
+				.code(1)
+				.build())
+			.period(Period.builder()
+				.startTime(LocalDateTime.of(2023, 1, 1, 10, 0))
+				.endTime(LocalDateTime.of(2023, 1, 1, 11, 0))
+				.build())
+			.community(community)
+			.associate(associate)
+			.build());
+		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
+		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate).build());
+
+		CreateUpdateMemoryRequest.LocationRequest updatedLocationRequest = CreateUpdateMemoryRequest.LocationRequest.builder()
+			.address("수정된 주소")
+			.name("수정된 장소")
+			.latitude(30.0F)
+			.longitude(40.0F)
+			.code(2)
+			.build();
+
+		CreateUpdateMemoryRequest.PeriodRequest updatedPeriodRequest = CreateUpdateMemoryRequest.PeriodRequest.builder()
+			.startTime(LocalDateTime.of(2024, 9, 1, 10, 0))
+			.endTime(LocalDateTime.of(2024, 9, 1, 11, 0))
+			.build();
+
+		CreateUpdateMemoryRequest request = CreateUpdateMemoryRequest.builder()
+			.title("수정된 추억")
+			.description("수정된 추억에 대한 설명입니다.")
+			.location(updatedLocationRequest)
+			.period(updatedPeriodRequest)
+			.associates(List.of(otherAssociate.getId()))
+			.build();
+
+		// when
+		CreateUpdateMemoryResponse response = memoryService.update(request, associate.getId(), memory.getId());
+
+		// then
+		assertThat(response).isNotNull();
+		assertThat(response.memoryId()).isEqualTo(memory.getId());
+
+		Memory foundMemory = memoryRepository.findById(response.memoryId()).orElseThrow();
+		assertThat(foundMemory.getEvent().getTitle()).isEqualTo("수정된 추억");
+		assertThat(foundMemory.getEvent().getDescription()).isEqualTo("수정된 추억에 대한 설명입니다.");
+		assertThat(foundMemory.getEvent().getLocation().getAddress()).isEqualTo("수정된 주소");
+		assertThat(foundMemory.getEvent().getPeriod().getStartTime()).isEqualTo(LocalDateTime.of(2024, 9, 1, 10, 0));
+
+		List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemory(foundMemory);
+		assertThat(memoryAssociates).hasSize(1);
+		assertThat(memoryAssociates).extracting(MemoryAssociate::getAssociate)
+			.containsExactlyInAnyOrder(otherAssociate);
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 기억을 수정하면 예외가 발생한다.")
+	void updateMemory_memoryNotFound() {
+		// given
+		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1008L));
+		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
+
+		CreateUpdateMemoryRequest.LocationRequest locationRequest = CreateUpdateMemoryRequest.LocationRequest.builder()
+			.address("테스트 주소")
+			.name("테스트 장소")
+			.latitude(10.0F)
+			.longitude(20.0F)
+			.code(1)
+			.build();
+
+		CreateUpdateMemoryRequest.PeriodRequest periodRequest = CreateUpdateMemoryRequest.PeriodRequest.builder()
+			.startTime(LocalDateTime.of(2024, 8, 1, 10, 0))
+			.endTime(LocalDateTime.of(2024, 8, 1, 11, 0))
+			.build();
+
+		CreateUpdateMemoryRequest request = CreateUpdateMemoryRequest.builder()
+			.title("새로운 추억")
+			.description("새로운 추억에 대한 설명입니다.")
+			.location(locationRequest)
+			.period(periodRequest)
+			.associates(List.of())
+			.build();
+
+		Long nonExistentMemoryId = 9999L;
+
+		// when // then
+		assertThatThrownBy(() -> memoryService.update(request, associate.getId(), nonExistentMemoryId))
+			.isInstanceOf(MementoException.class)
+			.satisfies(ex -> {
+				MementoException e = (MementoException)ex;
+				assertThat(e.getErrorCode()).isEqualTo(MEMORY_NOT_FOUND);
+			});
+	}
+
+	@Test
+	@DisplayName("기억의 작성자가 아닌 경우 기억을 수정하면 예외가 발생한다.")
+	void updateMemory_notAuthor() {
+		// given
+		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1009L));
+		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+		Associate authorAssociate = associateRepository.save(Associate.create("작성자어소시에이트", member, community));
+		Associate otherAssociate = associateRepository.save(Associate.create("다른어소시에이트", member, community));
+
+		Event event = eventRepository.save(Event.builder()
+			.title("기존 추억")
+			.description("기존 추억에 대한 설명입니다.")
+			.location(Location.builder()
+				.address("기존 주소")
+				.name("기존 장소")
+				.latitude(BigDecimal.valueOf(10.0F))
+				.longitude(BigDecimal.valueOf(20.0F))
+				.code(1)
+				.build())
+			.period(Period.builder()
+				.startTime(LocalDateTime.of(2023, 1, 1, 10, 0))
+				.endTime(LocalDateTime.of(2023, 1, 1, 11, 0))
+				.build())
+			.community(community)
+			.associate(authorAssociate)
+			.build());
+		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
+		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(authorAssociate).build());
+
+		CreateUpdateMemoryRequest.LocationRequest updatedLocationRequest = CreateUpdateMemoryRequest.LocationRequest.builder()
+			.address("수정된 주소")
+			.name("수정된 장소")
+			.latitude(30.0F)
+			.longitude(40.0F)
+			.code(2)
+			.build();
+
+		CreateUpdateMemoryRequest.PeriodRequest updatedPeriodRequest = CreateUpdateMemoryRequest.PeriodRequest.builder()
+			.startTime(LocalDateTime.of(2024, 9, 1, 10, 0))
+			.endTime(LocalDateTime.of(2024, 9, 1, 11, 0))
+			.build();
+
+		CreateUpdateMemoryRequest request = CreateUpdateMemoryRequest.builder()
+			.title("수정된 추억")
+			.description("수정된 추억에 대한 설명입니다.")
+			.location(updatedLocationRequest)
+			.period(updatedPeriodRequest)
+			.associates(List.of())
+			.build();
+
+		// when // then
+		assertThatThrownBy(() -> memoryService.update(request, otherAssociate.getId(), memory.getId()))
+			.isInstanceOf(MementoException.class)
+			.satisfies(ex -> {
+				MementoException e = (MementoException)ex;
+				assertThat(e.getErrorCode()).isEqualTo(MEMORY_NOT_AUTHOR);
 			});
 	}
 }

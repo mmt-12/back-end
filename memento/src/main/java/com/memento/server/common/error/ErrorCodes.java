@@ -74,6 +74,7 @@ public enum ErrorCodes implements ErrorCode {
 	COMMENT_ASSOCIATE_REQUIRED(BAD_REQUEST, 8004, "코멘트 작성자는 필수입니다."),
 
 	MEMORY_NOT_FOUND(BAD_REQUEST, 9000, "존재하지 않는 기억입니다."),
+	MEMORY_NOT_AUTHOR(BAD_REQUEST, 9001, "기억의 작성자가 아닙니다."),
 	;
 	private final HttpStatus status;
 	private final int code;
