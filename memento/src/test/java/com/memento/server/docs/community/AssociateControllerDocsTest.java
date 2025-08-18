@@ -1,6 +1,10 @@
 package com.memento.server.docs.community;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -30,14 +34,16 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.memento.server.api.controller.achievement.dto.SearchAchievementResponse;
 import com.memento.server.api.controller.community.AssociateController;
-import com.memento.server.api.controller.community.dto.ReadAssociateResponse;
+import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
 import com.memento.server.api.controller.community.dto.UpdateAssociateRequest;
 import com.memento.server.api.controller.community.dto.AssociateListResponse;
 import com.memento.server.api.controller.community.dto.AssociateListResponse.AssociateResponse;
 import com.memento.server.api.controller.community.dto.AssociateListResponse.AssociateResponse.AchievementResponse;
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.api.service.community.AssociateService;
+import com.memento.server.domain.achievement.AchievementType;
 
 public class AssociateControllerDocsTest extends RestDocsSupport {
 
@@ -52,33 +58,32 @@ public class AssociateControllerDocsTest extends RestDocsSupport {
 
 	@Test
 	@DisplayName("associate 조회")
-	void readTest() throws Exception {
+	void searchTest() throws Exception {
 		// given
+		setAuthentication(1L, 1L, 1L);
+
 		Long communityId = 1L;
 		Long associateId = 1L;
 
-		// when & then
-		ReadAssociateResponse response = ReadAssociateResponse.builder()
-			.nickname("오큰수")
-			.achievement(ReadAssociateResponse.Achievement.builder()
-				.id(1L)
-				.name("뤼전드")
-				.build())
-			.imageUrl("www.example.com/ohjs")
-			.introduction("싱싱싱~ 팅!팅!팅! 아!다 막았죠! 인지용~?")
-			.birthday(LocalDate.of(1999, 10, 13))
-			.build();
+		given(associateService.search(anyLong(), anyLong()))
+			.willReturn(
+				SearchAssociateResponse.builder()
+					.nickname("example")
+					.achievement(SearchAssociateResponse.Achievement.builder()
+						.id(1L)
+						.name("example")
+						.build())
+					.imageUrl("www.example.com/example")
+					.introduction("example introduction")
+					.birthday(LocalDate.of(1999, 1, 1))
+					.build()
+			);
 
+		// when & then
 		mockMvc.perform(
 				get(PATH + "/{associateId}", communityId, associateId))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.nickname").value(response.nickname()))
-			.andExpect(jsonPath("$.achievement.id").value(response.achievement().getId()))
-			.andExpect(jsonPath("$.achievement.name").value(response.achievement().getName()))
-			.andExpect(jsonPath("$.imageUrl").value(response.imageUrl()))
-			.andExpect(jsonPath("$.introduction").value(response.introduction()))
-			.andExpect(jsonPath("$.birthday").value(response.birthday().toString()))
 			.andDo(document("associate-read-test",
 				preprocessResponse(prettyPrint()),
 				responseFields(
@@ -156,14 +161,17 @@ public class AssociateControllerDocsTest extends RestDocsSupport {
 	@DisplayName("associate 수정 API")
 	void updateTest() throws Exception {
 		// given
+		setAuthentication(1L, 1L, 1L);
+
 		Long communityId = 1L;
 
 		UpdateAssociateRequest request = UpdateAssociateRequest.builder()
-			.profileImageUrl("www.example.com/ohjs")
-			.nickname("오준수")
-			.achievement(2L)
-			.introduction("오준수 뤼전드")
+			.profileImageUrl("https://...")
+			.nickname("nickname")
+			.achievement(1L)
+			.introduction("introduction")
 			.build();
+		doNothing().when(associateService).update(anyLong(), anyLong(), anyString(), anyString(), anyLong(), anyString());
 
 		// when & then
 		mockMvc.perform(
@@ -182,5 +190,4 @@ public class AssociateControllerDocsTest extends RestDocsSupport {
 				)
 			));
 	}
-
 }

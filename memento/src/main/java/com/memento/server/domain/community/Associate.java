@@ -90,4 +90,15 @@ public class Associate extends BaseEntity {
 	public int hashCode() {
 		return Objects.hashCode(id);
 	}
+
+	public void updateProfile(
+		String ProfileImageUrl,
+		String Nickname,
+		Achievement Achievement,
+		String Introduction) {
+		this.profileImageUrl = ProfileImageUrl;
+		this.nickname = Nickname;
+		this.achievement = Achievement;
+		this.introduction = Introduction;
+	}
 }
