@@ -5,12 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,29 +19,33 @@ import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
 import com.memento.server.api.service.community.AssociateService;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.achievement.Achievement;
+import com.memento.server.domain.achievement.AchievementRepository;
+import com.memento.server.domain.achievement.AchievementType;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
-import com.memento.server.spring.api.service.ServiceTestSupport;
 
 @SpringBootTest
 @Transactional
-public class AssociateServiceTest extends ServiceTestSupport {
+public class AssociateServiceTest{
 
 	@Autowired
-	private AssociateService associateService;
+	protected AssociateService associateService;
+
+	@Autowired
+	private CommunityRepository communityRepository;
 
 	@Autowired
 	private MemberRepository memberRepository;
 
 	@Autowired
-	private AssociateRepository associateRepository;
+	protected AchievementRepository achievementRepository;
 
 	@Autowired
-	private CommunityRepository communityRepository;
+	protected AssociateRepository associateRepository;
 
 	@Test
 	@DisplayName("커뮤니티 참여자 목록 조회")
@@ -213,80 +213,105 @@ public class AssociateServiceTest extends ServiceTestSupport {
 	@DisplayName("프로필 상세 조회")
 	void searchTest() {
 		// given
-		Long communityId = 1L;
-		Long associateId = 2L;
-
 		Achievement achievement = Achievement.builder()
-			.id(10L)
 			.name("test name")
+			.criteria("example")
+			.type(AchievementType.OPEN)
 			.build();
+		achievementRepository.save(achievement);
 
 		Member member = Member.builder()
-			.birthday(LocalDate.of(1990, 5, 1))
+			.name("example")
+			.email("example@example.com")
+			.kakaoId(123L)
+			.birthday(LocalDate.of(1999, 1, 1))
 			.build();
+		memberRepository.save(member);
+
+		Community community = Community.builder()
+			.member(member)
+			.name("example")
+			.build();
+		communityRepository.save(community);
 
 		Associate associate = Associate.builder()
-			.id(associateId)
+			.community(community)
 			.nickname("test nickname")
 			.achievement(achievement)
 			.profileImageUrl("www.example.com")
 			.introduction("test introduction")
 			.member(member)
 			.build();
-
-		doReturn(associate)
-			.when(associateService)
-			.validAssociate(communityId, associateId);
+		associateRepository.save(associate);
 
 		// when
-		SearchAssociateResponse response = associateService.search(communityId, associateId);
+		SearchAssociateResponse response = associateService.search(community.getId(), associate.getId());
 
 		// then
 		assertEquals("test nickname", response.nickname());
 		assertEquals("test name", response.achievement().getName());
 		assertEquals("www.example.com", response.imageUrl());
 		assertEquals("test introduction", response.introduction());
-		assertEquals(LocalDate.of(1990, 5, 1), response.birthday());
+		assertEquals(LocalDate.of(1999, 1, 1), response.birthday());
 	}
 
 	@Test
 	@DisplayName("프로필 수정")
 	void updateTest() {
 		// given
-		Long communityId = 1L;
-		Long associateId = 2L;
+		Member member = Member.builder()
+			.name("example")
+			.email("example@example.com")
+			.kakaoId(123L)
+			.birthday(LocalDate.of(1999, 1, 1))
+			.build();
+		memberRepository.save(member);
+
+		Community community = Community.builder()
+			.member(member)
+			.name("example")
+			.build();
+		communityRepository.save(community);
 
 		Achievement oldAchievement = Achievement.builder()
-			.id(10L)
 			.name("Novice")
+			.criteria("example")
+			.type(AchievementType.OPEN)
 			.build();
-
 		Achievement newAchievement = Achievement.builder()
-			.id(11L)
 			.name("Expert")
+			.criteria("example")
+			.type(AchievementType.OPEN)
 			.build();
+		achievementRepository.save(oldAchievement);
+		achievementRepository.save(newAchievement);
 
-		Associate associate = spy(
-			Associate.builder()
-				.id(associateId)
-				.nickname("OldName")
-				.achievement(oldAchievement)
-				.profileImageUrl("old-image")
-				.introduction("Old Intro")
-				.build()
-		);
-
-		doReturn(associate)
-			.when(associateService)
-			.validAssociate(communityId, associateId);
-
-		when(achievementRepository.findById(11L))
-			.thenReturn(Optional.of(newAchievement));
+		Associate associate = Associate.builder()
+			.community(community)
+			.member(member)
+			.achievement(oldAchievement)
+			.nickname("example")
+			.build();
+		associateRepository.save(associate);
 
 		// when
-		associateService.update(communityId, associateId, "new-image", null, 11L, "New Intro");
+		associateService.update(
+			community.getId(),
+			associate.getId(),
+			"new-image",
+			null,
+			newAchievement.getId(),
+			"New Intro"
+		);
 
 		// then
-		verify(associate).updateProfile("new-image", "OldName", newAchievement, "New Intro");
+		Associate updatedAssociate = associateRepository.findById(associate.getId())
+			.orElseThrow();
+
+		assertThat(updatedAssociate.getProfileImageUrl()).isEqualTo("new-image");
+		assertThat(updatedAssociate.getNickname()).isEqualTo("example");
+		assertThat(updatedAssociate.getAchievement().getId()).isEqualTo(newAchievement.getId());
+		assertThat(updatedAssociate.getAchievement().getName()).isEqualTo("Expert");
+		assertThat(updatedAssociate.getIntroduction()).isEqualTo("New Intro");
 	}
 }

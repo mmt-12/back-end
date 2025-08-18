@@ -23,6 +23,7 @@ import com.memento.server.api.service.community.AssociateService;
 import com.memento.server.api.service.emoji.EmojiService;
 import com.memento.server.api.service.guestBook.GuestBookService;
 import com.memento.server.api.service.mbti.MbtiService;
+import com.memento.server.api.service.member.MemberService;
 import com.memento.server.api.service.profileImage.ProfileImageService;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.api.service.auth.jwt.JwtProperties;
@@ -73,6 +74,9 @@ public abstract class ControllerTestSupport {
 
 	@MockitoBean
 	protected ProfileImageService profileImageService;
+
+	@MockitoBean
+	protected MemberService memberService;
 
 	@Autowired
 	protected JwtTokenProvider jwtTokenProvider;

@@ -29,12 +29,6 @@ import com.memento.server.spring.api.controller.ControllerTestSupport;
 })
 public class MemberControllerTest extends ControllerTestSupport {
 
-	@MockitoBean
-	private MemberService memberService;
-
-	@MockitoBean
-	private AssociateService associateService;
-
 	@Test
 	@DisplayName("회원가입 API 파라미터 매핑 테스트")
 	void signup() throws Exception {

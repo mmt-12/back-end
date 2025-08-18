@@ -5,55 +5,92 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.memento.server.api.controller.achievement.dto.SearchAchievementResponse;
+import com.memento.server.api.service.achievement.AchievementService;
 import com.memento.server.api.service.achievement.dto.SearchAchievementDto;
+import com.memento.server.domain.achievement.Achievement;
+import com.memento.server.domain.achievement.AchievementRepository;
 import com.memento.server.domain.achievement.AchievementType;
 import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
-import com.memento.server.spring.api.service.ServiceTestSupport;
+import com.memento.server.domain.community.CommunityRepository;
+import com.memento.server.domain.member.Member;
+import com.memento.server.domain.member.MemberRepository;
 
-public class AchievementServiceTest extends ServiceTestSupport {
+@SpringBootTest
+@Transactional
+public class AchievementServiceTest{
+
+	@Autowired
+	protected AchievementService achievementService;
+
+	@Autowired
+	protected CommunityRepository communityRepository;
+
+	@Autowired
+	protected MemberRepository memberRepository;
+
+	@Autowired
+	protected AssociateRepository associateRepository;
+
+	@Autowired
+	protected AchievementRepository achievementRepository;
 
 	@Test
 	@DisplayName("업적 조회")
 	void searchTest() {
 		// given
-		Long communityId = 1L;
-		Long associateId = 2L;
+		Member member = Member.builder()
+			.name("example")
+			.email("example@example.com")
+			.kakaoId(123L)
+			.birthday(LocalDate.of(1999, 1, 1))
+			.build();
+		memberRepository.save(member);
 
-		Associate associate = mock(Associate.class);
-		Community community = mock(Community.class);
+		Community community = Community.builder()
+			.member(member)
+			.name("example")
+			.build();
+		communityRepository.save(community);
 
-		when(associateRepository.findByIdAndDeletedAtNull(associateId))
-			.thenReturn(Optional.of(associate));
-		when(associate.getCommunity()).thenReturn(community);
-		when(community.getId()).thenReturn(communityId);
-		when(associate.getId()).thenReturn(associateId);
+		Achievement achievement1 = Achievement.builder()
+			.name("Novice")
+			.criteria("example")
+			.type(AchievementType.OPEN)
+			.build();
+		Achievement achievement2 = Achievement.builder()
+			.name("Expert")
+			.criteria("example")
+			.type(AchievementType.OPEN)
+			.build();
+		achievementRepository.save(achievement1);
+		achievementRepository.save(achievement2);
 
-		List<SearchAchievementDto> dtoList = List.of(
-			new SearchAchievementDto(1L, "시간빌게이츠", "연속 출석 수 15일 이상", AchievementType.OPEN, true),
-			new SearchAchievementDto(2L, "관상가", "모든 그룹원의 MBTI 테스트 참여", AchievementType.OPEN, true)
-		);
-
-		when(achievementRepository.findAllWithObtainedRecord(associateId))
-			.thenReturn(dtoList);
+		Associate associate = Associate.builder()
+			.community(community)
+			.member(member)
+			.nickname("example")
+			.build();
+		associateRepository.save(associate);
 
 		// when
-		SearchAchievementResponse response = achievementService.search(communityId, associateId);
+		SearchAchievementResponse response = achievementService.search(community.getId(), associate.getId());
 
 		// then
 		assertThat(response.achievements()).hasSize(2);
-		assertThat(response.achievements().get(0).getName()).isEqualTo("시간빌게이츠");
-		assertThat(response.achievements().get(1).isObtained()).isTrue();
-
-		verify(associateRepository).findByIdAndDeletedAtNull(associateId);
-		verify(achievementRepository).findAllWithObtainedRecord(associateId);
+		assertThat(response.achievements().get(0).getName()).isEqualTo("Novice");
+		assertThat(response.achievements().get(1).isObtained()).isFalse();
 	}
-
 }
