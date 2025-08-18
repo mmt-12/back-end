@@ -869,4 +869,91 @@ class MemoryServiceTest {
 				assertThat(e.getErrorCode()).isEqualTo(MEMORY_NOT_AUTHOR);
 			});
 	}
+
+	@Test
+	@DisplayName("기억을 삭제한다.")
+	void deleteMemory_success() {
+		// given
+		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1010L));
+		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
+
+		Event event = eventRepository.save(Event.builder()
+			.title("삭제할 추억")
+			.description("삭제될 추억입니다.")
+			.location(Location.builder()
+				.address("삭제 주소")
+				.name("삭제 장소")
+				.latitude(BigDecimal.valueOf(10.0F))
+				.longitude(BigDecimal.valueOf(20.0F))
+				.code(1)
+				.build())
+			.period(Period.builder()
+				.startTime(LocalDateTime.of(2023, 1, 1, 10, 0))
+				.endTime(LocalDateTime.of(2023, 1, 1, 11, 0))
+				.build())
+			.community(community)
+			.associate(associate)
+			.build());
+		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
+
+		// when
+		memoryService.delete(memory.getId(), associate.getId());
+
+		// then
+		assertThat(memoryRepository.findById(memory.getId())).isEmpty();
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 기억을 삭제하면 예외가 발생한다.")
+	void deleteMemory_memoryNotFound() {
+		// given
+		Long nonExistentMemoryId = 9999L;
+		Long currentAssociateId = 1L; // Dummy ID
+
+		// when // then
+		assertThatThrownBy(() -> memoryService.delete(nonExistentMemoryId, currentAssociateId))
+			.isInstanceOf(MementoException.class)
+			.satisfies(ex -> {
+				MementoException e = (MementoException)ex;
+				assertThat(e.getErrorCode()).isEqualTo(MEMORY_NOT_FOUND);
+			});
+	}
+
+	@Test
+	@DisplayName("기억의 작성자가 아닌 경우 기억을 삭제하면 예외가 발생한다.")
+	void deleteMemory_notAuthor() {
+		// given
+		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1011L));
+		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+		Associate authorAssociate = associateRepository.save(Associate.create("작성자어소시에이트", member, community));
+		Associate otherAssociate = associateRepository.save(Associate.create("다른어소시에이트", member, community));
+
+		Event event = eventRepository.save(Event.builder()
+			.title("삭제할 추억")
+			.description("삭제될 추억입니다.")
+			.location(Location.builder()
+				.address("삭제 주소")
+				.name("삭제 장소")
+				.latitude(BigDecimal.valueOf(10.0F))
+				.longitude(BigDecimal.valueOf(20.0F))
+				.code(1)
+				.build())
+			.period(Period.builder()
+				.startTime(LocalDateTime.of(2023, 1, 1, 10, 0))
+				.endTime(LocalDateTime.of(2023, 1, 1, 11, 0))
+				.build())
+			.community(community)
+			.associate(authorAssociate)
+			.build());
+		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
+
+		// when // then
+		assertThatThrownBy(() -> memoryService.delete(memory.getId(), otherAssociate.getId()))
+			.isInstanceOf(MementoException.class)
+			.satisfies(ex -> {
+				MementoException e = (MementoException)ex;
+				assertThat(e.getErrorCode()).isEqualTo(MEMORY_NOT_AUTHOR);
+			});
+	}
 }
