@@ -531,7 +531,7 @@ class MemoryServiceTest {
 			.description("새로운 추억에 대한 설명입니다.")
 			.location(locationRequest)
 			.period(periodRequest)
-			.associates(List.of(otherAssociate.getId()))
+			.associates(List.of(associate.getId(), otherAssociate.getId()))
 			.build();
 
 		// when
@@ -548,7 +548,7 @@ class MemoryServiceTest {
 		assertThat(foundMemory.getEvent().getPeriod().getStartTime()).isEqualTo(LocalDateTime.of(2024, 8, 1, 10, 0));
 
 		List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemory(foundMemory);
-		assertThat(memoryAssociates).hasSize(2); // original associate + otherAssociate
+		assertThat(memoryAssociates).hasSize(2);
 		assertThat(memoryAssociates).extracting(MemoryAssociate::getAssociate)
 			.containsExactlyInAnyOrder(associate, otherAssociate);
 	}

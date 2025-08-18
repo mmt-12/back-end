@@ -218,7 +218,7 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 				.address("경기도 양평시 양평군")
 				.build())
 			.build();
-		when(memoryService.update(any(), any(), any(), any())).thenReturn(
+		when(memoryService.update(any(), any(), any())).thenReturn(
 			CreateUpdateMemoryResponse.builder()
 				.memoryId(1L)
 				.build()
