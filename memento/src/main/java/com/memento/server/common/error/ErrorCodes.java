@@ -1,7 +1,6 @@
 package com.memento.server.common.error;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE;
+import static org.springframework.http.HttpStatus.*;
 
 import org.springframework.http.HttpStatus;
 

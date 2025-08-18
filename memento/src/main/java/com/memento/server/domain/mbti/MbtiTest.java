@@ -50,4 +50,8 @@ public class MbtiTest extends BaseEntity {
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "to_associate_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Associate toAssociate;
+
+	public void updateMbti(Mbti mbti) {
+		this.mbti = mbti;
+	}
 }
