@@ -182,7 +182,14 @@ public class MemoryService {
 		return CreateUpdateMemoryResponse.from(memory);
 	}
 
-	public void delete(Long communityId, Long memoryId, Long currentAssociateId) {
+	public void delete(Long memoryId, Long currentAssociateId) {
+		Memory memory = memoryRepository.findById(memoryId).orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
+		Event event = memory.getEvent();
+		if (!event.getAssociate().getId().equals(currentAssociateId)) {
+			throw new MementoException(MEMORY_NOT_AUTHOR);
+		}
+
+		memoryRepository.delete(memory);
 	}
 
 	public DownloadImagesResponse downloadImages(Long communityId, Long memoryId) {

@@ -79,7 +79,7 @@ public class MemoryController {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new IllegalArgumentException("다른 그룹의 요청입니다.");
 		}
-		memoryService.delete(communityId, memoryId, currentAssociateId);
+		memoryService.delete(memoryId, currentAssociateId);
 		return ResponseEntity.ok().build();
 	}
 
