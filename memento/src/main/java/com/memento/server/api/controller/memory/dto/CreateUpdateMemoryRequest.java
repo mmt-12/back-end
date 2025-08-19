@@ -6,26 +6,26 @@ import java.util.List;
 import lombok.Builder;
 
 @Builder
-public record CreateMemoryRequest(
+public record CreateUpdateMemoryRequest(
 	String title,
-	Period period,
+	PeriodRequest period,
 	String description,
 	List<Long> associates,
-	Location location
+	LocationRequest location
 ) {
 
 	@Builder
-	public record Period(
+	public record PeriodRequest(
 		LocalDateTime startTime,
 		LocalDateTime endTime
 	) {
 	}
 
 	@Builder
-	public record Location(
+	public record LocationRequest(
 		Float latitude,
 		Float longitude,
-		String code,
+		Integer code,
 		String name,
 		String address
 	) {

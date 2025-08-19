@@ -17,7 +17,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.queryPar
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
@@ -29,13 +28,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.memento.server.api.controller.memory.MemoryController;
-import com.memento.server.api.controller.memory.dto.CreateMemoryRequest;
-import com.memento.server.api.controller.memory.dto.CreateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
 import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.Memory;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.Memory.Location;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.Memory.Period;
+import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse;
+import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse.LocationResponse;
+import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse.PeriodResponse;
 import com.memento.server.api.service.memory.MemoryService;
 import com.memento.server.docs.RestDocsSupport;
 
@@ -55,21 +54,21 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 	void read() throws Exception {
 		// given
 		setAuthentication(1L, 1L, 1L);
-		when(memoryService.readAll(any(), any(), any(), any(), any(), any())).thenReturn(
+		when(memoryService.readAll(any(), any())).thenReturn(
 			ReadAllMemoryResponse.builder()
 				.cursor(3L)
 				.hasNext(true)
 				.memories(
 					List.of(
-						Memory.builder()
+						MemoryResponse.builder()
 							.id(1L)
 							.title("일평 mt")
 							.description("우리가 함께 마신 소주와 수영장 물을 추억하며")
-							.period(Period.builder()
+							.period(PeriodResponse.builder()
 								.startDate(LocalDateTime.of(2025, 6, 20, 10, 30))
 								.endDate(LocalDateTime.of(2025, 6, 21, 12, 30))
 								.build())
-							.location(Location.builder()
+							.location(LocationResponse.builder()
 								.latitude(36.34512323F)
 								.longitude(138.7712322F)
 								.code("16335")
@@ -145,24 +144,24 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 	void create() throws Exception {
 		// given
 		setAuthentication(1L, 1L, 1L);
-		CreateMemoryRequest request = CreateMemoryRequest.builder()
+		CreateUpdateMemoryRequest request = CreateUpdateMemoryRequest.builder()
 			.title("양평 MT!")
-			.period(CreateMemoryRequest.Period.builder()
+			.period(CreateUpdateMemoryRequest.PeriodRequest.builder()
 				.startTime(LocalDateTime.of(2024, 6, 20, 10, 30, 0))
 				.endTime(LocalDateTime.of(2024, 6, 20, 10, 30, 0))
 				.build())
 			.description("우리가 함께 마신 소주와 수영장 물을 기억하며")
 			.associates(List.of(1L, 2L, 3L, 4L))
-			.location(CreateMemoryRequest.Location.builder()
+			.location(CreateUpdateMemoryRequest.LocationRequest.builder()
 				.latitude(36.34512323f)
 				.longitude(138.7712322f)
-				.code("16335")
+				.code(16335)
 				.name("양평 서종풀팬션")
 				.address("경기도 양평시 양평군")
 				.build())
 			.build();
-		when(memoryService.create(any(), any())).thenReturn(
-			CreateMemoryResponse.builder()
+		when(memoryService.create(any(), any(), any())).thenReturn(
+			CreateUpdateMemoryResponse.builder()
 				.memoryId(1L)
 				.build()
 		);
@@ -203,24 +202,24 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 	void update() throws Exception {
 		// given
 		setAuthentication(1L, 1L, 1L);
-		CreateMemoryRequest request = CreateMemoryRequest.builder()
+		CreateUpdateMemoryRequest request = CreateUpdateMemoryRequest.builder()
 			.title("양평 MT!")
-			.period(CreateMemoryRequest.Period.builder()
+			.period(CreateUpdateMemoryRequest.PeriodRequest.builder()
 				.startTime(LocalDateTime.of(2024, 6, 20, 10, 30, 0))
 				.endTime(LocalDateTime.of(2024, 6, 20, 10, 30, 0))
 				.build())
 			.description("우리가 함께 마신 소주와 수영장 물을 기억하며")
 			.associates(List.of(1L, 2L, 3L, 4L))
-			.location(CreateMemoryRequest.Location.builder()
+			.location(CreateUpdateMemoryRequest.LocationRequest.builder()
 				.latitude(36.34512323f)
 				.longitude(138.7712322f)
-				.code("16335")
+				.code(16335)
 				.name("양평 서종풀팬션")
 				.address("경기도 양평시 양평군")
 				.build())
 			.build();
-		when(memoryService.update(any(), any(), any(), any())).thenReturn(
-			CreateMemoryResponse.builder()
+		when(memoryService.update(any(), any(), any())).thenReturn(
+			CreateUpdateMemoryResponse.builder()
 				.memoryId(1L)
 				.build()
 		);
@@ -282,7 +281,7 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 	void downloadImages() throws Exception {
 		// given
 		setAuthentication(1L, 1L, 1L);
-		when(memoryService.downloadImages(any(), any())).thenReturn(
+		when(memoryService.downloadImages(any())).thenReturn(
 			DownloadImagesResponse.builder()
 				.pictures(List.of(
 					"www.example.com/aws/s3/seonwoo/1",
