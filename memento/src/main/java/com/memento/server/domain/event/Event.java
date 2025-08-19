@@ -5,8 +5,13 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
+import java.math.BigDecimal;
+
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest.LocationRequest;
+import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest.PeriodRequest;
 import com.memento.server.common.BaseEntity;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.Community;
@@ -58,4 +63,28 @@ public class Event extends BaseEntity {
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "associate_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Associate associate;
+
+	public void update(CreateUpdateMemoryRequest request) {
+		this.title = request.title();
+		this.description = request.description();
+		updatePeriod(request.period());
+		updateLocation(request.location());
+	}
+
+	private void updateLocation(LocationRequest location) {
+		this.location = Location.builder()
+			.latitude(BigDecimal.valueOf(location.latitude()))
+			.longitude(BigDecimal.valueOf(location.longitude()))
+			.code(location.code())
+			.name(location.name())
+			.address(location.address())
+			.build();
+	}
+
+	private void updatePeriod(PeriodRequest period) {
+		this.period = Period.builder()
+			.startTime(period.startTime())
+			.endTime(period.endTime())
+			.build();
+	}
 }
