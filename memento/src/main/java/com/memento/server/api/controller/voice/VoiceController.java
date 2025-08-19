@@ -19,10 +19,12 @@ import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
+import com.memento.server.common.validator.FileValidator;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+
 
 @RequiredArgsConstructor
 @RestController
@@ -30,12 +32,14 @@ import lombok.RequiredArgsConstructor;
 public class VoiceController {
 
 	private final VoiceService voiceService;
+	private final FileValidator fileValidator;
 
 	@PostMapping
 	public ResponseEntity<Void> createVoice(@AssociateId Long associateId,
 		@PathVariable("communityId") Long communityId,
 		@Valid @RequestPart("data") VoiceCreateRequest request,
 		@NotNull(message = "voice 값은 필수입니다.") @RequestPart("voice") MultipartFile voice) {
+		fileValidator.validateVoiceFile(voice);
 		voiceService.createPermanentVoice(request.toServiceRequest(associateId, voice));
 		return ResponseEntity.status(CREATED).build();
 	}
@@ -53,4 +57,5 @@ public class VoiceController {
 		voiceService.removeVoice(VoiceRemoveRequest.of(associateId, voiceId));
 		return ResponseEntity.noContent().build();
 	}
+
 }

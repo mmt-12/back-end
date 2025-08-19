@@ -24,6 +24,13 @@ public enum ErrorCodes implements ErrorCode {
 	VOICE_URL_BLANK(BAD_REQUEST, 2004, "보이스 URL은 공백일 수 없습니다."),
 	VOICE_URL_TOO_LONG(BAD_REQUEST, 2005, "보이스 URL은 최대 255자까지 입력할 수 있습니다."),
 	VOICE_ASSOCIATE_REQUIRED(BAD_REQUEST, 2006, "보이스 작성자는 필수입니다."),
+	VOICE_FILE_TOO_LARGE(BAD_REQUEST, 2007, "음성 파일 크기는 10MB를 초과할 수 없습니다."),
+	VOICE_INVALID_FORMAT(BAD_REQUEST, 2008, "지원하지 않는 음성 파일 형식입니다."),
+
+	IMAGE_FILE_TOO_LARGE(BAD_REQUEST, 2009, "이미지 파일 크기가 제한을 초과합니다."),
+	IMAGE_INVALID_FORMAT(BAD_REQUEST, 2010, "지원하지 않는 이미지 파일 형식입니다."),
+	POST_TOO_MANY_FILES(BAD_REQUEST, 2011, "업로드할 수 있는 파일 개수를 초과했습니다."),
+	POST_FILES_TOO_LARGE(BAD_REQUEST, 2012, "전체 파일 크기가 제한을 초과합니다."),
 
 	EMOJI_NAME_REQUIRED(BAD_REQUEST, 3000, "이모지 이름은 필수입니다."),
 	EMOJI_NAME_BLANK(BAD_REQUEST, 3001, "이모지 이름은 공백일 수 없습니다."),
@@ -65,12 +72,16 @@ public enum ErrorCodes implements ErrorCode {
 	ASSOCIATE_NICKNAME_TOO_LONG(BAD_REQUEST, 7002, "그룹 참여자 닉네임은 51자 이하로 입력해야 합니다."),
 	ASSOCIATE_MEMBER_REQUIRED(BAD_REQUEST, 7003, "그룹 참여자 회원은 필수입니다."),
 	ASSOCIATE_COMMUNITY_REQUIRED(BAD_REQUEST, 7004, "그룹 참여자 커뮤니티는 필수입니다."),
+	ASSOCIATE_NOT_FOUND(BAD_REQUEST, 7005, "그룹 참여자를 찾을 수 없습니다."),
 
 	COMMENT_URL_REQUIRED(BAD_REQUEST, 8000, "코멘트 URL은 필수입니다."),
 	COMMENT_URL_BLANK(BAD_REQUEST, 8001, "코멘트 URL은 공백일 수 없습니다."),
 	COMMENT_URL_TOO_LONG(BAD_REQUEST, 8002, "코멘트 URL은 최대 255자까지 입력할 수 있습니다."),
 	COMMENT_POST_REQUIRED(BAD_REQUEST, 8003, "코멘트 게시글은 필수입니다."),
 	COMMENT_ASSOCIATE_REQUIRED(BAD_REQUEST, 8004, "코멘트 작성자는 필수입니다."),
+
+	MINIO_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, 9000, "파일 업로드 중 오류가 발생했습니다.")
+
 	;
 	private final HttpStatus status;
 	private final int code;

@@ -18,6 +18,7 @@ import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.api.service.auth.jwt.JwtProperties;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
 import com.memento.server.api.service.auth.jwt.MemberClaim;
+import com.memento.server.common.validator.FileValidator;
 import com.memento.server.spring.config.TestSecurityConfig;
 
 @WebMvcTest({
@@ -46,6 +47,9 @@ public abstract class ControllerTestSupport {
 
 	@Autowired
 	protected JwtTokenProvider jwtTokenProvider;
+
+	@MockitoBean
+	protected FileValidator fileValidator;
 
 	protected RequestPostProcessor withJwt(Long memberId, Long associateId, Long communityId) {
 		String token = createTestToken(memberId, associateId, communityId);

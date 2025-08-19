@@ -38,16 +38,18 @@ import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
+import com.memento.server.common.validator.FileValidator;
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.voice.VoiceFixtures;
 
 public class VoiceControllerDocsTest extends RestDocsSupport {
 
 	private final VoiceService voiceService = Mockito.mock(VoiceService.class);
+	private final FileValidator fileValidator = Mockito.mock(FileValidator.class);
 
 	@Override
 	protected Object initController() {
-		return new VoiceController(voiceService);
+		return new VoiceController(voiceService, fileValidator);
 	}
 
 	@Test
