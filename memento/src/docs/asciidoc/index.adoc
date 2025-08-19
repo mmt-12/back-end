@@ -53,8 +53,6 @@ include::api/v1/auth/auth.adoc[]
 
 include::api/v1/member/member.adoc[]
 
-include::api/v1/community/community.adoc[]
-
 include::api/v1/memory/memory.adoc[]
 
 include::api/v1/associate/associate.adoc[]

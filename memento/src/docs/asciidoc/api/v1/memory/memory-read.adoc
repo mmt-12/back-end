@@ -15,8 +15,8 @@ include::{snippets}/memory-read-test/query-parameters.adoc[]
 
 ==== HTTP Response
 
-include::{snippets}/community-list-test/http-response.adoc[]
+include::{snippets}/memory-read-test/http-response.adoc[]
 
 ==== Response Fields
 
-include::{snippets}/community-list-test/response-fields.adoc[]
+include::{snippets}/memory-read-test/response-fields.adoc[]
