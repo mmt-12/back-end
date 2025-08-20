@@ -39,7 +39,7 @@ public class AssociateService {
 		Long cursor,
 		Integer size
 	) {
-		Optional<Community> communityOptional = communityRepository.findById(communityId);
+		Optional<Community> communityOptional = communityRepository.findByIdAndDeletedAtIsNull(communityId);
 		if (communityOptional.isEmpty()) {
 			throw new MementoException(COMMUNITY_NOT_FOUND);
 		}

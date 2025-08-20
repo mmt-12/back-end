@@ -98,7 +98,7 @@ public class MemoryService {
 	public CreateUpdateMemoryResponse create(Long communityId, Long associateId, CreateUpdateMemoryRequest request) {
 		Associate associate = associateRepository.findById(associateId)
 			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
-		Community community = communityRepository.findById(communityId)
+		Community community = communityRepository.findByIdAndDeletedAtIsNull(communityId)
 			.orElseThrow(() -> new MementoException(COMMUNITY_NOT_FOUND));
 
 		Event event = eventRepository.save(Event.builder()
