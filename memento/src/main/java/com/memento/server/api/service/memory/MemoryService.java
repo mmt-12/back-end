@@ -37,7 +37,6 @@ import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.domain.memory.dto.MemoryAssociateCount;
 import com.memento.server.domain.post.PostImage;
 import com.memento.server.domain.post.PostImageRepository;
-import com.memento.server.domain.post.PostRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,7 +51,6 @@ public class MemoryService {
 	private final CommunityRepository communityRepository;
 	private final EventRepository eventRepository;
 	private final AssociateRepository associateRepository;
-	private final PostRepository postRepository;
 
 	public ReadAllMemoryResponse readAll(Long communityId, ReadAllMemoryRequest request) {
 		Long cursor = request.cursor();
@@ -96,7 +94,7 @@ public class MemoryService {
 
 	@Transactional
 	public CreateUpdateMemoryResponse create(Long communityId, Long associateId, CreateUpdateMemoryRequest request) {
-		Associate associate = associateRepository.findById(associateId)
+		Associate associate = associateRepository.findByIdAndDeletedAtIsNull(associateId)
 			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
 		Community community = communityRepository.findByIdAndDeletedAtIsNull(communityId)
 			.orElseThrow(() -> new MementoException(COMMUNITY_NOT_FOUND));
@@ -123,7 +121,7 @@ public class MemoryService {
 			.event(event)
 			.build());
 
-		List<Associate> associates = associateRepository.findAllById(request.associates());
+		List<Associate> associates = associateRepository.findAllByIdInAndDeletedAtIsNull(request.associates());
 		List<MemoryAssociate> memoryAssociates = new ArrayList<>();
 		for (Associate other : associates) {
 			memoryAssociates.add(MemoryAssociate.builder()
@@ -142,7 +140,7 @@ public class MemoryService {
 		Long currentAssociateId,
 		Long memoryId
 	) {
-		Memory memory = memoryRepository.findById(memoryId).orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
+		Memory memory = memoryRepository.findByIdAndDeletedAtIsNull(memoryId).orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
 		Event event = memory.getEvent();
 		if (!event.getAssociate().getId().equals(currentAssociateId)) {
 			throw new MementoException(MEMORY_NOT_AUTHOR);
@@ -150,7 +148,7 @@ public class MemoryService {
 
 		event.update(request);
 
-		List<MemoryAssociate> associates = memoryAssociateRepository.findAllByMemory(memory);
+		List<MemoryAssociate> associates = memoryAssociateRepository.findAllByMemoryAndDeletedAtIsNull(memory);
 		List<Long> checked = new ArrayList<>();
 
 		List<MemoryAssociate> deleteList = new ArrayList<>();
@@ -169,7 +167,7 @@ public class MemoryService {
 				continue;
 			newList.add(associateId);
 		}
-		List<Associate> newAssociates = associateRepository.findAllById(newList);
+		List<Associate> newAssociates = associateRepository.findAllByIdInAndDeletedAtIsNull(newList);
 
 		List<MemoryAssociate> newMemoryAssociates = new ArrayList<>();
 		for (Associate associate : newAssociates) {
@@ -184,7 +182,7 @@ public class MemoryService {
 	}
 
 	public void delete(Long memoryId, Long currentAssociateId) {
-		Memory memory = memoryRepository.findById(memoryId).orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
+		Memory memory = memoryRepository.findByIdAndDeletedAtIsNull(memoryId).orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
 		Event event = memory.getEvent();
 		if (!event.getAssociate().getId().equals(currentAssociateId)) {
 			throw new MementoException(MEMORY_NOT_AUTHOR);
@@ -194,7 +192,7 @@ public class MemoryService {
 	}
 
 	public DownloadImagesResponse downloadImages(Long memoryId) {
-		Memory memory = memoryRepository.findById(memoryId).orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
+		Memory memory = memoryRepository.findByIdAndDeletedAtIsNull(memoryId).orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
 		List<PostImage> postImages = postImageRepository.findAllByMemory(memory);
 
 		return DownloadImagesResponse.from(postImages);

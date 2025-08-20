@@ -29,4 +29,8 @@ public interface AssociateRepository extends JpaRepository<Associate, Long> {
 	);
 
 	List<Associate> findAllByMemberIdAndDeletedAtIsNull(Long memberId);
+
+	Optional<Associate> findByIdAndDeletedAtIsNull(Long id);
+
+	List<Associate> findAllByIdInAndDeletedAtIsNull(List<Long> ids);
 }
