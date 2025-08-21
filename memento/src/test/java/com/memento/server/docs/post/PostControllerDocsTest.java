@@ -1,5 +1,12 @@
 package com.memento.server.docs.post;
 
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -8,6 +15,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.NULL;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -22,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +41,17 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import com.memento.server.api.controller.post.PostController;
 import com.memento.server.api.controller.post.dto.CreatePostRequest;
-import com.memento.server.api.controller.post.dto.ReadAllPostResponse;
-import com.memento.server.api.controller.post.dto.ReadPostResponse;
+import com.memento.server.api.controller.post.dto.SearchAllPostResponse;
+import com.memento.server.api.controller.post.dto.SearchPostResponse;
 import com.memento.server.api.controller.post.dto.UpdatePostRequest;
+import com.memento.server.api.controller.post.dto.read.Achievement;
+import com.memento.server.api.controller.post.dto.read.CommentAuthor;
+import com.memento.server.api.controller.post.dto.read.Emoji;
+import com.memento.server.api.controller.post.dto.read.PostAuthor;
+import com.memento.server.api.controller.post.dto.read.TemporaryVoice;
+import com.memento.server.api.controller.post.dto.read.Voice;
+import com.memento.server.api.service.guestBook.GuestBookService;
+import com.memento.server.api.service.post.PostService;
 import com.memento.server.docs.RestDocsSupport;
 
 public class PostControllerDocsTest extends RestDocsSupport {
@@ -42,98 +59,95 @@ public class PostControllerDocsTest extends RestDocsSupport {
 	public static final String PATH = "/api/v1/communities/{communityId}/memories/{memoryId}/posts";
 	public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
+	private final PostService postService = mock(PostService.class);
+
 	@Override
 	protected Object initController() {
-		return new PostController();
+		return new PostController(postService);
 	}
 
 	@Test
 	@DisplayName("포스트 상세 조회")
-	public void readTest() throws Exception {
+	public void searchTest() throws Exception {
 		// given
-		Long groupId = 1L;
+		setAuthentication(1L, 1L, 1L);
+
+		Long communityId = 1L;
 		Long memoryId = 1L;
 		Long postId = 1L;
 
-		// when & then
-		ReadPostResponse response = ReadPostResponse.from();
+		SearchPostResponse response = SearchPostResponse.builder()
+			.id(1L)
+			.author(PostAuthor.builder()
+				.id(1L)
+				.imageUrl("www.example.com")
+				.nickname("example")
+				.achievement(Achievement.builder()
+					.id(1L)
+					.name("example")
+					.build())
+				.build())
+			.pictures(List.of("pic1.jpg"))
+			.content("테스트 게시글입니다.")
+			.createdAt(LocalDateTime.now())
+			.comments(SearchPostResponse.Comment.builder()
+				.emojis(List.of(Emoji.builder()
+					.id(1L)
+						.url("www.example.com")
+						.authors(List.of(CommentAuthor.builder()
+								.id(1L)
+								.commentId(1L)
+								.imageUrl("www.example.com")
+								.nickname("example")
+								.achievement(Achievement.builder()
+									.id(1L)
+									.name("example")
+									.build())
+								.createdAt(LocalDateTime.now())
+							.build()))
+						.isInvolved(true)
+					.build()))
+				.voices(List.of(Voice.builder()
+					.id(1L)
+					.url("www.example.com")
+					.authors(List.of(CommentAuthor.builder()
+						.id(1L)
+						.commentId(1L)
+						.imageUrl("www.example.com")
+						.nickname("example")
+						.achievement(Achievement.builder()
+							.id(1L)
+							.name("example")
+							.build())
+						.createdAt(LocalDateTime.now())
+						.build()))
+					.isInvolved(true)
+					.build()))
+				.temporaryVoices(List.of(TemporaryVoice.builder()
+					.id(1L)
+					.url("www.example.com")
+					.authors(List.of(CommentAuthor.builder()
+						.id(1L)
+						.commentId(1L)
+						.imageUrl("www.example.com")
+						.nickname("example")
+						.achievement(Achievement.builder()
+							.id(1L)
+							.name("example")
+							.build())
+						.createdAt(LocalDateTime.now())
+						.build()))
+					.build()))
+				.build())
+			.build();
 
+		when(postService.search(anyLong(), anyLong(), anyLong())).thenReturn(response);
+
+		// when & then
 		mockMvc.perform(
-				get(PATH + "/{postId}", groupId, memoryId, postId))
+				get(PATH + "/{postId}", communityId, memoryId, postId))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.id").value(response.id()))
-			.andExpect(jsonPath("$.author.id").value(response.author().getId()))
-			.andExpect(jsonPath("$.author.nickname").value(response.author().getNickname()))
-			.andExpect(jsonPath("$.author.imageUrl").value(response.author().getImageUrl()))
-			.andExpect(jsonPath("$.author.achievement.id").value(response.author().getAchievement().id()))
-			.andExpect(jsonPath("$.author.achievement.name").value(response.author().getAchievement().name()))
-			.andExpect(jsonPath("$.pictures[0]").value(response.pictures().get(0)))
-			.andExpect(jsonPath("$.content").value(response.content()))
-			.andExpect(jsonPath("$.createdAt").value(response.createdAt().format(formatter)))
-
-			// comments.emojis[0]
-			.andExpect(jsonPath("$.comments.emojis[0].id").value(response.comments().getEmojis().get(0).getId()))
-			.andExpect(jsonPath("$.comments.emojis[0].url").value(response.comments().getEmojis().get(0).getUrl()))
-			.andExpect(
-				jsonPath("$.comments.emojis[0].involved").value(response.comments().getEmojis().get(0).isInvolved()))
-
-			// comments.emojis[0].authors[0]
-			.andExpect(jsonPath("$.comments.emojis[0].authors[0].id").value(
-				response.comments().getEmojis().get(0).getAuthors().get(0).getId()))
-			.andExpect(jsonPath("$.comments.emojis[0].authors[0].imageUrl").value(
-				response.comments().getEmojis().get(0).getAuthors().get(0).getImageUrl()))
-			.andExpect(jsonPath("$.comments.emojis[0].authors[0].nickname").value(
-				response.comments().getEmojis().get(0).getAuthors().get(0).getNickname()))
-			.andExpect(jsonPath("$.comments.emojis[0].authors[0].achievement.id").value(
-				response.comments().getEmojis().get(0).getAuthors().get(0).getAchievement().id()))
-			.andExpect(jsonPath("$.comments.emojis[0].authors[0].achievement.name").value(
-				response.comments().getEmojis().get(0).getAuthors().get(0).getAchievement().name()))
-			.andExpect(jsonPath("$.comments.emojis[0].authors[0].createdAt").value(
-				response.comments().getEmojis().get(0).getAuthors().get(0).getCreatedAt().format(formatter)
-			))
-
-			// comments.voices[0]
-			.andExpect(jsonPath("$.comments.voices[0].id").value(response.comments().getVoices().get(0).getId()))
-			.andExpect(jsonPath("$.comments.voices[0].url").value(response.comments().getVoices().get(0).getUrl()))
-			.andExpect(
-				jsonPath("$.comments.voices[0].involved").value(response.comments().getVoices().get(0).isInvolved()))
-
-			// comments.voices[0].authors[0]
-			.andExpect(jsonPath("$.comments.voices[0].authors[0].id").value(
-				response.comments().getVoices().get(0).getAuthors().get(0).getId()))
-			.andExpect(jsonPath("$.comments.voices[0].authors[0].imageUrl").value(
-				response.comments().getVoices().get(0).getAuthors().get(0).getImageUrl()))
-			.andExpect(jsonPath("$.comments.voices[0].authors[0].nickname").value(
-				response.comments().getVoices().get(0).getAuthors().get(0).getNickname()))
-			.andExpect(jsonPath("$.comments.voices[0].authors[0].achievement.id").value(
-				response.comments().getVoices().get(0).getAuthors().get(0).getAchievement().id()))
-			.andExpect(jsonPath("$.comments.voices[0].authors[0].achievement.name").value(
-				response.comments().getVoices().get(0).getAuthors().get(0).getAchievement().name()))
-			.andExpect(jsonPath("$.comments.voices[0].authors[0].createdAt").value(
-				response.comments().getVoices().get(0).getAuthors().get(0).getCreatedAt().format(formatter)
-			))
-
-			// comments.temporaryVoices[0]
-			.andExpect(jsonPath("$.comments.temporaryVoices[0].id").value(
-				response.comments().getTemporaryVoices().get(0).getId()))
-			.andExpect(jsonPath("$.comments.temporaryVoices[0].url").value(
-				response.comments().getTemporaryVoices().get(0).getUrl()))
-
-			// comments.temporaryVoices[0].authors[0]
-			.andExpect(jsonPath("$.comments.temporaryVoices[0].authors[0].id").value(
-				response.comments().getTemporaryVoices().get(0).getAuthors().get(0).getId()))
-			.andExpect(jsonPath("$.comments.temporaryVoices[0].authors[0].imageUrl").value(
-				response.comments().getTemporaryVoices().get(0).getAuthors().get(0).getImageUrl()))
-			.andExpect(jsonPath("$.comments.temporaryVoices[0].authors[0].nickname").value(
-				response.comments().getTemporaryVoices().get(0).getAuthors().get(0).getNickname()))
-			.andExpect(jsonPath("$.comments.temporaryVoices[0].authors[0].achievement.id").value(
-				response.comments().getTemporaryVoices().get(0).getAuthors().get(0).getAchievement().id()))
-			.andExpect(jsonPath("$.comments.temporaryVoices[0].authors[0].achievement.name").value(
-				response.comments().getTemporaryVoices().get(0).getAuthors().get(0).getAchievement().name()))
-			.andExpect(jsonPath("$.comments.temporaryVoices[0].authors[0].createdAt").value(
-				response.comments().getTemporaryVoices().get(0).getAuthors().get(0).getCreatedAt().format(formatter)
-			))
 			.andDo(document("post-read-test",
 				preprocessResponse(prettyPrint()),
 				responseFields(
@@ -155,6 +169,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("comments.emojis[].url").type(STRING).description("이모지 경로"),
 					fieldWithPath("comments.emojis[].involved").type(BOOLEAN).description("이모지 등록 여부"),
 					fieldWithPath("comments.emojis[].authors").type(ARRAY).description("이모지 등록자 목록"),
+					fieldWithPath("comments.emojis[].authors[].commentId").type(NUMBER).description("이모지 댓글 아이디"),
 					fieldWithPath("comments.emojis[].authors[].id").type(NUMBER).description("이모지 등록자 아이디"),
 					fieldWithPath("comments.emojis[].authors[].imageUrl").type(STRING).description("이모지 등록자 프로필 이미지"),
 					fieldWithPath("comments.emojis[].authors[].nickname").type(STRING).description("이모지 등록자 이름"),
@@ -169,6 +184,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("comments.voices[].url").type(STRING).description("포스트 아이디"),
 					fieldWithPath("comments.voices[].involved").type(BOOLEAN).description("포스트 아이디"),
 					fieldWithPath("comments.voices[].authors").type(ARRAY).description("보이스 등록자 목록"),
+					fieldWithPath("comments.voices[].authors[].commentId").type(NUMBER).description("보이스 댓글 아이디"),
 					fieldWithPath("comments.voices[].authors[].id").type(NUMBER).description("보이스 등록자 아이디"),
 					fieldWithPath("comments.voices[].authors[].imageUrl").type(STRING).description("보이스 등록자 프로필 이미지"),
 					fieldWithPath("comments.voices[].authors[].nickname").type(STRING).description("보이스 등록자 이름"),
@@ -182,6 +198,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("comments.temporaryVoices[].id").type(NUMBER).description("포스트 아이디"),
 					fieldWithPath("comments.temporaryVoices[].url").type(STRING).description("포스트 아이디"),
 					fieldWithPath("comments.temporaryVoices[].authors").type(ARRAY).description("버블 등록자 목록"),
+					fieldWithPath("comments.temporaryVoices[].authors[].commentId").type(NUMBER).description("버블 댓글 아이디"),
 					fieldWithPath("comments.temporaryVoices[].authors[].id").type(NUMBER).description("버블 등록자 아이디"),
 					fieldWithPath("comments.temporaryVoices[].authors[].imageUrl").type(STRING)
 						.description("버블 등록자 프로필 이미지"),
@@ -201,138 +218,92 @@ public class PostControllerDocsTest extends RestDocsSupport {
 
 	@Test
 	@DisplayName("포스트 목록 조회")
-	public void readAllTest() throws Exception {
+	public void searchAllTest() throws Exception {
 		// given
-		Long groupId = 1L;
+		setAuthentication(1L, 1L, 1L);
+
+		Long communityId = 1L;
 		Long memoryId = 1L;
 
-		// when & then
-		ReadAllPostResponse response = ReadAllPostResponse.from();
+		SearchAllPostResponse response = SearchAllPostResponse.builder()
+			.cursor(1L)
+			.hasNext(false)
+			.posts(List.of(
+				SearchPostResponse.builder()
+					.id(1L)
+					.author(PostAuthor.builder()
+						.id(1L)
+						.imageUrl("www.example.com")
+						.nickname("example")
+						.achievement(Achievement.builder()
+							.id(1L)
+							.name("example")
+							.build())
+						.build())
+					.pictures(List.of("pic1.jpg"))
+					.content("테스트 게시글입니다.")
+					.createdAt(LocalDateTime.now())
+					.comments(SearchPostResponse.Comment.builder()
+						.emojis(List.of(Emoji.builder()
+							.id(1L)
+							.url("www.example.com")
+							.authors(List.of(CommentAuthor.builder()
+								.id(1L)
+								.commentId(1L)
+								.imageUrl("www.example.com")
+								.nickname("example")
+								.achievement(Achievement.builder()
+									.id(1L)
+									.name("example")
+									.build())
+								.createdAt(LocalDateTime.now())
+								.build()))
+							.isInvolved(true)
+							.build()))
+						.voices(List.of(Voice.builder()
+							.id(1L)
+							.url("www.example.com")
+							.authors(List.of(CommentAuthor.builder()
+								.id(1L)
+								.commentId(1L)
+								.imageUrl("www.example.com")
+								.nickname("example")
+								.achievement(Achievement.builder()
+									.id(1L)
+									.name("example")
+									.build())
+								.createdAt(LocalDateTime.now())
+								.build()))
+							.isInvolved(true)
+							.build()))
+						.temporaryVoices(List.of(TemporaryVoice.builder()
+							.id(1L)
+							.url("www.example.com")
+							.authors(List.of(CommentAuthor.builder()
+								.id(1L)
+								.commentId(1L)
+								.imageUrl("www.example.com")
+								.nickname("example")
+								.achievement(Achievement.builder()
+									.id(1L)
+									.name("example")
+									.build())
+								.createdAt(LocalDateTime.now())
+								.build()))
+							.build()))
+						.build())
+					.build()
+			))
+			.build();
 
+
+		when(postService.searchAll(anyLong(), anyLong(), anyLong())).thenReturn(response);
+
+		// when & then
 		mockMvc.perform(
-				get(PATH, groupId, memoryId))
+				get(PATH, communityId, memoryId))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.cursor").value(response.cursor()))
-			.andExpect(jsonPath("$.hasNext").value(response.hasNext()))
-			.andExpect(jsonPath("$.posts[0].id").value(response.posts().get(0).id()))
-			.andExpect(jsonPath("$.posts[0].author.id").value(response.posts().get(0).author().getId()))
-			.andExpect(jsonPath("$.posts[0].author.nickname").value(response.posts().get(0).author().getNickname()))
-			.andExpect(jsonPath("$.posts[0].author.imageUrl").value(response.posts().get(0).author().getImageUrl()))
-			.andExpect(jsonPath("$.posts[0].author.achievement.id").value(
-				response.posts().get(0).author().getAchievement().id()))
-			.andExpect(jsonPath("$.posts[0].author.achievement.name").value(
-				response.posts().get(0).author().getAchievement().name()))
-			.andExpect(jsonPath("$.posts[0].pictures[0]").value(response.posts().get(0).pictures().get(0)))
-			.andExpect(jsonPath("$.posts[0].content").value(response.posts().get(0).content()))
-			.andExpect(jsonPath("$.posts[0].createdAt").value(response.posts().get(0).createdAt().format(formatter)))
-
-			// comments.emojis[0]
-			.andExpect(jsonPath("$.posts[0].comments.emojis[0].id").value(
-				response.posts().get(0).comments().getEmojis().get(0).getId()))
-			.andExpect(jsonPath("$.posts[0].comments.emojis[0].url").value(
-				response.posts().get(0).comments().getEmojis().get(0).getUrl()))
-			.andExpect(jsonPath("$.posts[0].comments.emojis[0].involved").value(
-				response.posts().get(0).comments().getEmojis().get(0).isInvolved()))
-
-			// comments.emojis[0].authors[0]
-			.andExpect(jsonPath("$.posts[0].comments.emojis[0].authors[0].id").value(
-				response.posts().get(0).comments().getEmojis().get(0).getAuthors().get(0).getId()))
-			.andExpect(jsonPath("$.posts[0].comments.emojis[0].authors[0].imageUrl").value(
-				response.posts().get(0).comments().getEmojis().get(0).getAuthors().get(0).getImageUrl()))
-			.andExpect(jsonPath("$.posts[0].comments.emojis[0].authors[0].nickname").value(
-				response.posts().get(0).comments().getEmojis().get(0).getAuthors().get(0).getNickname()))
-			.andExpect(jsonPath("$.posts[0].comments.emojis[0].authors[0].achievement.id").value(
-				response.posts().get(0).comments().getEmojis().get(0).getAuthors().get(0).getAchievement().id()))
-			.andExpect(jsonPath("$.posts[0].comments.emojis[0].authors[0].achievement.name").value(
-				response.posts().get(0).comments().getEmojis().get(0).getAuthors().get(0).getAchievement().name()))
-			.andExpect(jsonPath("$.posts[0].comments.emojis[0].authors[0].createdAt").value(
-				response.posts()
-					.get(0)
-					.comments()
-					.getEmojis()
-					.get(0)
-					.getAuthors()
-					.get(0)
-					.getCreatedAt()
-					.format(formatter)
-			))
-
-			// comments.voices[0]
-			.andExpect(jsonPath("$.posts[0].comments.voices[0].id").value(
-				response.posts().get(0).comments().getVoices().get(0).getId()))
-			.andExpect(jsonPath("$.posts[0].comments.voices[0].url").value(
-				response.posts().get(0).comments().getVoices().get(0).getUrl()))
-			.andExpect(jsonPath("$.posts[0].comments.voices[0].involved").value(
-				response.posts().get(0).comments().getVoices().get(0).isInvolved()))
-
-			// comments.voices[0].authors[0]
-			.andExpect(jsonPath("$.posts[0].comments.voices[0].authors[0].id").value(
-				response.posts().get(0).comments().getVoices().get(0).getAuthors().get(0).getId()))
-			.andExpect(jsonPath("$.posts[0].comments.voices[0].authors[0].imageUrl").value(
-				response.posts().get(0).comments().getVoices().get(0).getAuthors().get(0).getImageUrl()))
-			.andExpect(jsonPath("$.posts[0].comments.voices[0].authors[0].nickname").value(
-				response.posts().get(0).comments().getVoices().get(0).getAuthors().get(0).getNickname()))
-			.andExpect(jsonPath("$.posts[0].comments.voices[0].authors[0].achievement.id").value(
-				response.posts().get(0).comments().getVoices().get(0).getAuthors().get(0).getAchievement().id()))
-			.andExpect(jsonPath("$.posts[0].comments.voices[0].authors[0].achievement.name").value(
-				response.posts().get(0).comments().getVoices().get(0).getAuthors().get(0).getAchievement().name()))
-			.andExpect(jsonPath("$.posts[0].comments.voices[0].authors[0].createdAt").value(
-				response.posts()
-					.get(0)
-					.comments()
-					.getVoices()
-					.get(0)
-					.getAuthors()
-					.get(0)
-					.getCreatedAt()
-					.format(formatter)
-			))
-
-			// comments.temporaryVoices[0]
-			.andExpect(jsonPath("$.posts[0].comments.temporaryVoices[0].id").value(
-				response.posts().get(0).comments().getTemporaryVoices().get(0).getId()))
-			.andExpect(jsonPath("$.posts[0].comments.temporaryVoices[0].url").value(
-				response.posts().get(0).comments().getTemporaryVoices().get(0).getUrl()))
-
-			// comments.temporaryVoices[0].authors[0]
-			.andExpect(jsonPath("$.posts[0].comments.temporaryVoices[0].authors[0].id").value(
-				response.posts().get(0).comments().getTemporaryVoices().get(0).getAuthors().get(0).getId()))
-			.andExpect(jsonPath("$.posts[0].comments.temporaryVoices[0].authors[0].imageUrl").value(
-				response.posts().get(0).comments().getTemporaryVoices().get(0).getAuthors().get(0).getImageUrl()))
-			.andExpect(jsonPath("$.posts[0].comments.temporaryVoices[0].authors[0].nickname").value(
-				response.posts().get(0).comments().getTemporaryVoices().get(0).getAuthors().get(0).getNickname()))
-			.andExpect(jsonPath("$.posts[0].comments.temporaryVoices[0].authors[0].achievement.id").value(
-				response.posts()
-					.get(0)
-					.comments()
-					.getTemporaryVoices()
-					.get(0)
-					.getAuthors()
-					.get(0)
-					.getAchievement()
-					.id()))
-			.andExpect(jsonPath("$.posts[0].comments.temporaryVoices[0].authors[0].achievement.name").value(
-				response.posts()
-					.get(0)
-					.comments()
-					.getTemporaryVoices()
-					.get(0)
-					.getAuthors()
-					.get(0)
-					.getAchievement()
-					.name()))
-			.andExpect(jsonPath("$.posts[0].comments.temporaryVoices[0].authors[0].createdAt").value(
-				response.posts()
-					.get(0)
-					.comments()
-					.getTemporaryVoices()
-					.get(0)
-					.getAuthors()
-					.get(0)
-					.getCreatedAt()
-					.format(formatter)
-			))
 			.andDo(document("post-read-all-test",
 				preprocessResponse(prettyPrint()),
 				responseFields(
@@ -357,6 +328,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("posts[].comments.emojis[].url").type(STRING).description("이모지 경로"),
 					fieldWithPath("posts[].comments.emojis[].involved").type(BOOLEAN).description("이모지 등록 여부"),
 					fieldWithPath("posts[].comments.emojis[].authors").type(ARRAY).description("이모지 등록자 목록"),
+					fieldWithPath("posts[].comments.emojis[].authors[].commentId").type(NUMBER).description("이미지 댓글 아이디"),
 					fieldWithPath("posts[].comments.emojis[].authors[].id").type(NUMBER).description("이모지 등록자 아이디"),
 					fieldWithPath("posts[].comments.emojis[].authors[].imageUrl").type(STRING)
 						.description("이모지 등록자 프로필 이미지"),
@@ -375,6 +347,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("posts[].comments.voices[].url").type(STRING).description("포스트 아이디"),
 					fieldWithPath("posts[].comments.voices[].involved").type(BOOLEAN).description("포스트 아이디"),
 					fieldWithPath("posts[].comments.voices[].authors").type(ARRAY).description("보이스 등록자 목록"),
+					fieldWithPath("posts[].comments.voices[].authors[].commentId").type(NUMBER).description("보이스 댓글 아이디"),
 					fieldWithPath("posts[].comments.voices[].authors[].id").type(NUMBER).description("보이스 등록자 아이디"),
 					fieldWithPath("posts[].comments.voices[].authors[].imageUrl").type(STRING)
 						.description("보이스 등록자 프로필 이미지"),
@@ -392,6 +365,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("posts[].comments.temporaryVoices[].id").type(NUMBER).description("포스트 아이디"),
 					fieldWithPath("posts[].comments.temporaryVoices[].url").type(STRING).description("포스트 아이디"),
 					fieldWithPath("posts[].comments.temporaryVoices[].authors").type(ARRAY).description("버블 등록자 목록"),
+					fieldWithPath("posts[].comments.temporaryVoices[].authors[].commentId").type(NUMBER).description("버블 댓글 아이디"),
 					fieldWithPath("posts[].comments.temporaryVoices[].authors[].id").type(NUMBER)
 						.description("버블 등록자 아이디"),
 					fieldWithPath("posts[].comments.temporaryVoices[].authors[].imageUrl").type(STRING)
@@ -414,7 +388,9 @@ public class PostControllerDocsTest extends RestDocsSupport {
 	@DisplayName("포스트 생성")
 	public void createTest() throws Exception {
 		// given
-		Long groupId = 1L;
+		setAuthentication(1L, 1L, 1L);
+
+		Long communityId = 1L;
 		Long memoryId = 1L;
 
 		CreatePostRequest request = CreatePostRequest.builder()
@@ -437,9 +413,11 @@ public class PostControllerDocsTest extends RestDocsSupport {
 			"sample image content".getBytes()
 		);
 
+		doNothing().when(postService).create(anyLong(), anyLong(), anyLong(), anyString(), eq(List.of(file)));
+
 		// when & then
 		mockMvc.perform(
-				multipart(PATH, groupId, memoryId)
+				multipart(PATH, communityId, memoryId)
 					.file(requestPart)
 					.file(file)
 					.contentType(MULTIPART_FORM_DATA)
@@ -463,7 +441,10 @@ public class PostControllerDocsTest extends RestDocsSupport {
 	@Test
 	@DisplayName("포스트 수정")
 	public void updateTest() throws Exception {
-		Long groupId = 1L;
+		// given
+		setAuthentication(1L, 1L, 1L);
+
+		Long communityId = 1L;
 		Long memoryId = 1L;
 		Long postId = 1L;
 
@@ -489,9 +470,11 @@ public class PostControllerDocsTest extends RestDocsSupport {
 			"new image content 1".getBytes()
 		);
 
+		doNothing().when(postService).update(anyLong(), anyLong(), anyLong(), anyString(), anyList(), eq(List.of(file)));
+
 		// when & then
 		mockMvc.perform(
-				multipart(PATH + "/{postId}", groupId, memoryId, postId)
+				multipart(PATH + "/{postId}", communityId, memoryId, postId)
 					.file(requestPart)
 					.file(file)
 					.contentType(MULTIPART_FORM_DATA)
@@ -517,13 +500,17 @@ public class PostControllerDocsTest extends RestDocsSupport {
 	@DisplayName("포스트 삭제")
 	public void deleteTest() throws Exception {
 		// given
-		Long groupId = 1L;
+		setAuthentication(1L, 1L, 1L);
+
+		Long communityId = 1L;
 		Long memoryId = 1L;
 		Long postId = 1L;
 
+		doNothing().when(postService).delete(anyLong(), anyLong(), anyLong());
+
 		// when & then
 		mockMvc.perform(
-				delete(PATH + "/{postId}", groupId, memoryId, postId))
+				delete(PATH + "/{postId}", communityId, memoryId, postId))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andDo(document("post-delete-test"));

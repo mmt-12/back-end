@@ -13,10 +13,15 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.memento.server.annotation.AssociateId;
+import com.memento.server.annotation.CommunityId;
 import com.memento.server.api.controller.post.dto.CreatePostRequest;
-import com.memento.server.api.controller.post.dto.ReadAllPostResponse;
-import com.memento.server.api.controller.post.dto.ReadPostResponse;
+import com.memento.server.api.controller.post.dto.SearchAllPostResponse;
+import com.memento.server.api.controller.post.dto.SearchPostResponse;
 import com.memento.server.api.controller.post.dto.UpdatePostRequest;
+import com.memento.server.api.service.post.PostService;
+import com.memento.server.common.error.ErrorCodes;
+import com.memento.server.common.exception.MementoException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,42 +30,82 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostController {
 
+	private final PostService postService;
+
 	@GetMapping("/{postId}")
-	public ResponseEntity<ReadPostResponse> read(
+	public ResponseEntity<SearchPostResponse> search(
+		@CommunityId Long currentCommunityId,
+		@AssociateId Long currentAssociateId,
+		@PathVariable Long communityId,
 		@PathVariable Long postId
 	){
-		return ResponseEntity.ok(ReadPostResponse.from());
+		if (!currentCommunityId.equals(communityId)) {
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
+		}
+		return ResponseEntity.ok(postService.search(communityId, currentAssociateId, postId));
 	}
 
 	@GetMapping()
-	public ResponseEntity<ReadAllPostResponse> readAll(
+	public ResponseEntity<SearchAllPostResponse> searchAll(
+		@CommunityId Long currentCommunityId,
+		@AssociateId Long currentAssociateId,
+		@PathVariable Long communityId,
 		@PathVariable Long memoryId
 	){
-		return ResponseEntity.ok(ReadAllPostResponse.from());
+		if (!currentCommunityId.equals(communityId)) {
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
+		}
+
+		return ResponseEntity.ok(postService.searchAll(communityId, currentAssociateId, memoryId));
 	}
 
 	@PostMapping()
 	public ResponseEntity<Void> create(
+		@CommunityId Long currentCommunityId,
+		@AssociateId Long currentAssociateId,
+		@PathVariable Long communityId,
 		@PathVariable Long memoryId,
 		@RequestPart CreatePostRequest request,
 		@RequestPart(required = false) List<MultipartFile> pictures
 	){
+		if (!currentCommunityId.equals(communityId)) {
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
+		}
+
+		postService.create(communityId, currentAssociateId, memoryId, request.content(), pictures);
 		return ResponseEntity.ok().build();
 	}
 
 	@PutMapping("/{postId}")
 	public ResponseEntity<Void> update(
+		@CommunityId Long currentCommunityId,
+		@AssociateId Long currentAssociateId,
+		@PathVariable Long communityId,
 		@PathVariable Long postId,
 		@RequestPart UpdatePostRequest request,
-		@RequestPart(required = false) List<MultipartFile> nswPictures
+		@RequestPart(required = false) List<MultipartFile> newPictures
 	) {
+		if (!currentCommunityId.equals(communityId)) {
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
+		}
+
+		postService.update(communityId, currentAssociateId, postId, request.content(), request.oldPictures(), newPictures);
+
 		return ResponseEntity.ok().build();
 	}
 
 	@DeleteMapping("/{postId}")
 	public ResponseEntity<Void> delete(
+		@CommunityId Long currentCommunityId,
+		@AssociateId Long currentAssociateId,
+		@PathVariable Long communityId,
 		@PathVariable Long postId
 	) {
+		if (!currentCommunityId.equals(communityId)) {
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
+		}
+
+		postService.delete(communityId, currentAssociateId, postId);
 		return ResponseEntity.ok().build();
 	}
 }

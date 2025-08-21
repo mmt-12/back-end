@@ -12,16 +12,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 public class CommentAuthor extends Author{
+	Long commentId;
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	LocalDateTime createdAt;
-
-	public static CommentAuthor from() {
-		return CommentAuthor.builder()
-			.id(1L)
-			.nickname("이중혁")
-			.imageUrl("https://aws.s3.memento/1")
-			.achievement(Achievement.from())
-			.createdAt(LocalDateTime.of(2025,07,12,10,30,00))
-			.build();
-	}
 }

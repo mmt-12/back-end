@@ -48,4 +48,8 @@ public class Post extends BaseEntity {
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "associate_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Associate associate;
+
+	public void updateContent(String content) {
+		this.content = content;
+	}
 }
