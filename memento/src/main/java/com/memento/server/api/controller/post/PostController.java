@@ -2,6 +2,8 @@ package com.memento.server.api.controller.post;
 
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,12 +40,13 @@ public class PostController {
 		@CommunityId Long currentCommunityId,
 		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
+		@PathVariable Long memoryId,
 		@PathVariable Long postId
 	){
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
-		return ResponseEntity.ok(postService.search(communityId, currentAssociateId, postId));
+		return ResponseEntity.ok(postService.search(communityId, memoryId, currentAssociateId, postId));
 	}
 
 	@GetMapping()
@@ -50,13 +54,16 @@ public class PostController {
 		@CommunityId Long currentCommunityId,
 		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
-		@PathVariable Long memoryId
+		@PathVariable Long memoryId,
+		@RequestParam(required = false, defaultValue = "10") int size,
+		@RequestParam(required = false) Long cursor
 	){
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
-		return ResponseEntity.ok(postService.searchAll(communityId, currentAssociateId, memoryId));
+		Pageable pageable = PageRequest.of(0, size);
+		return ResponseEntity.ok(postService.searchAll(communityId, currentAssociateId, memoryId, pageable, cursor));
 	}
 
 	@PostMapping()
@@ -82,6 +89,7 @@ public class PostController {
 		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long postId,
+		@PathVariable Long memoryId,
 		@RequestPart UpdatePostRequest request,
 		@RequestPart(required = false) List<MultipartFile> newPictures
 	) {
@@ -89,7 +97,7 @@ public class PostController {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
-		postService.update(communityId, currentAssociateId, postId, request.content(), request.oldPictures(), newPictures);
+		postService.update(communityId, memoryId, currentAssociateId, postId, request.content(), request.oldPictures(), newPictures);
 
 		return ResponseEntity.ok().build();
 	}
@@ -99,13 +107,14 @@ public class PostController {
 		@CommunityId Long currentCommunityId,
 		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
+		@PathVariable Long memoryId,
 		@PathVariable Long postId
 	) {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
-		postService.delete(communityId, currentAssociateId, postId);
+		postService.delete(communityId, memoryId, currentAssociateId, postId);
 		return ResponseEntity.ok().build();
 	}
 }

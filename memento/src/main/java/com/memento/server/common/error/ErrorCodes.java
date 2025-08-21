@@ -84,6 +84,9 @@ public enum ErrorCodes implements ErrorCode {
 
 	MEMORY_NOT_FOUND(BAD_REQUEST, 11000, "존재하지 않는 기억입니다."),
 	MEMORY_NOT_AUTHOR(BAD_REQUEST, 11001, "기억의 작성자가 아닙니다."),
+	MEMORY_POST_NOT_MATCH(BAD_REQUEST, 11002, "해당 기억의 포스트가 아닙니다."),
+
+	POST_NOT_EXISTENCE(BAD_REQUEST, 12000, "존재하지 않는 포스트입니다."),
 	;
 	private final HttpStatus status;
 	private final int code;

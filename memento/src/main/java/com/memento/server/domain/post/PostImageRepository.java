@@ -1,5 +1,6 @@
 package com.memento.server.domain.post;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,4 +28,8 @@ public interface PostImageRepository extends JpaRepository<PostImage, Long> {
 		ORDER BY pi.id DESC
 		""")
 	List<PostImage> findAllByMemory(@Param("memory") Memory memory);
+
+	List<PostImage> findByPostIdAndDeletedAtNull(Long postId);
+
+	List<PostImage> findAllByPostIdInAndDeletedAtNull(List<Long> postIds);
 }
