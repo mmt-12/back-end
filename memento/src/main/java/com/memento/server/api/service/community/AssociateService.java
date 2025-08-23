@@ -28,10 +28,9 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class AssociateService {
 
-	private final AssociateRepository repository;
+	private final AssociateRepository associateRepository;
 	private final CommunityRepository communityRepository;
 	private final AchievementRepository achievementRepository;
-
 
 	public AssociateListResponse searchAll(
 		Long communityId,
@@ -39,12 +38,12 @@ public class AssociateService {
 		Long cursor,
 		Integer size
 	) {
-		Optional<Community> communityOptional = communityRepository.findById(communityId);
+		Optional<Community> communityOptional = communityRepository.findByIdAndDeletedAtIsNull(communityId);
 		if (communityOptional.isEmpty()) {
 			throw new MementoException(COMMUNITY_NOT_FOUND);
 		}
 
-		List<Associate> associates = repository.findAllByCommunityIdAndKeywordWithCursor(
+		List<Associate> associates = associateRepository.findAllByCommunityIdAndKeywordWithCursor(
 			communityId,
 			keyword,
 			cursor,
@@ -55,13 +54,13 @@ public class AssociateService {
 	}
 
 	public CommunityListResponse searchAllMyAssociate(Long memberId) {
-		List<Associate> associates = repository.findAllByMemberId(memberId);
+		List<Associate> associates = associateRepository.findAllByMemberIdAndDeletedAtIsNull(memberId);
 
 		return CommunityListResponse.from(associates);
 	}
 
 	public Associate validAssociate(Long communityId, Long associateId){
-		Associate associate = repository.findByIdAndDeletedAtNull(associateId)
+		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
 			.orElseThrow(() -> new MementoException(ErrorCodes.ASSOCIATE_NOT_EXISTENCE));
 		if(!communityId.equals(associate.getCommunity().getId())){
 			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);

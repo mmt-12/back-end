@@ -305,7 +305,7 @@ public class AssociateServiceTest{
 		);
 
 		// then
-		Associate updatedAssociate = associateRepository.findById(associate.getId())
+		Associate updatedAssociate = associateRepository.findByIdAndDeletedAtIsNull(associate.getId())
 			.orElseThrow();
 
 		assertThat(updatedAssociate.getProfileImageUrl()).isEqualTo("new-image");

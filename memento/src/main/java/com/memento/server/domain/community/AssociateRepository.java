@@ -18,6 +18,7 @@ public interface AssociateRepository extends JpaRepository<Associate, Long> {
 		WHERE a.community.id = :communityId
 		  AND (:keyword IS NULL OR a.nickname LIKE CONCAT('%', :keyword, '%'))
 		  AND (:cursor IS NULL OR a.id < :cursor)
+		  AND (a.deletedAt IS NULL)
 		ORDER BY a.id DESC
 		""")
 	List<Associate> findAllByCommunityIdAndKeywordWithCursor(
@@ -27,5 +28,9 @@ public interface AssociateRepository extends JpaRepository<Associate, Long> {
 		Pageable pageable
 	);
 
-	List<Associate> findAllByMemberId(Long memberId);
+	List<Associate> findAllByMemberIdAndDeletedAtIsNull(Long memberId);
+
+	Optional<Associate> findByIdAndDeletedAtIsNull(Long id);
+
+	List<Associate> findAllByIdInAndDeletedAtIsNull(List<Long> ids);
 }

@@ -2,6 +2,7 @@ package com.memento.server.domain.memory;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +19,7 @@ public interface MemoryRepository extends JpaRepository<Memory, Long> {
 		  AND (:startDate IS NULL OR m.event.period.startTime >= :startDate)
 		  AND (:endDate IS NULL OR m.event.period.endTime <= :endDate)
 		  AND (:cursor IS NULL OR m.id < :cursor)
+		  AND (m.deletedAt IS NULL)
 		ORDER BY m.id DESC
 		""")
 	List<Memory> findAllByConditions(
@@ -28,4 +30,6 @@ public interface MemoryRepository extends JpaRepository<Memory, Long> {
 		@Param("cursor") Long cursor,
 		Pageable pageable
 	);
+
+	Optional<Memory> findByIdAndDeletedAtIsNull(Long id);
 }
