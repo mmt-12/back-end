@@ -40,7 +40,6 @@ public class VoiceController {
 
 	@PostMapping
 	public ResponseEntity<Void> createVoice(@AssociateId Long associateId,
-		@PathVariable("communityId") Long communityId,
 		@Valid @RequestPart("data") VoiceCreateRequest request,
 		@NotNull(message = "voice 값은 필수입니다.") @RequestPart("voice") MultipartFile voice) {
 		fileValidator.validateVoiceFile(voice);
