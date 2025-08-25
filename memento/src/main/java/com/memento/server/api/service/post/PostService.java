@@ -3,6 +3,7 @@ package com.memento.server.api.service.post;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 
 import java.io.InputStream;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,12 +27,14 @@ import com.memento.server.api.service.post.dto.PostCommentDto;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.config.MinioProperties;
+import com.memento.server.domain.comment.Comment;
 import com.memento.server.domain.comment.CommentRepository;
 import com.memento.server.domain.comment.CommentType;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.memory.MemoryRepository;
+import com.memento.server.domain.post.Hash;
 import com.memento.server.domain.post.Post;
 import com.memento.server.domain.post.PostImage;
 import com.memento.server.domain.post.PostImageRepository;
@@ -115,7 +118,7 @@ public class PostService {
 		Long lastCursor = null;
 		boolean hasNext = false;
 		if(posts.size() == pageable.getPageSize()){
-			lastCursor = posts.get(posts.size() - 1).getId();
+			lastCursor = posts.getLast().getId();
 			hasNext = true;
 		}
 
@@ -161,11 +164,14 @@ public class PostService {
 		}
 
 		List<PostImage> images = postImageRepository.findByPostIdAndDeletedAtNull(postId);
-		for(PostImage image : images){
-			if(oldPictures.contains(image.getId())){
-				continue;
-			}
-			image.markDeleted();
+		List<Long> deleteIds = images.stream()
+			.map(PostImage::getId)
+			.filter(id -> !oldPictures.contains(id))
+			.toList();
+
+		if(!deleteIds.isEmpty()){
+			postImageRepository.deleteAllById(deleteIds);
+			postImageRepository.flush();
 		}
 
 		if(newPictures != null){
@@ -181,6 +187,18 @@ public class PostService {
 
 		if(!post.getAssociate().equals(associate)){
 			throw new MementoException(ErrorCodes.ASSOCIATE_NOT_AUTHORITY);
+		}
+
+		Map<Post, List<PostImage>> imagesByPostId = postImageRepository
+			.findAllByPostIdInAndDeletedAtNull(List.of(postId))
+			.stream()
+			.collect(Collectors.groupingBy(PostImage::getPost));
+
+		postImageRepository.deleteAll(imagesByPostId.get(post));
+
+		List<Comment> comments = commentRepository.findAllByPostIdAndDeletedAtNull(post.getId());
+		for(Comment comment : comments){
+			comment.markDeleted();
 		}
 
 		post.markDeleted();
@@ -273,10 +291,11 @@ public class PostService {
 				.id(post.getAssociate().getId())
 				.imageUrl(post.getAssociate().getProfileImageUrl())
 				.nickname(post.getAssociate().getNickname())
-				.achievement(Achievement.builder()
-					.id(post.getAssociate().getAchievement().getId())
-					.name(post.getAssociate().getAchievement().getName())
-					.build())
+				.achievement(post.getAssociate().getAchievement() == null ? null :
+					Achievement.builder()
+						.id(post.getAssociate().getAchievement().getId())
+						.name(post.getAssociate().getAchievement().getName())
+						.build())
 				.build())
 			.content(post.getContent())
 			.pictures(images.stream().map(PostImage::getUrl).toList())
@@ -284,7 +303,7 @@ public class PostService {
 			.build();
 	}
 
-	private List<PostImage> saveImages(Post post, List<MultipartFile> pictures) {
+	public List<PostImage> saveImages(Post post, List<MultipartFile> pictures) {
 		String bucket = minioProperties.getBucket();
 		String baseUrl = minioProperties.getUrl();
 
@@ -294,6 +313,7 @@ public class PostService {
 			String extension = getExtension(originalFilename);
 			String filename = "post/"+ post.getId() +"/" + UUID.randomUUID() + "." + extension;
 			String expectedContentType = "image/" + extension;
+			Hash hash = null;
 
 			try (InputStream inputStream = image.getInputStream()) {
 				long contentLength = image.getSize();
@@ -307,6 +327,18 @@ public class PostService {
 						.build()
 				);
 
+				MessageDigest digest = MessageDigest.getInstance("SHA-256");
+				byte[] bytes = image.getBytes();
+				byte[] hashBytes = digest.digest(bytes);
+
+				StringBuilder sb = new StringBuilder();
+				for(byte b : hashBytes) {
+					sb.append(String.format("%02x", b));
+				}
+				hash = Hash.builder()
+					.hash(sb.toString())
+					.build();
+
 			} catch (Exception e) {
 				throw new MementoException(ErrorCodes.PROFILEIMAGE_SAVE_FAIL);
 			}
@@ -314,6 +346,7 @@ public class PostService {
 			images.add(PostImage.builder()
 					.url(baseUrl + "/" + filename)
 					.post(post)
+					.hash(hash)
 				.build());
 		}
 		return images;

@@ -15,7 +15,6 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
-import static org.springframework.restdocs.payload.JsonFieldType.NULL;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
@@ -27,7 +26,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
@@ -37,6 +35,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.memento.server.api.controller.post.PostController;
@@ -50,7 +50,6 @@ import com.memento.server.api.controller.post.dto.read.Emoji;
 import com.memento.server.api.controller.post.dto.read.PostAuthor;
 import com.memento.server.api.controller.post.dto.read.TemporaryVoice;
 import com.memento.server.api.controller.post.dto.read.Voice;
-import com.memento.server.api.service.guestBook.GuestBookService;
 import com.memento.server.api.service.post.PostService;
 import com.memento.server.docs.RestDocsSupport;
 
@@ -141,7 +140,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 				.build())
 			.build();
 
-		when(postService.search(anyLong(), anyLong(), anyLong())).thenReturn(response);
+		when(postService.search(anyLong(), anyLong(), anyLong(), anyLong())).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(
@@ -224,9 +223,12 @@ public class PostControllerDocsTest extends RestDocsSupport {
 
 		Long communityId = 1L;
 		Long memoryId = 1L;
+		int size = 10;
+		Long cursor = 100L;
+		Pageable pageable = PageRequest.of(0, size);
 
 		SearchAllPostResponse response = SearchAllPostResponse.builder()
-			.cursor(1L)
+			.cursor(cursor)
 			.hasNext(false)
 			.posts(List.of(
 				SearchPostResponse.builder()
@@ -297,7 +299,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 			.build();
 
 
-		when(postService.searchAll(anyLong(), anyLong(), anyLong())).thenReturn(response);
+		when(postService.searchAll(anyLong(), anyLong(), anyLong(), eq(pageable), anyLong())).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(
@@ -470,7 +472,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 			"new image content 1".getBytes()
 		);
 
-		doNothing().when(postService).update(anyLong(), anyLong(), anyLong(), anyString(), anyList(), eq(List.of(file)));
+		doNothing().when(postService).update(anyLong(), anyLong(), anyLong(), anyLong(), anyString(), anyList(), eq(List.of(file)));
 
 		// when & then
 		mockMvc.perform(
@@ -506,7 +508,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 		Long memoryId = 1L;
 		Long postId = 1L;
 
-		doNothing().when(postService).delete(anyLong(), anyLong(), anyLong());
+		doNothing().when(postService).delete(anyLong(), anyLong(), anyLong(), anyLong());
 
 		// when & then
 		mockMvc.perform(

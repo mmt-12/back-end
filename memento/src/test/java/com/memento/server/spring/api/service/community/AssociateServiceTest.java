@@ -4,7 +4,6 @@ import static com.memento.server.common.error.ErrorCodes.COMMUNITY_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
 
 import java.time.LocalDate;
 

@@ -1,6 +1,5 @@
 package com.memento.server.domain.comment;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,4 +30,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 		@Param("postIds") List<Long> postIds,
 		@Param("associateId") Long associateId
 	);
+
+	List<Comment> findAllByPostIdAndDeletedAtNull(Long id);
 }

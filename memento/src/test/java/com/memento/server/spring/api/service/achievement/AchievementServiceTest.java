@@ -1,14 +1,10 @@
 package com.memento.server.spring.api.service.achievement;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.memento.server.api.controller.achievement.dto.SearchAchievementResponse;
 import com.memento.server.api.service.achievement.AchievementService;
-import com.memento.server.api.service.achievement.dto.SearchAchievementDto;
 import com.memento.server.domain.achievement.Achievement;
 import com.memento.server.domain.achievement.AchievementRepository;
 import com.memento.server.domain.achievement.AchievementType;
@@ -46,6 +41,14 @@ public class AchievementServiceTest{
 
 	@Autowired
 	protected AchievementRepository achievementRepository;
+
+	@AfterEach
+	void afterEach() {
+		memberRepository.deleteAll();
+		communityRepository.deleteAll();
+		associateRepository.deleteAll();
+		achievementRepository.deleteAll();
+	}
 
 	@Test
 	@DisplayName("업적 조회")
