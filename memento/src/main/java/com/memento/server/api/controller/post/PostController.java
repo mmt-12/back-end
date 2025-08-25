@@ -26,6 +26,7 @@ import com.memento.server.api.service.post.PostService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -72,7 +73,7 @@ public class PostController {
 		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long memoryId,
-		@RequestPart CreatePostRequest request,
+		@RequestPart @Valid CreatePostRequest request,
 		@RequestPart(required = false) List<MultipartFile> pictures
 	){
 		if (!currentCommunityId.equals(communityId)) {
@@ -90,7 +91,7 @@ public class PostController {
 		@PathVariable Long communityId,
 		@PathVariable Long postId,
 		@PathVariable Long memoryId,
-		@RequestPart UpdatePostRequest request,
+		@RequestPart @Valid UpdatePostRequest request,
 		@RequestPart(required = false) List<MultipartFile> newPictures
 	) {
 		if (!currentCommunityId.equals(communityId)) {

@@ -400,7 +400,6 @@ public class PostControllerDocsTest extends RestDocsSupport {
 			.build();
 		String requestJson = objectMapper.writeValueAsString(request);
 
-		// JSON 파트
 		MockMultipartFile requestPart = new MockMultipartFile(
 			"request",
 			"",
@@ -456,7 +455,6 @@ public class PostControllerDocsTest extends RestDocsSupport {
 			.build();
 		String requestJson = objectMapper.writeValueAsString(request);
 
-		// JSON 파트
 		MockMultipartFile requestPart = new MockMultipartFile(
 			"request",
 			"",
@@ -464,7 +462,6 @@ public class PostControllerDocsTest extends RestDocsSupport {
 			requestJson.getBytes()
 		);
 
-		// 파일 여러 개
 		MockMultipartFile file = new MockMultipartFile(
 			"nswPictures",
 			"newImage1.png",

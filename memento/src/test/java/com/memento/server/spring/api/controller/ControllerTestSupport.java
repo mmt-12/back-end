@@ -15,6 +15,7 @@ import com.memento.server.api.controller.community.AssociateController;
 import com.memento.server.api.controller.emoji.EmojiController;
 import com.memento.server.api.controller.guestBook.GuestBookController;
 import com.memento.server.api.controller.mbti.MbtiController;
+import com.memento.server.api.controller.post.PostController;
 import com.memento.server.api.controller.profileImage.ProfileImageController;
 import com.memento.server.api.controller.notification.NotificationController;
 import com.memento.server.api.controller.voice.VoiceController;
@@ -25,6 +26,7 @@ import com.memento.server.api.service.emoji.EmojiService;
 import com.memento.server.api.service.guestBook.GuestBookService;
 import com.memento.server.api.service.mbti.MbtiService;
 import com.memento.server.api.service.member.MemberService;
+import com.memento.server.api.service.post.PostService;
 import com.memento.server.api.service.profileImage.ProfileImageService;
 import com.memento.server.api.service.notification.NotificationService;
 
@@ -44,6 +46,7 @@ import com.memento.server.spring.config.TestSecurityConfig;
 	MbtiController.class,
 	ProfileImageController.class,
 	NotificationController.class,
+	PostController.class,
 })
 @Import({TestSecurityConfig.class, JwtTokenProvider.class})
 @EnableConfigurationProperties(JwtProperties.class)
@@ -81,6 +84,9 @@ public abstract class ControllerTestSupport {
 
 	@MockitoBean
 	protected MemberService memberService;
+
+	@MockitoBean
+	protected PostService postService;
   
   @MockitoBean
   protected NotificationService notificationService;
