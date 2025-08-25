@@ -100,7 +100,7 @@ class MemberServiceTest {
 		MemberSignUpResponse response = memberService.signUp(kakaoId, name, email, birthday);
 
 		// then
-		Member saved = memberRepository.findByKakaoId(kakaoId).orElseThrow();
+		Member saved = memberRepository.findByKakaoIdAndDeletedAtIsNull(kakaoId).orElseThrow();
 		assertThat(saved.getName()).isEqualTo(name);
 		assertThat(saved.getEmail()).isEqualTo(email);
 		assertThat(response.memberId()).isEqualTo(saved.getId());
@@ -136,7 +136,7 @@ class MemberServiceTest {
 		memberService.update(member.getId(), "김철수", "kim@test.com");
 
 		// then
-		Member updated = memberRepository.findById(member.getId()).orElseThrow();
+		Member updated = memberRepository.findByIdAndDeletedAtIsNull(member.getId()).orElseThrow();
 		assertThat(updated.getName()).isEqualTo("김철수");
 		assertThat(updated.getEmail()).isEqualTo("kim@test.com");
 	}

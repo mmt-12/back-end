@@ -7,7 +7,7 @@ import lombok.Builder;
 @Builder
 public record ReadAllMemoryRequest(
 	Long cursor,
-	Long size,
+	Integer size,
 	String keyword,
 	LocalDate startDate,
 	LocalDate endDate

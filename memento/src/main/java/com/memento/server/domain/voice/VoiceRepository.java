@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface VoiceRepository extends JpaRepository<Voice, Long>, VoiceRepositoryCustom {
 	Optional<Voice> findByIdAndDeletedAtIsNull(Long id);
+
+	Voice findByIdAndDeletedAtNull(Long contentId);
 }

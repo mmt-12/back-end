@@ -46,16 +46,23 @@ public class Notification extends BaseEntity {
 	private String content;
 
 	@Column(name = "is_read", nullable = false)
-	private Boolean isRead;
-
-	@Column(name = "end_point_id", nullable = true)
-	private Long endPointId;
+	@Builder.Default
+	private Boolean isRead = false;
 
 	@Enumerated(STRING)
 	@Column(name = "type")
 	private NotificationType type;
 
+	@Column(name = "actor_id", nullable = true)
+	private Long actorId;
+
+	@Column(name = "post_id", nullable = true)
+	private Long postId;
+
+	@Column(name = "memory_id", nullable = true)
+	private Long memoryId;
+
 	@ManyToOne(fetch = LAZY)
-	@JoinColumn(name = "associate_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
-	private Associate associate;
+	@JoinColumn(name = "receiver_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
+	private Associate receiver;
 }
