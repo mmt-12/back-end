@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,6 @@ import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
 
 @SpringBootTest
-@Transactional
 class MemberServiceTest {
 
 	@Autowired
@@ -43,6 +43,13 @@ class MemberServiceTest {
 
 	@Autowired
 	private CommunityRepository communityRepository;
+
+	@AfterEach
+	void afterEach() {
+		memberRepository.deleteAllInBatch();
+		associateRepository.deleteAllInBatch();
+		communityRepository.deleteAllInBatch();
+	}
 
 	@Test
 	@DisplayName("커뮤니티 목록을 조회한다.")
