@@ -26,6 +26,8 @@ public enum ErrorCodes implements ErrorCode {
 	VOICE_ASSOCIATE_REQUIRED(BAD_REQUEST, 2006, "보이스 작성자는 필수입니다."),
 	VOICE_FILE_TOO_LARGE(BAD_REQUEST, 2007, "음성 파일 크기는 10MB를 초과할 수 없습니다."),
 	VOICE_INVALID_FORMAT(BAD_REQUEST, 2008, "지원하지 않는 음성 파일 형식입니다."),
+	VOICE_NOT_FOUND(BAD_REQUEST, 2009, "보이스를 찾을 수 없습니다."),
+	UNAUTHORIZED_VOICE_ACCESS(BAD_REQUEST, 2010, "보이스를 삭제할 권한이 없습니다."),
 
 	IMAGE_FILE_TOO_LARGE(BAD_REQUEST, 2009, "이미지 파일 크기가 제한을 초과합니다."),
 	IMAGE_INVALID_FORMAT(BAD_REQUEST, 2010, "지원하지 않는 이미지 파일 형식입니다."),

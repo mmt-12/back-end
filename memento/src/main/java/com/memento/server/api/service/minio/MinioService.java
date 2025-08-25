@@ -8,13 +8,13 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.memento.server.config.MinioConfig;
 import com.memento.server.config.MinioProperties;
 
 import com.memento.server.common.exception.MementoException;
 
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import lombok.RequiredArgsConstructor;
 
 import static com.memento.server.common.error.ErrorCodes.MINIO_EXCEPTION;
@@ -26,24 +26,40 @@ public class MinioService {
 	private final MinioClient minioClient;
 	private final MinioProperties minioProperties;
 
-	public String createPermanentVoice(MultipartFile voice) {
+	public String createFile(MultipartFile file) {
 		try {
-			String extension = getExtension(voice.getOriginalFilename());
+			String extension = getExtension(file.getOriginalFilename());
 			String filename = UUID.randomUUID() + "." + extension;
-			long contentLength = voice.getBytes().length;
+			long contentLength = file.getBytes().length;
 
-			try (InputStream inputStream = voice.getInputStream()) {
+			try (InputStream inputStream = file.getInputStream()) {
 				minioClient.putObject(
 					PutObjectArgs.builder()
 						.bucket(minioProperties.getBucket())
 						.object(filename)
 						.stream(inputStream, contentLength, -1)
-						.contentType(voice.getContentType())
+						.contentType(file.getContentType())
 						.build()
 				);
 			}
 
 			return minioProperties.getUrl() + "/" + minioProperties.getBucket() + "/" + filename;
+		} catch (Exception e) {
+			throw new MementoException(MINIO_EXCEPTION);
+		}
+	}
+
+	public void removeFile(String url) {
+		try {
+			String prefix = minioProperties.getUrl() + "/" + minioProperties.getBucket() + "/";
+			String name = url.substring(prefix.length());
+
+			minioClient.removeObject(
+				RemoveObjectArgs.builder()
+					.bucket(minioProperties.getBucket())
+					.object(name)
+					.build()
+			);
 		} catch (Exception e) {
 			throw new MementoException(MINIO_EXCEPTION);
 		}

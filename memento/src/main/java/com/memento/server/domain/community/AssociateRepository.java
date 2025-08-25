@@ -1,6 +1,7 @@
 package com.memento.server.domain.community;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,6 @@ public interface AssociateRepository extends JpaRepository<Associate, Long> {
 	);
 
 	List<Associate> findAllByMemberId(Long memberId);
+
+	Optional<Associate> findByIdAndDeletedAtIsNull(Long id);
 }

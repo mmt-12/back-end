@@ -36,6 +36,7 @@ import com.memento.server.api.controller.voice.dto.request.VoiceCreateRequest;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
+import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
 import com.memento.server.common.validator.FileValidator;
@@ -118,7 +119,7 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 		boolean hasNext = true;
 
 		VoiceResponse voiceResponse = VoiceResponse.of(VoiceFixtures.permanentVoice());
-		VoiceListResponse response = VoiceListResponse.of(List.of(voiceResponse), cursor, size, nextCursor, hasNext);
+		VoiceListResponse response = VoiceListResponse.of(List.of(voiceResponse), PageInfo.of(hasNext, nextCursor));
 
 		given(voiceService.getVoices(any(VoiceListQueryRequest.class)))
 			.willReturn(response);
@@ -139,7 +140,7 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 				),
 				queryParameters(
 					parameterWithName("cursor").description("현재 페이지의 마지막 보이스 ID (첫 페이지는 null)").optional(),
-					parameterWithName("size").description("요청할 보이스 수 (기본값: 10)").optional(),
+					parameterWithName("size").description("요청할 보이스 수 (1-30, 기본값: 10)").optional(),
 					parameterWithName("keyword").description("보이스 이름 검색 키워드 (선택)").optional()
 				),
 				responseFields(
@@ -149,10 +150,8 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("voices[].author.id").description("보이스 작성자 ID"),
 					fieldWithPath("voices[].author.nickname").description("보이스 작성자 닉네임"),
 					fieldWithPath("voices[].author.imageUrl").description("보이스 작성자 프로필 이미지 URL"),
-					fieldWithPath("cursor").description("현재 커서 위치 (마지막으로 조회한 보이스 ID)"),
-					fieldWithPath("size").description("요청한 보이스 수"),
-					fieldWithPath("nextCursor").description("다음 페이지 커서 (더 불러올 보이스가 있을 경우)"),
-					fieldWithPath("hasNext").description("다음 페이지 존재 여부")
+					fieldWithPath("pageInfo.hasNext").description("다음 페이지 존재 여부"),
+					fieldWithPath("pageInfo.nextCursor").description("다음 페이지 커서 (더 불러올 보이스가 있을 경우)")
 				)
 			));
 

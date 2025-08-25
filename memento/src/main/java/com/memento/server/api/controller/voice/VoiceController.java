@@ -22,10 +22,14 @@ import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.common.validator.FileValidator;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/communities/{communityId}/voices")
@@ -47,7 +51,9 @@ public class VoiceController {
 	@GetMapping
 	public ResponseEntity<VoiceListResponse> getVoices(@PathVariable("communityId") Long communityId,
 		@RequestParam(required = false) Long cursor,
-		@RequestParam(required = false, defaultValue = "10") int size,
+		@RequestParam(required = false, defaultValue = "10")
+		@Min(value = 1, message = "size는 1 이상이어야 합니다.")
+		@Max(value = 30, message = "size는 30 이하여야 합니다.") int size,
 		@RequestParam(required = false) String keyword) {
 		return ResponseEntity.ok(voiceService.getVoices(VoiceListQueryRequest.of(communityId, cursor, size, keyword)));
 	}

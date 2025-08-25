@@ -23,6 +23,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import com.memento.server.api.controller.voice.dto.request.VoiceCreateRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
+import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
 import com.memento.server.common.exception.MementoException;
@@ -362,7 +363,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 		boolean hasNext = true;
 
 		VoiceResponse voiceResponse = VoiceResponse.of(VoiceFixtures.permanentVoice());
-		VoiceListResponse response = VoiceListResponse.of(List.of(voiceResponse), cursor, size, nextCursor, hasNext);
+		VoiceListResponse response = VoiceListResponse.of(List.of(voiceResponse), PageInfo.of(hasNext, nextCursor));
 
 		given(voiceService.getVoices(any(VoiceListQueryRequest.class)))
 			.willReturn(response);
@@ -377,6 +378,52 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andExpect(status().isOk());
 
 		verify(voiceService).getVoices(any(VoiceListQueryRequest.class));
+	}
+
+	@Test
+	@DisplayName("보이스 목록 조회 시 size가 1보다 작으면 예외가 발생한다.")
+	void getVoicesWithSizeTooSmall() throws Exception {
+		// given
+		long communityId = 1L;
+		int invalidSize = 0;
+
+		// when & then
+		mockMvc.perform(
+				get("/api/v1/communities/{communityId}/voices", communityId)
+					.param("size", String.valueOf(invalidSize))
+					.with(withJwt(1L, 1L, 1L)))
+			.andDo(print())
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+			.andExpect(jsonPath("$.code").value(1001))
+			.andExpect(jsonPath("$.message").value("잘못된 입력"))
+			.andExpect(jsonPath("$.errors[0].field").value("size"))
+			.andExpect(jsonPath("$.errors[0].message").value("size는 1 이상이어야 합니다."));
+
+		verify(voiceService, never()).getVoices(any(VoiceListQueryRequest.class));
+	}
+
+	@Test
+	@DisplayName("보이스 목록 조회 시 size가 30보다 크면 예외가 발생한다.")
+	void getVoicesWithSizeTooLarge() throws Exception {
+		// given
+		long communityId = 1L;
+		int invalidSize = 31;
+
+		// when & then
+		mockMvc.perform(
+				get("/api/v1/communities/{communityId}/voices", communityId)
+					.param("size", String.valueOf(invalidSize))
+					.with(withJwt(1L, 1L, 1L)))
+			.andDo(print())
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+			.andExpect(jsonPath("$.code").value(1001))
+			.andExpect(jsonPath("$.message").value("잘못된 입력"))
+			.andExpect(jsonPath("$.errors[0].field").value("size"))
+			.andExpect(jsonPath("$.errors[0].message").value("size는 30 이하여야 합니다."));
+
+		verify(voiceService, never()).getVoices(any(VoiceListQueryRequest.class));
 	}
 
 	@Test

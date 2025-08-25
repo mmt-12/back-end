@@ -1,6 +1,8 @@
 package com.memento.server.api.service.voice;
 
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
+import static com.memento.server.common.error.ErrorCodes.UNAUTHORIZED_VOICE_ACCESS;
+import static com.memento.server.common.error.ErrorCodes.VOICE_NOT_FOUND;
 
 import java.util.List;
 
@@ -12,6 +14,7 @@ import com.memento.server.api.service.voice.dto.request.PermanentVoiceCreateServ
 import com.memento.server.api.service.voice.dto.request.TemporaryVoiceCreateServiceRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
+import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
 import com.memento.server.common.exception.MementoException;
@@ -37,40 +40,36 @@ public class VoiceService {
 
 	@Transactional
 	public void createPermanentVoice(PermanentVoiceCreateServiceRequest request) {
-		String url = minioService.createPermanentVoice(request.voice());
-		Associate associate = associateRepository.findById(request.associateId())
+		Associate associate = associateRepository.findByIdAndDeletedAtIsNull(request.associateId())
 			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_FOUND));
+
+		String url = minioService.createFile(request.voice());
 		Voice voice = Voice.createPermanent(request.name(), url, associate);
 		voiceRepository.save(voice);
 	}
 
 	public VoiceListResponse getVoices(VoiceListQueryRequest request) {
-		List<Voice> voices = voiceRepository.findVoicesWithPagination(request);
-		
-		// hasNext 판단을 위해 size + 1로 조회했으므로 실제 데이터는 size만큼만 사용
-		boolean hasNext = voices.size() > request.size();
-		if (hasNext) {
-			voices = voices.subList(0, request.size());
-		}
-		
-		// Voice 엔티티를 VoiceResponse로 변환
-		List<VoiceResponse> voiceResponses = voices.stream()
-			.map(VoiceResponse::of)
-			.toList();
-		
-		// 다음 커서 계산 (마지막 보이스의 ID)
-		Long nextCursor = voices.isEmpty() ? null : voices.get(voices.size() - 1).getId();
-		
-		return VoiceListResponse.of(
-			voiceResponses,
-			request.cursor(),
-			request.size(),
-			nextCursor,
-			hasNext
-		);
+		int pageSize = request.size();
+		List<VoiceResponse> voices = voiceRepository.findVoicesByCommunityWithCursor(request);
+
+		boolean hasNext = voices.size() > pageSize;
+		List<VoiceResponse> items = hasNext ? voices.subList(0, pageSize) : voices;
+
+		Long nextCursor = (hasNext && !items.isEmpty()) ? items.getLast().id() : null;
+
+		return VoiceListResponse.of(items, PageInfo.of(hasNext, nextCursor));
 	}
 
+	@Transactional
 	public void removeVoice(VoiceRemoveRequest request) {
+		Voice voice = voiceRepository.findByIdAndDeletedAtIsNull(request.voiceId())
+			.orElseThrow(() -> new MementoException(VOICE_NOT_FOUND));
 
+		if (!voice.getAssociate().getId().equals(request.associateId())) {
+			throw new MementoException(UNAUTHORIZED_VOICE_ACCESS);
+		}
+
+		minioService.removeFile(voice.getUrl());
+		voice.markDeleted();
 	}
 }
