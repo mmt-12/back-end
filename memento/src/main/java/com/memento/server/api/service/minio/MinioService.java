@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.memento.server.config.MinioProperties;
 
 import com.memento.server.common.exception.MementoException;
+import com.memento.server.config.MinioProperties.FileType;
 
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -26,8 +27,9 @@ public class MinioService {
 	private final MinioClient minioClient;
 	private final MinioProperties minioProperties;
 
-	public String createFile(MultipartFile file) {
+	public String createFile(MultipartFile file, FileType fileType) {
 		try {
+			String bucket = minioProperties.getBucketName(fileType);
 			String extension = getExtension(file.getOriginalFilename());
 			String filename = UUID.randomUUID() + "." + extension;
 			long contentLength = file.getBytes().length;
@@ -35,7 +37,7 @@ public class MinioService {
 			try (InputStream inputStream = file.getInputStream()) {
 				minioClient.putObject(
 					PutObjectArgs.builder()
-						.bucket(minioProperties.getBucket())
+						.bucket(bucket)
 						.object(filename)
 						.stream(inputStream, contentLength, -1)
 						.contentType(file.getContentType())
@@ -43,7 +45,7 @@ public class MinioService {
 				);
 			}
 
-			return minioProperties.getUrl() + "/" + minioProperties.getBucket() + "/" + filename;
+			return minioProperties.getUrl() + "/" + bucket + "/" + filename;
 		} catch (Exception e) {
 			throw new MementoException(MINIO_EXCEPTION);
 		}
@@ -51,13 +53,16 @@ public class MinioService {
 
 	public void removeFile(String url) {
 		try {
-			String prefix = minioProperties.getUrl() + "/" + minioProperties.getBucket() + "/";
-			String name = url.substring(prefix.length());
+			String baseUrl = minioProperties.getUrl() + "/";
+			String pathAfterUrl = url.substring(baseUrl.length());
+			String[] parts = pathAfterUrl.split("/", 2);
+			String bucket = parts[0];
+			String filename = parts[1];
 
 			minioClient.removeObject(
 				RemoveObjectArgs.builder()
-					.bucket(minioProperties.getBucket())
-					.object(name)
+					.bucket(bucket)
+					.object(filename)
 					.build()
 			);
 		} catch (Exception e) {

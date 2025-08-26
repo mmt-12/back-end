@@ -1,5 +1,7 @@
 package com.memento.server.config;
 
+import java.util.Map;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,5 +16,26 @@ public class MinioProperties {
 	private String url;
 	private String accessKey;
 	private String secretKey;
-	private String bucket;
+	private Map<String, String> buckets;
+
+	public enum FileType {
+		POST("post"), 
+		VOICE("voice"), 
+		EMOJI("emoji"), 
+		PROFILE_IMAGE("profile-image");
+
+		private final String bucketKey;
+
+		FileType(String bucketKey) {
+			this.bucketKey = bucketKey;
+		}
+
+		public String getBucketKey() {
+			return bucketKey;
+		}
+	}
+
+	public String getBucketName(FileType fileType) {
+		return buckets.get(fileType.getBucketKey());
+	}
 }
