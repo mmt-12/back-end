@@ -41,6 +41,8 @@ public enum ErrorCodes implements ErrorCode {
 	EMOJI_URL_BLANK(BAD_REQUEST, 3004, "이모지 URL은 공백일 수 없습니다."),
 	EMOJI_URL_TOO_LONG(BAD_REQUEST, 3005, "이모지 URL은 최대 255자까지 입력할 수 있습니다."),
 	EMOJI_ASSOCIATE_REQUIRED(BAD_REQUEST, 3006, "이모지 작성자는 필수입니다."),
+	EMOJI_NOT_FOUND(BAD_REQUEST, 3007, "이모지를 찾을 수 없습니다."),
+	UNAUTHORIZED_EMOJI_ACCESS(BAD_REQUEST, 3008, "이모지를 삭제할 권한이 없습니다."),
 
 	MEMBER_NAME_REQUIRED(BAD_REQUEST, 4000, "회원 이름은 필수입니다."),
 	MEMBER_NAME_BLANK(BAD_REQUEST, 4001, "회원 이름은 공백일 수 없습니다."),

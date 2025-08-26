@@ -41,17 +41,6 @@ public class VoiceRepositoryTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private EntityManager em;
-	
-	private Associate createAndSaveAssociate() {
-		Member member = Member.create("김싸피", "test@example.com", null, 12345L);
-		Member savedMember = memberRepository.save(member);
-		
-		Community community = Community.create("테스트 커뮤니티", savedMember);
-		Community savedCommunity = communityRepository.save(community);
-		
-		Associate associate = Associate.create("닉네임", savedMember, savedCommunity);
-		return associateRepository.save(associate);
-	}
 
 	@Test
 	@DisplayName("id에 해당하는 voice를 조회한다.")
@@ -207,5 +196,16 @@ public class VoiceRepositoryTest extends IntegrationsTestSupport {
 		// then
 		assertThat(voices).hasSize(1);
 		assertThat(voices.get(0).name()).isEqualTo("permanent");
+	}
+
+	private Associate createAndSaveAssociate() {
+		Member member = Member.create("김싸피", "test@example.com", null, 12345L);
+		Member savedMember = memberRepository.save(member);
+
+		Community community = Community.create("테스트 커뮤니티", savedMember);
+		Community savedCommunity = communityRepository.save(community);
+
+		Associate associate = Associate.create("닉네임", savedMember, savedCommunity);
+		return associateRepository.save(associate);
 	}
 }

@@ -1,6 +1,7 @@
 package com.memento.server.api.service.emoji.dto.response;
 
 import com.memento.server.domain.community.Associate;
+import com.querydsl.core.annotations.QueryProjection;
 
 import lombok.Builder;
 
@@ -17,5 +18,10 @@ public record EmojiAuthorResponse(
 			.nickname(associate.getNickname())
 			.imageUrl(associate.getProfileImageUrl())
 			.build();
+	}
+
+	@QueryProjection
+	public EmojiAuthorResponse {
+
 	}
 }
