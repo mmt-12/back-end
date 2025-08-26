@@ -260,7 +260,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andDo(print())
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-			.andExpect(jsonPath("$.code").value(2007))
+			.andExpect(jsonPath("$.code").value(2008))
 			.andExpect(jsonPath("$.message").value("음성 파일 크기는 10MB를 초과할 수 없습니다."));
 
 		verify(fileValidator).validateVoiceFile(voice);
@@ -302,7 +302,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andDo(print())
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-			.andExpect(jsonPath("$.code").value(2008))
+			.andExpect(jsonPath("$.code").value(2009))
 			.andExpect(jsonPath("$.message").value("지원하지 않는 음성 파일 형식입니다."));
 
 		verify(fileValidator).validateVoiceFile(voice);
@@ -344,7 +344,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andDo(print())
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-			.andExpect(jsonPath("$.code").value(2008))
+			.andExpect(jsonPath("$.code").value(2009))
 			.andExpect(jsonPath("$.message").value("지원하지 않는 음성 파일 형식입니다."));
 
 		verify(fileValidator).validateVoiceFile(voice);

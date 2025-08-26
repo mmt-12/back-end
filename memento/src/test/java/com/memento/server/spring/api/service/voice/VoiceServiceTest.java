@@ -3,6 +3,7 @@ package com.memento.server.spring.api.service.voice;
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.UNAUTHORIZED_VOICE_ACCESS;
 import static com.memento.server.common.error.ErrorCodes.VOICE_NOT_FOUND;
+import static com.memento.server.config.MinioProperties.FileType.VOICE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -82,7 +83,7 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 			.voice(file)
 			.build();
 
-		given(minioService.createFile(file))
+		given(minioService.createFile(file, VOICE))
 			.willReturn(url);
 
 		// when

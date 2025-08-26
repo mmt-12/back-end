@@ -1,5 +1,16 @@
 package com.memento.server.spring.domain.memory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
@@ -15,25 +26,9 @@ import com.memento.server.domain.memory.MemoryAssociate;
 import com.memento.server.domain.memory.MemoryAssociateRepository;
 import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.domain.memory.dto.MemoryAssociateCount;
-import com.memento.server.associate.AssociateFixtures;
-import com.memento.server.memory.MemoryFixtures;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import com.memento.server.spring.api.service.IntegrationsTestSupport;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-@DataJpaTest
-@EnableJpaAuditing
-class MemoryAssociateRepositoryTest {
+class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
 
     @Autowired
     private MemoryAssociateRepository memoryAssociateRepository;

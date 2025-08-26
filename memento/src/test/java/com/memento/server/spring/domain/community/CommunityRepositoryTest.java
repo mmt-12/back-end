@@ -1,25 +1,21 @@
 package com.memento.server.spring.domain.community;
 
-import com.memento.server.domain.community.Community;
-import com.memento.server.domain.community.CommunityRepository;
-import com.memento.server.domain.member.Member;
-import com.memento.server.domain.member.MemberRepository;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@DataJpaTest
-@EnableJpaAuditing
-class CommunityRepositoryTest {
+import com.memento.server.domain.community.Community;
+import com.memento.server.domain.community.CommunityRepository;
+import com.memento.server.domain.member.Member;
+import com.memento.server.domain.member.MemberRepository;
+import com.memento.server.spring.api.service.IntegrationsTestSupport;
+
+class CommunityRepositoryTest extends IntegrationsTestSupport {
 
     @Autowired
     private CommunityRepository communityRepository;
