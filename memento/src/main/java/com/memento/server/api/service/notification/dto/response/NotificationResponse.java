@@ -1,5 +1,7 @@
 package com.memento.server.api.service.notification.dto.response;
 
+import java.time.LocalDateTime;
+
 import com.memento.server.domain.notification.Notification;
 
 import lombok.Builder;
@@ -13,7 +15,8 @@ public record NotificationResponse(
 	String type,
 	Long actorId,
 	Long memoryId,
-	Long postId
+	Long postId,
+	LocalDateTime createdAt
 ) {
 
 	public static NotificationResponse from(Notification notification) {
@@ -26,6 +29,7 @@ public record NotificationResponse(
 			.actorId(notification.getActorId())
 			.memoryId(notification.getMemoryId())
 			.postId(notification.getPostId())
+			.createdAt(notification.getCreatedAt())
 			.build();
 	}
 }
