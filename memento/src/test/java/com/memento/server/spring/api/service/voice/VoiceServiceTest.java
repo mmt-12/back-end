@@ -17,10 +17,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.api.service.voice.dto.request.PermanentVoiceCreateServiceRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
@@ -57,9 +55,6 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private VoiceService voiceService;
-
-	@MockitoBean
-	private MinioService minioService;
 
 	@AfterEach
 	public void tearDown() {
