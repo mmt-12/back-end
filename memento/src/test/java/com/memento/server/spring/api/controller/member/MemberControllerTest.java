@@ -13,20 +13,12 @@ import java.util.Date;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import com.memento.server.api.controller.member.MemberController;
 import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
 import com.memento.server.api.service.auth.jwt.JwtToken;
-import com.memento.server.api.service.community.AssociateService;
-import com.memento.server.api.service.member.MemberService;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
 
-@WebMvcTest({
-	MemberController.class
-})
 public class MemberControllerTest extends ControllerTestSupport {
 
 	@Test

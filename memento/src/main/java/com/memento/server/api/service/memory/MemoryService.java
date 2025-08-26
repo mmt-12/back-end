@@ -181,6 +181,7 @@ public class MemoryService {
 		return CreateUpdateMemoryResponse.from(memory);
 	}
 
+	@Transactional
 	public void delete(Long memoryId, Long currentAssociateId) {
 		Memory memory = memoryRepository.findByIdAndDeletedAtIsNull(memoryId).orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
 		Event event = memory.getEvent();
