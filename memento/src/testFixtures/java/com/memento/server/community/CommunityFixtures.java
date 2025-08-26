@@ -3,6 +3,7 @@ package com.memento.server.community;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.memento.server.domain.community.Community;
+import com.memento.server.domain.member.Member;
 import com.memento.server.member.MemberFixtures;
 
 public class CommunityFixtures {
@@ -16,5 +17,9 @@ public class CommunityFixtures {
 			.name(NAME)
 			.member(MemberFixtures.member())
 			.build();
+	}
+
+	public static Community communityWithMember(Member member) {
+		return Community.create(NAME, member);
 	}
 }
