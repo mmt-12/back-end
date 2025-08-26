@@ -81,6 +81,7 @@ public class NotificationControllerDocsTest extends RestDocsSupport {
 						.optional(),
 					fieldWithPath("notifications[].memoryId").description("관련된 기억 ID (추억 관련 알림의 경우)").optional(),
 					fieldWithPath("notifications[].postId").description("관련된 게시글 ID (게시글 관련 알림의 경우)").optional(),
+					fieldWithPath("notifications[].createdAt").description("알림 생성 시간"),
 					fieldWithPath("cursor").description("현재 커서 위치 (마지막으로 조회한 알림 ID)"),
 					fieldWithPath("size").description("요청한 알림 수"),
 					fieldWithPath("nextCursor").description("다음 페이지 커서 (더 불러올 알림이 있을 경우)").optional(),
