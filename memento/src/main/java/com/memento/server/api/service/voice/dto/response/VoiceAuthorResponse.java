@@ -1,6 +1,7 @@
 package com.memento.server.api.service.voice.dto.response;
 
 import com.memento.server.domain.community.Associate;
+import com.querydsl.core.annotations.QueryProjection;
 
 import lombok.Builder;
 
@@ -17,5 +18,10 @@ public record VoiceAuthorResponse(
 			.nickname(associate.getNickname())
 			.imageUrl(associate.getProfileImageUrl())
 			.build();
+	}
+
+	@QueryProjection
+	public VoiceAuthorResponse {
+
 	}
 }

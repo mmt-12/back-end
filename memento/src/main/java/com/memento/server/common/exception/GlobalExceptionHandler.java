@@ -50,12 +50,22 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException e) {
 		log.warn("ConstraintViolationException 발생: {}", e.getMessage(), e);
 		List<FieldError> errors = e.getConstraintViolations().stream()
-			.map(cv -> FieldError.of(
-				cv.getPropertyPath().toString(), cv.getMessage()))
+			.map(cv -> {
+				String propertyPath = cv.getPropertyPath().toString();
+				String fieldName = extractFieldName(propertyPath);
+				return FieldError.of(fieldName, cv.getMessage());
+			})
 			.toList();
 
 		return ResponseEntity.badRequest()
 			.body(ErrorResponse.of(INVALID_INPUT_VALUE, errors));
+	}
+
+	private String extractFieldName(String propertyPath) {
+		if (propertyPath.contains(".")) {
+			return propertyPath.substring(propertyPath.lastIndexOf(".") + 1);
+		}
+		return propertyPath;
 	}
 
 	@ExceptionHandler(MissingServletRequestPartException.class)

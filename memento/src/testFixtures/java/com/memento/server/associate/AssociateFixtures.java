@@ -4,6 +4,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.memento.server.community.CommunityFixtures;
 import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.community.Community;
+import com.memento.server.domain.member.Member;
 import com.memento.server.member.MemberFixtures;
 
 public class AssociateFixtures {
@@ -18,5 +20,9 @@ public class AssociateFixtures {
 			.member(MemberFixtures.member())
 			.community(CommunityFixtures.community())
 			.build();
+	}
+
+	public static Associate associateWithMemberAndCommunity(Member member, Community community) {
+		return Associate.create(NICKNAME, member, community);
 	}
 }

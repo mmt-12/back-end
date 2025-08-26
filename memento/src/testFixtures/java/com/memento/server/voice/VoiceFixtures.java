@@ -3,6 +3,7 @@ package com.memento.server.voice;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.memento.server.associate.AssociateFixtures;
+import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.voice.Voice;
 
 public class VoiceFixtures {
@@ -28,5 +29,9 @@ public class VoiceFixtures {
 			.temporary(false)
 			.associate(AssociateFixtures.associate())
 			.build();
+	}
+
+	public static Voice permanentVoice(String name, String url, Associate associate) {
+		return Voice.createPermanent(name, url, associate);
 	}
 }
