@@ -159,6 +159,26 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
       assertThat(foundAssociate.get().getDeletedAt()).isNull();
     }
 
+    @Test
+    @DisplayName("커뮤니티로 조회한다.")
+    void findAllByCommunity() {
+        // given
+        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+        Member member2 = memberRepository.save(Member.create("김나나", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
+        Member member3 = memberRepository.save(Member.create("김다다", "muge@test.com", LocalDate.of(1990, 1, 1), 1003L));
+        Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+        Community community2 = communityRepository.save(Community.create("테스트커뮤니티", member2));
+        associateRepository.save(Associate.create("나나", member, community));
+        associateRepository.save(Associate.create("나나", member2, community2));
+        associateRepository.save(Associate.create("다다", member3, community));
+
+        // when
+        List<Associate> associates = associateRepository.findAllByCommunity(community);
+
+        // then
+        assertThat(associates.size()).isEqualTo(2);
+    }
+
     private Associate createAndSaveAssociate() {
       Member member = MemberFixtures.member();
       Member savedMember = memberRepository.save(member);
