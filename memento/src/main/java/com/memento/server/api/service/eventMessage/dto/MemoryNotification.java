@@ -7,7 +7,8 @@ public record MemoryNotification(
 	Long memoryId,
 	Long communityId,
 	Long authorId
-) {
+) implements NotificationEvent {
+
 	public static MemoryNotification from(Long memoryId, Long communityId, Long authorId) {
 		return MemoryNotification.builder()
 			.memoryId(memoryId)
