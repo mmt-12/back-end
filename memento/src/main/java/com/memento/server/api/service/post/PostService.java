@@ -39,7 +39,6 @@ import com.memento.server.domain.post.PostImage;
 import com.memento.server.domain.post.PostImageRepository;
 import com.memento.server.domain.post.PostRepository;
 
-import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -91,7 +90,7 @@ public class PostService {
 		return mapToSearchPostResponse(post, associate, imagesByPostId, commentsByPostId);
 	}
 
-	public SearchAllPostResponse searchAll(Long communityId, Long associateId, Long memoryId, Pageable pageable, Long cursor) {
+	public SearchAllPostResponse searchAll(Long communityId, Long memoryId, Long associateId, Pageable pageable, Long cursor) {
 		Associate associate = validAssociate(communityId, associateId);
 
 		List<Post> posts = postRepository.findAllByMemoryIdAndCursor(memoryId, cursor, pageable);
@@ -127,7 +126,7 @@ public class PostService {
 	}
 
 	@Transactional
-	public void create(Long communityId, Long associateId, Long memoryId, String content, List<MultipartFile> pictures) {
+	public void create(Long communityId, Long memoryId, Long associateId, String content, List<MultipartFile> pictures) {
 		Associate associate = validAssociate(communityId, associateId);
 
 		Memory memory = memoryRepository.findByIdAndDeletedAtIsNull(memoryId)
@@ -208,7 +207,7 @@ public class PostService {
 		List<PostImage> images = imagesByPostId.getOrDefault(post, List.of());
 		List<PostCommentDto> comments = commentsByPostId.getOrDefault(post.getId(), List.of());
 
-		// === Emoji 변환 ===
+		// Emoji 변환
 		List<Emoji> emojis = comments.stream()
 			.filter(c -> c.getType() == CommentType.EMOJI)
 			.collect(Collectors.groupingBy(PostCommentDto::getUrl))
@@ -231,7 +230,7 @@ public class PostService {
 			})
 			.collect(Collectors.toList());
 
-		// === Voice 변환 ===
+		// Voice 변환
 		List<Voice> voices = comments.stream()
 			.filter(c -> c.getType() == CommentType.VOICE && !c.getIsTemporary())
 			.collect(Collectors.groupingBy(PostCommentDto::getUrl))
@@ -254,7 +253,7 @@ public class PostService {
 			})
 			.collect(Collectors.toList());
 
-		// === TemporaryVoice 변환 ===
+		// TemporaryVoice 변환
 		List<TemporaryVoice> temporaryVoices = comments.stream()
 			.filter(c -> c.getType() == CommentType.VOICE && c.getIsTemporary())
 			.collect(Collectors.groupingBy(PostCommentDto::getUrl))

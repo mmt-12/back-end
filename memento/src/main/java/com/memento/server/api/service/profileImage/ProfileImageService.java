@@ -5,6 +5,7 @@ import static org.apache.commons.io.FilenameUtils.getExtension;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
@@ -50,7 +51,7 @@ public class ProfileImageService {
 		Associate associate = validAssociate(communityId, associateId);
 		Associate registrant = validAssociate(communityId, registrantId);
 
-		String url = minioService.createFile(image, POST);
+		String url = minioService.createFile(image, MinioProperties.FileType.PROFILE_IMAGE);
 		profileImageRepository.save(ProfileImage.builder()
 				.url(url)
 				.associate(associate)
@@ -59,14 +60,14 @@ public class ProfileImageService {
 	}
 
 	@Transactional
-	public void delete(Long communityId, Long associateId, Long registrantId, Long profileImageId) {
-		Associate registrant = validAssociate(communityId, registrantId);
+	public void delete(Long communityId, Long associateId, Long ownerId, Long profileImageId) {
+		Associate owner = validAssociate(communityId, ownerId);
 		Associate associate = validAssociate(communityId, associateId);
 
 		ProfileImage profileImage = profileImageRepository.findByIdAndDeletedAtIsNull(profileImageId)
 			.orElseThrow(() -> new MementoException(ErrorCodes.PROFILEIMAGE_NOT_EXISTENCE));
 
-		if(!profileImage.getRegistrant().equals(registrant) && !profileImage.getAssociate().equals(associate)){
+		if(!profileImage.getRegistrant().equals(associate) && !owner.equals(associate)){
 			throw new MementoException(ErrorCodes.ASSOCIATE_NOT_AUTHORITY);
 		}
 
@@ -89,6 +90,7 @@ public class ProfileImageService {
 			.map(p -> SearchProfileImageResponse.ProfileImage.builder()
 				.id(p.getId())
 				.url(p.getUrl())
+				.isRegister(Objects.equals(p.getRegistrant().getId(), associate.getId()))
 				.build())
 			.toList();
 

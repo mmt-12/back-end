@@ -18,5 +18,6 @@ public record SearchProfileImageResponse(
 	public static class ProfileImage {
 		Long id;
 		String url;
+		boolean isRegister;
 	}
 }

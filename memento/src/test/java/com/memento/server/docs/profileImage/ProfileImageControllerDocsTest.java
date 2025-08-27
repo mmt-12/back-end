@@ -108,7 +108,7 @@ public class ProfileImageControllerDocsTest extends RestDocsSupport {
 
 	@Test
 	@DisplayName("프로필 이미지 조회")
-	void readTest() throws Exception {
+	void searchTest() throws Exception {
 		// given
 		setAuthentication(1L, 1L, 1L);
 
@@ -146,6 +146,7 @@ public class ProfileImageControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("profileImages").type(ARRAY).description("프로필 이미지 리스트"),
 					fieldWithPath("profileImages[].id").type(NUMBER).description("프로필 이미지 ID"),
 					fieldWithPath("profileImages[].url").type(STRING).description("프로필 이미지 경로"),
+					fieldWithPath("profileImages[].isRegister").type(BOOLEAN).description("프로필 이미지 등록 여부"),
 					fieldWithPath("cursor").type(NUMBER).description("커서 값"),
 					fieldWithPath("hasNext").type(BOOLEAN).description("다음 값 존재 여부")
 				)

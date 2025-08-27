@@ -20,13 +20,16 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.post.dto.SearchAllPostResponse;
 import com.memento.server.api.controller.post.dto.SearchPostResponse;
 import com.memento.server.api.service.post.PostService;
+import com.memento.server.associate.AssociateFixtures;
 import com.memento.server.common.exception.MementoException;
+import com.memento.server.community.CommunityFixtures;
 import com.memento.server.config.MinioProperties;
 import com.memento.server.domain.comment.Comment;
 import com.memento.server.domain.comment.CommentRepository;
@@ -51,7 +54,15 @@ import com.memento.server.domain.post.PostImageRepository;
 import com.memento.server.domain.post.PostRepository;
 import com.memento.server.domain.voice.Voice;
 import com.memento.server.domain.voice.VoiceRepository;
+import com.memento.server.emoji.EmojiFixtures;
+import com.memento.server.event.EventFixtures;
+import com.memento.server.member.MemberFixtures;
+import com.memento.server.memory.MemoryFixtures;
+import com.memento.server.post.PostFixtures;
 import com.memento.server.spring.api.service.IntegrationsTestSupport;
+import com.memento.server.voice.VoiceFixtures;
+
+import jakarta.persistence.EntityManager;
 
 public class PostServiceTest extends IntegrationsTestSupport {
 
@@ -91,9 +102,9 @@ public class PostServiceTest extends IntegrationsTestSupport {
 	@BeforeEach
 	void beforeEach() {
 		postImageRepository.deleteAll();
+		commentRepository.deleteAll();
 		emojiRepository.deleteAll();
 		voiceRepository.deleteAll();
-		commentRepository.deleteAll();
 		postRepository.deleteAll();
 		memoryRepository.deleteAll();
 		eventRepository.deleteAll();
@@ -106,84 +117,41 @@ public class PostServiceTest extends IntegrationsTestSupport {
 	@DisplayName("포스트 상세 조회")
 	void searchTest(){
 		//given
-		Member member = Member.builder()
-			.name("example")
-			.email("example@example.com")
-			.kakaoId(123L)
-			.birthday(LocalDate.of(1999, 1, 1))
-			.build();
+		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = Community.builder()
-			.member(member)
-			.name("example")
-			.build();
+		Community community = CommunityFixtures.communityWithMember(member);
 		communityRepository.save(community);
 
-		Associate associate = Associate.builder()
-			.community(community)
-			.member(member)
-			.nickname("example")
-			.build();
+		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
 		associateRepository.save(associate);
 
-		Event event = Event.builder()
-			.associate(associate)
-			.community(community)
-			.description("example")
-			.title("example")
-			.location(Location.builder()
-				.name("test")
-				.address("test")
-				.code(1)
-				.latitude(new BigDecimal("123.45"))
-				.longitude(new BigDecimal("123.45"))
-				.build())
-			.period(Period.builder()
-				.startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now())
-				.build())
-			.build();
+		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = Memory.builder()
-			.event(event)
-			.build();
+		Memory memory = MemoryFixtures.memoryWithEvent(event);
 		memoryRepository.save(memory);
 
-		Post post = Post.builder()
-			.content("test")
-			.memory(memory)
-			.associate(associate)
-			.build();
+		Post post = PostFixtures.postWithMemoryAndAssociate(memory, associate);
 		postRepository.save(post);
 
-		Voice voice = Voice.builder()
-			.name("test")
-			.associate(associate)
-			.temporary(false)
-			.url("www.test.com")
-			.build();
+		Voice voice = VoiceFixtures.permanentVoice("test", "test.mp3", associate);
 		voiceRepository.save(voice);
 
-		Emoji emoji = Emoji.builder()
-			.name("test")
-			.associate(associate)
-			.url("www.test.com")
-			.build();
+		Emoji emoji = EmojiFixtures.emoji();
 		emojiRepository.save(emoji);
 
 		Comment comment1 = Comment.builder()
 			.associate(associate)
 			.post(post)
-			.url("www.test.com")
+			.url("https://example.com/image.png")
 			.type(CommentType.EMOJI)
 			.build();
 
 		Comment comment2 = Comment.builder()
 			.associate(associate)
 			.post(post)
-			.url("www.test.com")
+			.url("test.mp3")
 			.type(CommentType.VOICE)
 			.build();
 		commentRepository.save(comment1);
@@ -193,7 +161,7 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		SearchPostResponse response = postService.search(community.getId(), memory.getId(), associate.getId(), post.getId());
 
 		//then
-		assertThat(response.content()).isEqualTo("test");
+		assertThat(response.content()).isEqualTo("content");
 
 		// author 관련 검증
 		assertThat(response.author()).isNotNull();
@@ -214,87 +182,100 @@ public class PostServiceTest extends IntegrationsTestSupport {
 	}
 
 	@Test
-	@DisplayName("포스트 목록 조회")
-	void searchAllTest(){
+	@DisplayName("다른 기억의 포스트는 조회할 수 없습니다")
+	void searchWithDifferentMemoryTest(){
 		//given
-		Member member = Member.builder()
-			.name("example")
-			.email("example@example.com")
-			.kakaoId(123L)
-			.birthday(LocalDate.of(1999, 1, 1))
-			.build();
+		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = Community.builder()
-			.member(member)
-			.name("example")
-			.build();
+		Community community = CommunityFixtures.communityWithMember(member);
 		communityRepository.save(community);
 
-		Associate associate = Associate.builder()
-			.community(community)
-			.member(member)
-			.nickname("example")
-			.build();
+		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
 		associateRepository.save(associate);
 
-		Event event = Event.builder()
-			.associate(associate)
-			.community(community)
-			.description("example")
-			.title("example")
-			.location(Location.builder()
-				.name("test")
-				.address("test")
-				.code(1)
-				.latitude(new BigDecimal("123.45"))
-				.longitude(new BigDecimal("123.45"))
-				.build())
-			.period(Period.builder()
-				.startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now())
-				.build())
-			.build();
+		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = Memory.builder()
-			.event(event)
-			.build();
+		Memory memory = MemoryFixtures.memoryWithEvent(event);
 		memoryRepository.save(memory);
 
-		Post post = Post.builder()
-			.content("test")
-			.memory(memory)
-			.associate(associate)
-			.build();
+		Event event2 = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		eventRepository.save(event2);
+
+		Memory memory2 = MemoryFixtures.memoryWithEvent(event2);
+		memoryRepository.save(memory2);
+
+		Post post = PostFixtures.postWithMemoryAndAssociate(memory, associate);
 		postRepository.save(post);
 
-		Voice voice = Voice.builder()
-			.name("test")
-			.associate(associate)
-			.temporary(false)
-			.url("www.test.com")
-			.build();
+		Voice voice = VoiceFixtures.permanentVoice("test", "test.mp3", associate);
 		voiceRepository.save(voice);
 
-		Emoji emoji = Emoji.builder()
-			.name("test")
-			.associate(associate)
-			.url("www.test.com")
-			.build();
+		Emoji emoji = EmojiFixtures.emoji();
 		emojiRepository.save(emoji);
 
 		Comment comment1 = Comment.builder()
 			.associate(associate)
 			.post(post)
-			.url("www.test.com")
+			.url("https://example.com/image.png")
 			.type(CommentType.EMOJI)
 			.build();
 
 		Comment comment2 = Comment.builder()
 			.associate(associate)
 			.post(post)
-			.url("www.test.com")
+			.url("test.mp3")
+			.type(CommentType.VOICE)
+			.build();
+		commentRepository.save(comment1);
+		commentRepository.save(comment2);
+
+		// when & then
+		assertThrows(MementoException.class, () -> postService.search(community.getId(), memory2.getId(), associate.getId(), post.getId()));
+
+
+	}
+
+	@Test
+	@DisplayName("포스트 목록 조회")
+	void searchAllTest(){
+		//given
+		Member member = MemberFixtures.member();
+		memberRepository.save(member);
+
+		Community community = CommunityFixtures.communityWithMember(member);
+		communityRepository.save(community);
+
+		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		associateRepository.save(associate);
+
+		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		eventRepository.save(event);
+
+		Memory memory = MemoryFixtures.memoryWithEvent(event);
+		memoryRepository.save(memory);
+
+		Post post = PostFixtures.postWithMemoryAndAssociate(memory, associate);
+		postRepository.save(post);
+
+		Voice voice = VoiceFixtures.permanentVoice("test", "test.mp3", associate);
+		voiceRepository.save(voice);
+
+		Emoji emoji = EmojiFixtures.emoji();
+		emojiRepository.save(emoji);
+
+		Comment comment1 = Comment.builder()
+			.associate(associate)
+			.post(post)
+			.url("https://example.com/image.png")
+			.type(CommentType.EMOJI)
+			.build();
+
+		Comment comment2 = Comment.builder()
+			.associate(associate)
+			.post(post)
+			.url("test.mp3")
 			.type(CommentType.VOICE)
 			.build();
 		commentRepository.save(comment1);
@@ -308,7 +289,7 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		//then
 		assertThat(response.cursor()).isNull();
 		assertThat(response.hasNext()).isFalse();
-		assertThat(response.posts().getFirst().content()).isEqualTo("test");
+		assertThat(response.posts().getFirst().content()).isEqualTo("content");
 
 		// author 관련 검증
 		assertThat(response.posts().getFirst().author()).isNotNull();
@@ -329,91 +310,29 @@ public class PostServiceTest extends IntegrationsTestSupport {
 	}
 
 	@Test
-	@DisplayName("포스트 목록 cursor")
-	void searchAllCursorTest(){
+	@DisplayName("포스트 목록 조회 페이지네이션")
+	void searchAllWithPaginationTest(){
 		//given
-		Member member = Member.builder()
-			.name("example")
-			.email("example@example.com")
-			.kakaoId(123L)
-			.birthday(LocalDate.of(1999, 1, 1))
-			.build();
+		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = Community.builder()
-			.member(member)
-			.name("example")
-			.build();
+		Community community = CommunityFixtures.communityWithMember(member);
 		communityRepository.save(community);
 
-		Associate associate = Associate.builder()
-			.community(community)
-			.member(member)
-			.nickname("example")
-			.build();
+		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
 		associateRepository.save(associate);
 
-		Event event = Event.builder()
-			.associate(associate)
-			.community(community)
-			.description("example")
-			.title("example")
-			.location(Location.builder()
-				.name("test")
-				.address("test")
-				.code(1)
-				.latitude(new BigDecimal("123.45"))
-				.longitude(new BigDecimal("123.45"))
-				.build())
-			.period(Period.builder()
-				.startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now())
-				.build())
-			.build();
+		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = Memory.builder()
-			.event(event)
-			.build();
+		Memory memory = MemoryFixtures.memoryWithEvent(event);
 		memoryRepository.save(memory);
 
-		Post post = Post.builder()
-			.content("test")
-			.memory(memory)
-			.associate(associate)
-			.build();
+		Post post = PostFixtures.postWithMemoryAndAssociate(memory, associate);
 		postRepository.save(post);
 
-		Voice voice = Voice.builder()
-			.name("test")
-			.associate(associate)
-			.temporary(false)
-			.url("www.test.com")
-			.build();
-		voiceRepository.save(voice);
-
-		Emoji emoji = Emoji.builder()
-			.name("test")
-			.associate(associate)
-			.url("www.test.com")
-			.build();
-		emojiRepository.save(emoji);
-
-		Comment comment1 = Comment.builder()
-			.associate(associate)
-			.post(post)
-			.url("www.test.com")
-			.type(CommentType.EMOJI)
-			.build();
-
-		Comment comment2 = Comment.builder()
-			.associate(associate)
-			.post(post)
-			.url("www.test.com")
-			.type(CommentType.VOICE)
-			.build();
-		commentRepository.save(comment1);
-		commentRepository.save(comment2);
+		Post post2 = PostFixtures.postWithMemoryAndAssociate(memory, associate);
+		postRepository.save(post2);
 
 		Pageable pageable = PageRequest.of(0, 1);
 
@@ -421,58 +340,27 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		SearchAllPostResponse response = postService.searchAll(community.getId(), memory.getId(), associate.getId(), pageable, null);
 
 		//then
-		assertThat(response.cursor()).isNotNull();
+		assertThat(response.cursor()).isEqualTo(post2.getId());
 		assertThat(response.hasNext()).isTrue();
 	}
 
-
 	@Test
 	@DisplayName("포스트 생성")
-	public void createTest() throws IOException {
+	public void createTest() {
 		//given
-		Member member = Member.builder()
-			.name("example")
-			.email("example@example.com")
-			.kakaoId(123L)
-			.birthday(LocalDate.of(1999, 1, 1))
-			.build();
+		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = Community.builder()
-			.member(member)
-			.name("example")
-			.build();
+		Community community = CommunityFixtures.communityWithMember(member);
 		communityRepository.save(community);
 
-		Associate associate = Associate.builder()
-			.community(community)
-			.member(member)
-			.nickname("example")
-			.build();
+		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
 		associateRepository.save(associate);
 
-		Event event = Event.builder()
-			.associate(associate)
-			.community(community)
-			.description("example")
-			.title("example")
-			.location(Location.builder()
-				.name("test")
-				.address("test")
-				.code(1)
-				.latitude(new BigDecimal("123.45"))
-				.longitude(new BigDecimal("123.45"))
-				.build())
-			.period(Period.builder()
-				.startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now())
-				.build())
-			.build();
+		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = Memory.builder()
-			.event(event)
-			.build();
+		Memory memory = MemoryFixtures.memoryWithEvent(event);
 		memoryRepository.save(memory);
 
 		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
@@ -492,52 +380,85 @@ public class PostServiceTest extends IntegrationsTestSupport {
 	}
 
 	@Test
-	@DisplayName("중복 이미지는 저장할 수 없다")
-	public void createHashTest() throws IOException {
+	@DisplayName("존재하지 않는 기억에서 포스트를 생성할 수 없다")
+	public void createWithNotExistenceMemoryTest() {
 		//given
-		Member member = Member.builder()
-			.name("example")
-			.email("example@example.com")
-			.kakaoId(123L)
-			.birthday(LocalDate.of(1999, 1, 1))
-			.build();
+		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = Community.builder()
-			.member(member)
-			.name("example")
-			.build();
+		Community community = CommunityFixtures.communityWithMember(member);
 		communityRepository.save(community);
 
-		Associate associate = Associate.builder()
-			.community(community)
-			.member(member)
-			.nickname("example")
-			.build();
+		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
 		associateRepository.save(associate);
 
-		Event event = Event.builder()
-			.associate(associate)
-			.community(community)
-			.description("example")
-			.title("example")
-			.location(Location.builder()
-				.name("test")
-				.address("test")
-				.code(1)
-				.latitude(new BigDecimal("123.45"))
-				.longitude(new BigDecimal("123.45"))
-				.build())
-			.period(Period.builder()
-				.startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now())
-				.build())
-			.build();
+		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = Memory.builder()
-			.event(event)
-			.build();
+		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		String url = "https://example.com/test.png";
+		given(minioService.createFile(file, MinioProperties.FileType.POST))
+			.willReturn(url);
+
+		String content = "test";
+
+		//when & then
+		assertThrows(MementoException.class, () -> postService.create(community.getId(), 1L, associate.getId(), content, List.of(file)));
+	}
+
+	@Test
+	@DisplayName("다른 커뮤니티의 기억에서 포스트를 생성할 수 없다")
+	public void createWithDifferentMemoryTest() {
+		//given
+		Member member = MemberFixtures.member();
+		memberRepository.save(member);
+
+		Community community = CommunityFixtures.communityWithMember(member);
+		communityRepository.save(community);
+
+		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		associateRepository.save(associate);
+
+		Community community2 = CommunityFixtures.communityWithMember(member);
+		communityRepository.save(community2);
+
+		Associate associate2 = AssociateFixtures.associateWithMemberAndCommunity(member, community2);
+		associateRepository.save(associate2);
+
+		Event event = EventFixtures.eventWithCommunityAndAssociate(community2, associate2);
+		eventRepository.save(event);
+
+		Memory memory = MemoryFixtures.memoryWithEvent(event);
+		memoryRepository.save(memory);
+
+		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		String url = "https://example.com/test.png";
+		given(minioService.createFile(file, MinioProperties.FileType.POST))
+			.willReturn(url);
+
+		String content = "test";
+
+		//when & then
+		assertThrows(MementoException.class, () -> postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file)));
+	}
+
+	@Test
+	@DisplayName("중복 이미지는 저장할 수 없다")
+	public void createHashTest() {
+		//given
+		Member member = MemberFixtures.member();
+		memberRepository.save(member);
+
+		Community community = CommunityFixtures.communityWithMember(member);
+		communityRepository.save(community);
+
+		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		associateRepository.save(associate);
+
+		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		eventRepository.save(event);
+
+		Memory memory = MemoryFixtures.memoryWithEvent(event);
 		memoryRepository.save(memory);
 
 		MultipartFile file1 = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
@@ -560,51 +481,21 @@ public class PostServiceTest extends IntegrationsTestSupport {
 
 	@Test
 	@DisplayName("포스트 수정")
-	public void updateTest() throws IOException {
+	public void updateTest(){
 		//given
-		Member member = Member.builder()
-			.name("example")
-			.email("example@example.com")
-			.kakaoId(123L)
-			.birthday(LocalDate.of(1999, 1, 1))
-			.build();
+		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = Community.builder()
-			.member(member)
-			.name("example")
-			.build();
+		Community community = CommunityFixtures.communityWithMember(member);
 		communityRepository.save(community);
 
-		Associate associate = Associate.builder()
-			.community(community)
-			.member(member)
-			.nickname("example")
-			.build();
+		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
 		associateRepository.save(associate);
 
-		Event event = Event.builder()
-			.associate(associate)
-			.community(community)
-			.description("example")
-			.title("example")
-			.location(Location.builder()
-				.name("test")
-				.address("test")
-				.code(1)
-				.latitude(new BigDecimal("123.45"))
-				.longitude(new BigDecimal("123.45"))
-				.build())
-			.period(Period.builder()
-				.startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now())
-				.build())
-			.build();
+		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = Memory.builder()
-			.event(event)
-			.build();
+		Memory memory = MemoryFixtures.memoryWithEvent(event);
 		memoryRepository.save(memory);
 
 		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
@@ -627,59 +518,62 @@ public class PostServiceTest extends IntegrationsTestSupport {
 	}
 
 	@Test
-	@DisplayName("포스트 삭제")
-	public void deletePostTest() throws IOException {
-		// given
-		Member member = Member.builder()
-			.name("example")
-			.email("example@example.com")
-			.kakaoId(123L)
-			.birthday(LocalDate.of(1999, 1, 1))
-			.build();
+	@DisplayName("다른 참여자의 포스트는 수정할 수 없다")
+	public void updateWithDifferentAssociateTest(){
+		//given
+		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = Community.builder()
-			.member(member)
-			.name("example")
-			.build();
+		Community community = CommunityFixtures.communityWithMember(member);
 		communityRepository.save(community);
 
-		Associate associate = Associate.builder()
-			.community(community)
-			.member(member)
-			.nickname("example")
-			.build();
+		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
 		associateRepository.save(associate);
 
-		Event event = Event.builder()
-			.associate(associate)
-			.community(community)
-			.description("example")
-			.title("example")
-			.location(Location.builder()
-				.name("test")
-				.address("test")
-				.code(1)
-				.latitude(new BigDecimal("123.45"))
-				.longitude(new BigDecimal("123.45"))
-				.build())
-			.period(Period.builder()
-				.startTime(LocalDateTime.now())
-				.endTime(LocalDateTime.now())
-				.build())
-			.build();
+		Associate associate2 = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		associateRepository.save(associate2);
+
+		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = Memory.builder()
-			.event(event)
-			.build();
+		Memory memory = MemoryFixtures.memoryWithEvent(event);
 		memoryRepository.save(memory);
 
-		Post post = Post.builder()
-			.content("test")
-			.memory(memory)
-			.associate(associate)
-			.build();
+		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		String url = "https://example.com/test.png";
+		given(minioService.createFile(file, MinioProperties.FileType.POST))
+			.willReturn(url);
+
+		String content = "change";
+
+		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file));
+
+		Post post = postRepository.findAll().get(0);
+
+		//when & then
+		assertThrows(MementoException.class, () -> postService.update(community.getId(), memory.getId(), associate2.getId(), post.getId(), content, List.of(), List.of(file)));
+	}
+
+	@Test
+	@DisplayName("포스트 삭제")
+	public void deleteTest() {
+		// given
+		Member member = MemberFixtures.member();
+		memberRepository.save(member);
+
+		Community community = CommunityFixtures.communityWithMember(member);
+		communityRepository.save(community);
+
+		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		associateRepository.save(associate);
+
+		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		eventRepository.save(event);
+
+		Memory memory = MemoryFixtures.memoryWithEvent(event);
+		memoryRepository.save(memory);
+
+		Post post = PostFixtures.postWithMemoryAndAssociate(memory, associate);
 		postRepository.save(post);
 
 		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
@@ -712,4 +606,48 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		assertThat(deletedComment.getDeletedAt()).isNotNull();
 	}
 
+	@Test
+	@DisplayName("다른 참여자의 포스트는 삭제할 수 없다")
+	public void deleteWithDifferentAssociateTest(){
+		// given
+		Member member = MemberFixtures.member();
+		memberRepository.save(member);
+
+		Community community = CommunityFixtures.communityWithMember(member);
+		communityRepository.save(community);
+
+		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		associateRepository.save(associate);
+
+		Associate associate2 = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		associateRepository.save(associate2);
+
+		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		eventRepository.save(event);
+
+		Memory memory = MemoryFixtures.memoryWithEvent(event);
+		memoryRepository.save(memory);
+
+		Post post = PostFixtures.postWithMemoryAndAssociate(memory, associate);
+		postRepository.save(post);
+
+		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		String url = "https://example.com/test.png";
+		given(minioService.createFile(file, MinioProperties.FileType.POST))
+			.willReturn(url);
+
+		List<PostImage> images = postService.saveImages(post, List.of(file));
+		postImageRepository.saveAll(images);
+
+		Comment comment = Comment.builder()
+			.associate(associate)
+			.post(post)
+			.url("www.test.com")
+			.type(CommentType.EMOJI)
+			.build();
+		commentRepository.save(comment);
+
+		// when & then
+		assertThrows(MementoException.class, () -> postService.delete(community.getId(), memory.getId(), associate2.getId(), post.getId()));
+	}
 }

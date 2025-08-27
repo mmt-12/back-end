@@ -4,6 +4,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.memento.server.associate.AssociateFixtures;
 import com.memento.server.community.CommunityFixtures;
+import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.community.Community;
 import com.memento.server.domain.event.Event;
 
 public class EventFixtures {
@@ -14,13 +16,23 @@ public class EventFixtures {
 
 	public static Event event() {
 		return Event.builder()
-			.id(idGenerator.getAndIncrement())
 			.title(TITLE)
 			.description(DESCRIPTION)
 			.location(LocationFixtures.location())
 			.period(PeriodFixtures.period())
 			.community(CommunityFixtures.community())
 			.associate(AssociateFixtures.associate())
+			.build();
+	}
+
+	public static Event eventWithCommunityAndAssociate(Community community, Associate associate){
+		return Event.builder()
+			.title(TITLE)
+			.description(DESCRIPTION)
+			.location(LocationFixtures.location())
+			.period(PeriodFixtures.period())
+			.community(community)
+			.associate(associate)
 			.build();
 	}
 }

@@ -2,6 +2,7 @@ package com.memento.server.memory;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.memento.server.domain.event.Event;
 import com.memento.server.domain.memory.Memory;
 import com.memento.server.event.EventFixtures;
 
@@ -11,8 +12,11 @@ public class MemoryFixtures {
 
 	public static Memory memory() {
 		return Memory.builder()
-			.id(idGenerator.getAndIncrement())
 			.event(EventFixtures.event())
 			.build();
+	}
+
+	public static Memory memoryWithEvent(Event event){
+		return Memory.create(event);
 	}
 }

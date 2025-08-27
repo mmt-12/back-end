@@ -3,6 +3,8 @@ package com.memento.server.post;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.memento.server.associate.AssociateFixtures;
+import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.post.Post;
 import com.memento.server.memory.MemoryFixtures;
 
@@ -13,10 +15,17 @@ public class PostFixtures {
 
 	public static Post post() {
 		return Post.builder()
-			.id(idGenerator.getAndIncrement())
 			.content(CONTENT)
 			.memory(MemoryFixtures.memory())
 			.associate(AssociateFixtures.associate())
+			.build();
+	}
+
+	public static Post postWithMemoryAndAssociate(Memory memory, Associate associate){
+		return Post.builder()
+			.content(CONTENT)
+			.memory(memory)
+			.associate(associate)
 			.build();
 	}
 }
