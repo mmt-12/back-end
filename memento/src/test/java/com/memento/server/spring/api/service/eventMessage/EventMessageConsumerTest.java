@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.memento.server.api.service.eventMessage.EventMessageConsumer;
+import com.memento.server.api.service.eventMessage.dto.AssociateNotification;
 import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
@@ -61,6 +62,26 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 		memoryRepository.deleteAllInBatch();
 		communityRepository.deleteAllInBatch();
 		eventRepository.deleteAllInBatch();
+	}
+
+	@Test
+	@DisplayName("알림 이벤트를 받아 데이터베이스에 저장한다.")
+	void handleAssociateNotification() {
+		// given
+		Member member = memberRepository.save(Member.create("김가가", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
+		Member member2 = memberRepository.save(Member.create("김나나", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
+		Member member3 = memberRepository.save(Member.create("김다다", "muge@test.com", LocalDate.of(1990, 1, 1), 1003L));
+		Community community = communityRepository.save(Community.create("comm", member));
+		associateRepository.save(Associate.create("가가", member, community));
+		associateRepository.save(Associate.create("가가", member2, community));
+
+		// when
+		AssociateNotification eventMessage = AssociateNotification.from(community.getId(), member3.getId());
+		eventMessageConsumer.handleAssociateNotification(eventMessage);
+
+		// then
+		List<Notification> all = notificationRepository.findAll();
+		assertThat(all.size()).isEqualTo(2);
 	}
 
 	@Test
