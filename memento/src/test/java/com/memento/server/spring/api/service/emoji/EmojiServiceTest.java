@@ -16,7 +16,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.service.emoji.EmojiService;
@@ -26,7 +25,9 @@ import com.memento.server.api.service.emoji.dto.request.EmojiRemoveRequest;
 import com.memento.server.api.service.emoji.dto.response.EmojiListResponse;
 import com.memento.server.associate.AssociateFixtures;
 import com.memento.server.common.exception.MementoException;
+import com.memento.server.common.fixture.CommonFixtures;
 import com.memento.server.community.CommunityFixtures;
+import com.memento.server.config.MinioProperties;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
@@ -35,6 +36,7 @@ import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
 import com.memento.server.domain.emoji.Emoji;
 import com.memento.server.domain.emoji.EmojiRepository;
+import com.memento.server.emoji.EmojiFixtures;
 import com.memento.server.member.MemberFixtures;
 import com.memento.server.spring.api.service.IntegrationsTestSupport;
 
@@ -53,6 +55,9 @@ public class EmojiServiceTest extends IntegrationsTestSupport {
 	private CommunityRepository communityRepository;
 
 	@Autowired
+	private MinioProperties minioProperties;
+
+	@Autowired
 	private EmojiService emojiService;
 
 	@AfterEach
@@ -67,13 +72,14 @@ public class EmojiServiceTest extends IntegrationsTestSupport {
 	@DisplayName("emoji를 생성한다.")
 	void createEmoji() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		MultipartFile file = new MockMultipartFile("emoji", "test.png", "image/png", "test".getBytes());
-		String url = "https://example.com/test.png";
+		Fixtures fixtures = createFixtures();
+		MultipartFile file = CommonFixtures.emojiFile();
+		String url = CommonFixtures.mockUrl(minioProperties, file, EMOJI);
+		String name = "test";
 
 		EmojiCreateServiceRequest request = EmojiCreateServiceRequest.builder()
-			.name("test emoji")
-			.associateId(associate.getId())
+			.name(name)
+			.associateId(fixtures.associate.getId())
 			.emoji(file)
 			.build();
 
@@ -86,16 +92,16 @@ public class EmojiServiceTest extends IntegrationsTestSupport {
 		// then
 		Optional<Emoji> savedEmoji = emojiRepository.findAll().stream().findFirst();
 		assertThat(savedEmoji).isPresent();
-		assertThat(savedEmoji.get().getName()).isEqualTo("test emoji");
+		assertThat(savedEmoji.get().getName()).isEqualTo(name);
 		assertThat(savedEmoji.get().getUrl()).isEqualTo(url);
-		assertThat(savedEmoji.get().getAssociate().getId()).isEqualTo(associate.getId());
+		assertThat(savedEmoji.get().getAssociate().getId()).isEqualTo(fixtures.associate.getId());
 	}
 
 	@Test
 	@DisplayName("존재하지 않는 associate가 emoji를 생성하면 예외가 발생한다.")
 	void createEmojiWithNoAssociate() {
 		// given
-		MultipartFile file = new MockMultipartFile("emoji", "test.png", "image/png", "test".getBytes());
+		MultipartFile file = CommonFixtures.emojiFile();
 
 		EmojiCreateServiceRequest request = EmojiCreateServiceRequest.builder()
 			.name("test emoji")
@@ -114,12 +120,12 @@ public class EmojiServiceTest extends IntegrationsTestSupport {
 	@DisplayName("커뮤니티의 emoji 목록을 조회한다.")
 	void getEmojis() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Long communityId = associate.getCommunity().getId();
+		Fixtures fixtures = createFixtures();
+		Long communityId = fixtures.community.getId();
 
-		Emoji emoji1 = Emoji.create("emoji1", "url1", associate);
-		Emoji emoji2 = Emoji.create("emoji2", "url2", associate);
-		Emoji emoji3 = Emoji.create("emoji3", "url3", associate);
+		Emoji emoji1 = EmojiFixtures.emoji(fixtures.associate);
+		Emoji emoji2 = EmojiFixtures.emoji(fixtures.associate);
+		Emoji emoji3 = EmojiFixtures.emoji(fixtures.associate);
 		emojiRepository.saveAll(List.of(emoji1, emoji2, emoji3));
 
 		EmojiListQueryRequest request = EmojiListQueryRequest.of(communityId, null, 10, null);
@@ -137,12 +143,12 @@ public class EmojiServiceTest extends IntegrationsTestSupport {
 	@DisplayName("페이지 사이즈보다 많은 emoji가 있을 때 hasNext가 true이다.")
 	void getEmojisWithPagination() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Long communityId = associate.getCommunity().getId();
+		Fixtures fixtures = createFixtures();
+		Long communityId = fixtures.community.getId();
 
-		Emoji emoji1 = Emoji.create("emoji1", "url1", associate);
-		Emoji emoji2 = Emoji.create("emoji2", "url2", associate);
-		Emoji emoji3 = Emoji.create("emoji3", "url3", associate);
+		Emoji emoji1 = EmojiFixtures.emoji(fixtures.associate);
+		Emoji emoji2 = EmojiFixtures.emoji(fixtures.associate);
+		Emoji emoji3 = EmojiFixtures.emoji(fixtures.associate);
 		emojiRepository.saveAll(List.of(emoji1, emoji2, emoji3));
 
 		EmojiListQueryRequest request = EmojiListQueryRequest.of(communityId, null, 2, null);
@@ -160,8 +166,8 @@ public class EmojiServiceTest extends IntegrationsTestSupport {
 	@DisplayName("빈 커뮤니티에서 emoji 목록을 조회하면 빈 리스트를 반환한다.")
 	void getEmojisFromEmptyCommunity() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Long communityId = associate.getCommunity().getId();
+		Fixtures fixtures = createFixtures();
+		Long communityId = fixtures.community.getId();
 
 		EmojiListQueryRequest request = EmojiListQueryRequest.of(communityId, null, 10, null);
 
@@ -178,11 +184,11 @@ public class EmojiServiceTest extends IntegrationsTestSupport {
 	@DisplayName("이모지를 삭제한다.")
 	void removeEmoji() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Emoji emoji = Emoji.create("emoji", "url", associate);
+		Fixtures fixtures = createFixtures();
+		Emoji emoji = EmojiFixtures.emoji(fixtures.associate);
 		emojiRepository.save(emoji);
 
-		EmojiRemoveRequest request = EmojiRemoveRequest.of(associate.getId(), emoji.getId());
+		EmojiRemoveRequest request = EmojiRemoveRequest.of(fixtures.associate.getId(), emoji.getId());
 
 		doNothing().when(minioService).removeFile(emoji.getUrl());
 
@@ -199,8 +205,8 @@ public class EmojiServiceTest extends IntegrationsTestSupport {
 	@DisplayName("존재하지 않는 이모지를 삭제하면 예외가 발생한다.")
 	void removeEmojiNotFound() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		EmojiRemoveRequest request = EmojiRemoveRequest.of(associate.getId(), 999L);
+		Fixtures fixtures = createFixtures();
+		EmojiRemoveRequest request = EmojiRemoveRequest.of(fixtures.associate.getId(), 999L);
 
 		// when & then
 		assertThatThrownBy(() ->
@@ -214,10 +220,11 @@ public class EmojiServiceTest extends IntegrationsTestSupport {
 	@DisplayName("권한이 없는 associate가 이모지를 삭제하면 예외가 발생한다.")
 	void removeEmojiUnauthorized() {
 		// given
-		Associate emojiOwner = createAndSaveAssociate();
-		Associate otherAssociate = createAndSaveAssociate();
+		Fixtures fixtures = createFixtures();
+		Associate emojiOwner = fixtures.associate;
+		Associate otherAssociate = AssociateFixtures.associate(fixtures.member, fixtures.community);
 		
-		Emoji emoji = Emoji.create("emoji", "url", emojiOwner);
+		Emoji emoji = EmojiFixtures.emoji(emojiOwner);
 		emojiRepository.save(emoji);
 
 		EmojiRemoveRequest request = EmojiRemoveRequest.of(otherAssociate.getId(), emoji.getId());
@@ -229,14 +236,23 @@ public class EmojiServiceTest extends IntegrationsTestSupport {
 			.isEqualTo(UNAUTHORIZED_EMOJI_ACCESS);
 	}
 
-	private Associate createAndSaveAssociate() {
+	private record Fixtures(
+		Member member,
+		Community community,
+		Associate associate
+	) {
+
+	}
+
+	private Fixtures createFixtures() {
 		Member member = MemberFixtures.member();
+		Community community = CommunityFixtures.community(member);
+		Associate associate = AssociateFixtures.associate(member, community);
+
 		Member savedMember = memberRepository.save(member);
-
-		Community community = CommunityFixtures.communityWithMember(savedMember);
 		Community savedCommunity = communityRepository.save(community);
+		Associate savedAssociate = associateRepository.save(associate);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(savedMember, savedCommunity);
-		return associateRepository.save(associate);
+		return new Fixtures(savedMember, savedCommunity, savedAssociate);
 	}
 }

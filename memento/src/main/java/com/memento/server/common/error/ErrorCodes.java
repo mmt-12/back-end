@@ -88,6 +88,7 @@ public enum ErrorCodes implements ErrorCode {
 	COMMENT_URL_TOO_LONG(BAD_REQUEST, 8002, "코멘트 URL은 최대 255자까지 입력할 수 있습니다."),
 	COMMENT_POST_REQUIRED(BAD_REQUEST, 8003, "코멘트 게시글은 필수입니다."),
 	COMMENT_ASSOCIATE_REQUIRED(BAD_REQUEST, 8004, "코멘트 작성자는 필수입니다."),
+	COMMENT_NOT_FOUND(BAD_REQUEST, 8005, "코멘트를 찾을 수 없습니다."),
 
 	GUESTBOOK_NOT_EXISTENCE(BAD_REQUEST, 9000, "존재하지 않는 방명록입니다."),
 
@@ -97,7 +98,9 @@ public enum ErrorCodes implements ErrorCode {
 	MEMORY_NOT_FOUND(BAD_REQUEST, 11000, "존재하지 않는 기억입니다."),
 	MEMORY_NOT_AUTHOR(BAD_REQUEST, 11001, "기억의 작성자가 아닙니다."),
 
-	MINIO_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, 12000, "파일 업로드 중 오류가 발생했습니다.")
+	MINIO_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, 12000, "파일 업로드 중 오류가 발생했습니다."),
+
+	POST_NOT_FOUND(BAD_REQUEST, 13000, "포스트를 찾을 수 없습니다."),
 
 	;
 	private final HttpStatus status;

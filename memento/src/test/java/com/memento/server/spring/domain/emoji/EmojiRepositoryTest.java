@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.memento.server.associate.AssociateFixtures;
+import com.memento.server.community.CommunityFixtures;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
@@ -20,6 +22,8 @@ import com.memento.server.domain.emoji.Emoji;
 import com.memento.server.domain.emoji.EmojiRepository;
 import com.memento.server.api.service.emoji.dto.request.EmojiListQueryRequest;
 import com.memento.server.api.service.emoji.dto.response.EmojiResponse;
+import com.memento.server.emoji.EmojiFixtures;
+import com.memento.server.member.MemberFixtures;
 import com.memento.server.spring.api.service.IntegrationsTestSupport;
 
 import jakarta.persistence.EntityManager;
@@ -46,8 +50,8 @@ public class EmojiRepositoryTest extends IntegrationsTestSupport {
 	@DisplayName("id에 해당하는 emoji를 조회한다.")
 	void findByIdAndDeletedAtIsNull() {
 	    // given
-		Associate associate = createAndSaveAssociate();
-		Emoji emoji = Emoji.create("test emoji", "https://example.com/test.png", associate);
+		Fixtures fixtures = createFixtures();
+		Emoji emoji = EmojiFixtures.emoji(fixtures.associate);
 		Emoji savedEmoji = emojiRepository.save(emoji);
 
 	    // when
@@ -55,8 +59,7 @@ public class EmojiRepositoryTest extends IntegrationsTestSupport {
 
 	    // then
 		assertThat(foundEmoji).isPresent();
-		assertThat(foundEmoji.get().getName()).isEqualTo("test emoji");
-		assertThat(foundEmoji.get().getUrl()).isEqualTo("https://example.com/test.png");
+		assertThat(foundEmoji.get()).isEqualTo(savedEmoji);
 	}
 	
 	@Test
@@ -69,21 +72,23 @@ public class EmojiRepositoryTest extends IntegrationsTestSupport {
 		Optional<Emoji> foundEmoji = emojiRepository.findByIdAndDeletedAtIsNull(nonExistentId);
 
 	    // then
-		assertThat(foundEmoji).isEmpty();
+		assertThat(foundEmoji).isNotPresent();
 	}
 
 	@Test
 	@DisplayName("커뮤니티 ID로 emoji 목록을 조회한다.")
 	void findEmojiByCommunityWithCursor() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Long communityId = associate.getCommunity().getId();
+		Fixtures fixtures = createFixtures();
+		Long communityId = fixtures.community.getId();
+
+		Emoji emoji1 = EmojiFixtures.emoji(fixtures.associate);
+		Emoji emoji2 = EmojiFixtures.emoji(fixtures.associate);
+		Emoji emoji3 = EmojiFixtures.emoji(fixtures.associate);
 		
-		Emoji emoji1 = Emoji.create("emoji1", "url1", associate);
-		Emoji emoji2 = Emoji.create("emoji2", "url2", associate);
-		Emoji emoji3 = Emoji.create("emoji3", "url3", associate);
-		
-		emojiRepository.saveAll(List.of(emoji1, emoji2, emoji3));
+		Emoji savedEmoji1 = emojiRepository.save(emoji1);
+		Emoji savedEmoji2 = emojiRepository.save(emoji2);
+		Emoji savedEmoji3 = emojiRepository.save(emoji3);
 
 		EmojiListQueryRequest request = EmojiListQueryRequest.of(communityId, null, 10, null);
 
@@ -92,24 +97,24 @@ public class EmojiRepositoryTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(emojis).hasSize(3);
-		assertThat(emojis.get(0).name()).isEqualTo("emoji3");
-		assertThat(emojis.get(1).name()).isEqualTo("emoji2");
-		assertThat(emojis.get(2).name()).isEqualTo("emoji1");
+		assertThat(emojis.get(0).id()).isEqualTo(savedEmoji3.getId());
+		assertThat(emojis.get(1).id()).isEqualTo(savedEmoji2.getId());
+		assertThat(emojis.get(2).id()).isEqualTo(savedEmoji1.getId());
 	}
 
 	@Test
 	@DisplayName("커서를 사용한 페이징이 올바르게 동작한다.")
 	void findEmojiByCommunityWithCursorPaging() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Long communityId = associate.getCommunity().getId();
-		
-		Emoji emoji1 = Emoji.create("emoji1", "url1", associate);
-		Emoji emoji2 = Emoji.create("emoji2", "url2", associate);
-		Emoji emoji3 = Emoji.create("emoji3", "url3", associate);
+		Fixtures fixtures = createFixtures();
+		Long communityId = fixtures.community.getId();
 
-		emojiRepository.save(emoji1);
-		emojiRepository.save(emoji2);
+		Emoji emoji1 = EmojiFixtures.emoji(fixtures.associate);
+		Emoji emoji2 = EmojiFixtures.emoji(fixtures.associate);
+		Emoji emoji3 = EmojiFixtures.emoji(fixtures.associate);
+
+		Emoji savedEmoji1 = emojiRepository.save(emoji1);
+		Emoji savedEmoji2 = emojiRepository.save(emoji2);
 		Emoji savedEmoji3 = emojiRepository.save(emoji3);
 
 		EmojiListQueryRequest request = EmojiListQueryRequest.of(communityId, savedEmoji3.getId(), 10, null);
@@ -119,24 +124,25 @@ public class EmojiRepositoryTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(emojis).hasSize(2);
-		assertThat(emojis.get(0).name()).isEqualTo("emoji2");
-		assertThat(emojis.get(1).name()).isEqualTo("emoji1");
+		assertThat(emojis.get(0).id()).isEqualTo(savedEmoji2.getId());
+		assertThat(emojis.get(1).id()).isEqualTo(savedEmoji1.getId());
 	}
 
 	@Test
 	@DisplayName("키워드로 emoji 이름을 검색한다.")
 	void findEmojiByCommunityWithKeyword() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Long communityId = associate.getCommunity().getId();
-		
-		Emoji emoji1 = Emoji.create("hello world", "url1", associate);
-		Emoji emoji2 = Emoji.create("goodbye", "url2", associate);
-		Emoji emoji3 = Emoji.create("Hello Universe", "url3", associate);
-		
-		emojiRepository.save(emoji1);
-		emojiRepository.save(emoji2);
-		emojiRepository.save(emoji3);
+		Fixtures fixtures = createFixtures();
+		Long communityId = fixtures.community.getId();
+		final String KEYWORD = "hello";
+
+		Emoji emoji1 = EmojiFixtures.emoji(KEYWORD + " world", fixtures.associate);
+		Emoji emoji2 = EmojiFixtures.emoji("goodbye", fixtures.associate);
+		Emoji emoji3 = EmojiFixtures.emoji(KEYWORD.toUpperCase() + " Universe", fixtures.associate);
+
+		Emoji savedEmoji1 = emojiRepository.save(emoji1);
+		Emoji savedEmoji2 = emojiRepository.save(emoji2);
+		Emoji savedEmoji3 = emojiRepository.save(emoji3);
 
 		EmojiListQueryRequest request = EmojiListQueryRequest.of(communityId, null, 10, "hello");
 
@@ -145,20 +151,20 @@ public class EmojiRepositoryTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(emojis).hasSize(2);
-		assertThat(emojis).extracting("name").containsExactly("Hello Universe", "hello world");
+		assertThat(emojis).extracting("name").containsExactly(savedEmoji3.getName(), savedEmoji1.getName());
 	}
 
 	@Test
 	@DisplayName("삭제된 emoji는 조회되지 않는다.")
 	void findEmojiByCommunityWithCursorExcludeDeleted() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Long communityId = associate.getCommunity().getId();
-		
-		Emoji emoji1 = Emoji.create("emoji1", "url1", associate);
-		Emoji emoji2 = Emoji.create("emoji2", "url2", associate);
-		
-		emojiRepository.save(emoji1);
+		Fixtures fixtures = createFixtures();
+		Long communityId = fixtures.community.getId();
+
+		Emoji emoji1 = EmojiFixtures.emoji(fixtures.associate);
+		Emoji emoji2 = EmojiFixtures.emoji(fixtures.associate);
+
+		Emoji savedEmoji1 = emojiRepository.save(emoji1);
 		Emoji savedEmoji2 = emojiRepository.save(emoji2);
 
 		savedEmoji2.markDeleted();
@@ -171,17 +177,26 @@ public class EmojiRepositoryTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(emojis).hasSize(1);
-		assertThat(emojis.get(0).name()).isEqualTo("emoji1");
+		assertThat(emojis.get(0).id()).isEqualTo(savedEmoji1.getId());
 	}
 
-	private Associate createAndSaveAssociate() {
-		Member member = Member.create("김싸피", "test@example.com", null, 12345L);
+	private record Fixtures(
+		Member member,
+		Community community,
+		Associate associate
+	) {
+
+	}
+
+	private Fixtures createFixtures() {
+		Member member = MemberFixtures.member();
+		Community community = CommunityFixtures.community(member);
+		Associate associate = AssociateFixtures.associate(member, community);
+
 		Member savedMember = memberRepository.save(member);
-
-		Community community = Community.create("테스트 커뮤니티", savedMember);
 		Community savedCommunity = communityRepository.save(community);
+		Associate savedAssociate = associateRepository.save(associate);
 
-		Associate associate = Associate.create("닉네임", savedMember, savedCommunity);
-		return associateRepository.save(associate);
+		return new Fixtures(savedMember, savedCommunity, savedAssociate);
 	}
 }

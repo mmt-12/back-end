@@ -19,6 +19,7 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import com.memento.server.api.controller.comment.dto.EmojiCommentCreateRequest;
 import com.memento.server.api.controller.comment.dto.VoiceCommentCreateRequest;
+import com.memento.server.common.fixture.CommonFixtures;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
 
 public class CommentControllerTest extends ControllerTestSupport {
@@ -141,12 +142,7 @@ public class CommentControllerTest extends ControllerTestSupport {
 		long communityId = 1L;
 		long memoryId = 1L;
 
-		MockMultipartFile voice = new MockMultipartFile(
-			"voice",
-			"voice.wav",
-			"audio/wav",
-			"voice content".getBytes()
-		);
+		MockMultipartFile voice = CommonFixtures.voiceFile();
 
 		doNothing().when(commentService).createTemporaryVoiceComment(any());
 

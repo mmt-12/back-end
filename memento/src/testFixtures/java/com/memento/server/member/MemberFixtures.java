@@ -1,13 +1,11 @@
 package com.memento.server.member;
 
 import java.time.LocalDate;
-import java.util.concurrent.atomic.AtomicLong;
 
 import com.memento.server.domain.member.Member;
 
 public class MemberFixtures {
 
-	private static final AtomicLong idGenerator = new AtomicLong();
 	private static final String NAME = "김싸피";
 	private static final String EMAIL = "example@naver.com";
 	private static final LocalDate BIRTHDAY = LocalDate.of(1999, 1, 1);

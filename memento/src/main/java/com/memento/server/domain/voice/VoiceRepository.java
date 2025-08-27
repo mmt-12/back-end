@@ -8,4 +8,6 @@ public interface VoiceRepository extends JpaRepository<Voice, Long>, VoiceReposi
 	Optional<Voice> findByIdAndDeletedAtIsNull(Long id);
 
 	Voice findByIdAndDeletedAtNull(Long contentId);
+	
+	Optional<Voice> findByUrlAndDeletedAtIsNull(String url);
 }
