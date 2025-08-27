@@ -34,8 +34,6 @@ public class ProfileImageService {
 	private final AssociateRepository associateRepository;
 	private final ProfileImageRepository profileImageRepository;
 	private final MinioService minioService;
-	private final MinioClient minioClient;
-	private final MinioProperties minioProperties;
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -52,8 +50,6 @@ public class ProfileImageService {
 		Associate associate = validAssociate(communityId, associateId);
 		Associate registrant = validAssociate(communityId, registrantId);
 
-		// todo minioService method 호출로 변경
-		// String url = saveImage(associate, image);
 		String url = minioService.createFile(image, POST);
 		profileImageRepository.save(ProfileImage.builder()
 				.url(url)
@@ -102,33 +98,4 @@ public class ProfileImageService {
 			.hasNext(hasNext)
 			.build();
 	}
-
-	// todo 주석처리
-	// public String saveImage(Associate associate, MultipartFile image) {
-	// 	String bucket = minioProperties.getBucket();
-	// 	String baseUrl = minioProperties.getUrl();
-	//
-	// 	String originalFilename = image.getOriginalFilename();
-	// 	String extension = getExtension(originalFilename);
-	// 	String filename = "profileImage/"+ associate.getId() +"/" + UUID.randomUUID() + "." + extension;
-	// 	String expectedContentType = "image/" + extension;
-	//
-	// 	try (InputStream inputStream = image.getInputStream()) {
-	// 		long contentLength = image.getSize();
-	//
-	// 		minioClient.putObject(
-	// 			PutObjectArgs.builder()
-	// 				.bucket(bucket)
-	// 				.object(filename)
-	// 				.stream(inputStream, contentLength, -1)
-	// 				.contentType(expectedContentType)
-	// 				.build()
-	// 		);
-	//
-	// 	} catch (Exception e) {
-	// 		throw new MementoException(ErrorCodes.PROFILEIMAGE_SAVE_FAIL);
-	// 	}
-	//
-	// 	return baseUrl + "/" + filename;
-	// }
 }

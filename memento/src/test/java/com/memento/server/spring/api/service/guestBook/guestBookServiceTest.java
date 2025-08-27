@@ -1,6 +1,8 @@
 package com.memento.server.spring.api.service.guestBook;
 
+import static com.memento.server.config.MinioProperties.FileType.EMOJI;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.BDDMockito.given;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -15,9 +17,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
 import com.memento.server.api.service.guestBook.GuestBookService;
+import com.memento.server.config.MinioProperties;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
@@ -31,10 +35,9 @@ import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
 import com.memento.server.domain.voice.Voice;
 import com.memento.server.domain.voice.VoiceRepository;
+import com.memento.server.spring.api.service.IntegrationsTestSupport;
 
-@SpringBootTest
-@Transactional
-public class guestBookServiceTest {
+public class guestBookServiceTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private GuestBookService guestBookService;
@@ -256,13 +259,10 @@ public class guestBookServiceTest {
 			.build();
 		associateRepository.save(associate);
 
-		ClassPathResource resource = new ClassPathResource("static/test-voices/ooh.mp3");
-		MockMultipartFile file = new MockMultipartFile(
-			"voice",
-			resource.getFilename(),
-			"audio/mpeg",
-			resource.getInputStream()
-		);
+		MultipartFile file = new MockMultipartFile("voice", "test.mp3", "audio/mpeg", "test".getBytes());
+		String url = "https://example.com/test.png";
+		given(minioService.createFile(file, MinioProperties.FileType.VOICE))
+			.willReturn(url);
 
 		// when
 		guestBookService.createBubble(community.getId(), associate.getId(), file);
@@ -297,8 +297,17 @@ public class guestBookServiceTest {
 			.build();
 		associateRepository.save(associate);
 
+		GuestBook guestBook = GuestBook.builder()
+			.associate(associate)
+			.content("test")
+			.type(GuestBookType.TEXT)
+			.build();
+		guestBookRepository.save(guestBook);
+
 		// when
+		guestBookService.delete(guestBook.getId());
 
 		// then
+		assertThat(guestBookRepository.findById(guestBook.getId()).get().getDeletedAt()).isNotNull();
 	}
 }

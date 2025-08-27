@@ -101,6 +101,8 @@ public enum ErrorCodes implements ErrorCode {
 	MINIO_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, 12000, "파일 업로드 중 오류가 발생했습니다."),
 
 	POST_NOT_EXISTENCE(BAD_REQUEST, 13000, "존재하지 않는 포스트입니다."),
+	POST_IMAGE_SAVE_FAIL(BAD_REQUEST, 13001, "포스트 이미지 저장에 실패하였습니다."),
+	POST_IMAGE_DUPLICATED(BAD_REQUEST, 13002, "중복된 이미지는 저장할 수 없습니다."),
 
 	;
 	private final HttpStatus status;

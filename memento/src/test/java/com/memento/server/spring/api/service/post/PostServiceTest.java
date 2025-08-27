@@ -2,6 +2,7 @@ package com.memento.server.spring.api.service.post;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -20,10 +21,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.post.dto.SearchAllPostResponse;
 import com.memento.server.api.controller.post.dto.SearchPostResponse;
 import com.memento.server.api.service.post.PostService;
+import com.memento.server.common.exception.MementoException;
+import com.memento.server.config.MinioProperties;
 import com.memento.server.domain.comment.Comment;
 import com.memento.server.domain.comment.CommentRepository;
 import com.memento.server.domain.comment.CommentType;
@@ -47,10 +51,9 @@ import com.memento.server.domain.post.PostImageRepository;
 import com.memento.server.domain.post.PostRepository;
 import com.memento.server.domain.voice.Voice;
 import com.memento.server.domain.voice.VoiceRepository;
+import com.memento.server.spring.api.service.IntegrationsTestSupport;
 
-@SpringBootTest
-@Transactional
-public class PostServiceTest {
+public class PostServiceTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private PostService postService;
@@ -472,13 +475,10 @@ public class PostServiceTest {
 			.build();
 		memoryRepository.save(memory);
 
-		ClassPathResource resource = new ClassPathResource("static/test-images/ooh.png");
-		MockMultipartFile file = new MockMultipartFile(
-			"image",
-			resource.getFilename(),
-			"image/png",
-			resource.getInputStream()
-		);
+		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		String url = "https://example.com/test.png";
+		given(minioService.createFile(file, MinioProperties.FileType.POST))
+			.willReturn(url);
 
 		String content = "test";
 
@@ -540,26 +540,20 @@ public class PostServiceTest {
 			.build();
 		memoryRepository.save(memory);
 
-		ClassPathResource resource = new ClassPathResource("static/test-images/ooh.png");
-		MockMultipartFile file1 = new MockMultipartFile(
-			"image",
-			resource.getFilename(),
-			"image/png",
-			resource.getInputStream()
-		);
+		MultipartFile file1 = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		String url1 = "https://example.com/test.png";
+		given(minioService.createFile(file1, MinioProperties.FileType.POST))
+			.willReturn(url1);
 
-		ClassPathResource resource2 = new ClassPathResource("static/test-images/ooh2.png");
-		MockMultipartFile file2 = new MockMultipartFile(
-			"image",
-			resource2.getFilename(),
-			"image/png",
-			resource2.getInputStream()
-		);
+		MultipartFile file2 = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		String url2 = "https://example.com/test.png";
+		given(minioService.createFile(file2, MinioProperties.FileType.POST))
+			.willReturn(url2);
 
 		String content = "test";
 
 		//when & then
-		assertThrows(DataIntegrityViolationException.class, () -> {
+		assertThrows(MementoException.class, () -> {
 			postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file1, file2));
 		});
 	}
@@ -613,13 +607,10 @@ public class PostServiceTest {
 			.build();
 		memoryRepository.save(memory);
 
-		ClassPathResource resource = new ClassPathResource("static/test-images/ooh.png");
-		MockMultipartFile file = new MockMultipartFile(
-			"image",
-			resource.getFilename(),
-			"image/png",
-			resource.getInputStream()
-		);
+		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		String url = "https://example.com/test.png";
+		given(minioService.createFile(file, MinioProperties.FileType.POST))
+			.willReturn(url);
 
 		String content = "change";
 
@@ -632,7 +623,7 @@ public class PostServiceTest {
 
 		//then
 		assertThat(post.getContent()).isEqualTo(content);
-		assertThat(postImageRepository.findAll().size()).isEqualTo(1);
+		assertThat(postImageRepository.findAll().get(0).getDeletedAt()).isNotNull();
 	}
 
 	@Test
@@ -691,13 +682,10 @@ public class PostServiceTest {
 			.build();
 		postRepository.save(post);
 
-		ClassPathResource resource = new ClassPathResource("static/test-images/ooh.png");
-		MockMultipartFile file = new MockMultipartFile(
-			"image",
-			resource.getFilename(),
-			"image/png",
-			resource.getInputStream()
-		);
+		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		String url = "https://example.com/test.png";
+		given(minioService.createFile(file, MinioProperties.FileType.POST))
+			.willReturn(url);
 
 		List<PostImage> images = postService.saveImages(post, List.of(file));
 		postImageRepository.saveAll(images);

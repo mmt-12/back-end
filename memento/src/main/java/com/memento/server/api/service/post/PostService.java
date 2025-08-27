@@ -1,13 +1,11 @@
 package com.memento.server.api.service.post;
 
-import static org.apache.commons.io.FilenameUtils.getExtension;
-
-import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
@@ -23,6 +21,7 @@ import com.memento.server.api.controller.post.dto.read.Emoji;
 import com.memento.server.api.controller.post.dto.read.PostAuthor;
 import com.memento.server.api.controller.post.dto.read.TemporaryVoice;
 import com.memento.server.api.controller.post.dto.read.Voice;
+import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.api.service.post.dto.PostCommentDto;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
@@ -41,7 +40,6 @@ import com.memento.server.domain.post.PostImageRepository;
 import com.memento.server.domain.post.PostRepository;
 
 import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -54,8 +52,7 @@ public class PostService {
 	private final PostImageRepository postImageRepository;
 	private final MemoryRepository memoryRepository;
 	private final CommentRepository commentRepository;
-	private final MinioClient minioClient;
-	private final MinioProperties minioProperties;
+	private final MinioService minioService;
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -133,7 +130,7 @@ public class PostService {
 	public void create(Long communityId, Long associateId, Long memoryId, String content, List<MultipartFile> pictures) {
 		Associate associate = validAssociate(communityId, associateId);
 
-		Memory memory = memoryRepository.findByIdAndDeletedAtNull(memoryId)
+		Memory memory = memoryRepository.findByIdAndDeletedAtIsNull(memoryId)
 			.orElseThrow(() -> new MementoException(ErrorCodes.MEMORY_NOT_FOUND));
 
 		if(!memory.getEvent().getCommunity().getId().equals(communityId)){
@@ -164,14 +161,12 @@ public class PostService {
 		}
 
 		List<PostImage> images = postImageRepository.findByPostIdAndDeletedAtNull(postId);
-		List<Long> deleteIds = images.stream()
-			.map(PostImage::getId)
-			.filter(id -> !oldPictures.contains(id))
+		List<PostImage> deleteImages = images.stream()
+			.filter(image -> !oldPictures.contains(image.getId()))
 			.toList();
 
-		if(!deleteIds.isEmpty()){
-			postImageRepository.deleteAllById(deleteIds);
-			postImageRepository.flush();
+		for(PostImage image : deleteImages){
+			image.markDeleted();
 		}
 
 		if(newPictures != null){
@@ -194,7 +189,9 @@ public class PostService {
 			.stream()
 			.collect(Collectors.groupingBy(PostImage::getPost));
 
-		postImageRepository.deleteAll(imagesByPostId.get(post));
+		for(PostImage image : imagesByPostId.get(post)){
+			image.markDeleted();
+		}
 
 		List<Comment> comments = commentRepository.findAllByPostIdAndDeletedAtNull(post.getId());
 		for(Comment comment : comments){
@@ -304,29 +301,13 @@ public class PostService {
 	}
 
 	public List<PostImage> saveImages(Post post, List<MultipartFile> pictures) {
-		String bucket = minioProperties.getBucket();
-		String baseUrl = minioProperties.getUrl();
-
 		List<PostImage> images = new ArrayList<>();
+		List<Hash> hashes = new ArrayList<>();
 		for(MultipartFile image : pictures){
-			String originalFilename = image.getOriginalFilename();
-			String extension = getExtension(originalFilename);
-			String filename = "post/"+ post.getId() +"/" + UUID.randomUUID() + "." + extension;
-			String expectedContentType = "image/" + extension;
 			Hash hash = null;
-
-			try (InputStream inputStream = image.getInputStream()) {
-				long contentLength = image.getSize();
-
-				minioClient.putObject(
-					PutObjectArgs.builder()
-						.bucket(bucket)
-						.object(filename)
-						.stream(inputStream, contentLength, -1)
-						.contentType(expectedContentType)
-						.build()
-				);
-
+			String url = null;
+			try{
+				url = minioService.createFile(image, MinioProperties.FileType.POST);
 				MessageDigest digest = MessageDigest.getInstance("SHA-256");
 				byte[] bytes = image.getBytes();
 				byte[] hashBytes = digest.digest(bytes);
@@ -338,17 +319,30 @@ public class PostService {
 				hash = Hash.builder()
 					.hash(sb.toString())
 					.build();
-
-			} catch (Exception e) {
-				throw new MementoException(ErrorCodes.PROFILEIMAGE_SAVE_FAIL);
+			}catch (Exception e){
+				throw new MementoException(ErrorCodes.POST_IMAGE_SAVE_FAIL);
 			}
 
 			images.add(PostImage.builder()
-					.url(baseUrl + "/" + filename)
+					.url(url)
 					.post(post)
 					.hash(hash)
 				.build());
+			hashes.add(hash);
 		}
+
+		Set<String> uniqueHashes = new HashSet<>();
+		for (Hash hash : hashes) {
+			if (!uniqueHashes.add(hash.getHash())) {
+				throw new MementoException(ErrorCodes.POST_IMAGE_DUPLICATED);
+			}
+		}
+
+		List<PostImage> duplicatedImage = postImageRepository.findAllByHashInAndDeletedAtIsNull(hashes);
+		if(!duplicatedImage.isEmpty()){
+			throw new MementoException(ErrorCodes.POST_IMAGE_DUPLICATED);
+		}
+
 		return images;
 	}
 }

@@ -16,6 +16,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Hash {
 
-	@Column(name = "hash", length = 255, nullable = false, unique = true)
+	@Column(name = "hash", length = 255, nullable = false)
 	private String hash;
 }
