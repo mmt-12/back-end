@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,30 +66,37 @@ public class PostServiceTest {
 
 	@Autowired
 	private MemoryRepository memoryRepository;
+
 	@Autowired
 	private PostRepository postRepository;
+
 	@Autowired
 	private CommentRepository commentRepository;
+
 	@Autowired
 	private EventRepository eventRepository;
+
 	@Autowired
 	private VoiceRepository voiceRepository;
+
 	@Autowired
 	private EmojiRepository emojiRepository;
+
 	@Autowired
 	private PostImageRepository postImageRepository;
 
-	@AfterEach
-	void afterEach() {
-		memberRepository.deleteAll();
-		communityRepository.deleteAll();
-		associateRepository.deleteAll();
-		postRepository.deleteAll();
-		commentRepository.deleteAll();
-		eventRepository.deleteAll();
-		voiceRepository.deleteAll();
-		emojiRepository.deleteAll();
+	@BeforeEach
+	void beforeEach() {
 		postImageRepository.deleteAll();
+		emojiRepository.deleteAll();
+		voiceRepository.deleteAll();
+		commentRepository.deleteAll();
+		postRepository.deleteAll();
+		memoryRepository.deleteAll();
+		eventRepository.deleteAll();
+		associateRepository.deleteAll();
+		communityRepository.deleteAll();
+		memberRepository.deleteAll();
 	}
 
 	@Test
@@ -478,8 +485,7 @@ public class PostServiceTest {
 		//when
 		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file));
 
-		Post post = postRepository.findByIdAndDeletedAtIsNull(1L)
-			.orElseThrow();
+		Post post = postRepository.findAll().get(0);
 
 		//then
 		assertThat(post.getContent()).isEqualTo(content);
@@ -619,8 +625,7 @@ public class PostServiceTest {
 
 		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file));
 
-		Post post = postRepository.findByIdAndDeletedAtIsNull(1L)
-			.orElseThrow();
+		Post post = postRepository.findAll().get(0);
 
 		//when
 		postService.update(community.getId(), memory.getId(), associate.getId(), post.getId(), content, List.of(), List.of(file));
