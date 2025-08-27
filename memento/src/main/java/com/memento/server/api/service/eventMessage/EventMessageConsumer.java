@@ -15,7 +15,6 @@ import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
 import com.memento.server.domain.memory.Memory;
-import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.domain.notification.Notification;
 import com.memento.server.domain.notification.NotificationRepository;
 
@@ -27,7 +26,6 @@ public class EventMessageConsumer {
 
 	private final NotificationRepository notificationRepository;
 	private final AssociateRepository associateRepository;
-	private final MemoryRepository memoryRepository;
 
 	@Async
 	@TransactionalEventListener(phase = AFTER_COMMIT)
