@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.memento.server.api.service.eventMessage.EventMessageConsumer;
 import com.memento.server.api.service.eventMessage.dto.AssociateNotification;
+import com.memento.server.api.service.eventMessage.dto.MbtiNotification;
 import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
@@ -65,7 +66,24 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 	}
 
 	@Test
-	@DisplayName("알림 이벤트를 받아 데이터베이스에 저장한다.")
+	@DisplayName("MBTI 알림 이벤트를 데이터베이스에 저장한다.")
+	void handleMbtiNotification() {
+		// given
+		Member member = memberRepository.save(Member.create("김가가", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
+		Community community = communityRepository.save(Community.create("comm", member));
+		Associate associate = associateRepository.save(Associate.create("가가", member, community));
+
+		// when
+		MbtiNotification eventMessage = MbtiNotification.from(associate.getId());
+		eventMessageConsumer.handleMbtiNotification(eventMessage);
+
+		// then
+		List<Notification> all = notificationRepository.findAll();
+		assertThat(all.size()).isEqualTo(1);
+	}
+
+	@Test
+	@DisplayName("참가자 추가 알림 이벤트를 데이터베이스에 저장한다.")
 	void handleAssociateNotification() {
 		// given
 		Member member = memberRepository.save(Member.create("김가가", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
@@ -85,7 +103,7 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 	}
 
 	@Test
-	@DisplayName("알림 이벤트를 받아 데이터베이스에 저장한다.")
+	@DisplayName("기억 생성 알림 이벤트를 데이터베이스에 저장한다.")
 	void handleMemoryNotification() {
 		// given
 		Member member = memberRepository.save(Member.create("김가가", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
