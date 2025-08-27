@@ -32,4 +32,6 @@ public interface AssociateRepository extends JpaRepository<Associate, Long> {
 	Optional<Associate> findByIdAndDeletedAtIsNull(Long id);
 
 	List<Associate> findAllByIdInAndDeletedAtIsNull(List<Long> ids);
+
+	List<Associate> findAllByCommunity(Community community);
 }
