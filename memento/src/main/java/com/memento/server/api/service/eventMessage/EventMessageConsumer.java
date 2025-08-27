@@ -1,8 +1,10 @@
 package com.memento.server.api.service.eventMessage;
 
+import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_EXISTENCE;
 import static com.memento.server.common.error.ErrorCodes.COMMUNITY_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.MEMORY_NOT_FOUND;
 import static com.memento.server.domain.notification.NotificationType.ASSOCIATE;
+import static com.memento.server.domain.notification.NotificationType.MBTI;
 import static com.memento.server.domain.notification.NotificationType.MEMORY;
 import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.memento.server.api.service.eventMessage.dto.AssociateNotification;
+import com.memento.server.api.service.eventMessage.dto.MbtiNotification;
 import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
@@ -39,6 +42,20 @@ public class EventMessageConsumer {
 	private final AssociateRepository associateRepository;
 	private final MemoryRepository memoryRepository;
 	private final CommunityRepository communityRepository;
+
+	@TransactionalEventListener(phase = AFTER_COMMIT)
+	public void handleMbtiNotification(MbtiNotification event) {
+		Associate associate = associateRepository.findById(event.associateId())
+			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
+
+		notificationRepository.save(Notification.builder()
+			.title(MBTI.getTitle())
+			.content(MBTI.getTitle())
+			.type(MBTI)
+			.actorId(event.associateId())
+			.receiver(associate)
+			.build());
+	}
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleAssociateNotification(AssociateNotification event) {
