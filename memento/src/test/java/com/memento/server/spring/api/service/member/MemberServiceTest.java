@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,6 @@ import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
 
 @SpringBootTest
-@Transactional
 class MemberServiceTest {
 
 	@Autowired
@@ -43,6 +43,13 @@ class MemberServiceTest {
 
 	@Autowired
 	private CommunityRepository communityRepository;
+
+	@AfterEach
+	void afterEach() {
+		memberRepository.deleteAllInBatch();
+		associateRepository.deleteAllInBatch();
+		communityRepository.deleteAllInBatch();
+	}
 
 	@Test
 	@DisplayName("커뮤니티 목록을 조회한다.")
@@ -100,7 +107,7 @@ class MemberServiceTest {
 		MemberSignUpResponse response = memberService.signUp(kakaoId, name, email, birthday);
 
 		// then
-		Member saved = memberRepository.findByKakaoId(kakaoId).orElseThrow();
+		Member saved = memberRepository.findByKakaoIdAndDeletedAtIsNull(kakaoId).orElseThrow();
 		assertThat(saved.getName()).isEqualTo(name);
 		assertThat(saved.getEmail()).isEqualTo(email);
 		assertThat(response.memberId()).isEqualTo(saved.getId());
@@ -136,7 +143,7 @@ class MemberServiceTest {
 		memberService.update(member.getId(), "김철수", "kim@test.com");
 
 		// then
-		Member updated = memberRepository.findById(member.getId()).orElseThrow();
+		Member updated = memberRepository.findByIdAndDeletedAtIsNull(member.getId()).orElseThrow();
 		assertThat(updated.getName()).isEqualTo("김철수");
 		assertThat(updated.getEmail()).isEqualTo("kim@test.com");
 	}

@@ -34,12 +34,12 @@ public class MemberService {
 	private final JwtTokenProvider jwtTokenProvider;
 
 	public Optional<Member> findMemberWithKakaoId(Long kakaoId) {
-		return memberRepository.findByKakaoId(kakaoId);
+		return memberRepository.findByKakaoIdAndDeletedAtIsNull(kakaoId);
 	}
 
 	@Transactional
 	public MemberSignUpResponse signUp(Long kakaoId, String name, String email, LocalDate birthday) {
-		Optional<Member> memberOptional = memberRepository.findByKakaoId(kakaoId);
+		Optional<Member> memberOptional = memberRepository.findByKakaoIdAndDeletedAtIsNull(kakaoId);
 		if (memberOptional.isPresent()) {
 			throw new MementoException(MEMBER_DUPLICATE);
 		}
@@ -47,7 +47,7 @@ public class MemberService {
 		Member member = memberRepository.save(Member.create(name, email, birthday, kakaoId));
 
 		// 커뮤니티 자동 가입
-		Optional<Community> communityOptional = communityRepository.findById(1L);
+		Optional<Community> communityOptional = communityRepository.findByIdAndDeletedAtIsNull(1L);
 		Community community = communityOptional.orElse(
 			communityRepository.save(Community.create("SSAFY 12기 12반", member)));
 		Associate associate = associateRepository.save(Associate.create(name, member, community));
@@ -59,7 +59,7 @@ public class MemberService {
 
 	@Transactional
 	public void update(Long memberId, String name, String email) {
-		Optional<Member> memberOptional = memberRepository.findById(memberId);
+		Optional<Member> memberOptional = memberRepository.findByIdAndDeletedAtIsNull(memberId);
 		if (memberOptional.isEmpty()) {
 			throw new MementoException(MEMBER_NOT_FOUND);
 		}

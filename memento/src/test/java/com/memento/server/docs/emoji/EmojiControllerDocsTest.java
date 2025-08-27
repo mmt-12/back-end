@@ -38,6 +38,7 @@ import com.memento.server.api.service.emoji.dto.request.EmojiListQueryRequest;
 import com.memento.server.api.service.emoji.dto.request.EmojiRemoveRequest;
 import com.memento.server.api.service.emoji.dto.response.EmojiListResponse;
 import com.memento.server.api.service.emoji.dto.response.EmojiResponse;
+import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.emoji.EmojiFixtures;
 
@@ -117,7 +118,7 @@ public class EmojiControllerDocsTest extends RestDocsSupport {
 		boolean hasNext = true;
 
 		EmojiResponse emojiResponse = EmojiResponse.of(EmojiFixtures.emoji());
-		EmojiListResponse response = EmojiListResponse.of(List.of(emojiResponse), cursor, size, nextCursor, hasNext);
+		EmojiListResponse response = EmojiListResponse.of(List.of(emojiResponse), PageInfo.of(hasNext, nextCursor));
 
 		given(emojiService.getEmoji(any(EmojiListQueryRequest.class)))
 			.willReturn(response);
@@ -148,10 +149,8 @@ public class EmojiControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("emoji[].author.id").description("이모지 작성자 ID"),
 					fieldWithPath("emoji[].author.nickname").description("이모지 작성자 닉네임"),
 					fieldWithPath("emoji[].author.imageUrl").description("이모지 작성자 프로필 이미지 URL"),
-					fieldWithPath("cursor").description("현재 커서 위치 (마지막으로 조회한 이모지 ID)"),
-					fieldWithPath("size").description("요청한 이모지 수"),
-					fieldWithPath("nextCursor").description("다음 페이지 커서 (더 불러올 이모지가 있을 경우)"),
-					fieldWithPath("hasNext").description("다음 페이지 존재 여부")
+					fieldWithPath("pageInfo.hasNext").description("다음 페이지 존재 여부"),
+					fieldWithPath("pageInfo.nextCursor").description("다음 페이지 커서 (더 불러올 보이스가 있을 경우)")
 				)
 			));
 

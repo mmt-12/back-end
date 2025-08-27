@@ -12,11 +12,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
 import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
@@ -46,7 +48,6 @@ import com.memento.server.domain.post.PostImageRepository;
 import com.memento.server.domain.post.PostRepository;
 
 @SpringBootTest
-@Transactional
 class MemoryServiceTest {
 
 	@Autowired
@@ -75,6 +76,21 @@ class MemoryServiceTest {
 
 	@Autowired
 	private EventRepository eventRepository;
+
+	@Autowired
+	private TransactionTemplate transactionTemplate;
+
+	@AfterEach
+	void afterEach() {
+		memoryRepository.deleteAllInBatch();
+		memoryAssociateRepository.deleteAllInBatch();
+		postImageRepository.deleteAllInBatch();
+		postRepository.deleteAllInBatch();
+		memberRepository.deleteAllInBatch();
+		communityRepository.deleteAllInBatch();
+		associateRepository.deleteAllInBatch();
+		eventRepository.deleteAllInBatch();
+	}
 
 	@Test
 	@DisplayName("모든 기억을 조회한다.")
@@ -542,16 +558,22 @@ class MemoryServiceTest {
 		assertThat(response).isNotNull();
 		assertThat(response.memoryId()).isNotNull();
 
-		Memory foundMemory = memoryRepository.findById(response.memoryId()).orElseThrow();
-		assertThat(foundMemory.getEvent().getTitle()).isEqualTo("새로운 추억");
-		assertThat(foundMemory.getEvent().getDescription()).isEqualTo("새로운 추억에 대한 설명입니다.");
-		assertThat(foundMemory.getEvent().getLocation().getAddress()).isEqualTo("테스트 주소");
-		assertThat(foundMemory.getEvent().getPeriod().getStartTime()).isEqualTo(LocalDateTime.of(2024, 8, 1, 10, 0));
+		transactionTemplate.execute(status -> {
+			Memory foundMemory = memoryRepository.findByIdAndDeletedAtIsNull(response.memoryId()).orElseThrow();
+			assertThat(foundMemory.getEvent().getTitle()).isEqualTo("새로운 추억");
+			assertThat(foundMemory.getEvent().getDescription()).isEqualTo("새로운 추억에 대한 설명입니다.");
+			assertThat(foundMemory.getEvent().getLocation().getAddress()).isEqualTo("테스트 주소");
+			assertThat(foundMemory.getEvent().getPeriod().getStartTime()).isEqualTo(
+				LocalDateTime.of(2024, 8, 1, 10, 0));
 
-		List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemory(foundMemory);
-		assertThat(memoryAssociates).hasSize(2);
-		assertThat(memoryAssociates).extracting(MemoryAssociate::getAssociate)
-			.containsExactlyInAnyOrder(associate, otherAssociate);
+			List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemoryAndDeletedAtIsNull(
+				foundMemory);
+			assertThat(memoryAssociates).hasSize(2);
+			assertThat(memoryAssociates).extracting(MemoryAssociate::getAssociate)
+				.containsExactlyInAnyOrder(associate, otherAssociate);
+
+			return null;
+		});
 	}
 
 	@Test
@@ -691,16 +713,21 @@ class MemoryServiceTest {
 		assertThat(response).isNotNull();
 		assertThat(response.memoryId()).isEqualTo(memory.getId());
 
-		Memory foundMemory = memoryRepository.findById(response.memoryId()).orElseThrow();
-		assertThat(foundMemory.getEvent().getTitle()).isEqualTo("수정된 추억");
-		assertThat(foundMemory.getEvent().getDescription()).isEqualTo("수정된 추억에 대한 설명입니다.");
-		assertThat(foundMemory.getEvent().getLocation().getAddress()).isEqualTo("수정된 주소");
-		assertThat(foundMemory.getEvent().getPeriod().getStartTime()).isEqualTo(LocalDateTime.of(2024, 9, 1, 10, 0));
+		transactionTemplate.execute(status -> {
+			Memory foundMemory = memoryRepository.findByIdAndDeletedAtIsNull(response.memoryId()).orElseThrow();
+			assertThat(foundMemory.getEvent().getTitle()).isEqualTo("수정된 추억");
+			assertThat(foundMemory.getEvent().getDescription()).isEqualTo("수정된 추억에 대한 설명입니다.");
+			assertThat(foundMemory.getEvent().getLocation().getAddress()).isEqualTo("수정된 주소");
+			assertThat(foundMemory.getEvent().getPeriod().getStartTime()).isEqualTo(LocalDateTime.of(2024, 9, 1, 10, 0));
 
-		List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemory(foundMemory);
-		assertThat(memoryAssociates).hasSize(2);
-		assertThat(memoryAssociates).extracting(MemoryAssociate::getAssociate)
-			.containsExactlyInAnyOrder(associate, otherAssociate);
+			List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemoryAndDeletedAtIsNull(
+				foundMemory);
+			assertThat(memoryAssociates).hasSize(2);
+			assertThat(memoryAssociates).extracting(MemoryAssociate::getAssociate)
+				.containsExactlyInAnyOrder(associate, otherAssociate);
+
+			return null;
+		});
 	}
 
 	@Test
@@ -760,16 +787,21 @@ class MemoryServiceTest {
 		assertThat(response).isNotNull();
 		assertThat(response.memoryId()).isEqualTo(memory.getId());
 
-		Memory foundMemory = memoryRepository.findById(response.memoryId()).orElseThrow();
-		assertThat(foundMemory.getEvent().getTitle()).isEqualTo("수정된 추억");
-		assertThat(foundMemory.getEvent().getDescription()).isEqualTo("수정된 추억에 대한 설명입니다.");
-		assertThat(foundMemory.getEvent().getLocation().getAddress()).isEqualTo("수정된 주소");
-		assertThat(foundMemory.getEvent().getPeriod().getStartTime()).isEqualTo(LocalDateTime.of(2024, 9, 1, 10, 0));
+		transactionTemplate.execute(status -> {
+			Memory foundMemory = memoryRepository.findByIdAndDeletedAtIsNull(response.memoryId()).orElseThrow();
+			assertThat(foundMemory.getEvent().getTitle()).isEqualTo("수정된 추억");
+			assertThat(foundMemory.getEvent().getDescription()).isEqualTo("수정된 추억에 대한 설명입니다.");
+			assertThat(foundMemory.getEvent().getLocation().getAddress()).isEqualTo("수정된 주소");
+			assertThat(foundMemory.getEvent().getPeriod().getStartTime()).isEqualTo(LocalDateTime.of(2024, 9, 1, 10, 0));
 
-		List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemory(foundMemory);
-		assertThat(memoryAssociates).hasSize(1);
-		assertThat(memoryAssociates).extracting(MemoryAssociate::getAssociate)
-			.containsExactlyInAnyOrder(otherAssociate);
+			List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemoryAndDeletedAtIsNull(
+				foundMemory);
+			assertThat(memoryAssociates).hasSize(1);
+			assertThat(memoryAssociates).extracting(MemoryAssociate::getAssociate)
+				.containsExactlyInAnyOrder(otherAssociate);
+
+			return null;
+		});
 	}
 
 	@Test
@@ -902,7 +934,7 @@ class MemoryServiceTest {
 		memoryService.delete(memory.getId(), associate.getId());
 
 		// then
-		assertThat(memoryRepository.findById(memory.getId())).isEmpty();
+		assertThat(memoryRepository.findByIdAndDeletedAtIsNull(memory.getId())).isEmpty();
 	}
 
 	@Test

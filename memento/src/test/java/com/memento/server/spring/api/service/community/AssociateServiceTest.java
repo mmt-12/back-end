@@ -7,11 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.memento.server.api.controller.community.dto.AssociateListResponse;
 import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
@@ -28,7 +29,6 @@ import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
 
 @SpringBootTest
-@Transactional
 public class AssociateServiceTest{
 
 	@Autowired
@@ -45,6 +45,17 @@ public class AssociateServiceTest{
 
 	@Autowired
 	protected AssociateRepository associateRepository;
+
+	@Autowired
+	private TransactionTemplate transactionTemplate;
+
+	@AfterEach
+	void afterEach() {
+		memberRepository.deleteAllInBatch();
+		associateRepository.deleteAllInBatch();
+		communityRepository.deleteAllInBatch();
+		achievementRepository.deleteAllInBatch();
+	}
 
 	@Test
 	@DisplayName("커뮤니티 참여자 목록 조회")
@@ -304,13 +315,17 @@ public class AssociateServiceTest{
 		);
 
 		// then
-		Associate updatedAssociate = associateRepository.findById(associate.getId())
-			.orElseThrow();
+		transactionTemplate.execute(status -> {
+			Associate updatedAssociate = associateRepository.findByIdAndDeletedAtIsNull(associate.getId())
+				.orElseThrow();
 
-		assertThat(updatedAssociate.getProfileImageUrl()).isEqualTo("new-image");
-		assertThat(updatedAssociate.getNickname()).isEqualTo("example");
-		assertThat(updatedAssociate.getAchievement().getId()).isEqualTo(newAchievement.getId());
-		assertThat(updatedAssociate.getAchievement().getName()).isEqualTo("Expert");
-		assertThat(updatedAssociate.getIntroduction()).isEqualTo("New Intro");
+			assertThat(updatedAssociate.getProfileImageUrl()).isEqualTo("new-image");
+			assertThat(updatedAssociate.getNickname()).isEqualTo("example");
+			assertThat(updatedAssociate.getAchievement().getId()).isEqualTo(newAchievement.getId());
+			assertThat(updatedAssociate.getAchievement().getName()).isEqualTo("Expert");
+			assertThat(updatedAssociate.getIntroduction()).isEqualTo("New Intro");
+
+			return null;
+		});
 	}
 }

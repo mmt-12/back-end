@@ -16,6 +16,8 @@ public interface PostImageRepository extends JpaRepository<PostImage, Long> {
 		    FROM PostImage pi
 		    JOIN pi.post p
 		    WHERE p.memory.id IN :memoryIds
+		      AND (pi.deletedAt IS NULL)
+		      AND (p.deletedAt IS NULL)
 		    ORDER BY p.memory.id, pi.createdAt DESC
 		""")
 	List<PostImage> findAllByMemoryIds(@Param("memoryIds") List<Long> memoryIds);

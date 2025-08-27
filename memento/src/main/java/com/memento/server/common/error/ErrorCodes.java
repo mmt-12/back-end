@@ -24,6 +24,15 @@ public enum ErrorCodes implements ErrorCode {
 	VOICE_URL_TOO_LONG(BAD_REQUEST, 2005, "보이스 URL은 최대 255자까지 입력할 수 있습니다."),
 	VOICE_ASSOCIATE_REQUIRED(BAD_REQUEST, 2006, "보이스 작성자는 필수입니다."),
 	VOICE_SAVE_FAIL(BAD_REQUEST, 2007, "보이스 저장을 실패하였습니다."),
+	VOICE_FILE_TOO_LARGE(BAD_REQUEST, 2008, "음성 파일 크기는 10MB를 초과할 수 없습니다."),
+	VOICE_INVALID_FORMAT(BAD_REQUEST, 2009, "지원하지 않는 음성 파일 형식입니다."),
+	VOICE_NOT_FOUND(BAD_REQUEST, 2010, "보이스를 찾을 수 없습니다."),
+	UNAUTHORIZED_VOICE_ACCESS(BAD_REQUEST, 2011, "보이스를 삭제할 권한이 없습니다."),
+
+	IMAGE_FILE_TOO_LARGE(BAD_REQUEST, 2012, "이미지 파일 크기가 제한을 초과합니다."),
+	IMAGE_INVALID_FORMAT(BAD_REQUEST, 2013, "지원하지 않는 이미지 파일 형식입니다."),
+	POST_TOO_MANY_FILES(BAD_REQUEST, 2014, "업로드할 수 있는 파일 개수를 초과했습니다."),
+	POST_FILES_TOO_LARGE(BAD_REQUEST, 2015, "전체 파일 크기가 제한을 초과합니다."),
 
 	EMOJI_NAME_REQUIRED(BAD_REQUEST, 3000, "이모지 이름은 필수입니다."),
 	EMOJI_NAME_BLANK(BAD_REQUEST, 3001, "이모지 이름은 공백일 수 없습니다."),
@@ -32,6 +41,8 @@ public enum ErrorCodes implements ErrorCode {
 	EMOJI_URL_BLANK(BAD_REQUEST, 3004, "이모지 URL은 공백일 수 없습니다."),
 	EMOJI_URL_TOO_LONG(BAD_REQUEST, 3005, "이모지 URL은 최대 255자까지 입력할 수 있습니다."),
 	EMOJI_ASSOCIATE_REQUIRED(BAD_REQUEST, 3006, "이모지 작성자는 필수입니다."),
+	EMOJI_NOT_FOUND(BAD_REQUEST, 3007, "이모지를 찾을 수 없습니다."),
+	UNAUTHORIZED_EMOJI_ACCESS(BAD_REQUEST, 3008, "이모지를 삭제할 권한이 없습니다."),
 
 	MEMBER_NAME_REQUIRED(BAD_REQUEST, 4000, "회원 이름은 필수입니다."),
 	MEMBER_NAME_BLANK(BAD_REQUEST, 4001, "회원 이름은 공백일 수 없습니다."),
@@ -70,6 +81,7 @@ public enum ErrorCodes implements ErrorCode {
 	ASSOCIATE_NOT_AUTHORITY(BAD_REQUEST, 7005, "권한이 없는 참여자입니다."),
 	ASSOCIATE_NOT_EXISTENCE(BAD_REQUEST, 7006, "존재하지 않는 참여자 입니다."),
 	ASSOCIATE_COMMUNITY_NOT_MATCH(BAD_REQUEST, 7007, "해당 커뮤니티의 참가자가 아닙니다."),
+	ASSOCIATE_NOT_FOUND(BAD_REQUEST, 7008, "그룹 참여자를 찾을 수 없습니다."),
 
 	COMMENT_URL_REQUIRED(BAD_REQUEST, 8000, "코멘트 URL은 필수입니다."),
 	COMMENT_URL_BLANK(BAD_REQUEST, 8001, "코멘트 URL은 공백일 수 없습니다."),
@@ -86,7 +98,10 @@ public enum ErrorCodes implements ErrorCode {
 	MEMORY_NOT_AUTHOR(BAD_REQUEST, 11001, "기억의 작성자가 아닙니다."),
 	MEMORY_POST_NOT_MATCH(BAD_REQUEST, 11002, "해당 기억의 포스트가 아닙니다."),
 
-	POST_NOT_EXISTENCE(BAD_REQUEST, 12000, "존재하지 않는 포스트입니다."),
+	MINIO_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, 12000, "파일 업로드 중 오류가 발생했습니다."),
+
+	POST_NOT_EXISTENCE(BAD_REQUEST, 13000, "존재하지 않는 포스트입니다."),
+
 	;
 	private final HttpStatus status;
 	private final int code;

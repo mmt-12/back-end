@@ -14,9 +14,10 @@ public interface MemoryAssociateRepository extends JpaRepository<MemoryAssociate
 		    SELECT ma.memory.id AS memoryId, COUNT(ma) AS associateCount
 		    FROM MemoryAssociate ma
 		    WHERE ma.memory.id IN :memoryIds
+		      AND (ma.deletedAt IS NULL)
 		    GROUP BY ma.memory.id
 		""")
 	List<MemoryAssociateCount> countAssociatesByMemoryIds(@Param("memoryIds") List<Long> memoryIds);
 
-	List<MemoryAssociate> findAllByMemory(Memory memory);
+	List<MemoryAssociate> findAllByMemoryAndDeletedAtIsNull(Memory memory);
 }

@@ -3,6 +3,7 @@ package com.memento.server.spring.api.controller.voice;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
@@ -22,8 +23,11 @@ import org.springframework.mock.web.MockMultipartFile;
 import com.memento.server.api.controller.voice.dto.request.VoiceCreateRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
+import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
+import com.memento.server.common.exception.MementoException;
+import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
 import com.memento.server.voice.VoiceFixtures;
 
@@ -63,6 +67,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andDo(print())
 			.andExpect(status().isCreated());
 
+		verify(fileValidator).validateVoiceFile(any());
 		verify(voiceService).createPermanentVoice(any());
 	}
 
@@ -103,6 +108,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("$.errors[0].field").value("name"))
 			.andExpect(jsonPath("$.errors[0].message").value("name 값은 필수입니다."));
 
+		verify(fileValidator, never()).validateVoiceFile(any());
 		verify(voiceService, never()).createPermanentVoice(any());
 	}
 
@@ -147,6 +153,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("$.errors[0].field").value("name"))
 			.andExpect(jsonPath("$.errors[0].message").value("name은 최대 34자(한글 기준)까지 입력 가능합니다."));
 
+		verify(fileValidator, never()).validateVoiceFile(any());
 		verify(voiceService, never()).createPermanentVoice(any());
 	}
 
@@ -179,6 +186,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("$.errors[0].field").value("data"))
 			.andExpect(jsonPath("$.errors[0].message").value("data은(는) 필수입니다."));
 
+		verify(fileValidator, never()).validateVoiceFile(any());
 		verify(voiceService, never()).createPermanentVoice(any());
 	}
 
@@ -213,6 +221,133 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("$.errors[0].field").value("voice"))
 			.andExpect(jsonPath("$.errors[0].message").value("voice은(는) 필수입니다."));
 
+		verify(fileValidator, never()).validateVoiceFile(any());
+		verify(voiceService, never()).createPermanentVoice(any());
+	}
+
+	@Test
+	@DisplayName("보이스 생성 시 보이스 파일 크기가 설정된 제한을 초과하면 예외가 발생한다.")
+	void createVoiceWithTooLargeFile() throws Exception {
+		// given
+		long communityId = 1L;
+		String json = objectMapper.writeValueAsString(VoiceCreateRequest.builder()
+			.name("인쥐용").build());
+
+		MockMultipartFile data = new MockMultipartFile(
+			"data",
+			"request",
+			"application/json",
+			json.getBytes()
+		);
+
+		MockMultipartFile voice = new MockMultipartFile(
+			"voice",
+			"voice.wav",
+			"audio/wav",
+			"content".getBytes()
+		);
+
+		doThrow(new MementoException(ErrorCodes.VOICE_FILE_TOO_LARGE))
+			.when(fileValidator).validateVoiceFile(voice);
+
+		// when & then
+		mockMvc.perform(
+				multipart("/api/v1/communities/{communityId}/voices", communityId)
+					.file(data)
+					.file(voice)
+					.with(withJwt(1L, 1L, 1L))
+					.contentType(MULTIPART_FORM_DATA))
+			.andDo(print())
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+			.andExpect(jsonPath("$.code").value(2008))
+			.andExpect(jsonPath("$.message").value("음성 파일 크기는 10MB를 초과할 수 없습니다."));
+
+		verify(fileValidator).validateVoiceFile(voice);
+		verify(voiceService, never()).createPermanentVoice(any());
+	}
+
+	@Test
+	@DisplayName("보이스 생성 시 지원하지 않는 파일 형식으로 보이스를 생성하면 예외가 발생한다.")
+	void createVoiceWithInvalidFormat() throws Exception {
+		// given
+		long communityId = 1L;
+		String json = objectMapper.writeValueAsString(VoiceCreateRequest.builder()
+			.name("인쥐용").build());
+
+		MockMultipartFile data = new MockMultipartFile(
+			"data",
+			"request",
+			"application/json",
+			json.getBytes()
+		);
+
+		MockMultipartFile voice = new MockMultipartFile(
+			"voice",
+			"voice.txt",
+			"text/plain", // 지원하지 않는 형식
+			"content".getBytes()
+		);
+
+		doThrow(new MementoException(ErrorCodes.VOICE_INVALID_FORMAT))
+			.when(fileValidator).validateVoiceFile(voice);
+
+		// when & then
+		mockMvc.perform(
+				multipart("/api/v1/communities/{communityId}/voices", communityId)
+					.file(data)
+					.file(voice)
+					.with(withJwt(1L, 1L, 1L))
+					.contentType(MULTIPART_FORM_DATA))
+			.andDo(print())
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+			.andExpect(jsonPath("$.code").value(2009))
+			.andExpect(jsonPath("$.message").value("지원하지 않는 음성 파일 형식입니다."));
+
+		verify(fileValidator).validateVoiceFile(voice);
+		verify(voiceService, never()).createPermanentVoice(any());
+	}
+
+	@Test
+	@DisplayName("보이스 생성 시 contentType이 null인 파일로 보이스를 생성하면 예외가 발생한다.")
+	void createVoiceWithNullContentType() throws Exception {
+		// given
+		long communityId = 1L;
+		String json = objectMapper.writeValueAsString(VoiceCreateRequest.builder()
+			.name("인쥐용").build());
+
+		MockMultipartFile data = new MockMultipartFile(
+			"data",
+			"request",
+			"application/json",
+			json.getBytes()
+		);
+
+		MockMultipartFile voice = new MockMultipartFile(
+			"voice",
+			"voice.wav",
+			null, // null contentType
+			"content".getBytes()
+		);
+
+		doThrow(new MementoException(ErrorCodes.VOICE_INVALID_FORMAT))
+			.when(fileValidator).validateVoiceFile(voice);
+
+		// when & then
+		mockMvc.perform(
+				multipart("/api/v1/communities/{communityId}/voices", communityId)
+					.file(data)
+					.file(voice)
+					.with(withJwt(1L, 1L, 1L))
+					.contentType(MULTIPART_FORM_DATA))
+			.andDo(print())
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+			.andExpect(jsonPath("$.code").value(2009))
+			.andExpect(jsonPath("$.message").value("지원하지 않는 음성 파일 형식입니다."));
+
+		verify(fileValidator).validateVoiceFile(voice);
 		verify(voiceService, never()).createPermanentVoice(any());
 	}
 
@@ -228,7 +363,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 		boolean hasNext = true;
 
 		VoiceResponse voiceResponse = VoiceResponse.of(VoiceFixtures.permanentVoice());
-		VoiceListResponse response = VoiceListResponse.of(List.of(voiceResponse), cursor, size, nextCursor, hasNext);
+		VoiceListResponse response = VoiceListResponse.of(List.of(voiceResponse), PageInfo.of(hasNext, nextCursor));
 
 		given(voiceService.getVoices(any(VoiceListQueryRequest.class)))
 			.willReturn(response);
@@ -243,6 +378,52 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andExpect(status().isOk());
 
 		verify(voiceService).getVoices(any(VoiceListQueryRequest.class));
+	}
+
+	@Test
+	@DisplayName("보이스 목록 조회 시 size가 1보다 작으면 예외가 발생한다.")
+	void getVoicesWithSizeTooSmall() throws Exception {
+		// given
+		long communityId = 1L;
+		int invalidSize = 0;
+
+		// when & then
+		mockMvc.perform(
+				get("/api/v1/communities/{communityId}/voices", communityId)
+					.param("size", String.valueOf(invalidSize))
+					.with(withJwt(1L, 1L, 1L)))
+			.andDo(print())
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+			.andExpect(jsonPath("$.code").value(1001))
+			.andExpect(jsonPath("$.message").value("잘못된 입력"))
+			.andExpect(jsonPath("$.errors[0].field").value("size"))
+			.andExpect(jsonPath("$.errors[0].message").value("size는 1 이상이어야 합니다."));
+
+		verify(voiceService, never()).getVoices(any(VoiceListQueryRequest.class));
+	}
+
+	@Test
+	@DisplayName("보이스 목록 조회 시 size가 30보다 크면 예외가 발생한다.")
+	void getVoicesWithSizeTooLarge() throws Exception {
+		// given
+		long communityId = 1L;
+		int invalidSize = 31;
+
+		// when & then
+		mockMvc.perform(
+				get("/api/v1/communities/{communityId}/voices", communityId)
+					.param("size", String.valueOf(invalidSize))
+					.with(withJwt(1L, 1L, 1L)))
+			.andDo(print())
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+			.andExpect(jsonPath("$.code").value(1001))
+			.andExpect(jsonPath("$.message").value("잘못된 입력"))
+			.andExpect(jsonPath("$.errors[0].field").value("size"))
+			.andExpect(jsonPath("$.errors[0].message").value("size는 30 이하여야 합니다."));
+
+		verify(voiceService, never()).getVoices(any(VoiceListQueryRequest.class));
 	}
 
 	@Test
