@@ -6,11 +6,15 @@ import lombok.Builder;
 
 @Builder
 public record MemoryNotification(
-	Memory memory
+	Long memoryId,
+	Long communityId,
+	Long authorId
 ) {
-	public static MemoryNotification from(Memory memory) {
+	public static MemoryNotification from(Long memoryId, Long communityId, Long authorId) {
 		return MemoryNotification.builder()
-			.memory(memory)
+			.memoryId(memoryId)
+			.communityId(communityId)
+			.authorId(authorId)
 			.build();
 	}
 }
