@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.memento.server.api.service.eventMessage.EventMessageConsumer;
-import com.memento.server.api.service.eventMessage.EventMessagePublisher;
 import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
@@ -35,9 +34,6 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private EventMessageConsumer eventMessageConsumer;
-
-	@Autowired
-	private EventMessagePublisher eventMessagePublisher;
 
 	@Autowired
 	private NotificationRepository notificationRepository;
@@ -67,8 +63,8 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 		eventRepository.deleteAllInBatch();
 	}
 
-	@DisplayName("알림 이벤트를 받아 데이터베이스에 저장한다.")
 	@Test
+	@DisplayName("알림 이벤트를 받아 데이터베이스에 저장한다.")
 	void handleMemoryNotification() {
 		// given
 		Member member = memberRepository.save(Member.create("김가가", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
@@ -76,8 +72,8 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 		Member member3 = memberRepository.save(Member.create("김다다", "muge@test.com", LocalDate.of(1990, 1, 1), 1003L));
 		Community community = communityRepository.save(Community.create("comm", member));
 		Associate associate = associateRepository.save(Associate.create("가가", member, community));
-		Associate associate2 = associateRepository.save(Associate.create("나나", member2, community));
-		Associate associate3 = associateRepository.save(Associate.create("다다", member3, community));
+		associateRepository.save(Associate.create("나나", member2, community));
+		associateRepository.save(Associate.create("다다", member3, community));
 		Event event = eventRepository.save(
 			Event.builder()
 				.title("추억1")
@@ -99,7 +95,7 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
 
 		// when
-		MemoryNotification eventMessage = MemoryNotification.from(memory);
+		MemoryNotification eventMessage = MemoryNotification.from(memory.getId(), community.getId(), associate.getId());
 		eventMessageConsumer.handleMemoryNotification(eventMessage);
 
 		// then
