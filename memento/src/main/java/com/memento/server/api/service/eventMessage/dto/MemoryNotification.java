@@ -1,7 +1,5 @@
 package com.memento.server.api.service.eventMessage.dto;
 
-import com.memento.server.domain.memory.Memory;
-
 import lombok.Builder;
 
 @Builder
