@@ -6,8 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record MemoryNotification(
-	Memory memory,
-	Long authorId
+	Memory memory
 ) {
 	public static MemoryNotification from(Memory memory) {
 		return MemoryNotification.builder()
