@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,16 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private EventRepository eventRepository;
+
+	@AfterEach
+	public void tearDown() {
+		notificationRepository.deleteAllInBatch();
+		memberRepository.deleteAllInBatch();
+		associateRepository.deleteAllInBatch();
+		memoryRepository.deleteAllInBatch();
+		communityRepository.deleteAllInBatch();
+		eventRepository.deleteAllInBatch();
+	}
 
 	@DisplayName("알림 이벤트를 받아 데이터베이스에 저장한다.")
 	@Test
