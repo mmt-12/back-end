@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.memento.server.api.service.eventMessage.EventMessageConsumer;
 import com.memento.server.api.service.eventMessage.dto.AssociateNotification;
+import com.memento.server.api.service.eventMessage.dto.GuestBookNotification;
 import com.memento.server.api.service.eventMessage.dto.MbtiNotification;
 import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
 import com.memento.server.api.service.eventMessage.dto.NewImageNotification;
@@ -70,6 +71,23 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 		communityRepository.deleteAllInBatch();
 		eventRepository.deleteAllInBatch();
 		memoryAssociateRepository.deleteAllInBatch();
+	}
+
+	@Test
+	@DisplayName("프로필 이미지 등록 알림 이벤트를 데이터베이스에 저장한다.")
+	void handleGuestBookNotification() {
+		// given
+		Member member = memberRepository.save(Member.create("김가가", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
+		Community community = communityRepository.save(Community.create("comm", member));
+		Associate associate = associateRepository.save(Associate.create("가가", member, community));
+
+		// when
+		GuestBookNotification eventMessage = GuestBookNotification.from(associate.getId());
+		eventMessageConsumer.handleGuestBookNotification(eventMessage);
+
+		// then
+		List<Notification> all = notificationRepository.findAll();
+		assertThat(all.size()).isEqualTo(1);
 	}
 
 	@Test

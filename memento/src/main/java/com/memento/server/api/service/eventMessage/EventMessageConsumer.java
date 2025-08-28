@@ -2,6 +2,7 @@ package com.memento.server.api.service.eventMessage;
 
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_EXISTENCE;
 import static com.memento.server.domain.notification.NotificationType.ASSOCIATE;
+import static com.memento.server.domain.notification.NotificationType.GUESTBOOK;
 import static com.memento.server.domain.notification.NotificationType.MBTI;
 import static com.memento.server.domain.notification.NotificationType.MEMORY;
 import static com.memento.server.domain.notification.NotificationType.NEWIMAGE;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.memento.server.api.service.eventMessage.dto.AssociateNotification;
+import com.memento.server.api.service.eventMessage.dto.GuestBookNotification;
 import com.memento.server.api.service.eventMessage.dto.MbtiNotification;
 import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
 import com.memento.server.api.service.eventMessage.dto.NewImageNotification;
@@ -38,6 +40,20 @@ public class EventMessageConsumer {
 	private final NotificationRepository notificationRepository;
 	private final AssociateRepository associateRepository;
 	private final MemoryAssociateRepository memoryAssociateRepository;
+
+	@TransactionalEventListener(phase = AFTER_COMMIT)
+	public void handleGuestBookNotification(GuestBookNotification event) {
+		Associate associate = associateRepository.findById(event.associateId())
+			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
+
+		notificationRepository.save(Notification.builder()
+			.title(GUESTBOOK.getTitle())
+			.content(GUESTBOOK.getTitle())
+			.type(GUESTBOOK)
+			.actorId(event.associateId())
+			.receiver(associate)
+			.build());
+	}
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleNewImageNotification(NewImageNotification event) {
