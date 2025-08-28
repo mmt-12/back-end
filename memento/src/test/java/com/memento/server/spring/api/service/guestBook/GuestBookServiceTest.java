@@ -39,7 +39,7 @@ import com.memento.server.member.MemberFixtures;
 import com.memento.server.spring.api.service.IntegrationsTestSupport;
 import com.memento.server.voice.VoiceFixtures;
 
-public class guestBookServiceTest extends IntegrationsTestSupport {
+public class GuestBookServiceTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private GuestBookService guestBookService;
