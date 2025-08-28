@@ -123,7 +123,7 @@ public class EventMessagePublisherTest extends IntegrationsTestSupport {
 				.memory(memory)
 				.associate(associate3)
 				.build());
-			eventMessagePublisher.publishNotification(MemoryNotification.from(memory.getId(), community.getId(), associate.getId()));
+			eventMessagePublisher.publishNotification(MemoryNotification.from(memory.getId(), associate.getId()));
 			return null;
 		});
 

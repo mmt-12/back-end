@@ -135,7 +135,7 @@ public class MemoryService {
 		}
 		memoryAssociateRepository.saveAll(memoryAssociates);
 
-		eventMessagePublisher.publishNotification(MemoryNotification.from(memory.getId(), communityId, associateId));
+		eventMessagePublisher.publishNotification(MemoryNotification.from(memory.getId(), associateId));
 		return CreateUpdateMemoryResponse.from(memory);
 	}
 

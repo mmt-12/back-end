@@ -6,6 +6,7 @@ import static com.memento.server.domain.notification.NotificationType.GUESTBOOK;
 import static com.memento.server.domain.notification.NotificationType.MBTI;
 import static com.memento.server.domain.notification.NotificationType.MEMORY;
 import static com.memento.server.domain.notification.NotificationType.NEWIMAGE;
+import static com.memento.server.domain.notification.NotificationType.POST;
 import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT;
 
@@ -22,6 +23,7 @@ import com.memento.server.api.service.eventMessage.dto.GuestBookNotification;
 import com.memento.server.api.service.eventMessage.dto.MbtiNotification;
 import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
 import com.memento.server.api.service.eventMessage.dto.NewImageNotification;
+import com.memento.server.api.service.eventMessage.dto.PostNotification;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
@@ -42,6 +44,27 @@ public class EventMessageConsumer {
 	private final MemoryAssociateRepository memoryAssociateRepository;
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
+	public void handlePostNotification(PostNotification event) {
+		List<Associate> associates = memoryAssociateRepository.findAllAssociatesByMemoryId(event.memoryId());
+
+		List<Notification> notificationList = new ArrayList<>();
+		for (Associate associate : associates) {
+			if (associate.getId().equals(event.authorId()))
+				continue;
+			notificationList.add(Notification.builder()
+				.title(POST.getTitle())
+				.content(POST.getTitle())
+				.type(POST)
+				.receiver(associate)
+				.postId(event.postId())
+				.memoryId(event.memoryId())
+				.build());
+		}
+
+		notificationRepository.saveAll(notificationList);
+	}
+
+	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleGuestBookNotification(GuestBookNotification event) {
 		Associate associate = associateRepository.findById(event.associateId())
 			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
@@ -50,7 +73,6 @@ public class EventMessageConsumer {
 			.title(GUESTBOOK.getTitle())
 			.content(GUESTBOOK.getTitle())
 			.type(GUESTBOOK)
-			.actorId(event.associateId())
 			.receiver(associate)
 			.build());
 	}
@@ -64,7 +86,6 @@ public class EventMessageConsumer {
 			.title(NEWIMAGE.getTitle())
 			.content(NEWIMAGE.getTitle())
 			.type(NEWIMAGE)
-			.actorId(event.associateId())
 			.receiver(associate)
 			.build());
 	}
@@ -78,7 +99,6 @@ public class EventMessageConsumer {
 			.title(MBTI.getTitle())
 			.content(MBTI.getTitle())
 			.type(MBTI)
-			.actorId(event.associateId())
 			.receiver(associate)
 			.build());
 	}
@@ -95,7 +115,6 @@ public class EventMessageConsumer {
 				.title(ASSOCIATE.getTitle())
 				.content(ASSOCIATE.getTitle())
 				.type(ASSOCIATE)
-				.actorId(event.associateId())
 				.receiver(associate)
 				.build());
 		}
