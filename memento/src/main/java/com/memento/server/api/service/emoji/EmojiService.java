@@ -3,6 +3,7 @@ package com.memento.server.api.service.emoji;
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.EMOJI_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.UNAUTHORIZED_EMOJI_ACCESS;
+import static com.memento.server.common.error.ErrorCodes.EMOJI_NAME_DUPLICATE;
 import static com.memento.server.config.MinioProperties.FileType.*;
 
 import java.util.List;
@@ -37,6 +38,11 @@ public class EmojiService {
 	public void createEmoji(EmojiCreateServiceRequest request) {
 		Associate associate = associateRepository.findByIdAndDeletedAtIsNull(request.associateId())
 			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_FOUND));
+
+		boolean nameExists = emojiRepository.existsByNameAndDeletedAtIsNull(request.name());
+		if (nameExists) {
+			throw new MementoException(EMOJI_NAME_DUPLICATE);
+		}
 
 		String url = minioService.createFile(request.emoji(), EMOJI);
 		Emoji emoji = Emoji.create(request.name(), url, associate);

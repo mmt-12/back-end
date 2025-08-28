@@ -1,22 +1,18 @@
 package com.memento.server.post;
 
-import java.util.concurrent.atomic.AtomicLong;
-
-import com.memento.server.associate.AssociateFixtures;
+import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.post.Post;
-import com.memento.server.memory.MemoryFixtures;
 
 public class PostFixtures {
 
-	private static final AtomicLong idGenerator = new AtomicLong();
 	private static final String CONTENT = "content";
 
-	public static Post post() {
+	public static Post post(Memory memory, Associate associate) {
 		return Post.builder()
-			.id(idGenerator.getAndIncrement())
 			.content(CONTENT)
-			.memory(MemoryFixtures.memory())
-			.associate(AssociateFixtures.associate())
+			.memory(memory)
+			.associate(associate)
 			.build();
 	}
 }

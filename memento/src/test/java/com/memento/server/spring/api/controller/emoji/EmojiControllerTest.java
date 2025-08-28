@@ -25,6 +25,7 @@ import com.memento.server.api.service.emoji.dto.request.EmojiRemoveRequest;
 import com.memento.server.api.service.emoji.dto.response.EmojiListResponse;
 import com.memento.server.api.service.emoji.dto.response.EmojiResponse;
 import com.memento.server.common.dto.response.PageInfo;
+import com.memento.server.common.fixture.CommonFixtures;
 import com.memento.server.emoji.EmojiFixtures;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
 
@@ -35,23 +36,8 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	void createEmoji() throws Exception {
 		// given
 		long communityId = 1L;
-
-		String json = objectMapper.writeValueAsString(EmojiCreateRequest.builder()
-			.name("인쥐용").build());
-
-		MockMultipartFile data = new MockMultipartFile(
-			"data",
-			"request",
-			"application/json",
-			json.getBytes()
-		);
-
-		MockMultipartFile emoji = new MockMultipartFile(
-			"emoji",
-			"emoji.png",
-			"image/png",
-			new byte[] {(byte)0x89, 'P', 'N', 'G'}
-		);
+		MockMultipartFile data = CommonFixtures.jsonFile(EmojiCreateRequest.builder().name("인쥐용").build());
+		MockMultipartFile emoji = CommonFixtures.emojiFile();
 
 		doNothing().when(emojiService).createEmoji(any());
 
@@ -73,22 +59,8 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	void createEmojiWithoutName() throws Exception {
 		// given
 		long communityId = 1L;
-
-		String json = objectMapper.writeValueAsString(EmojiCreateRequest.builder().build());
-
-		MockMultipartFile data = new MockMultipartFile(
-			"data",
-			"request",
-			"application/json",
-			json.getBytes()
-		);
-
-		MockMultipartFile emoji = new MockMultipartFile(
-			"emoji",
-			"emoji.png",
-			"image/png",
-			new byte[] {(byte)0x89, 'P', 'N', 'G'}
-		);
+		MockMultipartFile data = CommonFixtures.jsonFile(EmojiCreateRequest.builder().build());
+		MockMultipartFile emoji = CommonFixtures.emojiFile();
 
 		doNothing().when(emojiService).createEmoji(any());
 
@@ -115,24 +87,9 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	void createEmojiWithTooLongName() throws Exception {
 		// given
 		long communityId = 1L;
-
 		String tooLongName = "가".repeat(35);
-
-		String json = objectMapper.writeValueAsString(EmojiCreateRequest.builder().name(tooLongName).build());
-
-		MockMultipartFile data = new MockMultipartFile(
-			"data",
-			"request",
-			"application/json",
-			json.getBytes()
-		);
-
-		MockMultipartFile emoji = new MockMultipartFile(
-			"emoji",
-			"emoji.png",
-			"image/png",
-			new byte[] {(byte)0x89, 'P', 'N', 'G'}
-		);
+		MockMultipartFile data = CommonFixtures.jsonFile(EmojiCreateRequest.builder().name(tooLongName).build());
+		MockMultipartFile emoji = CommonFixtures.emojiFile();
 
 		doNothing().when(emojiService).createEmoji(any());
 
@@ -159,13 +116,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	void createEmojiWithoutData() throws Exception {
 		// given
 		long communityId = 1L;
-
-		MockMultipartFile emoji = new MockMultipartFile(
-			"emoji",
-			"emoji.png",
-			"image/png",
-			new byte[] {(byte)0x89, 'P', 'N', 'G'}
-		);
+		MockMultipartFile emoji = CommonFixtures.emojiFile();
 
 		doNothing().when(emojiService).createEmoji(any());
 
@@ -191,17 +142,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	void createEmojiWithoutEmoji() throws Exception {
 		// given
 		long communityId = 1L;
-
-		String json = objectMapper.writeValueAsString(EmojiCreateRequest.builder()
-			.name("인쥐용")
-			.build());
-
-		MockMultipartFile data = new MockMultipartFile(
-			"data",
-			"request",
-			"application/json",
-			json.getBytes()
-		);
+		MockMultipartFile data = CommonFixtures.jsonFile(EmojiCreateRequest.builder().build());
 
 		doNothing().when(emojiService).createEmoji(any());
 

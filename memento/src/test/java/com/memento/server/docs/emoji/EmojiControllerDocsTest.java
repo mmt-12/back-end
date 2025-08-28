@@ -39,6 +39,7 @@ import com.memento.server.api.service.emoji.dto.request.EmojiRemoveRequest;
 import com.memento.server.api.service.emoji.dto.response.EmojiListResponse;
 import com.memento.server.api.service.emoji.dto.response.EmojiResponse;
 import com.memento.server.common.dto.response.PageInfo;
+import com.memento.server.common.fixture.CommonFixtures;
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.emoji.EmojiFixtures;
 
@@ -58,23 +59,8 @@ public class EmojiControllerDocsTest extends RestDocsSupport {
 		setAuthentication(1L, 1L, 1L);
 
 		long communityId = 1L;
-		String json = objectMapper.writeValueAsString(EmojiCreateRequest.builder()
-			.name("인쥐용")
-			.build());
-
-		MockMultipartFile data = new MockMultipartFile(
-			"data",
-			"request",
-			"application/json",
-			json.getBytes()
-		);
-
-		MockMultipartFile emoji = new MockMultipartFile(
-			"emoji",
-			"emoji.png",
-			"image/png",
-			new byte[] {(byte) 0x89, 'P', 'N', 'G'}
-		);
+		MockMultipartFile data = CommonFixtures.jsonFile(EmojiCreateRequest.builder().name("인쥐용").build());
+		MockMultipartFile emoji = CommonFixtures.emojiFile();
 
 		doNothing().when(emojiService).createEmoji(any());
 

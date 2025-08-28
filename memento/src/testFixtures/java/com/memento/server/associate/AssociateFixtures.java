@@ -22,7 +22,11 @@ public class AssociateFixtures {
 			.build();
 	}
 
-	public static Associate associateWithMemberAndCommunity(Member member, Community community) {
-		return Associate.create(NICKNAME, member, community);
+	public static Associate associate(Member member, Community community) {
+		return Associate.builder()
+			.nickname(NICKNAME)
+			.member(member)
+			.community(community)
+			.build();
 	}
 }
