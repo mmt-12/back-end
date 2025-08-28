@@ -28,7 +28,7 @@ public class TestSecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
 			.authorizeHttpRequests(authorize -> authorize
-				.requestMatchers("/api/v1/sign-in", "/redirect").permitAll()
+				.requestMatchers("/api/v1/sign-in", "/api/v1/auth/redirect").permitAll()
 				.requestMatchers("/error").permitAll()
 				.anyRequest().authenticated())
 			.addFilterBefore(new JwtFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)

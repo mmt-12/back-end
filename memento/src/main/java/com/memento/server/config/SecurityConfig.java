@@ -12,6 +12,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.memento.server.config.filter.JwtFilter;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
@@ -26,6 +29,18 @@ public class SecurityConfig {
 	private final JwtTokenProvider jwtTokenProvider;
 
 	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.addAllowedOrigin("http://localhost:3000");
+		configuration.addAllowedHeader("*");
+		configuration.addAllowedMethod("*");
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
+
+	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 			.httpBasic(AbstractHttpConfigurer::disable)
@@ -36,7 +51,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests(authorize -> authorize
 				.requestMatchers(PathRequest.toH2Console()).permitAll()
 				.requestMatchers("/favicon.ico").permitAll()
-				.requestMatchers("/api/v1/sign-in", "/redirect").permitAll()
+				.requestMatchers("/api/v1/sign-in", "/api/v1/auth/redirect").permitAll()
 				.requestMatchers("/error").permitAll()
 				.anyRequest().authenticated())
 			.addFilterBefore(new JwtFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
