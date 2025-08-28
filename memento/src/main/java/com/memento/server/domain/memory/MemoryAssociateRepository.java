@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.memory.dto.MemoryAssociateCount;
 
 public interface MemoryAssociateRepository extends JpaRepository<MemoryAssociate, Long> {
@@ -21,7 +20,4 @@ public interface MemoryAssociateRepository extends JpaRepository<MemoryAssociate
 	List<MemoryAssociateCount> countAssociatesByMemoryIds(@Param("memoryIds") List<Long> memoryIds);
 
 	List<MemoryAssociate> findAllByMemoryAndDeletedAtIsNull(Memory memory);
-
-	@Query("SELECT ma.associate FROM MemoryAssociate ma WHERE ma.memory.id = :memoryId")
-	List<Associate> findAllAssociatesByMemoryId(@Param("memoryId") Long memoryId);
 }
