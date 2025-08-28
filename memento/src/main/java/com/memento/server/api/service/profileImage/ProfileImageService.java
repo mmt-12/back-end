@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.profileImage.dto.SearchProfileImageResponse;
+import com.memento.server.api.service.eventMessage.EventMessagePublisher;
+import com.memento.server.api.service.eventMessage.dto.NewImageNotification;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.config.MinioProperties;
@@ -33,6 +35,7 @@ public class ProfileImageService {
 	private final ProfileImageRepository profileImageRepository;
 	private final MinioClient minioClient;
 	private final MinioProperties minioProperties;
+	private final EventMessagePublisher eventMessagePublisher;
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -55,6 +58,7 @@ public class ProfileImageService {
 				.associate(associate)
 				.registrant(registrant)
 				.build());
+		eventMessagePublisher.publishNotification(NewImageNotification.from(associateId));
 	}
 
 	@Transactional

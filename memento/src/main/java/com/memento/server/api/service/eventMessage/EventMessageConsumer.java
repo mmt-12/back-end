@@ -4,6 +4,7 @@ import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_EXISTENCE
 import static com.memento.server.domain.notification.NotificationType.ASSOCIATE;
 import static com.memento.server.domain.notification.NotificationType.MBTI;
 import static com.memento.server.domain.notification.NotificationType.MEMORY;
+import static com.memento.server.domain.notification.NotificationType.NEWIMAGE;
 import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT;
 
@@ -18,6 +19,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import com.memento.server.api.service.eventMessage.dto.AssociateNotification;
 import com.memento.server.api.service.eventMessage.dto.MbtiNotification;
 import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
+import com.memento.server.api.service.eventMessage.dto.NewImageNotification;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
@@ -36,6 +38,20 @@ public class EventMessageConsumer {
 	private final NotificationRepository notificationRepository;
 	private final AssociateRepository associateRepository;
 	private final MemoryAssociateRepository memoryAssociateRepository;
+
+	@TransactionalEventListener(phase = AFTER_COMMIT)
+	public void handleNewImageNotification(NewImageNotification event) {
+		Associate associate = associateRepository.findById(event.associateId())
+			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
+
+		notificationRepository.save(Notification.builder()
+			.title(NEWIMAGE.getTitle())
+			.content(NEWIMAGE.getTitle())
+			.type(NEWIMAGE)
+			.actorId(event.associateId())
+			.receiver(associate)
+			.build());
+	}
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleMbtiNotification(MbtiNotification event) {
