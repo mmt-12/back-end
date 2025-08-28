@@ -56,8 +56,8 @@ public class MemoryService {
 		Long cursor = request.cursor();
 		Integer size = request.size();
 		String keyword = request.keyword();
-		LocalDate startDate = request.startDate();
-		LocalDate endDate = request.endDate();
+		LocalDate startDate = request.startTime();
+		LocalDate endDate = request.endTime();
 
 		LocalDateTime startDateTime = null;
 		LocalDateTime endDateTime = null;
