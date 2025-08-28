@@ -8,4 +8,12 @@ public record EmojiCommentCreateServiceRequest(
 	Long postId,
 	Long associateId
 ) {
+
+	public static EmojiCommentCreateServiceRequest of(Long emojiId, Long postId, Long associateId) {
+		return EmojiCommentCreateServiceRequest.builder()
+			.emojiId(emojiId)
+			.postId(postId)
+			.associateId(associateId)
+			.build();
+	}
 }

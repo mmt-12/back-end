@@ -39,6 +39,7 @@ import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
 import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
+import com.memento.server.common.fixture.CommonFixtures;
 import com.memento.server.common.validator.FileValidator;
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.voice.VoiceFixtures;
@@ -60,22 +61,8 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 		setAuthentication(1L, 1L, 1L);
 
 		long communityId = 1L;
-		String json = objectMapper.writeValueAsString(VoiceCreateRequest.builder()
-			.name("인쥐용").build());
-
-		MockMultipartFile data = new MockMultipartFile(
-			"data",
-			"request",
-			"application/json",
-			json.getBytes()
-		);
-
-		MockMultipartFile voice = new MockMultipartFile(
-			"voice",
-			"voice.wav",
-			"audio/wav",
-			"".getBytes()
-		);
+		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().name("인쥐용").build());
+		MockMultipartFile voice = CommonFixtures.voiceFile();
 
 		doNothing().when(voiceService).createPermanentVoice(any());
 

@@ -2,25 +2,20 @@ package com.memento.server.api.service.emoji.dto.response;
 
 import java.util.List;
 
+import com.memento.server.common.dto.response.PageInfo;
+
 import lombok.Builder;
 
 @Builder
 public record EmojiListResponse(
 	List<EmojiResponse> emoji,
-	Long cursor,
-	int size,
-	Long nextCursor,
-	boolean hasNext
+	PageInfo pageInfo
 ) {
 
-	public static EmojiListResponse of(List<EmojiResponse> emoji, Long cursor, int size, Long nextCursor,
-		boolean hasNext) {
+	public static EmojiListResponse of(List<EmojiResponse> emoji, PageInfo pageInfo) {
 		return EmojiListResponse.builder()
 			.emoji(emoji)
-			.cursor(cursor)
-			.size(size)
-			.nextCursor(nextCursor)
-			.hasNext(hasNext)
+			.pageInfo(pageInfo)
 			.build();
 	}
 }

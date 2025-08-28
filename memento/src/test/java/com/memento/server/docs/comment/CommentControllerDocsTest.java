@@ -31,6 +31,7 @@ import com.memento.server.api.controller.comment.CommentController;
 import com.memento.server.api.controller.comment.dto.EmojiCommentCreateRequest;
 import com.memento.server.api.controller.comment.dto.VoiceCommentCreateRequest;
 import com.memento.server.api.service.comment.CommentService;
+import com.memento.server.common.fixture.CommonFixtures;
 import com.memento.server.docs.RestDocsSupport;
 
 public class CommentControllerDocsTest extends RestDocsSupport {
@@ -130,12 +131,7 @@ public class CommentControllerDocsTest extends RestDocsSupport {
 		long communityId = 1L;
 		long memoryId = 1L;
 
-		MockMultipartFile voice = new MockMultipartFile(
-			"voice",
-			"voice.wav",
-			"audio/wav",
-			"voice content".getBytes()
-		);
+		MockMultipartFile voice = CommonFixtures.voiceFile();
 
 		doNothing().when(commentService).createTemporaryVoiceComment(any());
 

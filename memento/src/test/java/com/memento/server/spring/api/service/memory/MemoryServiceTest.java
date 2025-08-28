@@ -178,8 +178,8 @@ class MemoryServiceTest {
 			.cursor(null)
 			.size(10)
 			.keyword(null)
-			.startDate(null)
-			.endDate(null)
+			.startTime(null)
+			.endTime(null)
 			.build();
 		ReadAllMemoryResponse response = memoryService.readAll(community.getId(), request);
 
@@ -301,8 +301,8 @@ class MemoryServiceTest {
 			.cursor(null)
 			.size(2)
 			.keyword(null)
-			.startDate(null)
-			.endDate(null)
+			.startTime(null)
+			.endTime(null)
 			.build();
 		ReadAllMemoryResponse response1 = memoryService.readAll(community.getId(), request1);
 
@@ -318,8 +318,8 @@ class MemoryServiceTest {
 			.cursor(response1.cursor())
 			.size(2)
 			.keyword(null)
-			.startDate(null)
-			.endDate(null)
+			.startTime(null)
+			.endTime(null)
 			.build();
 		ReadAllMemoryResponse response2 = memoryService.readAll(community.getId(), request2);
 
@@ -335,8 +335,8 @@ class MemoryServiceTest {
 			.cursor(response2.cursor())
 			.size(2)
 			.keyword(null)
-			.startDate(null)
-			.endDate(null)
+			.startTime(null)
+			.endTime(null)
 			.build();
 		ReadAllMemoryResponse response3 = memoryService.readAll(community.getId(), request3);
 
@@ -408,8 +408,8 @@ class MemoryServiceTest {
 			.cursor(null)
 			.size(10)
 			.keyword("여행")
-			.startDate(null)
-			.endDate(null)
+			.startTime(null)
+			.endTime(null)
 			.build();
 		ReadAllMemoryResponse response = memoryService.readAll(community.getId(), request);
 
@@ -509,8 +509,8 @@ class MemoryServiceTest {
 			.cursor(null)
 			.size(10)
 			.keyword(null)
-			.startDate(startDate)
-			.endDate(endDate)
+			.startTime(startDate)
+			.endTime(endDate)
 			.build();
 		ReadAllMemoryResponse response = memoryService.readAll(community.getId(), request);
 

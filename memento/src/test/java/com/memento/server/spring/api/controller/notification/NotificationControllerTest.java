@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -14,9 +15,8 @@ import org.junit.jupiter.api.Test;
 import com.memento.server.api.service.notification.dto.request.NotificationListQueryRequest;
 import com.memento.server.api.service.notification.dto.response.NotificationListResponse;
 import com.memento.server.api.service.notification.dto.response.NotificationResponse;
-import com.memento.server.domain.notification.NotificationType;
+import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
-import com.memento.server.notification.NotificationFixtures;
 
 public class NotificationControllerTest extends ControllerTestSupport {
 
@@ -28,10 +28,20 @@ public class NotificationControllerTest extends ControllerTestSupport {
 		Long nextCursor = cursor + size;
 		boolean hasNext = true;
 
-		NotificationResponse notificationResponse = NotificationResponse.from(NotificationFixtures.notificationWithType(
-			NotificationType.ACHIEVE));
-		NotificationListResponse response = NotificationListResponse.of(List.of(notificationResponse), cursor, size,
-			nextCursor, hasNext);
+		NotificationResponse notificationResponse = NotificationResponse.builder()
+			.id(1L)
+			.title("title")
+			.content("content")
+			.isRead(true)
+			.type("MEMORY")
+			.actorId(1L)
+			.memoryId(1L)
+			.postId(1L)
+			.createdAt(LocalDateTime.now())
+			.build();
+
+		NotificationListResponse response = NotificationListResponse.of(List.of(notificationResponse),
+			PageInfo.of(hasNext, nextCursor));
 
 		given(notificationService.getNotifications(any(NotificationListQueryRequest.class)))
 			.willReturn(response);

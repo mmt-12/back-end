@@ -28,6 +28,7 @@ import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.common.error.ErrorCodes;
+import com.memento.server.common.fixture.CommonFixtures;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
 import com.memento.server.voice.VoiceFixtures;
 
@@ -38,22 +39,8 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void createVoice() throws Exception {
 		// given
 		long communityId = 1L;
-		String json = objectMapper.writeValueAsString(VoiceCreateRequest.builder()
-			.name("인쥐용").build());
-
-		MockMultipartFile data = new MockMultipartFile(
-			"data",
-			"request",
-			"application/json",
-			json.getBytes()
-		);
-
-		MockMultipartFile voice = new MockMultipartFile(
-			"voice",
-			"voice.wav",
-			"audio/wav",
-			"".getBytes()
-		);
+		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().name("인쥐용").build());
+		MockMultipartFile voice = CommonFixtures.voiceFile();
 
 		doNothing().when(voiceService).createPermanentVoice(any());
 
@@ -76,21 +63,9 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void createVoiceWithoutName() throws Exception {
 		// given
 		long communityId = 1L;
-		String json = objectMapper.writeValueAsString(VoiceCreateRequest.builder().build());
+		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().build());
+		MockMultipartFile voice = CommonFixtures.voiceFile();
 
-		MockMultipartFile data = new MockMultipartFile(
-			"data",
-			"request",
-			"application/json",
-			json.getBytes()
-		);
-
-		MockMultipartFile voice = new MockMultipartFile(
-			"voice",
-			"voice.wav",
-			"audio/wav",
-			"".getBytes()
-		);
 		doNothing().when(voiceService).createPermanentVoice(any());
 
 		// when & then
@@ -118,23 +93,8 @@ public class VoiceControllerTest extends ControllerTestSupport {
 		// given
 		long communityId = 1L;
 		String tooLongName = "아".repeat(35);
-
-		String json = objectMapper.writeValueAsString(VoiceCreateRequest.builder()
-			.name(tooLongName).build());
-
-		MockMultipartFile data = new MockMultipartFile(
-			"data",
-			"request",
-			"application/json",
-			json.getBytes()
-		);
-
-		MockMultipartFile voice = new MockMultipartFile(
-			"voice",
-			"voice.wav",
-			"audio/wav",
-			"".getBytes()
-		);
+		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().name(tooLongName).build());
+		MockMultipartFile voice = CommonFixtures.voiceFile();
 
 		doNothing().when(voiceService).createPermanentVoice(any());
 
@@ -162,13 +122,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void createVoiceWithoutData() throws Exception {
 		// given
 		long communityId = 1L;
-
-		MockMultipartFile voice = new MockMultipartFile(
-			"voice",
-			"voice.wav",
-			"audio/wav",
-			"".getBytes()
-		);
+		MockMultipartFile voice = CommonFixtures.voiceFile();
 
 		doNothing().when(voiceService).createPermanentVoice(any());
 
@@ -195,15 +149,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void createVoiceWithoutVoice() throws Exception {
 		// given
 		long communityId = 1L;
-		String json = objectMapper.writeValueAsString(VoiceCreateRequest.builder()
-			.name("인쥐용").build());
-
-		MockMultipartFile data = new MockMultipartFile(
-			"data",
-			"request",
-			"application/json",
-			json.getBytes()
-		);
+		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().name("인쥐용").build());
 
 		doNothing().when(voiceService).createPermanentVoice(any());
 
@@ -230,22 +176,8 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void createVoiceWithTooLargeFile() throws Exception {
 		// given
 		long communityId = 1L;
-		String json = objectMapper.writeValueAsString(VoiceCreateRequest.builder()
-			.name("인쥐용").build());
-
-		MockMultipartFile data = new MockMultipartFile(
-			"data",
-			"request",
-			"application/json",
-			json.getBytes()
-		);
-
-		MockMultipartFile voice = new MockMultipartFile(
-			"voice",
-			"voice.wav",
-			"audio/wav",
-			"content".getBytes()
-		);
+		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().name("인쥐용").build());
+		MockMultipartFile voice = CommonFixtures.voiceFile();
 
 		doThrow(new MementoException(ErrorCodes.VOICE_FILE_TOO_LARGE))
 			.when(fileValidator).validateVoiceFile(voice);
@@ -260,7 +192,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andDo(print())
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-			.andExpect(jsonPath("$.code").value(2007))
+			.andExpect(jsonPath("$.code").value(2008))
 			.andExpect(jsonPath("$.message").value("음성 파일 크기는 10MB를 초과할 수 없습니다."));
 
 		verify(fileValidator).validateVoiceFile(voice);
@@ -272,16 +204,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void createVoiceWithInvalidFormat() throws Exception {
 		// given
 		long communityId = 1L;
-		String json = objectMapper.writeValueAsString(VoiceCreateRequest.builder()
-			.name("인쥐용").build());
-
-		MockMultipartFile data = new MockMultipartFile(
-			"data",
-			"request",
-			"application/json",
-			json.getBytes()
-		);
-
+		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().name("인쥐용").build());
 		MockMultipartFile voice = new MockMultipartFile(
 			"voice",
 			"voice.txt",
@@ -302,7 +225,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andDo(print())
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-			.andExpect(jsonPath("$.code").value(2008))
+			.andExpect(jsonPath("$.code").value(2009))
 			.andExpect(jsonPath("$.message").value("지원하지 않는 음성 파일 형식입니다."));
 
 		verify(fileValidator).validateVoiceFile(voice);
@@ -314,16 +237,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void createVoiceWithNullContentType() throws Exception {
 		// given
 		long communityId = 1L;
-		String json = objectMapper.writeValueAsString(VoiceCreateRequest.builder()
-			.name("인쥐용").build());
-
-		MockMultipartFile data = new MockMultipartFile(
-			"data",
-			"request",
-			"application/json",
-			json.getBytes()
-		);
-
+		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().name("인쥐용").build());
 		MockMultipartFile voice = new MockMultipartFile(
 			"voice",
 			"voice.wav",
@@ -344,7 +258,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 			.andDo(print())
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-			.andExpect(jsonPath("$.code").value(2008))
+			.andExpect(jsonPath("$.code").value(2009))
 			.andExpect(jsonPath("$.message").value("지원하지 않는 음성 파일 형식입니다."));
 
 		verify(fileValidator).validateVoiceFile(voice);

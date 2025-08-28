@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.memento.server.associate.AssociateFixtures;
+import com.memento.server.community.CommunityFixtures;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
@@ -20,7 +22,9 @@ import com.memento.server.domain.voice.Voice;
 import com.memento.server.domain.voice.VoiceRepository;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
+import com.memento.server.member.MemberFixtures;
 import com.memento.server.spring.api.service.IntegrationsTestSupport;
+import com.memento.server.voice.VoiceFixtures;
 
 import jakarta.persistence.EntityManager;
 
@@ -41,24 +45,13 @@ public class VoiceRepositoryTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private EntityManager em;
-	
-	private Associate createAndSaveAssociate() {
-		Member member = Member.create("김싸피", "test@example.com", null, 12345L);
-		Member savedMember = memberRepository.save(member);
-		
-		Community community = Community.create("테스트 커뮤니티", savedMember);
-		Community savedCommunity = communityRepository.save(community);
-		
-		Associate associate = Associate.create("닉네임", savedMember, savedCommunity);
-		return associateRepository.save(associate);
-	}
 
 	@Test
 	@DisplayName("id에 해당하는 voice를 조회한다.")
 	void findByIdAndDeletedAtIsNull() {
 	    // given
-		Associate associate = createAndSaveAssociate();
-		Voice voice = Voice.createPermanent("test voice", "https://example.com/test.wav", associate);
+		Fixtures fixtures = createFixtures();
+		Voice voice = VoiceFixtures.permanentVoice(fixtures.associate);
 		Voice savedVoice = voiceRepository.save(voice);
 
 	    // when
@@ -66,9 +59,7 @@ public class VoiceRepositoryTest extends IntegrationsTestSupport {
 
 	    // then
 		assertThat(foundVoice).isPresent();
-		assertThat(foundVoice.get().getName()).isEqualTo("test voice");
-		assertThat(foundVoice.get().getUrl()).isEqualTo("https://example.com/test.wav");
-		assertThat(foundVoice.get().isPermanent()).isTrue();
+		assertThat(foundVoice.get()).isEqualTo(savedVoice);
 	}
 	
 	@Test
@@ -81,21 +72,23 @@ public class VoiceRepositoryTest extends IntegrationsTestSupport {
 		Optional<Voice> foundVoice = voiceRepository.findByIdAndDeletedAtIsNull(nonExistentId);
 
 	    // then
-		assertThat(foundVoice).isEmpty();
+		assertThat(foundVoice).isNotPresent();
 	}
 
 	@Test
 	@DisplayName("커뮤니티 ID로 permanent voice 목록을 조회한다.")
 	void findVoicesByCommunityWithCursor() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Long communityId = associate.getCommunity().getId();
-		
-		Voice voice1 = Voice.createPermanent("voice1", "url1", associate);
-		Voice voice2 = Voice.createPermanent("voice2", "url2", associate);
-		Voice voice3 = Voice.createPermanent("voice3", "url3", associate);
-		
-		voiceRepository.saveAll(List.of(voice1, voice2, voice3));
+		Fixtures fixtures = createFixtures();
+		Long communityId = fixtures.community().getId();
+
+		Voice voice1 = VoiceFixtures.permanentVoice(fixtures.associate);
+		Voice voice2 = VoiceFixtures.permanentVoice(fixtures.associate);
+		Voice voice3 = VoiceFixtures.permanentVoice(fixtures.associate);
+
+		Voice savedVoice1 = voiceRepository.save(voice1);
+		Voice savedVoice2 = voiceRepository.save(voice2);
+		Voice savedVoice3 = voiceRepository.save(voice3);
 
 		VoiceListQueryRequest request = VoiceListQueryRequest.of(communityId, null, 10, null);
 
@@ -104,24 +97,24 @@ public class VoiceRepositoryTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(voices).hasSize(3);
-		assertThat(voices.get(0).name()).isEqualTo("voice3");
-		assertThat(voices.get(1).name()).isEqualTo("voice2");
-		assertThat(voices.get(2).name()).isEqualTo("voice1");
+		assertThat(voices.get(0).id()).isEqualTo(savedVoice3.getId());
+		assertThat(voices.get(1).id()).isEqualTo(savedVoice2.getId());
+		assertThat(voices.get(2).id()).isEqualTo(savedVoice1.getId());
 	}
 
 	@Test
 	@DisplayName("커서를 사용한 페이징이 올바르게 동작한다.")
 	void findVoicesByCommunityWithCursorPaging() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Long communityId = associate.getCommunity().getId();
-		
-		Voice voice1 = Voice.createPermanent("voice1", "url1", associate);
-		Voice voice2 = Voice.createPermanent("voice2", "url2", associate);
-		Voice voice3 = Voice.createPermanent("voice3", "url3", associate);
+		Fixtures fixtures = createFixtures();
+		Long communityId = fixtures.community().getId();
 
-		voiceRepository.save(voice1);
-		voiceRepository.save(voice2);
+		Voice voice1 = VoiceFixtures.permanentVoice(fixtures.associate);
+		Voice voice2 = VoiceFixtures.permanentVoice(fixtures.associate);
+		Voice voice3 = VoiceFixtures.permanentVoice(fixtures.associate);
+
+		Voice savedVoice1 = voiceRepository.save(voice1);
+		Voice savedVoice2 = voiceRepository.save(voice2);
 		Voice savedVoice3 = voiceRepository.save(voice3);
 
 		VoiceListQueryRequest request = VoiceListQueryRequest.of(communityId, savedVoice3.getId(), 10, null);
@@ -131,46 +124,47 @@ public class VoiceRepositoryTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(voices).hasSize(2);
-		assertThat(voices.get(0).name()).isEqualTo("voice2");
-		assertThat(voices.get(1).name()).isEqualTo("voice1");
+		assertThat(voices.get(0).id()).isEqualTo(savedVoice2.getId());
+		assertThat(voices.get(1).id()).isEqualTo(savedVoice1.getId());
 	}
 
 	@Test
 	@DisplayName("키워드로 voice 이름을 검색한다.")
 	void findVoicesByCommunityWithKeyword() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Long communityId = associate.getCommunity().getId();
-		
-		Voice voice1 = Voice.createPermanent("hello world", "url1", associate);
-		Voice voice2 = Voice.createPermanent("goodbye", "url2", associate);
-		Voice voice3 = Voice.createPermanent("Hello Universe", "url3", associate);
-		
-		voiceRepository.save(voice1);
-		voiceRepository.save(voice2);
-		voiceRepository.save(voice3);
+		Fixtures fixtures = createFixtures();
+		Long communityId = fixtures.community().getId();
+		final String KEYWORD = "hello";
 
-		VoiceListQueryRequest request = VoiceListQueryRequest.of(communityId, null, 10, "hello");
+		Voice voice1 = VoiceFixtures.permanentVoice(KEYWORD + " world", "url1", fixtures.associate);
+		Voice voice2 = VoiceFixtures.permanentVoice("goodbye", "url2", fixtures.associate);
+		Voice voice3 = VoiceFixtures.permanentVoice(KEYWORD.toUpperCase() + " Universe", "url3", fixtures.associate);
+		
+		Voice savedVoice1 = voiceRepository.save(voice1);
+		Voice savedVoice2 = voiceRepository.save(voice2);
+		Voice savedVoice3 = voiceRepository.save(voice3);
+
+		VoiceListQueryRequest request = VoiceListQueryRequest.of(communityId, null, 10, KEYWORD);
 
 		// when
 		List<VoiceResponse> voices = voiceRepository.findVoicesByCommunityWithCursor(request);
 
 		// then
 		assertThat(voices).hasSize(2);
-		assertThat(voices).extracting("name").containsExactly("Hello Universe", "hello world");
+		assertThat(voices).extracting("name").containsExactly(savedVoice3.getName(), savedVoice1.getName());
 	}
 
 	@Test
 	@DisplayName("삭제된 voice는 조회되지 않는다.")
 	void findVoicesByCommunityWithCursorExcludeDeleted() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Long communityId = associate.getCommunity().getId();
-		
-		Voice voice1 = Voice.createPermanent("voice1", "url1", associate);
-		Voice voice2 = Voice.createPermanent("voice2", "url2", associate);
-		
-		voiceRepository.save(voice1);
+		Fixtures fixtures = createFixtures();
+		Long communityId = fixtures.community().getId();
+
+		Voice voice1 = VoiceFixtures.permanentVoice(fixtures.associate);
+		Voice voice2 = VoiceFixtures.permanentVoice(fixtures.associate);
+
+		Voice savedVoice1 = voiceRepository.save(voice1);
 		Voice savedVoice2 = voiceRepository.save(voice2);
 
 		savedVoice2.markDeleted();
@@ -183,21 +177,21 @@ public class VoiceRepositoryTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(voices).hasSize(1);
-		assertThat(voices.get(0).name()).isEqualTo("voice1");
+		assertThat(voices.get(0).id()).isEqualTo(savedVoice1.getId());
 	}
 
 	@Test
 	@DisplayName("temporary voice는 조회되지 않는다.")
 	void findVoicesByCommunityWithCursorExcludeTemporary() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Long communityId = associate.getCommunity().getId();
+		Fixtures fixtures = createFixtures();
+		Long communityId = fixtures.community().getId();
+
+		Voice permanentVoice = VoiceFixtures.permanentVoice(fixtures.associate);
+		Voice temporaryVoice = VoiceFixtures.temporaryVoice(fixtures.associate);
 		
-		Voice permanentVoice = Voice.createPermanent("permanent", "url1", associate);
-		Voice temporaryVoice = Voice.createTemporary("url2", associate);
-		
-		voiceRepository.save(permanentVoice);
-		voiceRepository.save(temporaryVoice);
+		Voice savedPermanentVoice = voiceRepository.save(permanentVoice);
+		Voice savedTemporaryVoice = voiceRepository.save(temporaryVoice);
 
 		VoiceListQueryRequest request = VoiceListQueryRequest.of(communityId, null, 10, null);
 
@@ -206,6 +200,144 @@ public class VoiceRepositoryTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(voices).hasSize(1);
-		assertThat(voices.get(0).name()).isEqualTo("permanent");
+		assertThat(voices.get(0).id()).isEqualTo(savedPermanentVoice.getId());
+	}
+
+	@Test
+	@DisplayName("URL로 voice를 조회한다.")
+	void findByUrlAndDeletedAtIsNull() {
+		// given
+		Fixtures fixtures = createFixtures();
+		String voiceUrl = "https://example.com/voice.wav";
+		Voice voice = VoiceFixtures.permanentVoice(voiceUrl, fixtures.associate);
+		Voice savedVoice = voiceRepository.save(voice);
+
+		// when
+		Optional<Voice> foundVoice = voiceRepository.findByUrlAndDeletedAtIsNull(voiceUrl);
+
+		// then
+		assertThat(foundVoice).isPresent();
+		assertThat(foundVoice.get()).isEqualTo(savedVoice);
+		assertThat(foundVoice.get().getUrl()).isEqualTo(voiceUrl);
+		assertThat(foundVoice.get().getAssociate().getId()).isEqualTo(fixtures.associate.getId());
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 URL로 조회시 빈 Optional을 반환한다.")
+	void findByUrlAndDeletedAtIsNullWithNonExistentUrl() {
+		// given
+		String nonExistentUrl = "https://example.com/nonexistent.wav";
+
+		// when
+		Optional<Voice> foundVoice = voiceRepository.findByUrlAndDeletedAtIsNull(nonExistentUrl);
+
+		// then
+		assertThat(foundVoice).isNotPresent();
+	}
+
+	@Test
+	@DisplayName("삭제된 voice는 URL로 조회되지 않는다.")
+	void findByUrlAndDeletedAtIsNullWithDeletedVoice() {
+		// given
+		Fixtures fixtures = createFixtures();
+		String voiceUrl = "https://example.com/deleted-voice.wav";
+		Voice voice = VoiceFixtures.permanentVoice(voiceUrl, fixtures.associate);
+		Voice savedVoice = voiceRepository.save(voice);
+
+		savedVoice.markDeleted();
+		em.flush();
+
+		// when
+		Optional<Voice> foundVoice = voiceRepository.findByUrlAndDeletedAtIsNull(voiceUrl);
+
+		// then
+		assertThat(foundVoice).isNotPresent();
+	}
+
+	@Test
+	@DisplayName("temporary voice도 URL로 조회할 수 있다.")
+	void findByUrlAndDeletedAtIsNullWithTemporaryVoice() {
+		// given
+		Fixtures fixtures = createFixtures();
+		String voiceUrl = "https://example.com/temporary-voice.wav";
+		Voice voice = VoiceFixtures.temporaryVoice(voiceUrl, fixtures.associate);
+		Voice savedVoice = voiceRepository.save(voice);
+
+		// when
+		Optional<Voice> foundVoice = voiceRepository.findByUrlAndDeletedAtIsNull(voiceUrl);
+
+		// then
+		assertThat(foundVoice).isPresent();
+		assertThat(foundVoice.get()).isEqualTo(savedVoice);
+		assertThat(foundVoice.get().getUrl()).isEqualTo(voiceUrl);
+		assertThat(foundVoice.get().isPermanent()).isFalse();
+	}
+
+	@Test
+	@DisplayName("이름이 존재하는 경우 true를 반환한다.")
+	void existsByNameAndDeletedAtIsNullReturnsTrue() {
+		// given
+		Fixtures fixtures = createFixtures();
+		String voiceName = "testVoice";
+		Voice voice = VoiceFixtures.permanentVoice(voiceName, "url", fixtures.associate);
+		voiceRepository.save(voice);
+
+		// when
+		boolean exists = voiceRepository.existsByNameAndDeletedAtIsNull(voiceName);
+
+		// then
+		assertThat(exists).isTrue();
+	}
+
+	@Test
+	@DisplayName("이름이 존재하지 않는 경우 false를 반환한다.")
+	void existsByNameAndDeletedAtIsNullReturnsFalse() {
+		// given
+		String nonExistentName = "nonExistentVoice";
+
+		// when
+		boolean exists = voiceRepository.existsByNameAndDeletedAtIsNull(nonExistentName);
+
+		// then
+		assertThat(exists).isFalse();
+	}
+
+	@Test
+	@DisplayName("삭제된 voice 이름은 존재하지 않는 것으로 처리된다.")
+	void existsByNameAndDeletedAtIsNullWithDeletedVoice() {
+		// given
+		Fixtures fixtures = createFixtures();
+		String voiceName = "deletedVoice";
+		Voice voice = VoiceFixtures.permanentVoice(voiceName, "url", fixtures.associate);
+		Voice savedVoice = voiceRepository.save(voice);
+		
+		savedVoice.markDeleted();
+		em.flush();
+
+		// when
+		boolean exists = voiceRepository.existsByNameAndDeletedAtIsNull(voiceName);
+
+		// then
+		assertThat(exists).isFalse();
+	}
+
+	private record Fixtures(
+		Member member,
+		Community community,
+		Associate associate
+	) {
+
+	}
+
+	private Fixtures createFixtures() {
+		Member member = MemberFixtures.member();
+		Community community = CommunityFixtures.community(member);
+		Associate associate = AssociateFixtures.associate(member, community);
+
+		Member savedMember = memberRepository.save(member);
+		Community savedCommunity = communityRepository.save(community);
+		Associate savedAssociate = associateRepository.save(associate);
+
+		return new Fixtures(savedMember, savedCommunity, savedAssociate);
 	}
 }

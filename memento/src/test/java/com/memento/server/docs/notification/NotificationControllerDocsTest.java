@@ -14,6 +14,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.queryPar
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -25,9 +26,8 @@ import com.memento.server.api.service.notification.NotificationService;
 import com.memento.server.api.service.notification.dto.request.NotificationListQueryRequest;
 import com.memento.server.api.service.notification.dto.response.NotificationListResponse;
 import com.memento.server.api.service.notification.dto.response.NotificationResponse;
+import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.docs.RestDocsSupport;
-import com.memento.server.domain.notification.NotificationType;
-import com.memento.server.notification.NotificationFixtures;
 
 public class NotificationControllerDocsTest extends RestDocsSupport {
 
@@ -48,10 +48,20 @@ public class NotificationControllerDocsTest extends RestDocsSupport {
 		Long nextCursor = cursor + size;
 		boolean hasNext = true;
 
-		NotificationResponse notificationResponse = NotificationResponse.from(NotificationFixtures.notificationWithType(
-			NotificationType.ACHIEVE));
-		NotificationListResponse response = NotificationListResponse.of(List.of(notificationResponse), cursor, size,
-			nextCursor, hasNext);
+		NotificationResponse notificationResponse = NotificationResponse.builder()
+			.id(1L)
+			.title("title")
+			.content("content")
+			.isRead(true)
+			.type("MEMORY")
+			.actorId(1L)
+			.memoryId(1L)
+			.postId(1L)
+			.createdAt(LocalDateTime.now())
+			.build();
+
+		NotificationListResponse response = NotificationListResponse.of(List.of(notificationResponse),
+			PageInfo.of(hasNext, nextCursor));
 
 		given(notificationService.getNotifications(any(NotificationListQueryRequest.class)))
 			.willReturn(response);
@@ -79,12 +89,11 @@ public class NotificationControllerDocsTest extends RestDocsSupport {
 						"알림 타입 (ACHIEVE, MEMORY, REACTION, POST, BIRTHDAY, ASSOCIATE, GUESTBOOK, MBTI, NEWIMAGE)"),
 					fieldWithPath("notifications[].actorId").description("알림을 발생시킨 사용자 ID (시스템 알림의 경우 null)")
 						.optional(),
-					fieldWithPath("notifications[].memoryId").description("관련된 기억 ID (추억 관련 알림의 경우)").optional(),
-					fieldWithPath("notifications[].postId").description("관련된 게시글 ID (게시글 관련 알림의 경우)").optional(),
-					fieldWithPath("cursor").description("현재 커서 위치 (마지막으로 조회한 알림 ID)"),
-					fieldWithPath("size").description("요청한 알림 수"),
-					fieldWithPath("nextCursor").description("다음 페이지 커서 (더 불러올 알림이 있을 경우)").optional(),
-					fieldWithPath("hasNext").description("다음 페이지 존재 여부")
+					fieldWithPath("notifications[].memoryId").description("관련된 기억 ID (추억 관련 알림의 경우 그외 null)").optional(),
+					fieldWithPath("notifications[].postId").description("관련된 게시글 ID (게시글 관련 알림의 경우 그외 null)").optional(),
+					fieldWithPath("notifications[].createdAt").description("알림 생성 시간"),
+					fieldWithPath("pageInfo.hasNext").description("다음 페이지 존재 여부"),
+					fieldWithPath("pageInfo.nextCursor").description("다음 페이지 커서 (더 불러올 보이스가 있을 경우)")
 				)
 			));
 

@@ -10,8 +10,6 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
@@ -28,10 +26,9 @@ import com.memento.server.domain.memory.MemoryAssociate;
 import com.memento.server.domain.memory.MemoryAssociateRepository;
 import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.domain.memory.dto.MemoryAssociateCount;
+import com.memento.server.spring.api.service.IntegrationsTestSupport;
 
-@DataJpaTest
-@EnableJpaAuditing
-class MemoryAssociateRepositoryTest {
+class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
 
     @Autowired
     private MemoryAssociateRepository memoryAssociateRepository;

@@ -250,22 +250,6 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
         assertThat(foundAssociates).extracting(Associate::getId)
                 .containsExactlyInAnyOrder(associate.getId(), associate2.getId());
     }
-  
-    @Test
-    @DisplayName("삭제되지 않은 associate를 id로 조회한다.")
-    void findByIdAndDeletedAtIsNull() {
-      // given
-      Associate associate = createAndSaveAssociate();
-      Long associateId = associate.getId();
-
-      // when
-      Optional<Associate> foundAssociate = associateRepository.findByIdAndDeletedAtIsNull(associateId);
-
-      // then
-      assertThat(foundAssociate).isPresent();
-      assertThat(foundAssociate.get().getId()).isEqualTo(associateId);
-      assertThat(foundAssociate.get().getDeletedAt()).isNull();
-    }
 
     @Test
     @DisplayName("커뮤니티로 조회한다.")
@@ -287,14 +271,38 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
         assertThat(associates.size()).isEqualTo(2);
     }
 
-    private Associate createAndSaveAssociate() {
-      Member member = MemberFixtures.member();
-      Member savedMember = memberRepository.save(member);
+	@Test
+	@DisplayName("삭제되지 않은 associate를 id로 조회한다.")
+	void findByIdAndDeletedAtIsNull() {
+		// given
+		Fixtures fixtures = createFixtures();
+		Long associateId = fixtures.associate.getId();
 
-      Community community = CommunityFixtures.communityWithMember(savedMember);
-      Community savedCommunity = communityRepository.save(community);
+		// when
+		Optional<Associate> foundAssociate = associateRepository.findByIdAndDeletedAtIsNull(associateId);
 
-      Associate associate = AssociateFixtures.associateWithMemberAndCommunity(savedMember, savedCommunity);
-      return associateRepository.save(associate);
+		// then
+		assertThat(foundAssociate).isPresent();
+		assertThat(foundAssociate.get()).isEqualTo(fixtures.associate);
+	}
+
+    private record Fixtures(
+        Member member,
+        Community community,
+        Associate associate
+    ) {
+
     }
+
+    private Fixtures createFixtures() {
+        Member member = MemberFixtures.member();
+        Community community = CommunityFixtures.community(member);
+		Associate associate = AssociateFixtures.associate(member, community);
+
+		Member savedMember = memberRepository.save(member);
+		Community savedCommunity = communityRepository.save(community);
+		Associate savedAssociate = associateRepository.save(associate);
+
+		return new Fixtures(savedMember, savedCommunity, savedAssociate);
+	}
 }
