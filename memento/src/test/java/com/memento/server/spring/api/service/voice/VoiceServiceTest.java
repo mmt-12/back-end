@@ -3,6 +3,7 @@ package com.memento.server.spring.api.service.voice;
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.UNAUTHORIZED_VOICE_ACCESS;
 import static com.memento.server.common.error.ErrorCodes.VOICE_NOT_FOUND;
+import static com.memento.server.common.error.ErrorCodes.VOICE_NAME_DUPLICATE;
 import static com.memento.server.config.MinioProperties.FileType.VOICE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.service.voice.VoiceService;
@@ -26,7 +26,9 @@ import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.associate.AssociateFixtures;
 import com.memento.server.common.exception.MementoException;
+import com.memento.server.common.fixture.CommonFixtures;
 import com.memento.server.community.CommunityFixtures;
+import com.memento.server.config.MinioProperties;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
@@ -54,6 +56,9 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 	private CommunityRepository communityRepository;
 
 	@Autowired
+	private MinioProperties minioProperties;
+
+	@Autowired
 	private VoiceService voiceService;
 
 	@AfterEach
@@ -68,13 +73,14 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 	@DisplayName("permanent voice를 생성한다.")
 	void createPermanentVoice() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		MultipartFile file = new MockMultipartFile("voice", "test.wav", "audio/wav", "test".getBytes());
-		String url = "https://example.com/test.wav";
+		Fixtures fixtures = createFixtures();
+		MultipartFile file = CommonFixtures.voiceFile();
+		String url = CommonFixtures.mockUrl(minioProperties, file, VOICE);
+		String name = "name";
 
 		PermanentVoiceCreateServiceRequest request = PermanentVoiceCreateServiceRequest.builder()
-			.name("test voice")
-			.associateId(associate.getId())
+			.name(name)
+			.associateId(fixtures.associate.getId())
 			.voice(file)
 			.build();
 
@@ -87,17 +93,17 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 		// then
 		Optional<Voice> savedVoice = voiceRepository.findAll().stream().findFirst();
 		assertThat(savedVoice).isPresent();
-		assertThat(savedVoice.get().getName()).isEqualTo("test voice");
+		assertThat(savedVoice.get().getName()).isEqualTo(name);
 		assertThat(savedVoice.get().getUrl()).isEqualTo(url);
 		assertThat(savedVoice.get().isPermanent()).isTrue();
-		assertThat(savedVoice.get().getAssociate().getId()).isEqualTo(associate.getId());
+		assertThat(savedVoice.get().getAssociate().getId()).isEqualTo(fixtures.associate.getId());
 	}
 
 	@Test
 	@DisplayName("존재하지 않는 associate가 permanent voice를 생성하면 예외가 발생한다.")
 	void createPermanentVoiceWithNoAssociate() {
 		// given
-		MultipartFile file = new MockMultipartFile("voice", "test.wav", "audio/wav", "test".getBytes());
+		MultipartFile file = CommonFixtures.voiceFile();
 
 		PermanentVoiceCreateServiceRequest request = PermanentVoiceCreateServiceRequest.builder()
 			.name("test voice")
@@ -113,15 +119,39 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 	}
 
 	@Test
+	@DisplayName("중복된 이름으로 permanent voice를 생성하면 예외가 발생한다.")
+	void createPermanentVoiceWithDuplicateName() {
+		// given
+		Fixtures fixtures = createFixtures();
+		String duplicateName = "duplicateName";
+		MultipartFile file = CommonFixtures.voiceFile();
+
+		Voice existingVoice = VoiceFixtures.permanentVoice(duplicateName, "url1", fixtures.associate);
+		voiceRepository.save(existingVoice);
+
+		PermanentVoiceCreateServiceRequest request = PermanentVoiceCreateServiceRequest.builder()
+			.name(duplicateName)
+			.associateId(fixtures.associate.getId())
+			.voice(file)
+			.build();
+
+		// when & then
+		assertThatThrownBy(() -> voiceService.createPermanentVoice(request))
+			.isInstanceOf(MementoException.class)
+			.extracting("errorCode")
+			.isEqualTo(VOICE_NAME_DUPLICATE);
+	}
+
+	@Test
 	@DisplayName("커뮤니티의 voice 목록을 조회한다.")
 	void getVoices() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Long communityId = associate.getCommunity().getId();
+		Fixtures fixtures = createFixtures();
+		Long communityId = fixtures.community().getId();
 
-		Voice voice1 = VoiceFixtures.permanentVoice("voice1", "url1", associate);
-		Voice voice2 = VoiceFixtures.permanentVoice("voice2", "url2", associate);
-		Voice voice3 = VoiceFixtures.permanentVoice("voice2", "url2", associate);
+		Voice voice1 = VoiceFixtures.permanentVoice(fixtures.associate);
+		Voice voice2 = VoiceFixtures.permanentVoice(fixtures.associate);
+		Voice voice3 = VoiceFixtures.permanentVoice(fixtures.associate);
 		voiceRepository.saveAll(List.of(voice1, voice2, voice3));
 
 		VoiceListQueryRequest request = VoiceListQueryRequest.of(communityId, null, 10, null);
@@ -139,12 +169,12 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 	@DisplayName("페이지 사이즈보다 많은 voice가 있을 때 hasNext가 true이다.")
 	void getVoicesWithPagination() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Long communityId = associate.getCommunity().getId();
+		Fixtures fixtures = createFixtures();
+		Long communityId = fixtures.community().getId();
 
-		Voice voice1 = VoiceFixtures.permanentVoice("voice1", "url1", associate);
-		Voice voice2 = VoiceFixtures.permanentVoice("voice2", "url2", associate);
-		Voice voice3 = VoiceFixtures.permanentVoice("voice2", "url2", associate);
+		Voice voice1 = VoiceFixtures.permanentVoice(fixtures.associate);
+		Voice voice2 = VoiceFixtures.permanentVoice(fixtures.associate);
+		Voice voice3 = VoiceFixtures.permanentVoice(fixtures.associate);
 		voiceRepository.saveAll(List.of(voice1, voice2, voice3));
 
 		VoiceListQueryRequest request = VoiceListQueryRequest.of(communityId, null, 2, null);
@@ -162,8 +192,8 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 	@DisplayName("빈 커뮤니티에서 voice 목록을 조회하면 빈 리스트를 반환한다.")
 	void getVoicesFromEmptyCommunity() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Long communityId = associate.getCommunity().getId();
+		Fixtures fixtures = createFixtures();
+		Long communityId = fixtures.community().getId();
 
 		VoiceListQueryRequest request = VoiceListQueryRequest.of(communityId, null, 10, null);
 
@@ -180,11 +210,11 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 	@DisplayName("보이스를 삭제한다.")
 	void removeVoice() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		Voice voice = VoiceFixtures.permanentVoice("voice", "url", associate);
+		Fixtures fixtures = createFixtures();
+		Voice voice = VoiceFixtures.permanentVoice(fixtures.associate);
 		voiceRepository.save(voice);
 
-		VoiceRemoveRequest request = VoiceRemoveRequest.of(associate.getId(), voice.getId());
+		VoiceRemoveRequest request = VoiceRemoveRequest.of(fixtures.associate.getId(), voice.getId());
 
 		doNothing().when(minioService).removeFile(voice.getUrl());
 
@@ -201,8 +231,8 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 	@DisplayName("존재하지 않는 보이스를 삭제하면 예외가 발생한다.")
 	void removeVoiceNotFound() {
 		// given
-		Associate associate = createAndSaveAssociate();
-		VoiceRemoveRequest request = VoiceRemoveRequest.of(associate.getId(), 999L);
+		Fixtures fixtures = createFixtures();
+		VoiceRemoveRequest request = VoiceRemoveRequest.of(fixtures.associate.getId(), 999L);
 
 		// when & then
 		assertThatThrownBy(() ->
@@ -216,10 +246,11 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 	@DisplayName("권한이 없는 associate가 보이스를 삭제하면 예외가 발생한다.")
 	void removeVoiceUnauthorized() {
 		// given
-		Associate voiceOwner = createAndSaveAssociate();
-		Associate otherAssociate = createAndSaveAssociate();
+		Fixtures fixtures = createFixtures();
+		Associate voiceOwner = fixtures.associate;
+		Associate otherAssociate = AssociateFixtures.associate(fixtures.member, fixtures.community);
 		
-		Voice voice = VoiceFixtures.permanentVoice("voice", "url", voiceOwner);
+		Voice voice = VoiceFixtures.permanentVoice(voiceOwner);
 		voiceRepository.save(voice);
 
 		VoiceRemoveRequest request = VoiceRemoveRequest.of(otherAssociate.getId(), voice.getId());
@@ -231,14 +262,23 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 			.isEqualTo(UNAUTHORIZED_VOICE_ACCESS);
 	}
 
-	private Associate createAndSaveAssociate() {
+	private record Fixtures(
+		Member member,
+		Community community,
+		Associate associate
+	) {
+
+	}
+
+	private Fixtures createFixtures() {
 		Member member = MemberFixtures.member();
+		Community community = CommunityFixtures.community(member);
+		Associate associate = AssociateFixtures.associate(member, community);
+
 		Member savedMember = memberRepository.save(member);
-
-		Community community = CommunityFixtures.communityWithMember(savedMember);
 		Community savedCommunity = communityRepository.save(community);
+		Associate savedAssociate = associateRepository.save(associate);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(savedMember, savedCommunity);
-		return associateRepository.save(associate);
+		return new Fixtures(savedMember, savedCommunity, savedAssociate);
 	}
 }

@@ -19,7 +19,10 @@ public class CommunityFixtures {
 			.build();
 	}
 
-	public static Community communityWithMember(Member member) {
-		return Community.create(NAME, member);
+	public static Community community(Member member) {
+		return Community.builder()
+			.name(NAME)
+			.member(member)
+			.build();
 	}
 }

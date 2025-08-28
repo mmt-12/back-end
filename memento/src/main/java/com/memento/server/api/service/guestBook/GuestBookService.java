@@ -1,7 +1,5 @@
 package com.memento.server.api.service.guestBook;
 
-import static com.memento.server.config.MinioProperties.FileType.VOICE;
-
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -10,11 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
+import com.memento.server.api.service.eventMessage.EventMessagePublisher;
+import com.memento.server.api.service.eventMessage.dto.GuestBookNotification;
 import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
-import com.memento.server.config.MinioProperties;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.emoji.Emoji;
@@ -37,6 +36,7 @@ public class GuestBookService {
 	private final GuestBookRepository guestBookRepository;
 	private final VoiceRepository voiceRepository;
 	private final EmojiRepository emojiRepository;
+	private final EventMessagePublisher eventMessagePublisher;
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -78,6 +78,7 @@ public class GuestBookService {
 		}
 		
 		guestBookRepository.save(guestBook);
+		eventMessagePublisher.publishNotification(GuestBookNotification.from(associateId));
 	}
 
 	@Transactional
@@ -91,6 +92,7 @@ public class GuestBookService {
 				.content(url)
 				.type(GuestBookType.VOICE)
 				.build());
+		eventMessagePublisher.publishNotification(GuestBookNotification.from(associateId));
 	}
 
 	public SearchGuestBookResponse search(Long communityId, Long associateId, Pageable pageable, Long cursor) {

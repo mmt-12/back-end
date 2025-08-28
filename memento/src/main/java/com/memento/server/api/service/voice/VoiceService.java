@@ -3,6 +3,7 @@ package com.memento.server.api.service.voice;
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.UNAUTHORIZED_VOICE_ACCESS;
 import static com.memento.server.common.error.ErrorCodes.VOICE_NOT_FOUND;
+import static com.memento.server.common.error.ErrorCodes.VOICE_NAME_DUPLICATE;
 import static com.memento.server.config.MinioProperties.FileType.*;
 
 import java.util.List;
@@ -43,6 +44,11 @@ public class VoiceService {
 	public void createPermanentVoice(PermanentVoiceCreateServiceRequest request) {
 		Associate associate = associateRepository.findByIdAndDeletedAtIsNull(request.associateId())
 			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_FOUND));
+
+		boolean nameExists = voiceRepository.existsByNameAndDeletedAtIsNull(request.name());
+		if (nameExists) {
+			throw new MementoException(VOICE_NAME_DUPLICATE);
+		}
 
 		String url = minioService.createFile(request.voice(), VOICE);
 		Voice voice = Voice.createPermanent(request.name(), url, associate);

@@ -4,6 +4,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.memento.server.api.controller.mbti.dto.SearchMbtiResponse;
+import com.memento.server.api.service.eventMessage.EventMessageConsumer;
+import com.memento.server.api.service.eventMessage.EventMessagePublisher;
+import com.memento.server.api.service.eventMessage.dto.MbtiNotification;
 import com.memento.server.api.service.mbti.dto.MbtiSearchDto;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
@@ -22,6 +25,7 @@ public class MbtiService {
 
 	private final AssociateRepository associateRepository;
 	private final MbtiTestRepository mbtiTestRepository;
+	private final EventMessagePublisher eventMessagePublisher;
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -50,6 +54,7 @@ public class MbtiService {
 			.toAssociate(toAssociate)
 			.mbti(mbti)
 			.build());
+		eventMessagePublisher.publishNotification(MbtiNotification.from(toAssociate.getId()));
 	}
 
 	public SearchMbtiResponse search(Long communityId, Long associateId) {

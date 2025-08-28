@@ -21,6 +21,8 @@ import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
 import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
+import com.memento.server.api.service.eventMessage.EventMessagePublisher;
+import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
@@ -52,12 +54,14 @@ public class MemoryService {
 	private final EventRepository eventRepository;
 	private final AssociateRepository associateRepository;
 
+	private final EventMessagePublisher eventMessagePublisher;
+
 	public ReadAllMemoryResponse readAll(Long communityId, ReadAllMemoryRequest request) {
 		Long cursor = request.cursor();
 		Integer size = request.size();
 		String keyword = request.keyword();
-		LocalDate startDate = request.startDate();
-		LocalDate endDate = request.endDate();
+		LocalDate startDate = request.startTime();
+		LocalDate endDate = request.endTime();
 
 		LocalDateTime startDateTime = null;
 		LocalDateTime endDateTime = null;
@@ -131,6 +135,7 @@ public class MemoryService {
 		}
 		memoryAssociateRepository.saveAll(memoryAssociates);
 
+		eventMessagePublisher.publishNotification(MemoryNotification.from(memory.getId(), associateId));
 		return CreateUpdateMemoryResponse.from(memory);
 	}
 
