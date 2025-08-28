@@ -43,10 +43,11 @@ services:
     networks:
       - memento-dev-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "timeout", "5s", "bash", "-c", "</dev/tcp/localhost/9000"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
   minio-init-dev:
     image: minio/mc
@@ -57,8 +58,14 @@ services:
       /bin/sh -c "
         sleep 5;
         mc alias set dev http://memento-minio-dev:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY};
-        mc mb dev/${MINIO_BUCKET_NAME} || true;
-        mc anonymous set download dev/${MINIO_BUCKET_NAME};
+        mc mb dev/${POST_BUCKET} || true;
+        mc mb dev/${VOICE_BUCKET} || true;
+        mc mb dev/${EMOJI_BUCKET} || true;
+        mc mb dev/${PROFILE_IMAGE_BUCKET} || true;
+        mc anonymous set download dev/${POST_BUCKET};
+        mc anonymous set download dev/${VOICE_BUCKET};
+        mc anonymous set download dev/${EMOJI_BUCKET};
+        mc anonymous set download dev/${PROFILE_IMAGE_BUCKET};
       "
     networks:
       - memento-dev-network
@@ -87,13 +94,20 @@ services:
       - ../env/.env.dev
     environment:
       TZ: Asia/Seoul
-      SPRING_PROFILES_ACTIVE: dev
+      SPRING_PROFILES_ACTIVE: ${ENV_PROFILE}
+      MYSQL_URL: ${MYSQL_URL}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MINIO_URL: ${MINIO_URL}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
-      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+      POST_BUCKET: ${POST_BUCKET}
+      VOICE_BUCKET: ${VOICE_BUCKET}
+      EMOJI_BUCKET: ${EMOJI_BUCKET}
+      PROFILE_IMAGE_BUCKET: ${PROFILE_IMAGE_BUCKET}
+      JWT_SECRET: ${JWT_SECRET}
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID}
+      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET}
     ports:
       - 8081:8080
     depends_on:
