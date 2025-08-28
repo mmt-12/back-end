@@ -9,7 +9,7 @@ public record ReadAllMemoryRequest(
 	Long cursor,
 	Integer size,
 	String keyword,
-	LocalDate startDate,
-	LocalDate endDate
+	LocalDate startTime,
+	LocalDate endTime
 ) {
 }

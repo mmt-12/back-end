@@ -37,13 +37,13 @@ public record ReadAllMemoryResponse(
 
 		@Builder
 		public record PeriodResponse(
-			LocalDateTime startDate,
-			LocalDateTime endDate
+			LocalDateTime startTime,
+			LocalDateTime endTime
 		) {
 			public static PeriodResponse from(Period period) {
 				return PeriodResponse.builder()
-					.startDate(period.getStartTime())
-					.endDate(period.getEndTime())
+					.startTime(period.getStartTime())
+					.endTime(period.getEndTime())
 					.build();
 			}
 		}
@@ -54,7 +54,7 @@ public record ReadAllMemoryResponse(
 			String name,
 			Float latitude,
 			Float longitude,
-			String code
+			Integer code
 		) {
 			public static LocationResponse from(Location location) {
 				return LocationResponse.builder()
@@ -62,7 +62,7 @@ public record ReadAllMemoryResponse(
 					.name(location.getName())
 					.latitude(location.getLatitude().floatValue())
 					.longitude(location.getLongitude().floatValue())
-					.code(location.getCode().toString())
+					.code(location.getCode())
 					.build();
 			}
 		}
