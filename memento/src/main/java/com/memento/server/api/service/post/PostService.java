@@ -65,7 +65,7 @@ public class PostService {
 
 	public Post validPost(Long memoryId, Long postId){
 		Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
-			.orElseThrow(() -> new MementoException(ErrorCodes.POST_NOT_EXISTENCE));
+			.orElseThrow(() -> new MementoException(ErrorCodes.POST_NOT_FOUND));
 		if(!memoryId.equals(post.getMemory().getId())){
 			throw new MementoException(ErrorCodes.MEMORY_POST_NOT_MATCH);
 		}

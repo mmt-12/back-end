@@ -62,14 +62,14 @@ public class AchievementServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
 		Achievement achievement1 = AchievementFixtures.achievement();
 		Achievement achievement2 = AchievementFixtures.achievement();
 		achievementRepository.saveAll(List.of(achievement1,achievement2));
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
 		// when
@@ -88,14 +88,14 @@ public class AchievementServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
 		Achievement achievement1 = AchievementFixtures.achievement();
 		Achievement achievement2 = AchievementFixtures.achievement();
 		achievementRepository.saveAll(List.of(achievement1,achievement2));
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
 

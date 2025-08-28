@@ -64,13 +64,13 @@ public class ProfileImageServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Associate registrant = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate registrant = AssociateFixtures.associate(member, community);
 		associateRepository.save(registrant);
 
 		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
@@ -94,13 +94,13 @@ public class ProfileImageServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Associate registrant = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate registrant = AssociateFixtures.associate(member, community);
 		associateRepository.save(registrant);
 
 		ProfileImage profileImage1 = ProfileImage.builder()
@@ -139,13 +139,13 @@ public class ProfileImageServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Associate registrant = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate registrant = AssociateFixtures.associate(member, community);
 		associateRepository.save(registrant);
 
 		ProfileImage profileImage1 = ProfileImage.builder()
@@ -181,13 +181,13 @@ public class ProfileImageServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Associate registrant = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate registrant = AssociateFixtures.associate(member, community);
 		associateRepository.save(registrant);
 
 		ProfileImage profileImage = ProfileImage.builder()
@@ -214,13 +214,13 @@ public class ProfileImageServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Associate registrant = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate registrant = AssociateFixtures.associate(member, community);
 		associateRepository.save(registrant);
 
 		// when & then
@@ -234,16 +234,16 @@ public class ProfileImageServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Associate registrant = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate registrant = AssociateFixtures.associate(member, community);
 		associateRepository.save(registrant);
 
-		Associate notAuthorityAssociate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate notAuthorityAssociate = AssociateFixtures.associate(member, community);
 		associateRepository.save(notAuthorityAssociate);
 
 		ProfileImage profileImage = ProfileImage.builder()

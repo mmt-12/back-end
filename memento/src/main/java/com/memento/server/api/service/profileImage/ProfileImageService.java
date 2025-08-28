@@ -14,6 +14,7 @@ import com.memento.server.api.service.eventMessage.dto.NewImageNotification;
 import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
+import com.memento.server.config.MinioProperties;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.profileImage.ProfileImage;

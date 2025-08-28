@@ -231,10 +231,10 @@ public class AssociateServiceTest{
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
 		Achievement achievement = AchievementFixtures.achievement();
@@ -255,7 +255,7 @@ public class AssociateServiceTest{
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
 		Achievement oldAchievement = Achievement.builder()
@@ -311,7 +311,7 @@ public class AssociateServiceTest{
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
 		Achievement oldAchievement = Achievement.builder()

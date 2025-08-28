@@ -6,7 +6,6 @@ import static org.mockito.BDDMockito.given;
 
 import java.io.IOException;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
@@ -81,10 +79,10 @@ public class guestBookServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
 		GuestBook guestBook = GuestBook.builder()
@@ -111,10 +109,10 @@ public class guestBookServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
 		GuestBook guestBook1 = GuestBook.builder()
@@ -148,10 +146,10 @@ public class guestBookServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
 		String content = "test";
@@ -173,10 +171,10 @@ public class guestBookServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
 		Emoji emoji = EmojiFixtures.emoji();
@@ -199,10 +197,10 @@ public class guestBookServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
 		Voice voice = VoiceFixtures.permanentVoice("test", "https://example.com/test.mp3", associate);
@@ -225,10 +223,10 @@ public class guestBookServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
 		// when & then
@@ -242,10 +240,10 @@ public class guestBookServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
 		MultipartFile file = new MockMultipartFile("voice", "test.mp3", "audio/mpeg", "test".getBytes());
@@ -268,10 +266,10 @@ public class guestBookServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
 		GuestBook guestBook = GuestBook.builder()
@@ -295,10 +293,10 @@ public class guestBookServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
 		// when & then

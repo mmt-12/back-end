@@ -4,24 +4,15 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.post.dto.SearchAllPostResponse;
@@ -42,8 +33,6 @@ import com.memento.server.domain.emoji.Emoji;
 import com.memento.server.domain.emoji.EmojiRepository;
 import com.memento.server.domain.event.Event;
 import com.memento.server.domain.event.EventRepository;
-import com.memento.server.domain.event.Location;
-import com.memento.server.domain.event.Period;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
 import com.memento.server.domain.memory.Memory;
@@ -61,8 +50,6 @@ import com.memento.server.memory.MemoryFixtures;
 import com.memento.server.post.PostFixtures;
 import com.memento.server.spring.api.service.IntegrationsTestSupport;
 import com.memento.server.voice.VoiceFixtures;
-
-import jakarta.persistence.EntityManager;
 
 public class PostServiceTest extends IntegrationsTestSupport {
 
@@ -120,19 +107,19 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		Event event = EventFixtures.event(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = MemoryFixtures.memoryWithEvent(event);
+		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
-		Post post = PostFixtures.postWithMemoryAndAssociate(memory, associate);
+		Post post = PostFixtures.post(memory, associate);
 		postRepository.save(post);
 
 		Voice voice = VoiceFixtures.permanentVoice("test", "test.mp3", associate);
@@ -188,25 +175,25 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		Event event = EventFixtures.event(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = MemoryFixtures.memoryWithEvent(event);
+		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
-		Event event2 = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		Event event2 = EventFixtures.event(community, associate);
 		eventRepository.save(event2);
 
-		Memory memory2 = MemoryFixtures.memoryWithEvent(event2);
+		Memory memory2 = MemoryFixtures.memory(event2);
 		memoryRepository.save(memory2);
 
-		Post post = PostFixtures.postWithMemoryAndAssociate(memory, associate);
+		Post post = PostFixtures.post(memory, associate);
 		postRepository.save(post);
 
 		Voice voice = VoiceFixtures.permanentVoice("test", "test.mp3", associate);
@@ -244,19 +231,19 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		Event event = EventFixtures.event(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = MemoryFixtures.memoryWithEvent(event);
+		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
-		Post post = PostFixtures.postWithMemoryAndAssociate(memory, associate);
+		Post post = PostFixtures.post(memory, associate);
 		postRepository.save(post);
 
 		Voice voice = VoiceFixtures.permanentVoice("test", "test.mp3", associate);
@@ -316,22 +303,22 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		Event event = EventFixtures.event(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = MemoryFixtures.memoryWithEvent(event);
+		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
-		Post post = PostFixtures.postWithMemoryAndAssociate(memory, associate);
+		Post post = PostFixtures.post(memory, associate);
 		postRepository.save(post);
 
-		Post post2 = PostFixtures.postWithMemoryAndAssociate(memory, associate);
+		Post post2 = PostFixtures.post(memory, associate);
 		postRepository.save(post2);
 
 		Pageable pageable = PageRequest.of(0, 1);
@@ -351,16 +338,16 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		Event event = EventFixtures.event(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = MemoryFixtures.memoryWithEvent(event);
+		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
 		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
@@ -386,13 +373,13 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		Event event = EventFixtures.event(community, associate);
 		eventRepository.save(event);
 
 		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
@@ -413,22 +400,22 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Community community2 = CommunityFixtures.communityWithMember(member);
+		Community community2 = CommunityFixtures.community(member);
 		communityRepository.save(community2);
 
-		Associate associate2 = AssociateFixtures.associateWithMemberAndCommunity(member, community2);
+		Associate associate2 = AssociateFixtures.associate(member, community2);
 		associateRepository.save(associate2);
 
-		Event event = EventFixtures.eventWithCommunityAndAssociate(community2, associate2);
+		Event event = EventFixtures.event(community2, associate2);
 		eventRepository.save(event);
 
-		Memory memory = MemoryFixtures.memoryWithEvent(event);
+		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
 		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
@@ -449,16 +436,16 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		Event event = EventFixtures.event(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = MemoryFixtures.memoryWithEvent(event);
+		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
 		MultipartFile file1 = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
@@ -486,16 +473,16 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		Event event = EventFixtures.event(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = MemoryFixtures.memoryWithEvent(event);
+		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
 		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
@@ -524,19 +511,19 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Associate associate2 = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate2 = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate2);
 
-		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		Event event = EventFixtures.event(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = MemoryFixtures.memoryWithEvent(event);
+		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
 		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
@@ -561,19 +548,19 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		Event event = EventFixtures.event(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = MemoryFixtures.memoryWithEvent(event);
+		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
-		Post post = PostFixtures.postWithMemoryAndAssociate(memory, associate);
+		Post post = PostFixtures.post(memory, associate);
 		postRepository.save(post);
 
 		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
@@ -613,22 +600,22 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
-		Associate associate2 = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate2 = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate2);
 
-		Event event = EventFixtures.eventWithCommunityAndAssociate(community, associate);
+		Event event = EventFixtures.event(community, associate);
 		eventRepository.save(event);
 
-		Memory memory = MemoryFixtures.memoryWithEvent(event);
+		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
-		Post post = PostFixtures.postWithMemoryAndAssociate(memory, associate);
+		Post post = PostFixtures.post(memory, associate);
 		postRepository.save(post);
 
 		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());

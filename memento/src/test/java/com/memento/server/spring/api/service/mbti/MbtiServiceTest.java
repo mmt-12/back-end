@@ -55,13 +55,13 @@ public class MbtiServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate1 = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate1 = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate1);
 
-		Associate associate2 = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate2 = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate2);
 
 		//when
@@ -80,13 +80,13 @@ public class MbtiServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate1 = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate1 = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate1);
 
-		Associate associate2 = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate2 = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate2);
 
 		MbtiTest mbtiTest = MbtiTest.builder()
@@ -112,13 +112,13 @@ public class MbtiServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = CommunityFixtures.communityWithMember(member);
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate1 = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate1 = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate1);
 
-		Associate associate2 = AssociateFixtures.associateWithMemberAndCommunity(member, community);
+		Associate associate2 = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate2);
 
 		MbtiTest mbtiTest1 = MbtiTest.builder()
