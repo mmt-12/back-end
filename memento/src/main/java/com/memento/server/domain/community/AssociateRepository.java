@@ -32,4 +32,12 @@ public interface AssociateRepository extends JpaRepository<Associate, Long> {
 	Optional<Associate> findByIdAndDeletedAtIsNull(Long id);
 
 	List<Associate> findAllByIdInAndDeletedAtIsNull(List<Long> ids);
+
+	List<Associate> findAllByCommunityId(Long communityId);
+
+	@Query("SELECT ma.associate FROM MemoryAssociate ma WHERE ma.memory.id = :memoryId")
+	List<Associate> findAllByMemoryId(@Param("memoryId") Long memoryId);
+
+	@Query("SELECT p.associate FROM Post p WHERE p.id = :postId")
+	Optional<Associate> findByPostId(Long postId);
 }

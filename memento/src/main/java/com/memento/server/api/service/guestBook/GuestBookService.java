@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
+import com.memento.server.api.service.eventMessage.EventMessagePublisher;
+import com.memento.server.api.service.eventMessage.dto.GuestBookNotification;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
@@ -34,6 +36,7 @@ public class GuestBookService {
 	private final VoiceService voiceService;
 	private final VoiceRepository voiceRepository;
 	private final EmojiRepository emojiRepository;
+	private final EventMessagePublisher eventMessagePublisher;
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -73,6 +76,7 @@ public class GuestBookService {
 		}
 		
 		guestBookRepository.save(guestBook);
+		eventMessagePublisher.publishNotification(GuestBookNotification.from(associateId));
 	}
 
 	@Transactional
@@ -90,6 +94,7 @@ public class GuestBookService {
 				.content(saveVoice.getUrl())
 				.type(GuestBookType.VOICE)
 				.build());
+		eventMessagePublisher.publishNotification(GuestBookNotification.from(associateId));
 	}
 
 	public SearchGuestBookResponse search(Long communityId, Long associateId, Pageable pageable, Long cursor) {

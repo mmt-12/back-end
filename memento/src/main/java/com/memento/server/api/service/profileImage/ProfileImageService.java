@@ -1,11 +1,8 @@
 package com.memento.server.api.service.profileImage;
 
 import static com.memento.server.config.MinioProperties.FileType.POST;
-import static org.apache.commons.io.FilenameUtils.getExtension;
 
-import java.io.InputStream;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,17 +10,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.profileImage.dto.SearchProfileImageResponse;
+import com.memento.server.api.service.eventMessage.EventMessagePublisher;
+import com.memento.server.api.service.eventMessage.dto.NewImageNotification;
 import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
-import com.memento.server.config.MinioProperties;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.profileImage.ProfileImage;
 import com.memento.server.domain.profileImage.ProfileImageRepository;
 
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -34,8 +30,7 @@ public class ProfileImageService {
 	private final AssociateRepository associateRepository;
 	private final ProfileImageRepository profileImageRepository;
 	private final MinioService minioService;
-	private final MinioClient minioClient;
-	private final MinioProperties minioProperties;
+	private final EventMessagePublisher eventMessagePublisher;
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -60,6 +55,7 @@ public class ProfileImageService {
 				.associate(associate)
 				.registrant(registrant)
 				.build());
+		eventMessagePublisher.publishNotification(NewImageNotification.from(associateId));
 	}
 
 	@Transactional
