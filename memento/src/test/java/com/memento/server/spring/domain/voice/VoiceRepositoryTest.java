@@ -273,6 +273,54 @@ public class VoiceRepositoryTest extends IntegrationsTestSupport {
 		assertThat(foundVoice.get().isPermanent()).isFalse();
 	}
 
+	@Test
+	@DisplayName("이름이 존재하는 경우 true를 반환한다.")
+	void existsByNameAndDeletedAtIsNullReturnsTrue() {
+		// given
+		Fixtures fixtures = createFixtures();
+		String voiceName = "testVoice";
+		Voice voice = VoiceFixtures.permanentVoice(voiceName, "url", fixtures.associate);
+		voiceRepository.save(voice);
+
+		// when
+		boolean exists = voiceRepository.existsByNameAndDeletedAtIsNull(voiceName);
+
+		// then
+		assertThat(exists).isTrue();
+	}
+
+	@Test
+	@DisplayName("이름이 존재하지 않는 경우 false를 반환한다.")
+	void existsByNameAndDeletedAtIsNullReturnsFalse() {
+		// given
+		String nonExistentName = "nonExistentVoice";
+
+		// when
+		boolean exists = voiceRepository.existsByNameAndDeletedAtIsNull(nonExistentName);
+
+		// then
+		assertThat(exists).isFalse();
+	}
+
+	@Test
+	@DisplayName("삭제된 voice 이름은 존재하지 않는 것으로 처리된다.")
+	void existsByNameAndDeletedAtIsNullWithDeletedVoice() {
+		// given
+		Fixtures fixtures = createFixtures();
+		String voiceName = "deletedVoice";
+		Voice voice = VoiceFixtures.permanentVoice(voiceName, "url", fixtures.associate);
+		Voice savedVoice = voiceRepository.save(voice);
+		
+		savedVoice.markDeleted();
+		em.flush();
+
+		// when
+		boolean exists = voiceRepository.existsByNameAndDeletedAtIsNull(voiceName);
+
+		// then
+		assertThat(exists).isFalse();
+	}
+
 	private record Fixtures(
 		Member member,
 		Community community,

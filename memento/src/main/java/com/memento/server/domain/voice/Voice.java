@@ -41,7 +41,7 @@ public class Voice extends BaseEntity {
 	@GeneratedValue(strategy = IDENTITY)
 	private Long id;
 
-	@Column(name = "name", length = 102, nullable = true)
+	@Column(name = "name", length = 102, unique = true, nullable = true)
 	private String name;
 
 	@Column(name = "url", length = 255, nullable = false)

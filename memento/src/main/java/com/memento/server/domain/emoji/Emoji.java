@@ -40,7 +40,7 @@ public class Emoji extends BaseEntity {
 	@GeneratedValue(strategy = IDENTITY)
 	private Long id;
 
-	@Column(name = "name", length = 102, nullable = false)
+	@Column(name = "name", length = 102, unique = true, nullable = false)
 	private String name;
 
 	@Column(name = "url", length = 255, nullable = false)

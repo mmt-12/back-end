@@ -180,6 +180,54 @@ public class EmojiRepositoryTest extends IntegrationsTestSupport {
 		assertThat(emojis.get(0).id()).isEqualTo(savedEmoji1.getId());
 	}
 
+	@Test
+	@DisplayName("이름이 존재하는 경우 true를 반환한다.")
+	void existsByNameAndDeletedAtIsNullReturnsTrue() {
+		// given
+		Fixtures fixtures = createFixtures();
+		String emojiName = "testEmoji";
+		Emoji emoji = EmojiFixtures.emoji(emojiName, fixtures.associate);
+		emojiRepository.save(emoji);
+
+		// when
+		boolean exists = emojiRepository.existsByNameAndDeletedAtIsNull(emojiName);
+
+		// then
+		assertThat(exists).isTrue();
+	}
+
+	@Test
+	@DisplayName("이름이 존재하지 않는 경우 false를 반환한다.")
+	void existsByNameAndDeletedAtIsNullReturnsFalse() {
+		// given
+		String nonExistentName = "nonExistentEmoji";
+
+		// when
+		boolean exists = emojiRepository.existsByNameAndDeletedAtIsNull(nonExistentName);
+
+		// then
+		assertThat(exists).isFalse();
+	}
+
+	@Test
+	@DisplayName("삭제된 emoji 이름은 존재하지 않는 것으로 처리된다.")
+	void existsByNameAndDeletedAtIsNullWithDeletedEmoji() {
+		// given
+		Fixtures fixtures = createFixtures();
+		String emojiName = "deletedEmoji";
+		Emoji emoji = EmojiFixtures.emoji(emojiName, fixtures.associate);
+		Emoji savedEmoji = emojiRepository.save(emoji);
+		
+		savedEmoji.markDeleted();
+		em.flush();
+
+		// when
+		boolean exists = emojiRepository.existsByNameAndDeletedAtIsNull(emojiName);
+
+		// then
+		assertThat(exists).isFalse();
+	}
+
 	private record Fixtures(
 		Member member,
 		Community community,

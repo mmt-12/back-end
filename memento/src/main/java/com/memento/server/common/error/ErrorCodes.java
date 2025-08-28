@@ -28,11 +28,12 @@ public enum ErrorCodes implements ErrorCode {
 	VOICE_INVALID_FORMAT(BAD_REQUEST, 2009, "지원하지 않는 음성 파일 형식입니다."),
 	VOICE_NOT_FOUND(BAD_REQUEST, 2010, "보이스를 찾을 수 없습니다."),
 	UNAUTHORIZED_VOICE_ACCESS(BAD_REQUEST, 2011, "보이스를 삭제할 권한이 없습니다."),
+	VOICE_NAME_DUPLICATE(BAD_REQUEST, 2012, "이미 존재하는 보이스 이름입니다."),
 
-	IMAGE_FILE_TOO_LARGE(BAD_REQUEST, 2012, "이미지 파일 크기가 제한을 초과합니다."),
-	IMAGE_INVALID_FORMAT(BAD_REQUEST, 2013, "지원하지 않는 이미지 파일 형식입니다."),
-	POST_TOO_MANY_FILES(BAD_REQUEST, 2014, "업로드할 수 있는 파일 개수를 초과했습니다."),
-	POST_FILES_TOO_LARGE(BAD_REQUEST, 2015, "전체 파일 크기가 제한을 초과합니다."),
+	IMAGE_FILE_TOO_LARGE(BAD_REQUEST, 2013, "이미지 파일 크기가 제한을 초과합니다."),
+	IMAGE_INVALID_FORMAT(BAD_REQUEST, 2014, "지원하지 않는 이미지 파일 형식입니다."),
+	POST_TOO_MANY_FILES(BAD_REQUEST, 2015, "업로드할 수 있는 파일 개수를 초과했습니다."),
+	POST_FILES_TOO_LARGE(BAD_REQUEST, 2016, "전체 파일 크기가 제한을 초과합니다."),
 
 	EMOJI_NAME_REQUIRED(BAD_REQUEST, 3000, "이모지 이름은 필수입니다."),
 	EMOJI_NAME_BLANK(BAD_REQUEST, 3001, "이모지 이름은 공백일 수 없습니다."),
@@ -43,6 +44,7 @@ public enum ErrorCodes implements ErrorCode {
 	EMOJI_ASSOCIATE_REQUIRED(BAD_REQUEST, 3006, "이모지 작성자는 필수입니다."),
 	EMOJI_NOT_FOUND(BAD_REQUEST, 3007, "이모지를 찾을 수 없습니다."),
 	UNAUTHORIZED_EMOJI_ACCESS(BAD_REQUEST, 3008, "이모지를 삭제할 권한이 없습니다."),
+	EMOJI_NAME_DUPLICATE(BAD_REQUEST, 3009, "이미 존재하는 이모지 이름입니다."),
 
 	MEMBER_NAME_REQUIRED(BAD_REQUEST, 4000, "회원 이름은 필수입니다."),
 	MEMBER_NAME_BLANK(BAD_REQUEST, 4001, "회원 이름은 공백일 수 없습니다."),

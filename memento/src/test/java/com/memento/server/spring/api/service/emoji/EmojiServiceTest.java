@@ -3,6 +3,7 @@ package com.memento.server.spring.api.service.emoji;
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.UNAUTHORIZED_EMOJI_ACCESS;
 import static com.memento.server.common.error.ErrorCodes.EMOJI_NOT_FOUND;
+import static com.memento.server.common.error.ErrorCodes.EMOJI_NAME_DUPLICATE;
 import static com.memento.server.config.MinioProperties.FileType.EMOJI;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -114,6 +115,30 @@ public class EmojiServiceTest extends IntegrationsTestSupport {
 			.isInstanceOf(MementoException.class)
 			.extracting("errorCode")
 			.isEqualTo(ASSOCIATE_NOT_FOUND);
+	}
+
+	@Test
+	@DisplayName("중복된 이름으로 emoji를 생성하면 예외가 발생한다.")
+	void createEmojiWithDuplicateName() {
+		// given
+		Fixtures fixtures = createFixtures();
+		String duplicateName = "duplicateName";
+		MultipartFile file = CommonFixtures.emojiFile();
+
+		Emoji existingEmoji = EmojiFixtures.emoji(duplicateName, fixtures.associate);
+		emojiRepository.save(existingEmoji);
+
+		EmojiCreateServiceRequest request = EmojiCreateServiceRequest.builder()
+			.name(duplicateName)
+			.associateId(fixtures.associate.getId())
+			.emoji(file)
+			.build();
+
+		// when & then
+		assertThatThrownBy(() -> emojiService.createEmoji(request))
+			.isInstanceOf(MementoException.class)
+			.extracting("errorCode")
+			.isEqualTo(EMOJI_NAME_DUPLICATE);
 	}
 
 	@Test

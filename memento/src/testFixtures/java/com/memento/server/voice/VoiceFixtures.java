@@ -9,13 +9,13 @@ import com.memento.server.domain.voice.Voice;
 public class VoiceFixtures {
 
 	private static final AtomicLong idGenerator = new AtomicLong();
-	private static final String NAME = "voice";
+	private static final AtomicLong nameGenerator = new AtomicLong();
 	private static final String TEMPORARY_URL = "https://example.com/voice/temporary.wav";
 	private static final String PERMANENT_URL = "https://example.com/voice/permanent.wav";
 
 	public static Voice temporaryVoice(Associate associate) {
 		return Voice.builder()
-			.name(NAME)
+			.name(null)
 			.url(TEMPORARY_URL)
 			.temporary(true)
 			.associate(associate)
@@ -24,7 +24,7 @@ public class VoiceFixtures {
 
 	public static Voice temporaryVoice(String url, Associate associate) {
 		return Voice.builder()
-			.name(NAME)
+			.name(null)
 			.url(url)
 			.temporary(true)
 			.associate(associate)
@@ -34,7 +34,7 @@ public class VoiceFixtures {
 	public static Voice permanentVoice() {
 		return Voice.builder()
 			.id(idGenerator.getAndIncrement())
-			.name(NAME)
+			.name("voice" + nameGenerator.getAndIncrement())
 			.url(PERMANENT_URL)
 			.temporary(false)
 			.associate(AssociateFixtures.associate())
@@ -43,7 +43,7 @@ public class VoiceFixtures {
 
 	public static Voice permanentVoice(Associate associate) {
 		return Voice.builder()
-			.name(NAME)
+			.name("voice" + nameGenerator.getAndIncrement())
 			.url(PERMANENT_URL)
 			.temporary(false)
 			.associate(associate)
@@ -52,7 +52,7 @@ public class VoiceFixtures {
 
 	public static Voice permanentVoice(String url, Associate associate) {
 		return Voice.builder()
-			.name(NAME)
+			.name("voice" + nameGenerator.getAndIncrement())
 			.url(url)
 			.temporary(false)
 			.associate(associate)

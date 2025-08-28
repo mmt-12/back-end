@@ -3,6 +3,7 @@ package com.memento.server.spring.api.service.voice;
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.UNAUTHORIZED_VOICE_ACCESS;
 import static com.memento.server.common.error.ErrorCodes.VOICE_NOT_FOUND;
+import static com.memento.server.common.error.ErrorCodes.VOICE_NAME_DUPLICATE;
 import static com.memento.server.config.MinioProperties.FileType.VOICE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -115,6 +116,30 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 			.isInstanceOf(MementoException.class)
 			.extracting("errorCode")
 			.isEqualTo(ASSOCIATE_NOT_FOUND);
+	}
+
+	@Test
+	@DisplayName("중복된 이름으로 permanent voice를 생성하면 예외가 발생한다.")
+	void createPermanentVoiceWithDuplicateName() {
+		// given
+		Fixtures fixtures = createFixtures();
+		String duplicateName = "duplicateName";
+		MultipartFile file = CommonFixtures.voiceFile();
+
+		Voice existingVoice = VoiceFixtures.permanentVoice(duplicateName, "url1", fixtures.associate);
+		voiceRepository.save(existingVoice);
+
+		PermanentVoiceCreateServiceRequest request = PermanentVoiceCreateServiceRequest.builder()
+			.name(duplicateName)
+			.associateId(fixtures.associate.getId())
+			.voice(file)
+			.build();
+
+		// when & then
+		assertThatThrownBy(() -> voiceService.createPermanentVoice(request))
+			.isInstanceOf(MementoException.class)
+			.extracting("errorCode")
+			.isEqualTo(VOICE_NAME_DUPLICATE);
 	}
 
 	@Test
