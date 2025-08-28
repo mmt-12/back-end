@@ -1,8 +1,6 @@
 package com.memento.server.api.service.eventMessage;
 
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_EXISTENCE;
-import static com.memento.server.common.error.ErrorCodes.COMMUNITY_NOT_FOUND;
-import static com.memento.server.common.error.ErrorCodes.MEMORY_NOT_FOUND;
 import static com.memento.server.domain.notification.NotificationType.ASSOCIATE;
 import static com.memento.server.domain.notification.NotificationType.MBTI;
 import static com.memento.server.domain.notification.NotificationType.MEMORY;
@@ -23,10 +21,7 @@ import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
-import com.memento.server.domain.community.Community;
-import com.memento.server.domain.community.CommunityRepository;
-import com.memento.server.domain.memory.Memory;
-import com.memento.server.domain.memory.MemoryRepository;
+import com.memento.server.domain.memory.MemoryAssociateRepository;
 import com.memento.server.domain.notification.Notification;
 import com.memento.server.domain.notification.NotificationRepository;
 
@@ -40,8 +35,7 @@ public class EventMessageConsumer {
 
 	private final NotificationRepository notificationRepository;
 	private final AssociateRepository associateRepository;
-	private final MemoryRepository memoryRepository;
-	private final CommunityRepository communityRepository;
+	private final MemoryAssociateRepository memoryAssociateRepository;
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleMbtiNotification(MbtiNotification event) {
@@ -59,9 +53,7 @@ public class EventMessageConsumer {
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleAssociateNotification(AssociateNotification event) {
-		Community community = communityRepository.findById(event.communityId())
-			.orElseThrow(() -> new MementoException(COMMUNITY_NOT_FOUND));
-		List<Associate> associates = associateRepository.findAllByCommunity(community);
+		List<Associate> associates = associateRepository.findAllByCommunityId(event.communityId());
 
 		List<Notification> notificationList = new ArrayList<>();
 		for (Associate associate : associates) {
@@ -81,11 +73,7 @@ public class EventMessageConsumer {
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleMemoryNotification(MemoryNotification event) {
-		Memory memory = memoryRepository.findById(event.memoryId())
-			.orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
-		Community community = communityRepository.findById(event.communityId())
-			.orElseThrow(() -> new MementoException(COMMUNITY_NOT_FOUND));
-		List<Associate> associates = associateRepository.findAllByCommunity(community);
+		List<Associate> associates = memoryAssociateRepository.findAllAssociatesByMemoryId(event.memoryId());
 
 		List<Notification> notificationList = new ArrayList<>();
 		for (Associate associate : associates) {
@@ -96,7 +84,7 @@ public class EventMessageConsumer {
 				.content(MEMORY.getTitle())
 				.type(MEMORY)
 				.receiver(associate)
-				.memoryId(memory.getId())
+				.memoryId(event.memoryId())
 				.build());
 		}
 

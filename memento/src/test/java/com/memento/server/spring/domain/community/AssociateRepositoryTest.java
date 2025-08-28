@@ -9,11 +9,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-
 import org.springframework.transaction.annotation.Transactional;
 
 import com.memento.server.associate.AssociateFixtures;
@@ -24,7 +21,6 @@ import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
-
 import com.memento.server.member.MemberFixtures;
 import com.memento.server.spring.api.service.IntegrationsTestSupport;
 
@@ -83,7 +79,7 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
 
     @Test
     @DisplayName("커뮤니티 ID와 키워드로 연관 관계 목록을 조회한다")
-    void findAllByCommunityIdAndKeywordWithCursor_커뮤니티_ID와_키워드로_연관_관계_목록을_조회한다() {
+    void findAllByCommunityIdIdAndKeywordWithCursor_커뮤니티_ID와_키워드로_연관_관계_목록을_조회한다() {
         // given
         Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
         Member member2 = memberRepository.save(Member.create("테스트멤버2", "test@test.com", LocalDate.of(1990, 1, 1), 1008L));
@@ -161,7 +157,7 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
 
     @Test
     @DisplayName("커뮤니티로 조회한다.")
-    void findAllByCommunity() {
+    void findAllByCommunityId() {
         // given
         Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
         Member member2 = memberRepository.save(Member.create("김나나", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
@@ -173,7 +169,7 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
         associateRepository.save(Associate.create("다다", member3, community));
 
         // when
-        List<Associate> associates = associateRepository.findAllByCommunity(community);
+        List<Associate> associates = associateRepository.findAllByCommunityId(community.getId());
 
         // then
         assertThat(associates.size()).isEqualTo(2);

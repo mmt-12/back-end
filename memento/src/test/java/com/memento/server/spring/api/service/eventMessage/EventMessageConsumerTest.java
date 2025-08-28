@@ -27,6 +27,8 @@ import com.memento.server.domain.event.Period;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
 import com.memento.server.domain.memory.Memory;
+import com.memento.server.domain.memory.MemoryAssociate;
+import com.memento.server.domain.memory.MemoryAssociateRepository;
 import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.domain.notification.Notification;
 import com.memento.server.domain.notification.NotificationRepository;
@@ -55,6 +57,9 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 	@Autowired
 	private EventRepository eventRepository;
 
+	@Autowired
+	private MemoryAssociateRepository memoryAssociateRepository;
+
 	@AfterEach
 	public void tearDown() {
 		notificationRepository.deleteAllInBatch();
@@ -63,6 +68,7 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 		memoryRepository.deleteAllInBatch();
 		communityRepository.deleteAllInBatch();
 		eventRepository.deleteAllInBatch();
+		memoryAssociateRepository.deleteAllInBatch();
 	}
 
 	@Test
@@ -111,8 +117,8 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 		Member member3 = memberRepository.save(Member.create("김다다", "muge@test.com", LocalDate.of(1990, 1, 1), 1003L));
 		Community community = communityRepository.save(Community.create("comm", member));
 		Associate associate = associateRepository.save(Associate.create("가가", member, community));
-		associateRepository.save(Associate.create("나나", member2, community));
-		associateRepository.save(Associate.create("다다", member3, community));
+		Associate associate2 = associateRepository.save(Associate.create("나나", member2, community));
+		Associate associate3 = associateRepository.save(Associate.create("다다", member3, community));
 		Event event = eventRepository.save(
 			Event.builder()
 				.title("추억1")
@@ -132,6 +138,18 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 				.associate(associate)
 				.build());
 		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
+		memoryAssociateRepository.save(MemoryAssociate.builder()
+			.memory(memory)
+			.associate(associate)
+			.build());
+		memoryAssociateRepository.save(MemoryAssociate.builder()
+			.memory(memory)
+			.associate(associate2)
+			.build());
+		memoryAssociateRepository.save(MemoryAssociate.builder()
+			.memory(memory)
+			.associate(associate3)
+			.build());
 
 		// when
 		MemoryNotification eventMessage = MemoryNotification.from(memory.getId(), community.getId(), associate.getId());
