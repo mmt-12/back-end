@@ -7,6 +7,7 @@ import static com.memento.server.domain.notification.NotificationType.MBTI;
 import static com.memento.server.domain.notification.NotificationType.MEMORY;
 import static com.memento.server.domain.notification.NotificationType.NEWIMAGE;
 import static com.memento.server.domain.notification.NotificationType.POST;
+import static com.memento.server.domain.notification.NotificationType.REACTION;
 import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT;
 
@@ -24,10 +25,10 @@ import com.memento.server.api.service.eventMessage.dto.MbtiNotification;
 import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
 import com.memento.server.api.service.eventMessage.dto.NewImageNotification;
 import com.memento.server.api.service.eventMessage.dto.PostNotification;
+import com.memento.server.api.service.eventMessage.dto.ReactionNotification;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
-import com.memento.server.domain.memory.MemoryAssociateRepository;
 import com.memento.server.domain.notification.Notification;
 import com.memento.server.domain.notification.NotificationRepository;
 
@@ -41,11 +42,24 @@ public class EventMessageConsumer {
 
 	private final NotificationRepository notificationRepository;
 	private final AssociateRepository associateRepository;
-	private final MemoryAssociateRepository memoryAssociateRepository;
+
+	@TransactionalEventListener(phase = AFTER_COMMIT)
+	public void handleReactionNotification(ReactionNotification event) {
+		Associate associate = associateRepository.findByPostId(event.postId())
+			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
+
+		notificationRepository.save(Notification.builder()
+			.title(REACTION.getTitle())
+			.content(REACTION.getTitle())
+			.type(REACTION)
+			.receiver(associate)
+			.postId(event.postId())
+			.build());
+	}
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handlePostNotification(PostNotification event) {
-		List<Associate> associates = memoryAssociateRepository.findAllAssociatesByMemoryId(event.memoryId());
+		List<Associate> associates = associateRepository.findAllByMemoryId(event.memoryId());
 
 		List<Notification> notificationList = new ArrayList<>();
 		for (Associate associate : associates) {
@@ -124,7 +138,7 @@ public class EventMessageConsumer {
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleMemoryNotification(MemoryNotification event) {
-		List<Associate> associates = memoryAssociateRepository.findAllAssociatesByMemoryId(event.memoryId());
+		List<Associate> associates = associateRepository.findAllByMemoryId(event.memoryId());
 
 		List<Notification> notificationList = new ArrayList<>();
 		for (Associate associate : associates) {

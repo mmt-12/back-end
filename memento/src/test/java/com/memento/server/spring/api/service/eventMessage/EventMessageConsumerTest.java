@@ -19,6 +19,7 @@ import com.memento.server.api.service.eventMessage.dto.MbtiNotification;
 import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
 import com.memento.server.api.service.eventMessage.dto.NewImageNotification;
 import com.memento.server.api.service.eventMessage.dto.PostNotification;
+import com.memento.server.api.service.eventMessage.dto.ReactionNotification;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
@@ -78,6 +79,63 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 		eventRepository.deleteAllInBatch();
 		memoryAssociateRepository.deleteAllInBatch();
 		postRepository.deleteAllInBatch();
+	}
+
+	@Test
+	@DisplayName("리액션 알림 이벤트를 데이터베이스에 저장한다.")
+	void handleReactionNotification() {
+		// given
+		Member member = memberRepository.save(Member.create("김가가", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
+		Member member2 = memberRepository.save(Member.create("김나나", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
+		Member member3 = memberRepository.save(Member.create("김다다", "muge@test.com", LocalDate.of(1990, 1, 1), 1003L));
+		Community community = communityRepository.save(Community.create("comm", member));
+		Associate associate = associateRepository.save(Associate.create("가가", member, community));
+		Associate associate2 = associateRepository.save(Associate.create("나나", member2, community));
+		Associate associate3 = associateRepository.save(Associate.create("다다", member3, community));
+		Event event = eventRepository.save(
+			Event.builder()
+				.title("추억1")
+				.description("내용1")
+				.location(Location.builder()
+					.address("주소1")
+					.name("장소1")
+					.latitude(BigDecimal.valueOf(1.0))
+					.longitude(BigDecimal.valueOf(1.0))
+					.code(1)
+					.build())
+				.period(Period.builder()
+					.startTime(LocalDateTime.now().minusDays(2))
+					.endTime(LocalDateTime.now().minusDays(1))
+					.build())
+				.community(community)
+				.associate(associate)
+				.build());
+		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
+		memoryAssociateRepository.save(MemoryAssociate.builder()
+			.memory(memory)
+			.associate(associate)
+			.build());
+		memoryAssociateRepository.save(MemoryAssociate.builder()
+			.memory(memory)
+			.associate(associate2)
+			.build());
+		memoryAssociateRepository.save(MemoryAssociate.builder()
+			.memory(memory)
+			.associate(associate3)
+			.build());
+		Post post = postRepository.save(Post.builder()
+			.content("content")
+			.memory(memory)
+			.associate(associate)
+			.build());
+
+		// when
+		ReactionNotification eventMessage = ReactionNotification.from(post.getId());
+		eventMessageConsumer.handleReactionNotification(eventMessage);
+
+		// then
+		List<Notification> all = notificationRepository.findAll();
+		assertThat(all.size()).isEqualTo(1);
 	}
 
 	@Test
