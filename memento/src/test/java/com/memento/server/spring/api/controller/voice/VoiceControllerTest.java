@@ -39,6 +39,8 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void createVoice() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().name("인쥐용").build());
 		MockMultipartFile voice = CommonFixtures.voiceFile();
 
@@ -49,7 +51,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/voices", communityId)
 					.file(data)
 					.file(voice)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isCreated());
@@ -63,6 +65,8 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void createVoiceWithoutName() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().build());
 		MockMultipartFile voice = CommonFixtures.voiceFile();
 
@@ -73,7 +77,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/voices", communityId)
 					.file(data)
 					.file(voice)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -92,6 +96,8 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void createVoiceWithTooLongName() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		String tooLongName = "아".repeat(35);
 		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().name(tooLongName).build());
 		MockMultipartFile voice = CommonFixtures.voiceFile();
@@ -103,7 +109,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/voices", communityId)
 					.file(data)
 					.file(voice)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -122,6 +128,8 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void createVoiceWithoutData() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		MockMultipartFile voice = CommonFixtures.voiceFile();
 
 		doNothing().when(voiceService).createPermanentVoice(any());
@@ -130,7 +138,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 		mockMvc.perform(
 				multipart("/api/v1/communities/{communityId}/voices", communityId)
 					.file(voice)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -149,6 +157,8 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void createVoiceWithoutVoice() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().name("인쥐용").build());
 
 		doNothing().when(voiceService).createPermanentVoice(any());
@@ -157,7 +167,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 		mockMvc.perform(
 				multipart("/api/v1/communities/{communityId}/voices", communityId)
 					.file(data)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -176,6 +186,8 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void createVoiceWithTooLargeFile() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().name("인쥐용").build());
 		MockMultipartFile voice = CommonFixtures.voiceFile();
 
@@ -187,7 +199,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/voices", communityId)
 					.file(data)
 					.file(voice)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -204,6 +216,8 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void createVoiceWithInvalidFormat() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().name("인쥐용").build());
 		MockMultipartFile voice = new MockMultipartFile(
 			"voice",
@@ -220,7 +234,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/voices", communityId)
 					.file(data)
 					.file(voice)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -237,6 +251,8 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void createVoiceWithNullContentType() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().name("인쥐용").build());
 		MockMultipartFile voice = new MockMultipartFile(
 			"voice",
@@ -253,7 +269,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/voices", communityId)
 					.file(data)
 					.file(voice)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -270,6 +286,8 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void getVoices() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		long cursor = 1L;
 		String keyword = "인쥐용";
 		int size = 10;
@@ -288,7 +306,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 					.param("cursor", String.valueOf(cursor))
 					.param("size", String.valueOf(size))
 					.param("keyword", keyword)
-					.with(withJwt(1L, 1L, 1L)))
+					.with(withJwt(memberId, associateId, communityId)))
 			.andExpect(status().isOk());
 
 		verify(voiceService).getVoices(any(VoiceListQueryRequest.class));
@@ -299,13 +317,15 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void getVoicesWithSizeTooSmall() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		int invalidSize = 0;
 
 		// when & then
 		mockMvc.perform(
 				get("/api/v1/communities/{communityId}/voices", communityId)
 					.param("size", String.valueOf(invalidSize))
-					.with(withJwt(1L, 1L, 1L)))
+					.with(withJwt(memberId, associateId, communityId)))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
@@ -322,13 +342,15 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void getVoicesWithSizeTooLarge() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		int invalidSize = 31;
 
 		// when & then
 		mockMvc.perform(
 				get("/api/v1/communities/{communityId}/voices", communityId)
 					.param("size", String.valueOf(invalidSize))
-					.with(withJwt(1L, 1L, 1L)))
+					.with(withJwt(memberId, associateId, communityId)))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.status").value("BAD_REQUEST"))
@@ -345,6 +367,8 @@ public class VoiceControllerTest extends ControllerTestSupport {
 	void removeVoice() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		long voiceId = 1L;
 
 		doNothing().when(voiceService).removeVoice(any(VoiceRemoveRequest.class));
@@ -352,7 +376,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 		// when && then
 		mockMvc.perform(
 				delete("/api/v1/communities/{communityId}/voices/{voiceId}", communityId, voiceId)
-					.with(withJwt(1L, 1L, 1L)))
+					.with(withJwt(memberId, associateId, communityId)))
 			.andDo(print())
 			.andExpect(status().isNoContent());
 

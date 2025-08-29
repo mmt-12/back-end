@@ -10,6 +10,7 @@ import com.memento.server.annotation.AssociateId;
 import com.memento.server.api.service.notification.NotificationService;
 import com.memento.server.api.service.notification.dto.request.NotificationListQueryRequest;
 import com.memento.server.api.service.notification.dto.response.NotificationListResponse;
+import com.memento.server.api.service.notification.dto.response.NotificationUnreadResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,5 +27,10 @@ public class NotificationController {
 		@RequestParam(required = false, defaultValue = "10") int size) {
 		return ResponseEntity.ok(
 			notificationService.getNotifications(NotificationListQueryRequest.of(associateId, cursor, size)));
+	}
+
+	@GetMapping("/unread")
+	public ResponseEntity<NotificationUnreadResponse> getUnread(@AssociateId Long associateId) {
+		return ResponseEntity.ok(notificationService.getUnread(associateId));
 	}
 }

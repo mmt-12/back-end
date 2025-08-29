@@ -1,0 +1,9 @@
+[[Notification-Get-Unread-API]]
+=== 안읽은 알림 조회
+
+==== HTTP Request
+include::{snippets}/notification-get-unread/http-request.adoc[]
+
+==== HTTP Response
+include::{snippets}/notification-get-unread/http-response.adoc[]
+include::{snippets}/notification-get-unread/response-fields.adoc[]
