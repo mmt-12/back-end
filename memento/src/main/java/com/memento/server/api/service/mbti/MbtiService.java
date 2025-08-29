@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.memento.server.api.controller.mbti.dto.SearchMbtiResponse;
-import com.memento.server.api.service.eventMessage.EventMessageConsumer;
 import com.memento.server.api.service.eventMessage.EventMessagePublisher;
 import com.memento.server.api.service.eventMessage.dto.MbtiNotification;
 import com.memento.server.api.service.mbti.dto.MbtiSearchDto;

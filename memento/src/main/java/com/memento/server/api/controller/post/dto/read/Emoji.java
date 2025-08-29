@@ -11,13 +11,4 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class Emoji extends Reaction {
 	boolean isInvolved;
-
-	public static Emoji from(){
-		return Emoji.builder()
-			.id(1L)
-			.url("https://aws.s3.memento/1")
-			.isInvolved(true)
-			.authors(List.of(CommentAuthor.from()))
-			.build();
-	}
 }

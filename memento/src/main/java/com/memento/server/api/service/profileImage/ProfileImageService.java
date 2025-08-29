@@ -1,8 +1,7 @@
 package com.memento.server.api.service.profileImage;
 
-import static com.memento.server.config.MinioProperties.FileType.POST;
-
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,6 +14,7 @@ import com.memento.server.api.service.eventMessage.dto.NewImageNotification;
 import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
+import com.memento.server.config.MinioProperties;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.profileImage.ProfileImage;
@@ -47,9 +47,7 @@ public class ProfileImageService {
 		Associate associate = validAssociate(communityId, associateId);
 		Associate registrant = validAssociate(communityId, registrantId);
 
-		// todo minioService method 호출로 변경
-		// String url = saveImage(associate, image);
-		String url = minioService.createFile(image, POST);
+		String url = minioService.createFile(image, MinioProperties.FileType.PROFILE_IMAGE);
 		profileImageRepository.save(ProfileImage.builder()
 				.url(url)
 				.associate(associate)
@@ -59,14 +57,14 @@ public class ProfileImageService {
 	}
 
 	@Transactional
-	public void delete(Long communityId, Long associateId, Long registrantId, Long profileImageId) {
-		Associate registrant = validAssociate(communityId, registrantId);
+	public void delete(Long communityId, Long associateId, Long ownerId, Long profileImageId) {
+		Associate owner = validAssociate(communityId, ownerId);
 		Associate associate = validAssociate(communityId, associateId);
 
 		ProfileImage profileImage = profileImageRepository.findByIdAndDeletedAtIsNull(profileImageId)
 			.orElseThrow(() -> new MementoException(ErrorCodes.PROFILEIMAGE_NOT_EXISTENCE));
 
-		if(!profileImage.getRegistrant().equals(registrant) && !profileImage.getAssociate().equals(associate)){
+		if(!profileImage.getRegistrant().equals(associate) && !owner.equals(associate)){
 			throw new MementoException(ErrorCodes.ASSOCIATE_NOT_AUTHORITY);
 		}
 
@@ -89,6 +87,7 @@ public class ProfileImageService {
 			.map(p -> SearchProfileImageResponse.ProfileImage.builder()
 				.id(p.getId())
 				.url(p.getUrl())
+				.isRegister(Objects.equals(p.getRegistrant().getId(), associate.getId()))
 				.build())
 			.toList();
 
@@ -98,33 +97,4 @@ public class ProfileImageService {
 			.hasNext(hasNext)
 			.build();
 	}
-
-	// todo 주석처리
-	// public String saveImage(Associate associate, MultipartFile image) {
-	// 	String bucket = minioProperties.getBucket();
-	// 	String baseUrl = minioProperties.getUrl();
-	//
-	// 	String originalFilename = image.getOriginalFilename();
-	// 	String extension = getExtension(originalFilename);
-	// 	String filename = "profileImage/"+ associate.getId() +"/" + UUID.randomUUID() + "." + extension;
-	// 	String expectedContentType = "image/" + extension;
-	//
-	// 	try (InputStream inputStream = image.getInputStream()) {
-	// 		long contentLength = image.getSize();
-	//
-	// 		minioClient.putObject(
-	// 			PutObjectArgs.builder()
-	// 				.bucket(bucket)
-	// 				.object(filename)
-	// 				.stream(inputStream, contentLength, -1)
-	// 				.contentType(expectedContentType)
-	// 				.build()
-	// 		);
-	//
-	// 	} catch (Exception e) {
-	// 		throw new MementoException(ErrorCodes.PROFILEIMAGE_SAVE_FAIL);
-	// 	}
-	//
-	// 	return baseUrl + "/" + filename;
-	// }
 }

@@ -10,12 +10,4 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 public class TemporaryVoice extends Reaction{
-
-	public static TemporaryVoice from(){
-		return TemporaryVoice.builder()
-			.id(1L)
-			.url("https://aws.s3.memento/1")
-			.authors(List.of(CommentAuthor.from()))
-			.build();
-	}
 }

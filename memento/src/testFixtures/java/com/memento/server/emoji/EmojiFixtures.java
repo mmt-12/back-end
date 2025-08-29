@@ -14,7 +14,6 @@ public class EmojiFixtures {
 
 	public static Emoji emoji() {
 		return Emoji.builder()
-			.id(idGenerator.getAndIncrement())
 			.name("emoji" + nameGenerator.getAndIncrement())
 			.url(URL)
 			.associate(AssociateFixtures.associate())

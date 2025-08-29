@@ -14,7 +14,6 @@ public class AchievementFixtures {
 
 	public static Achievement achievement() {
 		return Achievement.builder()
-			.id(idGenerator.getAndIncrement())
 			.name(NAME)
 			.criteria(CRITERIA)
 			.type(OPEN)

@@ -11,13 +11,4 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class Voice extends Reaction{
 	boolean isInvolved;
-
-	public static Voice from(){
-		return Voice.builder()
-			.id(1L)
-			.url("https://aws.s3.memento/1")
-			.isInvolved(true)
-			.authors(List.of(CommentAuthor.from()))
-			.build();
-	}
 }

@@ -99,10 +99,13 @@ public enum ErrorCodes implements ErrorCode {
 
 	MEMORY_NOT_FOUND(BAD_REQUEST, 11000, "존재하지 않는 기억입니다."),
 	MEMORY_NOT_AUTHOR(BAD_REQUEST, 11001, "기억의 작성자가 아닙니다."),
+	MEMORY_POST_NOT_MATCH(BAD_REQUEST, 11002, "해당 기억의 포스트가 아닙니다."),
 
 	MINIO_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, 12000, "파일 업로드 중 오류가 발생했습니다."),
 
 	POST_NOT_FOUND(BAD_REQUEST, 13000, "포스트를 찾을 수 없습니다."),
+	POST_IMAGE_SAVE_FAIL(BAD_REQUEST, 13001, "포스트 이미지 저장에 실패하였습니다."),
+	POST_IMAGE_DUPLICATED(BAD_REQUEST, 13002, "중복된 이미지는 저장할 수 없습니다."),
 
 	;
 	private final HttpStatus status;

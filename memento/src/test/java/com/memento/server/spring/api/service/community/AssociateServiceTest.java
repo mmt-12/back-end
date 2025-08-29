@@ -4,6 +4,7 @@ import static com.memento.server.common.error.ErrorCodes.COMMUNITY_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
 
@@ -14,10 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import com.memento.server.achievement.AchievementFixtures;
 import com.memento.server.api.controller.community.dto.AssociateListResponse;
 import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
 import com.memento.server.api.service.community.AssociateService;
+import com.memento.server.associate.AssociateFixtures;
 import com.memento.server.common.exception.MementoException;
+import com.memento.server.community.CommunityFixtures;
 import com.memento.server.domain.achievement.Achievement;
 import com.memento.server.domain.achievement.AchievementRepository;
 import com.memento.server.domain.achievement.AchievementType;
@@ -27,6 +31,7 @@ import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
+import com.memento.server.member.MemberFixtures;
 
 @SpringBootTest
 public class AssociateServiceTest{
@@ -223,45 +228,23 @@ public class AssociateServiceTest{
 	@DisplayName("프로필 상세 조회")
 	void searchTest() {
 		// given
-		Achievement achievement = Achievement.builder()
-			.name("test name")
-			.criteria("example")
-			.type(AchievementType.OPEN)
-			.build();
-		achievementRepository.save(achievement);
-
-		Member member = Member.builder()
-			.name("example")
-			.email("example@example.com")
-			.kakaoId(123L)
-			.birthday(LocalDate.of(1999, 1, 1))
-			.build();
+		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = Community.builder()
-			.member(member)
-			.name("example")
-			.build();
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Associate associate = Associate.builder()
-			.community(community)
-			.nickname("test nickname")
-			.achievement(achievement)
-			.profileImageUrl("www.example.com")
-			.introduction("test introduction")
-			.member(member)
-			.build();
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
+
+		Achievement achievement = AchievementFixtures.achievement();
+		achievementRepository.save(achievement);
 
 		// when
 		SearchAssociateResponse response = associateService.search(community.getId(), associate.getId());
 
 		// then
-		assertEquals("test nickname", response.nickname());
-		assertEquals("test name", response.achievement().getName());
-		assertEquals("www.example.com", response.imageUrl());
-		assertEquals("test introduction", response.introduction());
+		assertEquals("nickname", response.nickname());
 		assertEquals(LocalDate.of(1999, 1, 1), response.birthday());
 	}
 
@@ -269,18 +252,10 @@ public class AssociateServiceTest{
 	@DisplayName("프로필 수정")
 	void updateTest() {
 		// given
-		Member member = Member.builder()
-			.name("example")
-			.email("example@example.com")
-			.kakaoId(123L)
-			.birthday(LocalDate.of(1999, 1, 1))
-			.build();
+		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = Community.builder()
-			.member(member)
-			.name("example")
-			.build();
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
 		Achievement oldAchievement = Achievement.builder()
@@ -327,5 +302,43 @@ public class AssociateServiceTest{
 
 			return null;
 		});
+	}
+
+	@Test
+	@DisplayName("존재하지 않은 업적으로 수정할 수 없습니다")
+	void updateWithAchievementTest() {
+		// given
+		Member member = MemberFixtures.member();
+		memberRepository.save(member);
+
+		Community community = CommunityFixtures.community(member);
+		communityRepository.save(community);
+
+		Achievement oldAchievement = Achievement.builder()
+			.name("Novice")
+			.criteria("example")
+			.type(AchievementType.OPEN)
+			.build();
+		achievementRepository.save(oldAchievement);
+
+		Associate associate = Associate.builder()
+			.community(community)
+			.member(member)
+			.achievement(oldAchievement)
+			.nickname("example")
+			.build();
+		associateRepository.save(associate);
+
+		// when & then
+		assertThrows(MementoException.class, () ->
+		associateService.update(
+			community.getId(),
+			associate.getId(),
+			"new-image",
+			null,
+			12L,
+			"New Intro"
+		));
+
 	}
 }

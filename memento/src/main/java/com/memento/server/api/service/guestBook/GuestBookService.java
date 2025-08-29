@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
 import com.memento.server.api.service.eventMessage.EventMessagePublisher;
 import com.memento.server.api.service.eventMessage.dto.GuestBookNotification;
-import com.memento.server.api.service.voice.VoiceService;
+import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.config.MinioProperties;
@@ -31,9 +31,9 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class GuestBookService {
 
+	private final MinioService minioService;
 	private final AssociateRepository associateRepository;
 	private final GuestBookRepository guestBookRepository;
-	private final VoiceService voiceService;
 	private final VoiceRepository voiceRepository;
 	private final EmojiRepository emojiRepository;
 	private final EventMessagePublisher eventMessagePublisher;
@@ -60,14 +60,16 @@ public class GuestBookService {
 				.type(type)
 				.build();
 		}else if(type.equals(GuestBookType.VOICE)){
-			Voice voice = voiceRepository.findByIdAndDeletedAtNull(contentId);
+			Voice voice = voiceRepository.findByIdAndDeletedAtIsNull(contentId)
+				.orElseThrow(() -> new MementoException(ErrorCodes.VOICE_NOT_FOUND));
 			guestBook = GuestBook.builder()
 				.associate(associate)
 				.content(voice.getUrl())
 				.type(type)
 				.build();
 		}else{
-			Emoji emoji = emojiRepository.findByIdAndDeletedAtNull(contentId);
+			Emoji emoji = emojiRepository.findByIdAndDeletedAtIsNull(contentId)
+				.orElseThrow(() -> new MementoException(ErrorCodes.EMOJI_NOT_FOUND));
 			guestBook = GuestBook.builder()
 				.associate(associate)
 				.content(emoji.getUrl())
@@ -83,15 +85,11 @@ public class GuestBookService {
 	public void createBubble(Long communityId, Long associateId, MultipartFile voice) {
 		Associate associate = validAssociate(communityId, associateId);
 
-		Voice saveVoice = voiceService.saveVoice(associate, voice);
-
-		if (saveVoice == null) {
-			throw new MementoException(ErrorCodes.VOICE_SAVE_FAIL);
-		}
+		String url = saveVoice(associate, voice);
 
 		guestBookRepository.save(GuestBook.builder()
 				.associate(associate)
-				.content(saveVoice.getUrl())
+				.content(url)
 				.type(GuestBookType.VOICE)
 				.build());
 		eventMessagePublisher.publishNotification(GuestBookNotification.from(associateId));
@@ -135,5 +133,15 @@ public class GuestBookService {
 			.orElseThrow(() -> new MementoException(ErrorCodes.GUESTBOOK_NOT_EXISTENCE));
 
 		guestBook.markDeleted();
+	}
+
+	public String saveVoice(Associate associate, MultipartFile voice) {
+		String url = minioService.createFile(voice, MinioProperties.FileType.VOICE);
+
+		return voiceRepository.save(Voice.builder()
+			.associate(associate)
+			.url(url)
+			.temporary(true)
+			.build()).getUrl();
 	}
 }

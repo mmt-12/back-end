@@ -40,4 +40,10 @@ public class Memory extends BaseEntity {
 	@OneToOne(fetch = LAZY)
 	@JoinColumn(name = "event_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Event event;
+
+	public static Memory create(Event event) {
+		return Memory.builder()
+			.event(event)
+			.build();
+	}
 }

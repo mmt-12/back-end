@@ -1,36 +1,33 @@
 package com.memento.server.spring.api.service.achievement;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.memento.server.achievement.AchievementFixtures;
 import com.memento.server.api.controller.achievement.dto.SearchAchievementResponse;
 import com.memento.server.api.service.achievement.AchievementService;
-import com.memento.server.api.service.achievement.dto.SearchAchievementDto;
+import com.memento.server.associate.AssociateFixtures;
+import com.memento.server.community.CommunityFixtures;
 import com.memento.server.domain.achievement.Achievement;
+import com.memento.server.domain.achievement.AchievementAssociate;
+import com.memento.server.domain.achievement.AchievementAssociateRepository;
 import com.memento.server.domain.achievement.AchievementRepository;
-import com.memento.server.domain.achievement.AchievementType;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
+import com.memento.server.member.MemberFixtures;
+import com.memento.server.spring.api.service.IntegrationsTestSupport;
 
-@SpringBootTest
-@Transactional
-public class AchievementServiceTest{
+public class AchievementServiceTest extends IntegrationsTestSupport {
 
 	@Autowired
 	protected AchievementService achievementService;
@@ -46,43 +43,33 @@ public class AchievementServiceTest{
 
 	@Autowired
 	protected AchievementRepository achievementRepository;
+	@Autowired
+	private AchievementAssociateRepository achievementAssociateRepository;
+
+	@AfterEach
+	void afterEach() {
+		achievementAssociateRepository.deleteAll();
+		achievementRepository.deleteAll();
+		associateRepository.deleteAll();
+		communityRepository.deleteAll();
+		memberRepository.deleteAll();
+	}
 
 	@Test
 	@DisplayName("업적 조회")
 	void searchTest() {
 		// given
-		Member member = Member.builder()
-			.name("example")
-			.email("example@example.com")
-			.kakaoId(123L)
-			.birthday(LocalDate.of(1999, 1, 1))
-			.build();
+		Member member = MemberFixtures.member();
 		memberRepository.save(member);
 
-		Community community = Community.builder()
-			.member(member)
-			.name("example")
-			.build();
+		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
-		Achievement achievement1 = Achievement.builder()
-			.name("Novice")
-			.criteria("example")
-			.type(AchievementType.OPEN)
-			.build();
-		Achievement achievement2 = Achievement.builder()
-			.name("Expert")
-			.criteria("example")
-			.type(AchievementType.OPEN)
-			.build();
-		achievementRepository.save(achievement1);
-		achievementRepository.save(achievement2);
+		Achievement achievement1 = AchievementFixtures.achievement();
+		Achievement achievement2 = AchievementFixtures.achievement();
+		achievementRepository.saveAll(List.of(achievement1,achievement2));
 
-		Associate associate = Associate.builder()
-			.community(community)
-			.member(member)
-			.nickname("example")
-			.build();
+		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
 		// when
@@ -90,7 +77,40 @@ public class AchievementServiceTest{
 
 		// then
 		assertThat(response.achievements()).hasSize(2);
-		assertThat(response.achievements().get(0).getName()).isEqualTo("Novice");
+		assertThat(response.achievements().get(0).getName()).isEqualTo("achievement");
+		assertThat(response.achievements().get(1).isObtained()).isFalse();
+	}
+
+	@Test
+	@DisplayName("업적을 일부만 달성한 경우 조회 성공")
+	void searchAchievements_partialObtained() {
+		// given
+		Member member = MemberFixtures.member();
+		memberRepository.save(member);
+
+		Community community = CommunityFixtures.community(member);
+		communityRepository.save(community);
+
+		Achievement achievement1 = AchievementFixtures.achievement();
+		Achievement achievement2 = AchievementFixtures.achievement();
+		achievementRepository.saveAll(List.of(achievement1,achievement2));
+
+		Associate associate = AssociateFixtures.associate(member, community);
+		associateRepository.save(associate);
+
+
+		AchievementAssociate aa = achievementAssociateRepository.save(
+			AchievementAssociate.builder()
+				.achievement(achievement1)
+				.associate(associate)
+				.build()
+		);
+
+		// when
+		SearchAchievementResponse response = achievementService.search(community.getId(), associate.getId());
+
+		// then
+		assertThat(response.achievements().get(0).isObtained()).isTrue();
 		assertThat(response.achievements().get(1).isObtained()).isFalse();
 	}
 }

@@ -79,16 +79,4 @@ public class VoiceService {
 		minioService.removeFile(voice.getUrl());
 		voice.markDeleted();
 	}
-
-	public Voice saveVoice(Associate associate, MultipartFile voice) {
-		String url = minioService.createFile(voice, VOICE);
-
-		Voice saveVoice = voiceRepository.save(Voice.builder()
-			.associate(associate)
-			.url(url)
-			.temporary(true)
-			.build());
-
-		return saveVoice;
-	}
 }
