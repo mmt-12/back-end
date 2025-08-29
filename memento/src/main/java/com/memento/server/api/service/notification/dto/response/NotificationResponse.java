@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.memento.server.domain.notification.Notification;
+import com.querydsl.core.annotations.QueryProjection;
 
 import lombok.Builder;
 
@@ -33,5 +34,10 @@ public record NotificationResponse(
 			.postId(notification.getPostId())
 			.createdAt(notification.getCreatedAt())
 			.build();
+	}
+
+	@QueryProjection
+	public NotificationResponse{
+
 	}
 }
