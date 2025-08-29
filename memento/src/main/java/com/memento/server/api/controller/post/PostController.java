@@ -64,7 +64,7 @@ public class PostController {
 		}
 
 		Pageable pageable = PageRequest.of(0, size);
-		return ResponseEntity.ok(postService.searchAll(communityId, currentAssociateId, memoryId, pageable, cursor));
+		return ResponseEntity.ok(postService.searchAll(communityId, memoryId, currentAssociateId, pageable, cursor));
 	}
 
 	@PostMapping()

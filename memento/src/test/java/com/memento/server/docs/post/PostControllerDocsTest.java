@@ -1,5 +1,6 @@
 package com.memento.server.docs.post;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -225,7 +226,6 @@ public class PostControllerDocsTest extends RestDocsSupport {
 		Long memoryId = 1L;
 		int size = 10;
 		Long cursor = 100L;
-		Pageable pageable = PageRequest.of(0, size);
 
 		SearchAllPostResponse response = SearchAllPostResponse.builder()
 			.cursor(cursor)
@@ -299,7 +299,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 			.build();
 
 
-		when(postService.searchAll(anyLong(), anyLong(), anyLong(), eq(pageable), anyLong())).thenReturn(response);
+		when(postService.searchAll(anyLong(), anyLong(), anyLong(), any(Pageable.class), any())).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(
