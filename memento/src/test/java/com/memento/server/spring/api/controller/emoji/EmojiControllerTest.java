@@ -36,6 +36,8 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	void createEmoji() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		MockMultipartFile data = CommonFixtures.jsonFile(EmojiCreateRequest.builder().name("인쥐용").build());
 		MockMultipartFile emoji = CommonFixtures.emojiFile();
 
@@ -46,7 +48,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/emoji", communityId)
 					.file(data)
 					.file(emoji)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isCreated());
@@ -59,6 +61,8 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	void createEmojiWithoutName() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		MockMultipartFile data = CommonFixtures.jsonFile(EmojiCreateRequest.builder().build());
 		MockMultipartFile emoji = CommonFixtures.emojiFile();
 
@@ -69,7 +73,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/emoji", communityId)
 					.file(data)
 					.file(emoji)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -87,6 +91,8 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	void createEmojiWithTooLongName() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		String tooLongName = "가".repeat(35);
 		MockMultipartFile data = CommonFixtures.jsonFile(EmojiCreateRequest.builder().name(tooLongName).build());
 		MockMultipartFile emoji = CommonFixtures.emojiFile();
@@ -98,7 +104,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/emoji", communityId)
 					.file(data)
 					.file(emoji)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -116,6 +122,8 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	void createEmojiWithoutData() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		MockMultipartFile emoji = CommonFixtures.emojiFile();
 
 		doNothing().when(emojiService).createEmoji(any());
@@ -124,7 +132,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 		mockMvc.perform(
 				multipart("/api/v1/communities/{communityId}/emoji", communityId)
 					.file(emoji)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -142,6 +150,8 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	void createEmojiWithoutEmoji() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		MockMultipartFile data = CommonFixtures.jsonFile(EmojiCreateRequest.builder().build());
 
 		doNothing().when(emojiService).createEmoji(any());
@@ -150,7 +160,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 		mockMvc.perform(
 				multipart("/api/v1/communities/{communityId}/emoji", communityId)
 					.file(data)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -168,6 +178,8 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	void getEmoji() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		long cursor = 1L;
 		String keyword = "인쥐용";
 		int size = 10;
@@ -186,7 +198,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 					.param("cursor", String.valueOf(cursor))
 					.param("size", String.valueOf(size))
 					.param("keyword", keyword)
-					.with(withJwt(1L, 1L, 1L)))
+					.with(withJwt(memberId, associateId, communityId)))
 			.andDo(print())
 			.andExpect(status().isOk());
 
@@ -198,6 +210,8 @@ public class EmojiControllerTest extends ControllerTestSupport {
 	void removeEmoji() throws Exception {
 		// given
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		long emojiId = 1L;
 
 		doNothing().when(emojiService).removeEmoji(any(EmojiRemoveRequest.class));
@@ -205,7 +219,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 		// when && then
 		mockMvc.perform(
 				delete("/api/v1/communities/{communityId}/emoji/{emojiId}", communityId, emojiId)
-					.with(withJwt(1L, 1L, 1L)))
+					.with(withJwt(memberId, associateId, communityId)))
 			.andDo(print())
 			.andExpect(status().isNoContent());
 

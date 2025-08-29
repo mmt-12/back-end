@@ -26,6 +26,7 @@ import com.memento.server.api.service.notification.NotificationService;
 import com.memento.server.api.service.notification.dto.request.NotificationListQueryRequest;
 import com.memento.server.api.service.notification.dto.response.NotificationListResponse;
 import com.memento.server.api.service.notification.dto.response.NotificationResponse;
+import com.memento.server.api.service.notification.dto.response.NotificationUnreadResponse;
 import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.docs.RestDocsSupport;
 
@@ -41,7 +42,10 @@ public class NotificationControllerDocsTest extends RestDocsSupport {
 	@Test
 	@DisplayName("알림 목록을 조회한다.")
 	void getNotifications() throws Exception {
-		setAuthentication(1L, 1L, 1L);
+		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+		setAuthentication(memberId, associateId, communityId);
 
 		long cursor = 1L;
 		int size = 10;
@@ -98,5 +102,32 @@ public class NotificationControllerDocsTest extends RestDocsSupport {
 			));
 
 		verify(notificationService).getNotifications(any(NotificationListQueryRequest.class));
+	}
+
+	@Test
+	@DisplayName("안읽은 알림이 있는지 여부와 개수를 조회한다.")
+	void getUnread() throws Exception {
+		// given
+		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+		setAuthentication(memberId, associateId, communityId);
+
+		NotificationUnreadResponse response = NotificationUnreadResponse.of(true, 5);
+
+		given(notificationService.getUnread(associateId)).willReturn(response);
+		// when && then
+		mockMvc.perform(
+				get("/api/v1/notifications/unread"))
+			.andExpect(status().isOk())
+			.andDo(document("notification-get-unread",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				responseFields(
+					fieldWithPath("hasUnread").description("안읽은 알림 여부"),
+					fieldWithPath("count").description("안읽은 알림 개수")
+				)));
+
+		verify(notificationService).getUnread(any());
 	}
 }

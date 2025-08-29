@@ -58,9 +58,11 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 	@DisplayName("보이스 리액션을 생성한다.")
 	void createVoice() throws Exception {
 		// given
-		setAuthentication(1L, 1L, 1L);
-
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+		setAuthentication(memberId, associateId, communityId);
+
 		MockMultipartFile data = CommonFixtures.jsonFile(VoiceCreateRequest.builder().name("인쥐용").build());
 		MockMultipartFile voice = CommonFixtures.voiceFile();
 
@@ -96,9 +98,11 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 	@DisplayName("보이스 목록을 조회한다.")
 	void getVoices() throws Exception {
 		// given
-		setAuthentication(1L, 1L, 1L);
-
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+		setAuthentication(memberId, associateId, communityId);
+
 		long cursor = 1L;
 		String keyword = "인쥐용";
 		int size = 10;
@@ -149,9 +153,11 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 	@DisplayName("보이스를 삭제한다.")
 	void removeVoice() throws Exception {
 		// given
-		setAuthentication(1L, 1L, 1L);
+		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+		setAuthentication(memberId, associateId, communityId);
 
-		Long communityId = 1L;
 		Long voiceId = 1L;
 
 		doNothing().when(voiceService).removeVoice(any(VoiceRemoveRequest.class));

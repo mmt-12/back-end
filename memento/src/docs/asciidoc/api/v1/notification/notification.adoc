@@ -2,3 +2,4 @@
 == Notification API
 
 include::notification-get.adoc[]
+include::notification-get-unread.adoc[]

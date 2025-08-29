@@ -47,10 +47,12 @@ public class CommentControllerDocsTest extends RestDocsSupport {
 	@DisplayName("이모지 댓글을 생성한다.")
 	void createEmojiComment() throws Exception {
 		// given
-		setAuthentication(1L, 1L, 1L);
+		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+		setAuthentication(memberId, associateId, communityId);
 
 		long postId = 1L;
-		long communityId = 1L;
 		long memoryId = 1L;
 		EmojiCommentCreateRequest request = EmojiCommentCreateRequest.builder()
 			.emojiId(1L)
@@ -86,10 +88,12 @@ public class CommentControllerDocsTest extends RestDocsSupport {
 	@DisplayName("보이스 댓글을 생성한다.")
 	void createVoiceComment() throws Exception {
 		// given
-		setAuthentication(1L, 1L, 1L);
+		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+		setAuthentication(memberId, associateId, communityId);
 
 		long postId = 1L;
-		long communityId = 1L;
 		long memoryId = 1L;
 		VoiceCommentCreateRequest request = VoiceCommentCreateRequest.builder()
 			.voiceId(1L)
@@ -125,10 +129,12 @@ public class CommentControllerDocsTest extends RestDocsSupport {
 	@DisplayName("임시 보이스 댓글을 생성한다.")
 	void createTemporaryVoiceComment() throws Exception {
 		// given
-		setAuthentication(1L, 1L, 1L);
+		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+		setAuthentication(memberId, associateId, communityId);
 
 		long postId = 1L;
-		long communityId = 1L;
 		long memoryId = 1L;
 
 		MockMultipartFile voice = CommonFixtures.voiceFile();

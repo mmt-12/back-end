@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import com.memento.server.api.service.notification.dto.request.NotificationListQueryRequest;
 import com.memento.server.api.service.notification.dto.response.NotificationListResponse;
 import com.memento.server.api.service.notification.dto.response.NotificationResponse;
+import com.memento.server.api.service.notification.dto.response.NotificationUnreadResponse;
 import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
 
@@ -23,6 +24,9 @@ public class NotificationControllerTest extends ControllerTestSupport {
 	@Test
 	@DisplayName("알림 목록을 조회한다.")
 	void getNotifications() throws Exception {
+		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
 		long cursor = 1L;
 		int size = 10;
 		Long nextCursor = cursor + size;
@@ -51,9 +55,29 @@ public class NotificationControllerTest extends ControllerTestSupport {
 				get("/api/v1/notifications")
 					.param("cursor", String.valueOf(cursor))
 					.param("size", String.valueOf(size))
-					.with(withJwt(1L, 1L, 1L)))
+					.with(withJwt(memberId, associateId, communityId)))
 			.andExpect(status().isOk());
 
 		verify(notificationService).getNotifications(any(NotificationListQueryRequest.class));
+	}
+
+	@Test
+	@DisplayName("안읽은 알림이 있는지 여부와 개수를 조회한다.")
+	void getUnread() throws Exception {
+	    // given
+		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+
+		NotificationUnreadResponse response = NotificationUnreadResponse.of(true, 5);
+
+		given(notificationService.getUnread(associateId)).willReturn(response);
+	    // when && then
+		mockMvc.perform(
+				get("/api/v1/notifications/unread")
+					.with(withJwt(memberId, associateId, communityId)))
+			.andExpect(status().isOk());
+
+		verify(notificationService).getUnread(any());
 	}
 }

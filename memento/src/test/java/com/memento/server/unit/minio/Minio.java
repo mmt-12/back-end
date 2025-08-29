@@ -1,5 +1,6 @@
 package com.memento.server.unit.minio;
 
+import static com.memento.server.config.MinioProperties.FileType.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -9,6 +10,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
+
+import com.memento.server.config.MinioProperties;
 
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
@@ -20,7 +23,6 @@ import io.minio.errors.ErrorResponseException;
 
 public class Minio {
 
-	private static final String BUCKET = "memento-local-bucket";
 	private static final String URL = "http://localhost:9000";
 	private static final String ACCESS_KEY = "minioadmin";
 	private static final String SECRET_KEY = "minioadmin";
@@ -44,7 +46,7 @@ public class Minio {
 		try (InputStream inputStream = imageResource.getInputStream()) {
 			minioClient.putObject(
 				PutObjectArgs.builder()
-					.bucket(BUCKET)
+					.bucket(EMOJI.getBucketKey())
 					.object(filename)
 					.stream(inputStream, contentLength, -1)
 					.contentType(expectedContentType)
@@ -55,7 +57,7 @@ public class Minio {
 		// then
 		StatObjectResponse stat = minioClient.statObject(
 			StatObjectArgs.builder()
-				.bucket(BUCKET)
+				.bucket(EMOJI.getBucketKey())
 				.object(filename)
 				.build()
 		);
@@ -77,7 +79,7 @@ public class Minio {
 		byte[] data;
 		try (InputStream inputStream = minioClient.getObject(
 			GetObjectArgs.builder()
-				.bucket(BUCKET)
+				.bucket(EMOJI.getBucketKey())
 				.object(filename)
 				.build()
 		)) {
@@ -100,7 +102,7 @@ public class Minio {
 		// when
 		minioClient.removeObject(
 			RemoveObjectArgs.builder()
-				.bucket(BUCKET)
+				.bucket(EMOJI.getBucketKey())
 				.object(filename)
 				.build()
 		);
@@ -108,7 +110,7 @@ public class Minio {
 		// then
 		assertThatThrownBy(() -> minioClient.statObject(
 			StatObjectArgs.builder()
-				.bucket(BUCKET)
+				.bucket(EMOJI.getBucketKey())
 				.object(filename)
 				.build()
 		)).isInstanceOf(ErrorResponseException.class)
@@ -122,7 +124,7 @@ public class Minio {
 		try (InputStream inputStream = imageResource.getInputStream()) {
 			minioClient.putObject(
 				PutObjectArgs.builder()
-					.bucket(BUCKET)
+					.bucket(EMOJI.getBucketKey())
 					.object(filename)
 					.stream(inputStream, imageResource.contentLength(), -1)
 					.contentType("image/" + extension)

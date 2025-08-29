@@ -28,8 +28,10 @@ public class CommentControllerTest extends ControllerTestSupport {
 	@DisplayName("이모지 댓글을 생성한다.")
 	void createEmojiComment() throws Exception {
 		// given
-		long postId = 1L;
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+		long postId = 1L;
 		long memoryId = 1L;
 		EmojiCommentCreateRequest request = EmojiCommentCreateRequest.builder()
 			.emojiId(1L)
@@ -41,7 +43,7 @@ public class CommentControllerTest extends ControllerTestSupport {
 		mockMvc.perform(
 				post("/api/v1/communities/{communityId}/memories/{memoryId}/posts/{postId}/comments/emoji", 
 					communityId, memoryId, postId)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.content(objectMapper.writeValueAsString(request))
 					.contentType(APPLICATION_JSON))
 			.andDo(print())
@@ -54,8 +56,10 @@ public class CommentControllerTest extends ControllerTestSupport {
 	@DisplayName("이모지 댓글 생성 시 emojiId는 필수값이다.")
 	void createEmojiCommentWithoutEmojiId() throws Exception {
 		// given
-		long postId = 1L;
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+		long postId = 1L;
 		long memoryId = 1L;
 		EmojiCommentCreateRequest request = EmojiCommentCreateRequest.builder().build();
 
@@ -65,7 +69,7 @@ public class CommentControllerTest extends ControllerTestSupport {
 		mockMvc.perform(
 				post("/api/v1/communities/{communityId}/memories/{memoryId}/posts/{postId}/comments/emoji",
 					communityId, memoryId, postId)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.content(objectMapper.writeValueAsString(request))
 					.contentType(APPLICATION_JSON))
 			.andDo(print())
@@ -83,8 +87,10 @@ public class CommentControllerTest extends ControllerTestSupport {
 	@DisplayName("보이스 댓글을 생성한다.")
 	void createVoiceComment() throws Exception {
 		// given
-		long postId = 1L;
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+		long postId = 1L;
 		long memoryId = 1L;
 		VoiceCommentCreateRequest request = VoiceCommentCreateRequest.builder()
 			.voiceId(1L)
@@ -96,7 +102,7 @@ public class CommentControllerTest extends ControllerTestSupport {
 		mockMvc.perform(
 				post("/api/v1/communities/{communityId}/memories/{memoryId}/posts/{postId}/comments/voices", 
 					communityId, memoryId, postId)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.content(objectMapper.writeValueAsString(request))
 					.contentType(APPLICATION_JSON))
 			.andDo(print())
@@ -109,8 +115,10 @@ public class CommentControllerTest extends ControllerTestSupport {
 	@DisplayName("보이스 댓글 생성 시 voiceId는 필수값이다.")
 	void createVoiceCommentWithoutVoiceId() throws Exception {
 		// given
-		long postId = 1L;
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+		long postId = 1L;
 		long memoryId = 1L;
 		VoiceCommentCreateRequest request = VoiceCommentCreateRequest.builder().build();
 
@@ -120,7 +128,7 @@ public class CommentControllerTest extends ControllerTestSupport {
 		mockMvc.perform(
 				post("/api/v1/communities/{communityId}/memories/{memoryId}/posts/{postId}/comments/voices",
 					communityId, memoryId, postId)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.content(objectMapper.writeValueAsString(request))
 					.contentType(APPLICATION_JSON))
 			.andDo(print())
@@ -138,8 +146,10 @@ public class CommentControllerTest extends ControllerTestSupport {
 	@DisplayName("임시 보이스 댓글을 생성한다.")
 	void createTemporaryVoiceComment() throws Exception {
 		// given
-		long postId = 1L;
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+		long postId = 1L;
 		long memoryId = 1L;
 
 		MockMultipartFile voice = CommonFixtures.voiceFile();
@@ -151,7 +161,7 @@ public class CommentControllerTest extends ControllerTestSupport {
 				multipart("/api/v1/communities/{communityId}/memories/{memoryId}/posts/{postId}/comments/bubble", 
 					communityId, memoryId, postId)
 					.file(voice)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isCreated());
@@ -163,8 +173,10 @@ public class CommentControllerTest extends ControllerTestSupport {
 	@DisplayName("임시 보이스 댓글 생성 시 voice는 필수값이다.")
 	void createTemporaryVoiceCommentWithoutVoice() throws Exception {
 		// given
-		long postId = 1L;
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+		long postId = 1L;
 		long memoryId = 1L;
 
 		doNothing().when(commentService).createTemporaryVoiceComment(any());
@@ -173,7 +185,7 @@ public class CommentControllerTest extends ControllerTestSupport {
 		mockMvc.perform(
 				multipart("/api/v1/communities/{communityId}/memories/{memoryId}/posts/{postId}/comments/bubble", 
 					communityId, memoryId, postId)
-					.with(withJwt(1L, 1L, 1L))
+					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -190,8 +202,10 @@ public class CommentControllerTest extends ControllerTestSupport {
 	@DisplayName("댓글을 삭제한다.")
 	void deleteComment() throws Exception {
 		// given
-		long postId = 1L;
 		long communityId = 1L;
+		long associateId = 1L;
+		long memberId = 1L;
+		long postId = 1L;
 		long memoryId = 1L;
 		long commentId = 1L;
 
@@ -201,7 +215,7 @@ public class CommentControllerTest extends ControllerTestSupport {
 		mockMvc.perform(
 				delete("/api/v1/communities/{communityId}/memories/{memoryId}/posts/{postId}/comments/{commentId}", 
 					communityId, memoryId, postId, commentId)
-					.with(withJwt(1L, 1L, 1L)))
+					.with(withJwt(memberId, associateId, communityId)))
 			.andDo(print())
 			.andExpect(status().isNoContent());
 
