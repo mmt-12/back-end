@@ -131,14 +131,14 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Comment comment1 = Comment.builder()
 			.associate(associate)
 			.post(post)
-			.url("https://example.com/image.png")
+			.url(emoji.getUrl())
 			.type(CommentType.EMOJI)
 			.build();
 
 		Comment comment2 = Comment.builder()
 			.associate(associate)
 			.post(post)
-			.url("test.mp3")
+			.url(voice.getUrl())
 			.type(CommentType.VOICE)
 			.build();
 		commentRepository.save(comment1);
@@ -164,7 +164,10 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		assertThat(response.comments()).isNotNull();
 		// EMOJI, VOICE
 		assertThat(response.comments().getEmojis()).hasSize(1);
+		assertThat(response.comments().getEmojis().getFirst().getUrl()).isEqualTo(emoji.getUrl());
+		assertThat(response.comments().getEmojis().getFirst().getName()).isEqualTo(emoji.getName());
 		assertThat(response.comments().getVoices()).hasSize(1);
+		assertThat(response.comments().getVoices().getFirst().getName()).isEqualTo(voice.getName());
 		assertThat(response.comments().getTemporaryVoices()).isEmpty();
 	}
 

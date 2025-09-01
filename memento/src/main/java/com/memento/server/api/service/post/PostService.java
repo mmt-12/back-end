@@ -224,6 +224,7 @@ public class PostService {
 				return Emoji.builder()
 					.id(dtoList.get(0).getId())
 					.url(url)
+					.name(dtoList.get(0).getName())
 					.authors(authors)
 					.isInvolved(isInvolved)
 					.build();
@@ -247,6 +248,7 @@ public class PostService {
 				return Voice.builder()
 					.id(dtoList.get(0).getId())
 					.url(url)
+					.name(dtoList.get(0).getName())
 					.authors(authors)
 					.isInvolved(isInvolved)
 					.build();
@@ -268,6 +270,7 @@ public class PostService {
 				return TemporaryVoice.builder()
 					.id(dtoList.get(0).getId())
 					.url(url)
+					.name(dtoList.get(0).getName())
 					.authors(authors)
 					.build();
 			})

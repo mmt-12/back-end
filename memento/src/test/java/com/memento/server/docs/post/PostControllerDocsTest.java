@@ -94,6 +94,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 				.emojis(List.of(Emoji.builder()
 					.id(1L)
 						.url("www.example.com")
+						.name("test")
 						.authors(List.of(CommentAuthor.builder()
 								.id(1L)
 								.commentId(1L)
@@ -110,6 +111,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 				.voices(List.of(Voice.builder()
 					.id(1L)
 					.url("www.example.com")
+					.name("test")
 					.authors(List.of(CommentAuthor.builder()
 						.id(1L)
 						.commentId(1L)
@@ -126,6 +128,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 				.temporaryVoices(List.of(TemporaryVoice.builder()
 					.id(1L)
 					.url("www.example.com")
+					.name("test")
 					.authors(List.of(CommentAuthor.builder()
 						.id(1L)
 						.commentId(1L)
@@ -167,6 +170,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("comments.emojis").type(ARRAY).description("이모지 배열"),
 					fieldWithPath("comments.emojis[].id").type(NUMBER).description("이모지 아이디"),
 					fieldWithPath("comments.emojis[].url").type(STRING).description("이모지 경로"),
+					fieldWithPath("comments.emojis[].name").type(STRING).description("이모지 이름"),
 					fieldWithPath("comments.emojis[].involved").type(BOOLEAN).description("이모지 등록 여부"),
 					fieldWithPath("comments.emojis[].authors").type(ARRAY).description("이모지 등록자 목록"),
 					fieldWithPath("comments.emojis[].authors[].commentId").type(NUMBER).description("이모지 댓글 아이디"),
@@ -179,10 +183,11 @@ public class PostControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("comments.emojis[].authors[].achievement.name").type(STRING)
 						.description("이모지 등록자 업적 이름"),
 					fieldWithPath("comments.emojis[].authors[].createdAt").type(STRING).description("이모지 등록자 등록 일시"),
-					fieldWithPath("comments.voices").type(ARRAY).description("포스트 아이디"),
-					fieldWithPath("comments.voices[].id").type(NUMBER).description("포스트 아이디"),
-					fieldWithPath("comments.voices[].url").type(STRING).description("포스트 아이디"),
-					fieldWithPath("comments.voices[].involved").type(BOOLEAN).description("포스트 아이디"),
+					fieldWithPath("comments.voices").type(ARRAY).description("보이스 배열"),
+					fieldWithPath("comments.voices[].id").type(NUMBER).description("보이스 아이디"),
+					fieldWithPath("comments.voices[].url").type(STRING).description("보이스 경로"),
+					fieldWithPath("comments.voices[].name").type(STRING).description("보이스 이름"),
+					fieldWithPath("comments.voices[].involved").type(BOOLEAN).description("보이스 등록 여부"),
 					fieldWithPath("comments.voices[].authors").type(ARRAY).description("보이스 등록자 목록"),
 					fieldWithPath("comments.voices[].authors[].commentId").type(NUMBER).description("보이스 댓글 아이디"),
 					fieldWithPath("comments.voices[].authors[].id").type(NUMBER).description("보이스 등록자 아이디"),
@@ -194,9 +199,10 @@ public class PostControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("comments.voices[].authors[].achievement.name").type(STRING)
 						.description("보이스 등록자 업적 이름"),
 					fieldWithPath("comments.voices[].authors[].createdAt").type(STRING).description("보이스 등록자 등록 일시"),
-					fieldWithPath("comments.temporaryVoices").type(ARRAY).description("포스트 아이디"),
-					fieldWithPath("comments.temporaryVoices[].id").type(NUMBER).description("포스트 아이디"),
-					fieldWithPath("comments.temporaryVoices[].url").type(STRING).description("포스트 아이디"),
+					fieldWithPath("comments.temporaryVoices").type(ARRAY).description("버블 보이스 배열"),
+					fieldWithPath("comments.temporaryVoices[].id").type(NUMBER).description("버블 보이스 아이디"),
+					fieldWithPath("comments.temporaryVoices[].url").type(STRING).description("버블 보이스 경로"),
+					fieldWithPath("comments.temporaryVoices[].name").type(STRING).description("버블 보이스 이름"),
 					fieldWithPath("comments.temporaryVoices[].authors").type(ARRAY).description("버블 등록자 목록"),
 					fieldWithPath("comments.temporaryVoices[].authors[].commentId").type(NUMBER).description("버블 댓글 아이디"),
 					fieldWithPath("comments.temporaryVoices[].authors[].id").type(NUMBER).description("버블 등록자 아이디"),
