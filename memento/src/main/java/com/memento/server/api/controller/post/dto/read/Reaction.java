@@ -14,5 +14,6 @@ import lombok.experimental.SuperBuilder;
 public abstract class Reaction {
 	Long id;
 	String url;
+	String name;
 	List<CommentAuthor> authors;
 }

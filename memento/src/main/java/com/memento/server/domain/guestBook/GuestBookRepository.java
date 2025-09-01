@@ -16,7 +16,7 @@ public interface GuestBookRepository extends JpaRepository<GuestBook, Long> {
 	WHERE g.associate.id = :associateId
 	  AND (:cursor IS NULL OR g.id < :cursor)
 	  AND g.deletedAt IS NULL
-	ORDER BY g.id DESC
+	ORDER BY g.createdAt DESC
 """)
 	List<GuestBook> findPageByAssociateId(
 		@Param("associateId") Long associateId,

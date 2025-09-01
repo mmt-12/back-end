@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 import com.memento.server.api.service.mbti.dto.MbtiSearchDto;
 
 public interface MbtiTestRepository extends JpaRepository<MbtiTest, Long> {
-	MbtiTest findByFromAssociateIdAndToAssociateId(Long id, Long id1);
+	MbtiTest findByFromAssociateIdAndToAssociateId(Long from, Long to);
 
 	@Query("""
     SELECT new com.memento.server.api.service.mbti.dto.MbtiSearchDto(
