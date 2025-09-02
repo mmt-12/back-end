@@ -4,7 +4,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -24,9 +23,9 @@ import com.memento.server.api.controller.auth.AuthController;
 import com.memento.server.api.controller.auth.dto.AuthGuestResponse;
 import com.memento.server.api.controller.auth.dto.AuthMemberResponse;
 import com.memento.server.api.controller.auth.dto.AuthResponse;
-import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.api.service.auth.AuthService;
 import com.memento.server.api.service.auth.jwt.JwtToken;
+import com.memento.server.docs.RestDocsSupport;
 
 public class AuthControllerDocsTest extends RestDocsSupport {
 
@@ -44,7 +43,7 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 		when(authService.getAuthUrl()).thenReturn("https://kauth.kakao.com/oauth/authorize?client_id=...");
 
 		// when & then
-		mockMvc.perform(post("/api/v1/sign-in"))
+		mockMvc.perform(get("/api/v1/sign-in"))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(redirectedUrl("https://kauth.kakao.com/oauth/authorize?client_id=..."))
 			.andDo(document("auth-sign-in",
@@ -67,7 +66,7 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 		when(authService.handleAuthorizationCallback("code123")).thenReturn(response);
 
 		// when & then
-		mockMvc.perform(get("/redirect")
+		mockMvc.perform(get("/api/v1/auth/redirect")
 				.param("code", "code123"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.kakaoId").value(123L))
@@ -105,7 +104,7 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 		when(authService.handleAuthorizationCallback("code123")).thenReturn(response);
 
 		// when & then
-		mockMvc.perform(get("/redirect")
+		mockMvc.perform(get("/api/v1/auth/redirect")
 				.param("code", "code123"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.memberId").value(123L))

@@ -32,7 +32,7 @@ public class JwtFilter extends GenericFilter {
 	private static final List<String> WHITELIST = List.of(
 		"/favicon.ico",
 		"/api/v1/sign-in",
-		"/redirect",
+		"/api/v1/auth/redirect",
 		"/error",
 		"/h2-console/**"
 	);
