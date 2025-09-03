@@ -271,13 +271,11 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		commentRepository.save(comment1);
 		commentRepository.save(comment2);
 
-		Pageable pageable = PageRequest.of(0, 10);
-
 		//when
-		SearchAllPostResponse response = postService.searchAll(community.getId(), memory.getId(), associate.getId(), pageable, null);
+		SearchAllPostResponse response = postService.searchAll(community.getId(), memory.getId(), associate.getId(), 10, null);
 
 		//then
-		assertThat(response.cursor()).isNull();
+		assertThat(response.nextCursor()).isNull();
 		assertThat(response.hasNext()).isFalse();
 		assertThat(response.posts().getFirst().content()).isEqualTo("content");
 
@@ -324,13 +322,12 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Post post2 = PostFixtures.post(memory, associate);
 		postRepository.save(post2);
 
-		Pageable pageable = PageRequest.of(0, 1);
-
 		//when
-		SearchAllPostResponse response = postService.searchAll(community.getId(), memory.getId(), associate.getId(), pageable, null);
+		SearchAllPostResponse response = postService.searchAll(community.getId(), memory.getId(), associate.getId(), 1, null);
 
 		//then
-		assertThat(response.cursor()).isEqualTo(post2.getId());
+		assertThat(response.posts()).hasSize(1);
+		assertThat(response.nextCursor()).isEqualTo(post.getId());
 		assertThat(response.hasNext()).isTrue();
 	}
 

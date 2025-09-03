@@ -12,7 +12,7 @@ public interface ProfileImageRepository extends JpaRepository<ProfileImage, Long
 	@Query("""
 	SELECT p FROM ProfileImage p
 	WHERE p.associate.id = :associateId
-	  AND (:cursor IS NULL OR p.id < :cursor)
+	  AND (:cursor IS NULL OR p.id <= :cursor)
 	  AND p.deletedAt IS NULL
 	ORDER BY p.id DESC
 """)

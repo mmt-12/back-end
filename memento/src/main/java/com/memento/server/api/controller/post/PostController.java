@@ -62,9 +62,7 @@ public class PostController {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
-
-		Pageable pageable = PageRequest.of(0, size);
-		return ResponseEntity.ok(postService.searchAll(communityId, memoryId, currentAssociateId, pageable, cursor));
+		return ResponseEntity.ok(postService.searchAll(communityId, memoryId, currentAssociateId, size, cursor));
 	}
 
 	@PostMapping()

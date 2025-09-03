@@ -3,6 +3,7 @@ package com.memento.server.api.service.profileImage;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,8 +72,10 @@ public class ProfileImageService {
 		profileImage.markDeleted();
 	}
 
-	public SearchProfileImageResponse search(Long communityId, Long associateId, Pageable pageable, Long cursor) {
+	public SearchProfileImageResponse search(Long communityId, Long associateId, int size, Long cursor) {
 		Associate associate = validAssociate(communityId, associateId);
+
+		Pageable pageable = PageRequest.of(0, size+1);
 
 		List<ProfileImage> profileImageList = profileImageRepository.findProfileImageByAssociateId(associate.getId(), cursor, pageable);
 
@@ -83,7 +86,7 @@ public class ProfileImageService {
 			hasNext = true;
 		}
 
-		List<SearchProfileImageResponse.ProfileImage> profileImages = profileImageList.stream()
+		List<SearchProfileImageResponse.ProfileImage> profileImages = profileImageList.stream().limit(size)
 			.map(p -> SearchProfileImageResponse.ProfileImage.builder()
 				.id(p.getId())
 				.url(p.getUrl())
@@ -93,7 +96,7 @@ public class ProfileImageService {
 
 		return SearchProfileImageResponse.builder()
 			.profileImages(profileImages)
-			.cursor(lastCursor)
+			.nextCursor(lastCursor)
 			.hasNext(hasNext)
 			.build();
 	}

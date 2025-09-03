@@ -1,5 +1,6 @@
 package com.memento.server.docs.profileImage;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -125,13 +126,11 @@ public class ProfileImageControllerDocsTest extends RestDocsSupport {
 					.url("www.example.com/s3/seonwoo/1")
 					.build()
 			))
-			.cursor(2L)
+			.nextCursor(2L)
 			.hasNext(false)
 			.build();
 
-		Pageable pageable = PageRequest.of(0, size);
-
-		when(profileImageService.search(anyLong(), anyLong(), eq(pageable), anyLong())).thenReturn(response);
+		when(profileImageService.search(anyLong(), anyLong(), anyInt(), anyLong())).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(
@@ -147,7 +146,7 @@ public class ProfileImageControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("profileImages[].id").type(NUMBER).description("프로필 이미지 ID"),
 					fieldWithPath("profileImages[].url").type(STRING).description("프로필 이미지 경로"),
 					fieldWithPath("profileImages[].register").type(BOOLEAN).description("프로필 이미지 등록 여부"),
-					fieldWithPath("cursor").type(NUMBER).description("커서 값"),
+					fieldWithPath("nextCursor").type(NUMBER).description("다음 커서 값"),
 					fieldWithPath("hasNext").type(BOOLEAN).description("다음 값 존재 여부")
 				)
 			));

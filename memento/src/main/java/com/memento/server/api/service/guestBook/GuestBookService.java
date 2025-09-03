@@ -2,6 +2,7 @@ package com.memento.server.api.service.guestBook;
 
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,8 +96,10 @@ public class GuestBookService {
 		eventMessagePublisher.publishNotification(GuestBookNotification.from(associateId));
 	}
 
-	public SearchGuestBookResponse search(Long communityId, Long associateId, Pageable pageable, Long cursor) {
+	public SearchGuestBookResponse search(Long communityId, Long associateId, int size, Long cursor) {
 		Associate associate = validAssociate(communityId, associateId);
+
+		Pageable pageable = PageRequest.of(0,size+1);
 
 		List<GuestBook> guestBookList = guestBookRepository.findPageByAssociateId(
 			associate.getId(),
@@ -111,7 +114,7 @@ public class GuestBookService {
 			hasNext = true;
 		}
 
-		List<SearchGuestBookResponse.GuestBook> guestBooks = guestBookList.stream()
+		List<SearchGuestBookResponse.GuestBook> guestBooks = guestBookList.stream().limit(size)
 			.map(g -> SearchGuestBookResponse.GuestBook.builder()
 				.id(g.getId())
 				.type(g.getType())
@@ -122,7 +125,7 @@ public class GuestBookService {
 
 		return SearchGuestBookResponse.builder()
 			.guestBooks(guestBooks)
-			.cursor(lastCursor)
+			.nextCursor(lastCursor)
 			.hasNext(hasNext)
 			.build();
 	}

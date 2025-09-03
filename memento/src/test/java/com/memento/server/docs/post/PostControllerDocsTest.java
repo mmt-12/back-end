@@ -1,6 +1,7 @@
 package com.memento.server.docs.post;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -234,7 +235,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 		Long cursor = 100L;
 
 		SearchAllPostResponse response = SearchAllPostResponse.builder()
-			.cursor(cursor)
+			.nextCursor(cursor)
 			.hasNext(false)
 			.posts(List.of(
 				SearchPostResponse.builder()
@@ -308,7 +309,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 			.build();
 
 
-		when(postService.searchAll(anyLong(), anyLong(), anyLong(), any(Pageable.class), any())).thenReturn(response);
+		when(postService.searchAll(anyLong(), anyLong(), anyLong(), anyInt(), any())).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(
@@ -318,7 +319,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 			.andDo(document("post-read-all-test",
 				preprocessResponse(prettyPrint()),
 				responseFields(
-					fieldWithPath("cursor").type(NUMBER).description("커서 값"),
+					fieldWithPath("nextCursor").type(NUMBER).description("다음 커서 값"),
 					fieldWithPath("hasNext").type(BOOLEAN).description("다음 값 존재 여부"),
 					fieldWithPath("posts").type(ARRAY).description("포스트 목록"),
 					fieldWithPath("posts[].id").type(NUMBER).description("포스트 아이디"),

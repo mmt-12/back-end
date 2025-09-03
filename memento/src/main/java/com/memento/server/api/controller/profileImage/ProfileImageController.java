@@ -78,8 +78,6 @@ public class ProfileImageController {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
-
-		Pageable pageable = PageRequest.of(0, size);
-		return ResponseEntity.ok(profileImageService.search(communityId, associateId, pageable, cursor));
+		return ResponseEntity.ok(profileImageService.search(communityId, associateId, size, cursor));
 	}
 }

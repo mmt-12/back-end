@@ -122,7 +122,7 @@ public class AssociateControllerDocsTest extends RestDocsSupport {
 							.build()
 					)
 				)
-				.cursor(5L)
+				.nextCursor(5L)
 				.hasNext(true)
 				.build()
 		);
@@ -151,7 +151,7 @@ public class AssociateControllerDocsTest extends RestDocsSupport {
 					subsectionWithPath("associates[].achievement").description("참여자 업적"),
 					fieldWithPath("associates[].achievement.id").description("업적 아이디"),
 					fieldWithPath("associates[].achievement.name").description("업적 이름"),
-					fieldWithPath("cursor").description("다음 커서값"),
+					fieldWithPath("nextCursor").description("다음 커서값"),
 					fieldWithPath("hasNext").description("다음 페이지 여부")
 				)
 			));

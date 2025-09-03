@@ -19,7 +19,7 @@ import lombok.Builder;
 
 @Builder
 public record ReadAllMemoryResponse(
-	Long cursor,
+	Long nextCursor,
 	Boolean hasNext,
 	List<MemoryResponse> memories
 ) {
@@ -109,7 +109,7 @@ public record ReadAllMemoryResponse(
 
 		return ReadAllMemoryResponse.builder()
 			.hasNext(hasNext)
-			.cursor(nextCursor)
+			.nextCursor(nextCursor)
 			.memories(memoryResponses)
 			.build();
 	}

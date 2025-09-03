@@ -98,7 +98,7 @@ public class AssociateServiceTest{
 		assertThat(associateListResponse.associates().size()).isEqualTo(10);
 		assertThat(associateListResponse.associates().getFirst().nickname()).isEqualTo(associate11.getNickname());
 		assertThat(associateListResponse.associates().getLast().nickname()).isEqualTo(associate2.getNickname());
-		assertThat(associateListResponse.cursor()).isEqualTo(associate2.getId());
+		assertThat(associateListResponse.nextCursor()).isEqualTo(associate2.getId());
 		assertThat(associateListResponse.hasNext()).isEqualTo(true);
 	}
 
@@ -119,7 +119,7 @@ public class AssociateServiceTest{
 		assertThat(associateListResponse.communityName()).isEqualTo(community.getName());
 		assertThat(associateListResponse.associates().size()).isEqualTo(1);
 		assertThat(associateListResponse.associates().getFirst().nickname()).isEqualTo(associate1.getNickname());
-		assertThat(associateListResponse.cursor()).isEqualTo(associate1.getId());
+		assertThat(associateListResponse.nextCursor()).isEqualTo(associate1.getId());
 		assertThat(associateListResponse.hasNext()).isEqualTo(false);
 	}
 
@@ -160,7 +160,7 @@ public class AssociateServiceTest{
 		assertThat(associateListResponse.associates().size()).isEqualTo(10);
 		assertThat(associateListResponse.associates().getFirst().nickname()).isEqualTo(associate10.getNickname());
 		assertThat(associateListResponse.associates().getLast().nickname()).isEqualTo(associate1.getNickname());
-		assertThat(associateListResponse.cursor()).isEqualTo(associate1.getId());
+		assertThat(associateListResponse.nextCursor()).isEqualTo(associate1.getId());
 		assertThat(associateListResponse.hasNext()).isEqualTo(false);
 	}
 
@@ -204,7 +204,7 @@ public class AssociateServiceTest{
 		assertThat(associateListResponse.associates().size()).isEqualTo(10);
 		assertThat(associateListResponse.associates().getFirst().nickname()).isEqualTo(associate11.getNickname());
 		assertThat(associateListResponse.associates().getLast().nickname()).isEqualTo(associate1.getNickname());
-		assertThat(associateListResponse.cursor()).isEqualTo(associate1.getId());
+		assertThat(associateListResponse.nextCursor()).isEqualTo(associate1.getId());
 		assertThat(associateListResponse.hasNext()).isEqualTo(false);
 	}
 

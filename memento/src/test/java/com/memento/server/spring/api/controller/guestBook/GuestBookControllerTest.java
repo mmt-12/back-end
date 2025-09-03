@@ -1,5 +1,6 @@
 package com.memento.server.spring.api.controller.guestBook;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -220,11 +221,11 @@ public class GuestBookControllerTest extends ControllerTestSupport {
 				.content("example")
 				.createdAt(LocalDateTime.now())
 				.build()))
-			.cursor(cursor)
+			.nextCursor(cursor)
 			.hasNext(true)
 			.build();
 
-		when(guestBookService.search(anyLong(), anyLong(), eq(pageable), anyLong())).thenReturn(response);
+		when(guestBookService.search(anyLong(), anyLong(), anyInt(), anyLong())).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(
@@ -253,11 +254,11 @@ public class GuestBookControllerTest extends ControllerTestSupport {
 				.content("example")
 				.createdAt(LocalDateTime.now())
 				.build()))
-			.cursor(cursor)
+			.nextCursor(cursor)
 			.hasNext(true)
 			.build();
 
-		when(guestBookService.search(anyLong(), anyLong(), eq(pageable), anyLong())).thenReturn(response);
+		when(guestBookService.search(anyLong(), anyLong(), anyInt(), anyLong())).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(

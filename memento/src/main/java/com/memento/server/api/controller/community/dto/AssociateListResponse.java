@@ -13,7 +13,7 @@ import lombok.Builder;
 public record AssociateListResponse(
 	String communityName,
 	List<AssociateResponse> associates,
-	Long cursor,
+	Long nextCursor,
 	Boolean hasNext
 ) {
 
@@ -70,7 +70,7 @@ public record AssociateListResponse(
 		return AssociateListResponse.builder()
 			.communityName(community.getName())
 			.associates(associatesResult)
-			.cursor(nextCursor)
+			.nextCursor(nextCursor)
 			.hasNext(hasNext)
 			.build();
 	}

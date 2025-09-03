@@ -1,5 +1,6 @@
 package com.memento.server.spring.api.controller.profileImage;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -214,13 +215,11 @@ public class ProfileImageControllerTest extends ControllerTestSupport {
 					.url("www.example.com/s3/seonwoo/1")
 					.build()
 			))
-			.cursor(2L)
+			.nextCursor(2L)
 			.hasNext(false)
 			.build();
 
-		Pageable pageable = PageRequest.of(0, size);
-
-		when(profileImageService.search(anyLong(), anyLong(), eq(pageable), anyLong())).thenReturn(response);
+		when(profileImageService.search(anyLong(), anyLong(), anyInt(), anyLong())).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(
@@ -249,13 +248,11 @@ public class ProfileImageControllerTest extends ControllerTestSupport {
 					.url("www.example.com/s3/seonwoo/1")
 					.build()
 			))
-			.cursor(2L)
+			.nextCursor(2L)
 			.hasNext(false)
 			.build();
 
-		Pageable pageable = PageRequest.of(0, size);
-
-		when(profileImageService.search(anyLong(), anyLong(), eq(pageable), anyLong())).thenReturn(response);
+		when(profileImageService.search(anyLong(), anyLong(),anyInt(), anyLong())).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(
