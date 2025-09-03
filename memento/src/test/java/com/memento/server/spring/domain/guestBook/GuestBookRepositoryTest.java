@@ -109,7 +109,7 @@ public class GuestBookRepositoryTest extends IntegrationsTestSupport {
 		List<GuestBook> list = guestBookRepository.findPageByAssociateId(associate.getId(),  guestBook2.getId(), pageable);
 
 		// then
-		assertThat(list.get(0).getId()).isEqualTo(guestBook1.getId());
+		assertThat(list.get(0).getId()).isEqualTo(guestBook2.getId());
 	}
 
 }
