@@ -117,19 +117,17 @@ public class ProfileImageServiceTest extends IntegrationsTestSupport {
 			.build();
 		profileImageRepository.save(profileImage2);
 
-		Pageable pageable = PageRequest.of(0,10);
-
 		Long cursor = null;
 
 		// when
-		SearchProfileImageResponse response = profileImageService.search(community.getId(), associate.getId(), pageable, cursor);
+		SearchProfileImageResponse response = profileImageService.search(community.getId(), associate.getId(), 10, cursor);
 
 		//then
 		assertThat(response.profileImages().size()).isEqualTo(2);
 		assertThat(response.profileImages().getFirst().getUrl()).isEqualTo("test2.png");
 		assertThat(response.profileImages().getFirst().isRegister()).isFalse();
 		assertThat(response.hasNext()).isFalse();
-		assertThat(response.cursor()).isNull();
+		assertThat(response.nextCursor()).isNull();
 	}
 
 	@Test
@@ -162,15 +160,13 @@ public class ProfileImageServiceTest extends IntegrationsTestSupport {
 			.build();
 		profileImageRepository.save(profileImage2);
 
-		Pageable pageable = PageRequest.of(0,1);
-
 		Long cursor = null;
 
 		// when
-		SearchProfileImageResponse response = profileImageService.search(community.getId(), associate.getId(), pageable, cursor);
+		SearchProfileImageResponse response = profileImageService.search(community.getId(), associate.getId(), 1, cursor);
 
 		//then
-		assertThat(response.cursor()).isEqualTo(profileImage2.getId());
+		assertThat(response.nextCursor()).isEqualTo(profileImage1.getId());
 		assertThat(response.hasNext()).isTrue();
 	}
 

@@ -14,7 +14,7 @@ public interface GuestBookRepository extends JpaRepository<GuestBook, Long> {
 	@Query("""
 	SELECT g FROM GuestBook g
 	WHERE g.associate.id = :associateId
-	  AND (:cursor IS NULL OR g.id < :cursor)
+	  AND (:cursor IS NULL OR g.id <= :cursor)
 	  AND g.deletedAt IS NULL
 	ORDER BY g.id DESC
 """)

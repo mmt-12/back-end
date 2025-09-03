@@ -15,7 +15,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     SELECT p
     FROM Post p
     WHERE p.memory.id = :memoryId
-      AND (:cursor IS NULL OR p.id < :cursor)
+      AND (:cursor IS NULL OR p.id <= :cursor)
       AND p.deletedAt IS NULL
     ORDER BY p.id DESC
     """)

@@ -1,6 +1,7 @@
 package com.memento.server.docs.guestBook;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -177,7 +178,7 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 		Long associateId = 1L;
 		int size = 10;
 		Long cursor = 100L;
-		Pageable pageable = PageRequest.of(0, size);
+		Pageable pageable = PageRequest.of(0, size+1);
 
 		SearchGuestBookResponse response = SearchGuestBookResponse.builder()
 			.guestBooks(List.of(SearchGuestBookResponse.GuestBook.builder()
@@ -186,11 +187,11 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 					.content("example")
 					.createdAt(LocalDateTime.now())
 				.build()))
-			.cursor(cursor)
+			.nextCursor(cursor)
 			.hasNext(true)
 			.build();
 
-		when(guestBookService.search(anyLong(), anyLong(), eq(pageable), anyLong())).thenReturn(response);
+		when(guestBookService.search(anyLong(), anyLong(), anyInt(), anyLong())).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(
@@ -207,7 +208,7 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("guestBooks[].type").type(STRING).description("방명록 종류"),
 					fieldWithPath("guestBooks[].content").type(STRING).description("방명록 내용"),
 					fieldWithPath("guestBooks[].createdAt").type(STRING).description("방명록 생성 시각"),
-					fieldWithPath("cursor").type(NUMBER).description("커서 값"),
+					fieldWithPath("nextCursor").type(NUMBER).description("다음 커서 값"),
 					fieldWithPath("hasNext").type(BOOLEAN).description("다음 값 존재 여부")
 				)
 			));

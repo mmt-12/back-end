@@ -1,5 +1,6 @@
 package com.memento.server.spring.api.controller.post;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -80,7 +81,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
 		Pageable pageable = PageRequest.of(0, 10);
 
-		when(postService.searchAll(anyLong(), anyLong(), anyLong(), eq(pageable), anyLong())).thenReturn(null);
+		when(postService.searchAll(anyLong(), anyLong(), anyLong(), anyInt(), anyLong())).thenReturn(null);
 
 		// when & then
 		mockMvc.perform(
@@ -99,7 +100,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
 		Pageable pageable = PageRequest.of(0, 10);
 
-		when(postService.searchAll(anyLong(), anyLong(), anyLong(), eq(pageable), anyLong())).thenReturn(null);
+		when(postService.searchAll(anyLong(), anyLong(), anyLong(), anyInt(), anyLong())).thenReturn(null);
 
 		// when & then
 		mockMvc.perform(

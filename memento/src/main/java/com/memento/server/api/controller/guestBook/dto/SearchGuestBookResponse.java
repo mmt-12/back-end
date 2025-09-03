@@ -13,7 +13,7 @@ import lombok.Getter;
 @Builder
 public record SearchGuestBookResponse(
 	List<GuestBook> guestBooks,
-	Long cursor,
+	Long nextCursor,
 	boolean hasNext
 ) {
 	@Getter

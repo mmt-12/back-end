@@ -18,16 +18,24 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             c.associate,
             c.url,
             c.type,
+            case
+               when c.type = com.memento.server.domain.comment.CommentType.VOICE then v.name
+               when c.type = com.memento.server.domain.comment.CommentType.EMOJI then e.name
+               else null
+            end,
             case when c.type = com.memento.server.domain.comment.CommentType.VOICE then v.temporary else null end
         )
         from Comment c
-        left join Voice v 
-            on v.url = c.url 
+        left join Voice v
+            on v.url = c.url
            and c.type = com.memento.server.domain.comment.CommentType.VOICE
+        left join Emoji e
+            on e.url = c.url
+           and c.type = com.memento.server.domain.comment.CommentType.EMOJI
         where c.post.id in :postIds
           and c.deletedAt is null
         order by c.post.id, c.createdAt
-    """)
+   """)
 	List<PostCommentDto> findPostCommentsByPostIds(
 		@Param("postIds") List<Long> postIds,
 		@Param("associateId") Long associateId

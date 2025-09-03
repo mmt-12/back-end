@@ -6,7 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record SearchAllPostResponse(
-	Long cursor,
+	Long nextCursor,
 	boolean hasNext,
 	List<SearchPostResponse> posts
 ) {

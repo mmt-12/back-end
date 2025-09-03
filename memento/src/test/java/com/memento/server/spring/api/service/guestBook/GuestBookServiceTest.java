@@ -92,10 +92,8 @@ public class GuestBookServiceTest extends IntegrationsTestSupport {
 			.build();
 		guestBookRepository.save(guestBook);
 
-		Pageable pageable = PageRequest.of(0, 10);
-
 		//when
-		SearchGuestBookResponse response = guestBookService.search(community.getId(), associate.getId(), pageable, null);
+		SearchGuestBookResponse response = guestBookService.search(community.getId(), associate.getId(), 10, null);
 
 		//then
 		assertThat(response.guestBooks().getFirst().getContent()).isEqualTo("test");
@@ -129,13 +127,12 @@ public class GuestBookServiceTest extends IntegrationsTestSupport {
 			.build();
 		guestBookRepository.save(guestBook2);
 
-		Pageable pageable = PageRequest.of(0, 1);
-
 		//when
-		SearchGuestBookResponse response = guestBookService.search(community.getId(), associate.getId(), pageable, null);
+		SearchGuestBookResponse response = guestBookService.search(community.getId(), associate.getId(), 1, null);
 
 		//then
-		assertThat(response.cursor()).isEqualTo(guestBook2.getId());
+		assertThat(response.guestBooks().size()).isEqualTo(1);
+		assertThat(response.nextCursor()).isEqualTo(guestBook1.getId());
 		assertThat(response.hasNext()).isTrue();
 	}
 

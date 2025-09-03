@@ -16,5 +16,6 @@ public class PostCommentDto {
 	private Associate associate;
 	private String url;
 	private CommentType type;
+	private String name;
 	private Boolean isTemporary;
 }

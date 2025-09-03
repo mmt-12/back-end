@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,12 +91,14 @@ public class PostService {
 		return mapToSearchPostResponse(post, associate, imagesByPostId, commentsByPostId);
 	}
 
-	public SearchAllPostResponse searchAll(Long communityId, Long memoryId, Long associateId, Pageable pageable, Long cursor) {
+	public SearchAllPostResponse searchAll(Long communityId, Long memoryId, Long associateId, int size, Long cursor) {
 		Associate associate = validAssociate(communityId, associateId);
+
+		Pageable pageable = PageRequest.of(0, size+1);
 
 		List<Post> posts = postRepository.findAllByMemoryIdAndCursor(memoryId, cursor, pageable);
 
-		List<Long> postIds = posts.stream().map(Post::getId).toList();
+		List<Long> postIds = posts.stream().limit(size).map(Post::getId).toList();
 
 		Map<Post, List<PostImage>> imagesByPostId = postImageRepository
 			.findAllByPostIdInAndDeletedAtNull(postIds)
@@ -107,7 +110,7 @@ public class PostService {
 			.stream()
 			.collect(Collectors.groupingBy(PostCommentDto::getPostId));
 
-		List<SearchPostResponse> responses = posts.stream()
+		List<SearchPostResponse> responses = posts.stream().limit(size)
 			.map(post -> mapToSearchPostResponse(post, associate, imagesByPostId, commentsByPostId))
 			.toList();
 
@@ -119,7 +122,7 @@ public class PostService {
 		}
 
 		return SearchAllPostResponse.builder()
-			.cursor(lastCursor)
+			.nextCursor(lastCursor)
 			.hasNext(hasNext)
 			.posts(responses)
 			.build();
@@ -224,6 +227,7 @@ public class PostService {
 				return Emoji.builder()
 					.id(dtoList.get(0).getId())
 					.url(url)
+					.name(dtoList.get(0).getName())
 					.authors(authors)
 					.isInvolved(isInvolved)
 					.build();
@@ -247,6 +251,7 @@ public class PostService {
 				return Voice.builder()
 					.id(dtoList.get(0).getId())
 					.url(url)
+					.name(dtoList.get(0).getName())
 					.authors(authors)
 					.isInvolved(isInvolved)
 					.build();
@@ -268,6 +273,7 @@ public class PostService {
 				return TemporaryVoice.builder()
 					.id(dtoList.get(0).getId())
 					.url(url)
+					.name(dtoList.get(0).getName())
 					.authors(authors)
 					.build();
 			})

@@ -56,7 +56,7 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 		setAuthentication(1L, 1L, 1L);
 		when(memoryService.readAll(any(), any())).thenReturn(
 			ReadAllMemoryResponse.builder()
-				.cursor(3L)
+				.nextCursor(3L)
 				.hasNext(true)
 				.memories(
 					List.of(
@@ -117,7 +117,7 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 					parameterWithName("endTime").description("검색 범위 끝 날짜 (YYYY-MM-DD)")
 				),
 				responseFields(
-					fieldWithPath("cursor").description("다음 커서 값"),
+					fieldWithPath("nextCursor").description("다음 커서 값"),
 					fieldWithPath("hasNext").description("다음 데이터 여부"),
 					subsectionWithPath("memories").description("기억 목록"),
 					fieldWithPath("memories[].id").description("기억 아이디"),

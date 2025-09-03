@@ -197,7 +197,7 @@ class MemoryServiceTest {
 		assertThat(response.memories().get(2).memberAmount()).isEqualTo(2);
 
 		assertThat(response.hasNext()).isFalse();
-		assertThat(response.cursor()).isEqualTo(memory1.getId());
+		assertThat(response.nextCursor()).isEqualTo(memory1.getId());
 	}
 
 	@Test
@@ -310,11 +310,11 @@ class MemoryServiceTest {
 		assertThat(response1.memories().get(0).title()).isEqualTo("추억5");
 		assertThat(response1.memories().get(1).title()).isEqualTo("추억4");
 		assertThat(response1.hasNext()).isTrue();
-		assertThat(response1.cursor()).isEqualTo(memory4.getId());
+		assertThat(response1.nextCursor()).isEqualTo(memory4.getId());
 
 		// when
 		ReadAllMemoryRequest request2 = ReadAllMemoryRequest.builder()
-			.cursor(response1.cursor())
+			.cursor(response1.nextCursor())
 			.size(2)
 			.keyword(null)
 			.startTime(null)
@@ -327,11 +327,11 @@ class MemoryServiceTest {
 		assertThat(response2.memories().get(0).title()).isEqualTo("추억3");
 		assertThat(response2.memories().get(1).title()).isEqualTo("추억2");
 		assertThat(response2.hasNext()).isTrue();
-		assertThat(response2.cursor()).isEqualTo(memory2.getId());
+		assertThat(response2.nextCursor()).isEqualTo(memory2.getId());
 
 		// when
 		ReadAllMemoryRequest request3 = ReadAllMemoryRequest.builder()
-			.cursor(response2.cursor())
+			.cursor(response2.nextCursor())
 			.size(2)
 			.keyword(null)
 			.startTime(null)
@@ -343,7 +343,7 @@ class MemoryServiceTest {
 		assertThat(response3.memories()).hasSize(1);
 		assertThat(response3.memories().get(0).title()).isEqualTo("추억1");
 		assertThat(response3.hasNext()).isFalse();
-		assertThat(response3.cursor()).isEqualTo(memory1.getId());
+		assertThat(response3.nextCursor()).isEqualTo(memory1.getId());
 	}
 
 	@Test
