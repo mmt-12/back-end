@@ -61,6 +61,25 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
     private PostRepository postRepository;
 
     @Test
+    @DisplayName("findByMemberIdAndDeletedAtIsNull")
+    void findByMemberIdAndDeletedAtIsNull() {
+        // given
+        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+        Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+        Associate associate = associateRepository.save(Associate.builder()
+            .nickname("Associate 1")
+            .member(member)
+            .community(community)
+            .build());
+
+        // when
+        Optional<Associate> foundAssociate = associateRepository.findByMemberIdAndDeletedAtIsNull(member.getId());
+
+        // then
+        assertThat(foundAssociate.get().getId()).isEqualTo(associate.getId());
+    }
+
+    @Test
     @DisplayName("포스트 생성자를 조회한다.")
     void findByPostId() {
         // given

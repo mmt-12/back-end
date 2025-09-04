@@ -1,8 +1,12 @@
 package com.memento.server.api.service.auth;
 
-import org.springframework.stereotype.Service;
+import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
 
-import com.memento.server.client.oauth.KakaoClient;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.memento.server.api.controller.auth.dto.AuthGuestResponse;
 import com.memento.server.api.controller.auth.dto.AuthMemberResponse;
 import com.memento.server.api.controller.auth.dto.AuthResponse;
@@ -13,17 +17,24 @@ import com.memento.server.api.service.member.MemberService;
 import com.memento.server.api.service.oauth.KakaoOpenIdDecoder;
 import com.memento.server.api.service.oauth.KakaoOpenIdPayload;
 import com.memento.server.api.service.oauth.KakaoToken;
+import com.memento.server.client.oauth.KakaoClient;
+import com.memento.server.common.exception.MementoException;
+import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.community.AssociateRepository;
+import com.memento.server.domain.community.Community;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthService {
 
 	private final KakaoClient kakaoClient;
 	private final MemberService memberService;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final KakaoOpenIdDecoder kakaoOpenIdDecoder;
+	private final AssociateRepository associateRepository;
 
 	public String getAuthUrl() {
 		return kakaoClient.getAuthUrl();
@@ -36,8 +47,14 @@ public class AuthService {
 
 		return memberService.findMemberWithKakaoId(kakaoId)
 			.<AuthResponse>map(member -> {
+				// 커뮤니티 자동 선택
+				Associate associate = associateRepository.findByMemberIdAndDeletedAtIsNull(member.getId())
+					.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_FOUND));
+
 				MemberClaim memberClaim = MemberClaim.builder()
 					.memberId(member.getId())
+					.communityId(associate.getCommunity().getId())
+					.associateId(associate.getId())
 					.build();
 				JwtToken token = jwtTokenProvider.createToken(memberClaim);
 
