@@ -36,9 +36,9 @@ import com.memento.server.api.controller.voice.dto.request.VoiceCreateRequest;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
-import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
+import com.memento.server.associate.AssociateFixtures;
 import com.memento.server.common.fixture.CommonFixtures;
 import com.memento.server.common.validator.FileValidator;
 import com.memento.server.docs.RestDocsSupport;
@@ -110,7 +110,7 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 		boolean hasNext = true;
 
 		VoiceResponse voiceResponse = VoiceResponse.of(VoiceFixtures.permanentVoice());
-		VoiceListResponse response = VoiceListResponse.of(List.of(voiceResponse), PageInfo.of(hasNext, nextCursor));
+		VoiceListResponse response = VoiceListResponse.of(List.of(voiceResponse), nextCursor, hasNext);
 
 		given(voiceService.getVoices(any(VoiceListQueryRequest.class)))
 			.willReturn(response);
@@ -141,8 +141,8 @@ public class VoiceControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("voices[].author.id").description("보이스 작성자 ID"),
 					fieldWithPath("voices[].author.nickname").description("보이스 작성자 닉네임"),
 					fieldWithPath("voices[].author.imageUrl").description("보이스 작성자 프로필 이미지 URL"),
-					fieldWithPath("pageInfo.hasNext").description("다음 페이지 존재 여부"),
-					fieldWithPath("pageInfo.nextCursor").description("다음 페이지 커서 (더 불러올 보이스가 있을 경우)")
+					fieldWithPath("nextCursor").description("다음 페이지 커서 (더 불러올 보이스가 있을 경우)").optional(),
+					fieldWithPath("hasNext").description("다음 페이지 존재 여부")
 				)
 			));
 

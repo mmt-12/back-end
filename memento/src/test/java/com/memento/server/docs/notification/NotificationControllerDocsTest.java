@@ -27,7 +27,6 @@ import com.memento.server.api.service.notification.dto.request.NotificationListQ
 import com.memento.server.api.service.notification.dto.response.NotificationListResponse;
 import com.memento.server.api.service.notification.dto.response.NotificationResponse;
 import com.memento.server.api.service.notification.dto.response.NotificationUnreadResponse;
-import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.docs.RestDocsSupport;
 
 public class NotificationControllerDocsTest extends RestDocsSupport {
@@ -64,8 +63,8 @@ public class NotificationControllerDocsTest extends RestDocsSupport {
 			.createdAt(LocalDateTime.now())
 			.build();
 
-		NotificationListResponse response = NotificationListResponse.of(List.of(notificationResponse),
-			PageInfo.of(hasNext, nextCursor));
+		NotificationListResponse response = NotificationListResponse.of(List.of(notificationResponse), nextCursor,
+			hasNext);
 
 		given(notificationService.getNotifications(any(NotificationListQueryRequest.class)))
 			.willReturn(response);
@@ -96,8 +95,8 @@ public class NotificationControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("notifications[].memoryId").description("관련된 기억 ID (추억 관련 알림의 경우 그외 null)").optional(),
 					fieldWithPath("notifications[].postId").description("관련된 게시글 ID (게시글 관련 알림의 경우 그외 null)").optional(),
 					fieldWithPath("notifications[].createdAt").description("알림 생성 시간"),
-					fieldWithPath("pageInfo.hasNext").description("다음 페이지 존재 여부"),
-					fieldWithPath("pageInfo.nextCursor").description("다음 페이지 커서 (더 불러올 보이스가 있을 경우)")
+					fieldWithPath("nextCursor").description("다음 페이지 커서 (더 불러올 보이스가 있을 경우)").optional(),
+					fieldWithPath("hasNext").description("다음 페이지 존재 여부")
 				)
 			));
 

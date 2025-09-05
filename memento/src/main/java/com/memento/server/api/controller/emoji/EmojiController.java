@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/communities/{communityId}/emoji")
+@RequestMapping("/api/v1/communities/{communityId}/emojis")
 public class EmojiController {
 
 	private final EmojiService emojiService;

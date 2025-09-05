@@ -10,14 +10,12 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.api.service.voice.dto.request.PermanentVoiceCreateServiceRequest;
 import com.memento.server.api.service.voice.dto.request.TemporaryVoiceCreateServiceRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
-import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
 import com.memento.server.common.exception.MementoException;
@@ -64,7 +62,7 @@ public class VoiceService {
 
 		Long nextCursor = (hasNext && !items.isEmpty()) ? items.getLast().id() : null;
 
-		return VoiceListResponse.of(items, PageInfo.of(hasNext, nextCursor));
+		return VoiceListResponse.of(items, nextCursor, hasNext);
 	}
 
 	@Transactional

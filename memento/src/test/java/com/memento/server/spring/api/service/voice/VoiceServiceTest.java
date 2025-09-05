@@ -161,8 +161,8 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(response.voices()).hasSize(3);
-		assertThat(response.pageInfo().hasNext()).isFalse();
-		assertThat(response.pageInfo().nextCursor()).isNull();
+		assertThat(response.hasNext()).isFalse();
+		assertThat(response.nextCursor()).isNull();
 	}
 
 	@Test
@@ -184,8 +184,8 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(response.voices()).hasSize(2);
-		assertThat(response.pageInfo().hasNext()).isTrue();
-		assertThat(response.pageInfo().nextCursor()).isNotNull();
+		assertThat(response.hasNext()).isTrue();
+		assertThat(response.nextCursor()).isNotNull();
 	}
 
 	@Test
@@ -202,8 +202,8 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(response.voices()).isEmpty();
-		assertThat(response.pageInfo().hasNext()).isFalse();
-		assertThat(response.pageInfo().nextCursor()).isNull();
+		assertThat(response.hasNext()).isFalse();
+		assertThat(response.nextCursor()).isNull();
 	}
 
 	@Test

@@ -23,7 +23,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import com.memento.server.api.controller.voice.dto.request.VoiceCreateRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
-import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
 import com.memento.server.api.service.voice.dto.response.VoiceResponse;
 import com.memento.server.common.exception.MementoException;
@@ -295,7 +294,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 		boolean hasNext = true;
 
 		VoiceResponse voiceResponse = VoiceResponse.of(VoiceFixtures.permanentVoice());
-		VoiceListResponse response = VoiceListResponse.of(List.of(voiceResponse), PageInfo.of(hasNext, nextCursor));
+		VoiceListResponse response = VoiceListResponse.of(List.of(voiceResponse), nextCursor, hasNext);
 
 		given(voiceService.getVoices(any(VoiceListQueryRequest.class)))
 			.willReturn(response);

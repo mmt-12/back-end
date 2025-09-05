@@ -24,7 +24,6 @@ import com.memento.server.api.service.emoji.dto.request.EmojiListQueryRequest;
 import com.memento.server.api.service.emoji.dto.request.EmojiRemoveRequest;
 import com.memento.server.api.service.emoji.dto.response.EmojiListResponse;
 import com.memento.server.api.service.emoji.dto.response.EmojiResponse;
-import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.common.fixture.CommonFixtures;
 import com.memento.server.emoji.EmojiFixtures;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
@@ -45,7 +44,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(
-				multipart("/api/v1/communities/{communityId}/emoji", communityId)
+				multipart("/api/v1/communities/{communityId}/emojis", communityId)
 					.file(data)
 					.file(emoji)
 					.with(withJwt(memberId, associateId, communityId))
@@ -70,7 +69,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(
-				multipart("/api/v1/communities/{communityId}/emoji", communityId)
+				multipart("/api/v1/communities/{communityId}/emojis", communityId)
 					.file(data)
 					.file(emoji)
 					.with(withJwt(memberId, associateId, communityId))
@@ -101,7 +100,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(
-				multipart("/api/v1/communities/{communityId}/emoji", communityId)
+				multipart("/api/v1/communities/{communityId}/emojis", communityId)
 					.file(data)
 					.file(emoji)
 					.with(withJwt(memberId, associateId, communityId))
@@ -130,7 +129,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(
-				multipart("/api/v1/communities/{communityId}/emoji", communityId)
+				multipart("/api/v1/communities/{communityId}/emojis", communityId)
 					.file(emoji)
 					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
@@ -158,7 +157,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(
-				multipart("/api/v1/communities/{communityId}/emoji", communityId)
+				multipart("/api/v1/communities/{communityId}/emojis", communityId)
 					.file(data)
 					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
@@ -187,14 +186,14 @@ public class EmojiControllerTest extends ControllerTestSupport {
 		boolean hasNext = true;
 
 		EmojiResponse emojiResponse = EmojiResponse.of(EmojiFixtures.emoji());
-		EmojiListResponse response = EmojiListResponse.of(List.of(emojiResponse), PageInfo.of(hasNext, nextCursor));
+		EmojiListResponse response = EmojiListResponse.of(List.of(emojiResponse), nextCursor, hasNext);
 
 		given(emojiService.getEmoji(any(EmojiListQueryRequest.class)))
 			.willReturn(response);
 
 		// when & then
 		mockMvc.perform(
-				get("/api/v1/communities/{communityId}/emoji", communityId)
+				get("/api/v1/communities/{communityId}/emojis", communityId)
 					.param("cursor", String.valueOf(cursor))
 					.param("size", String.valueOf(size))
 					.param("keyword", keyword)
@@ -218,7 +217,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 
 		// when && then
 		mockMvc.perform(
-				delete("/api/v1/communities/{communityId}/emoji/{emojiId}", communityId, emojiId)
+				delete("/api/v1/communities/{communityId}/emojis/{emojiId}", communityId, emojiId)
 					.with(withJwt(memberId, associateId, communityId)))
 			.andDo(print())
 			.andExpect(status().isNoContent());

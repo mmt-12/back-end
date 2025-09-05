@@ -15,7 +15,6 @@ import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.api.service.emoji.dto.request.EmojiCreateServiceRequest;
 import com.memento.server.api.service.emoji.dto.request.EmojiListQueryRequest;
 import com.memento.server.api.service.emoji.dto.request.EmojiRemoveRequest;
-import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.api.service.emoji.dto.response.EmojiListResponse;
 import com.memento.server.api.service.emoji.dto.response.EmojiResponse;
 import com.memento.server.common.exception.MementoException;
@@ -58,7 +57,7 @@ public class EmojiService {
 
 		Long nextCursor = (hasNext && !items.isEmpty()) ? items.getLast().id() : null;
 
-		return EmojiListResponse.of(items, PageInfo.of(hasNext, nextCursor));
+		return EmojiListResponse.of(items, nextCursor, hasNext);
 	}
 
 	@Transactional

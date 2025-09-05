@@ -16,7 +16,6 @@ import com.memento.server.api.service.notification.dto.request.NotificationListQ
 import com.memento.server.api.service.notification.dto.response.NotificationListResponse;
 import com.memento.server.api.service.notification.dto.response.NotificationResponse;
 import com.memento.server.api.service.notification.dto.response.NotificationUnreadResponse;
-import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
 
 public class NotificationControllerTest extends ControllerTestSupport {
@@ -44,8 +43,8 @@ public class NotificationControllerTest extends ControllerTestSupport {
 			.createdAt(LocalDateTime.now())
 			.build();
 
-		NotificationListResponse response = NotificationListResponse.of(List.of(notificationResponse),
-			PageInfo.of(hasNext, nextCursor));
+		NotificationListResponse response = NotificationListResponse.of(List.of(notificationResponse), nextCursor,
+			hasNext);
 
 		given(notificationService.getNotifications(any(NotificationListQueryRequest.class)))
 			.willReturn(response);
