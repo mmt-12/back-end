@@ -72,8 +72,8 @@ class NotificationServiceTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(response.notifications()).hasSize(2);
-		assertThat(response.pageInfo().hasNext()).isTrue();
-		assertThat(response.pageInfo().nextCursor()).isNotNull();
+		assertThat(response.hasNext()).isTrue();
+		assertThat(response.nextCursor()).isNotNull();
 
 		List<NotificationResponse> notifications = response.notifications();
 		assertThat(notifications.get(0).title()).isEqualTo("title3");
@@ -102,7 +102,7 @@ class NotificationServiceTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(response.notifications()).hasSize(1);
-		assertThat(response.pageInfo().hasNext()).isFalse();
+		assertThat(response.hasNext()).isFalse();
 		assertThat(response.notifications().get(0).title()).isEqualTo(notification1.getTitle());
 	}
 
@@ -118,8 +118,8 @@ class NotificationServiceTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(response.notifications()).isEmpty();
-		assertThat(response.pageInfo().hasNext()).isFalse();
-		assertThat(response.pageInfo().nextCursor()).isNull();
+		assertThat(response.hasNext()).isFalse();
+		assertThat(response.nextCursor()).isNull();
 	}
 
 	@Test

@@ -160,8 +160,8 @@ public class EmojiServiceTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(response.emojis()).hasSize(3);
-		assertThat(response.pageInfo().hasNext()).isFalse();
-		assertThat(response.pageInfo().nextCursor()).isNull();
+		assertThat(response.hasNext()).isFalse();
+		assertThat(response.nextCursor()).isNull();
 	}
 
 	@Test
@@ -183,8 +183,8 @@ public class EmojiServiceTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(response.emojis()).hasSize(2);
-		assertThat(response.pageInfo().hasNext()).isTrue();
-		assertThat(response.pageInfo().nextCursor()).isNotNull();
+		assertThat(response.hasNext()).isTrue();
+		assertThat(response.nextCursor()).isNotNull();
 	}
 
 	@Test
@@ -201,8 +201,8 @@ public class EmojiServiceTest extends IntegrationsTestSupport {
 
 		// then
 		assertThat(response.emojis()).isEmpty();
-		assertThat(response.pageInfo().hasNext()).isFalse();
-		assertThat(response.pageInfo().nextCursor()).isNull();
+		assertThat(response.hasNext()).isFalse();
+		assertThat(response.nextCursor()).isNull();
 	}
 
 	@Test

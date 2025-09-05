@@ -12,6 +12,15 @@ public class EmojiFixtures {
 	private static final AtomicLong nameGenerator = new AtomicLong();
 	private static final String URL = "https://example.com/emoji/image.png";
 
+	public static Emoji emojiWithId() {
+		return Emoji.builder()
+			.id(idGenerator.getAndIncrement())
+			.name("emoji" + nameGenerator.getAndIncrement())
+			.url(URL)
+			.associate(AssociateFixtures.associate())
+			.build();
+	}
+
 	public static Emoji emoji() {
 		return Emoji.builder()
 			.name("emoji" + nameGenerator.getAndIncrement())

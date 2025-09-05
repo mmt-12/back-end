@@ -24,7 +24,6 @@ import com.memento.server.api.service.emoji.dto.request.EmojiListQueryRequest;
 import com.memento.server.api.service.emoji.dto.request.EmojiRemoveRequest;
 import com.memento.server.api.service.emoji.dto.response.EmojiListResponse;
 import com.memento.server.api.service.emoji.dto.response.EmojiResponse;
-import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.common.fixture.CommonFixtures;
 import com.memento.server.emoji.EmojiFixtures;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
@@ -187,7 +186,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 		boolean hasNext = true;
 
 		EmojiResponse emojiResponse = EmojiResponse.of(EmojiFixtures.emoji());
-		EmojiListResponse response = EmojiListResponse.of(List.of(emojiResponse), PageInfo.of(hasNext, nextCursor));
+		EmojiListResponse response = EmojiListResponse.of(List.of(emojiResponse), nextCursor, hasNext);
 
 		given(emojiService.getEmoji(any(EmojiListQueryRequest.class)))
 			.willReturn(response);

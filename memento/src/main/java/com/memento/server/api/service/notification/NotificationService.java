@@ -9,7 +9,6 @@ import com.memento.server.api.service.notification.dto.request.NotificationListQ
 import com.memento.server.api.service.notification.dto.response.NotificationListResponse;
 import com.memento.server.api.service.notification.dto.response.NotificationResponse;
 import com.memento.server.api.service.notification.dto.response.NotificationUnreadResponse;
-import com.memento.server.common.dto.response.PageInfo;
 import com.memento.server.domain.notification.NotificationRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,7 @@ public class NotificationService {
 
 		Long nextCursor = notifications.isEmpty() ? null : notifications.get(notifications.size() - 1).id();
 
-		return NotificationListResponse.of(notifications, PageInfo.of(hasNext, nextCursor));
+		return NotificationListResponse.of(notifications, nextCursor, hasNext);
 	}
 
 	public NotificationUnreadResponse getUnread(Long associateId) {

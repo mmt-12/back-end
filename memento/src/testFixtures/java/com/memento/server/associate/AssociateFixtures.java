@@ -12,11 +12,13 @@ public class AssociateFixtures {
 
 	private static final AtomicLong idGenerator = new AtomicLong();
 	private static final String NICKNAME = "nickname";
+	private static final String PROFILE_IMAGE_URL = "https://example.com/profile_image/image.png";
 
 	public static Associate associate() {
 		return Associate.builder()
 			.id(idGenerator.getAndIncrement())
 			.nickname(NICKNAME)
+			.profileImageUrl(PROFILE_IMAGE_URL)
 			.member(MemberFixtures.member())
 			.community(CommunityFixtures.community())
 			.build();

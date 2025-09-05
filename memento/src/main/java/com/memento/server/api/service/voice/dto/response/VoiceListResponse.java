@@ -2,20 +2,20 @@ package com.memento.server.api.service.voice.dto.response;
 
 import java.util.List;
 
-import com.memento.server.common.dto.response.PageInfo;
-
 import lombok.Builder;
 
 @Builder
 public record VoiceListResponse(
 	List<VoiceResponse> voices,
-	PageInfo pageInfo
+	Long nextCursor,
+	boolean hasNext
 ) {
 
-	public static VoiceListResponse of(List<VoiceResponse> voices, PageInfo pageInfo) {
+	public static VoiceListResponse of(List<VoiceResponse> voices, Long nextCursor, boolean hasNext) {
 		return VoiceListResponse.builder()
 			.voices(voices)
-			.pageInfo(pageInfo)
+			.nextCursor(nextCursor)
+			.hasNext(hasNext)
 			.build();
 	}
 }
