@@ -8,13 +8,13 @@ import lombok.Builder;
 
 @Builder
 public record EmojiListResponse(
-	List<EmojiResponse> emoji,
+	List<EmojiResponse> emojis,
 	PageInfo pageInfo
 ) {
 
-	public static EmojiListResponse of(List<EmojiResponse> emoji, PageInfo pageInfo) {
+	public static EmojiListResponse of(List<EmojiResponse> emojis, PageInfo pageInfo) {
 		return EmojiListResponse.builder()
-			.emoji(emoji)
+			.emojis(emojis)
 			.pageInfo(pageInfo)
 			.build();
 	}

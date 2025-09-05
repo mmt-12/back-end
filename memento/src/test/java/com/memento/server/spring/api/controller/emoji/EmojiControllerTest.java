@@ -45,7 +45,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(
-				multipart("/api/v1/communities/{communityId}/emoji", communityId)
+				multipart("/api/v1/communities/{communityId}/emojis", communityId)
 					.file(data)
 					.file(emoji)
 					.with(withJwt(memberId, associateId, communityId))
@@ -70,7 +70,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(
-				multipart("/api/v1/communities/{communityId}/emoji", communityId)
+				multipart("/api/v1/communities/{communityId}/emojis", communityId)
 					.file(data)
 					.file(emoji)
 					.with(withJwt(memberId, associateId, communityId))
@@ -101,7 +101,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(
-				multipart("/api/v1/communities/{communityId}/emoji", communityId)
+				multipart("/api/v1/communities/{communityId}/emojis", communityId)
 					.file(data)
 					.file(emoji)
 					.with(withJwt(memberId, associateId, communityId))
@@ -130,7 +130,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(
-				multipart("/api/v1/communities/{communityId}/emoji", communityId)
+				multipart("/api/v1/communities/{communityId}/emojis", communityId)
 					.file(emoji)
 					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
@@ -158,7 +158,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(
-				multipart("/api/v1/communities/{communityId}/emoji", communityId)
+				multipart("/api/v1/communities/{communityId}/emojis", communityId)
 					.file(data)
 					.with(withJwt(memberId, associateId, communityId))
 					.contentType(MULTIPART_FORM_DATA))
@@ -194,7 +194,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(
-				get("/api/v1/communities/{communityId}/emoji", communityId)
+				get("/api/v1/communities/{communityId}/emojis", communityId)
 					.param("cursor", String.valueOf(cursor))
 					.param("size", String.valueOf(size))
 					.param("keyword", keyword)
@@ -218,7 +218,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 
 		// when && then
 		mockMvc.perform(
-				delete("/api/v1/communities/{communityId}/emoji/{emojiId}", communityId, emojiId)
+				delete("/api/v1/communities/{communityId}/emojis/{emojiId}", communityId, emojiId)
 					.with(withJwt(memberId, associateId, communityId)))
 			.andDo(print())
 			.andExpect(status().isNoContent());

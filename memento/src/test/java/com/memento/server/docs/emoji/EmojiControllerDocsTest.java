@@ -68,7 +68,7 @@ public class EmojiControllerDocsTest extends RestDocsSupport {
 
 		// when & then
 		mockMvc.perform(
-				multipart("/api/v1/communities/{communityId}/emoji", communityId)
+				multipart("/api/v1/communities/{communityId}/emojis", communityId)
 					.file(data)
 					.file(emoji)
 					.contentType(MULTIPART_FORM_DATA))
@@ -115,7 +115,7 @@ public class EmojiControllerDocsTest extends RestDocsSupport {
 
 		// when & then
 		mockMvc.perform(
-				get("/api/v1/communities/{communityId}/emoji", communityId)
+				get("/api/v1/communities/{communityId}/emojis", communityId)
 					.param("cursor", String.valueOf(cursor))
 					.param("size", String.valueOf(size))
 					.param("keyword", keyword))
@@ -133,12 +133,12 @@ public class EmojiControllerDocsTest extends RestDocsSupport {
 					parameterWithName("keyword").description("이모지 이름 검색 키워드 (선택)").optional()
 				),
 				responseFields(
-					fieldWithPath("emoji[].id").description("이모지 ID"),
-					fieldWithPath("emoji[].name").description("이모지 이름"),
-					fieldWithPath("emoji[].url").description("이모지 오디오 URL"),
-					fieldWithPath("emoji[].author.id").description("이모지 작성자 ID"),
-					fieldWithPath("emoji[].author.nickname").description("이모지 작성자 닉네임"),
-					fieldWithPath("emoji[].author.imageUrl").description("이모지 작성자 프로필 이미지 URL"),
+					fieldWithPath("emojis[].id").description("이모지 ID"),
+					fieldWithPath("emojis[].name").description("이모지 이름"),
+					fieldWithPath("emojis[].url").description("이모지 오디오 URL"),
+					fieldWithPath("emojis[].author.id").description("이모지 작성자 ID"),
+					fieldWithPath("emojis[].author.nickname").description("이모지 작성자 닉네임"),
+					fieldWithPath("emojis[].author.imageUrl").description("이모지 작성자 프로필 이미지 URL"),
 					fieldWithPath("pageInfo.hasNext").description("다음 페이지 존재 여부"),
 					fieldWithPath("pageInfo.nextCursor").description("다음 페이지 커서 (더 불러올 보이스가 있을 경우)")
 				)
@@ -162,7 +162,7 @@ public class EmojiControllerDocsTest extends RestDocsSupport {
 
 		// when && then
 		mockMvc.perform(
-				delete("/api/v1/communities/{communityId}/emoji/{emojiId}", communityId, emojiId))
+				delete("/api/v1/communities/{communityId}/emojis/{emojiId}", communityId, emojiId))
 			.andDo(print())
 			.andExpect(status().isNoContent())
 			.andDo(document("emoji-remove",
