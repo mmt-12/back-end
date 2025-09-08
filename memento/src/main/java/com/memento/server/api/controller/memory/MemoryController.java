@@ -19,6 +19,7 @@ import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
 import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
+import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
 import com.memento.server.api.service.memory.MemoryService;
 import com.memento.server.common.exception.MementoException;
 
@@ -42,6 +43,19 @@ public class MemoryController {
 		}
 
 		return ResponseEntity.ok(memoryService.readAll(communityId, request));
+	}
+
+	@GetMapping("/{memoryId}")
+	public ResponseEntity<ReadMemoryResponse> read(
+		@CommunityId Long currentCommunityId,
+		@PathVariable Long communityId,
+		@PathVariable Long memoryId
+	) {
+		if (!currentCommunityId.equals(communityId)) {
+			throw new MementoException(COMMUNITY_NOT_MATCH);
+		}
+
+		return ResponseEntity.ok(memoryService.read(memoryId));
 	}
 
 	@PostMapping
@@ -87,7 +101,7 @@ public class MemoryController {
 		return ResponseEntity.ok().build();
 	}
 
-	@GetMapping("/{memoryId}")
+	@GetMapping("/{memoryId}/images")
 	public ResponseEntity<DownloadImagesResponse> downloadImages(
 		@CommunityId Long currentCommunityId,
 		@PathVariable Long communityId,
