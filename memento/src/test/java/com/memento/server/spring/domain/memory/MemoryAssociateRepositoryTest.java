@@ -49,6 +49,95 @@ class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
     private AssociateRepository associateRepository;
 
     @Test
+    @DisplayName("단일 메모리 ID로 연관된 Associate 수를 조회한다")
+    void countAssociatesByMemoryId_단일_메모리_ID로_연관된_Associate_수를_조회한다() {
+        // given
+        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1009L));
+        Member member2 = memberRepository.save(Member.create("테스트멤버2", "test@test.com", LocalDate.of(1990, 1, 1), 1010L));
+        Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+        Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
+        Associate associate2 = associateRepository.save(Associate.create("다른어소시에이트", member2, community));
+
+        Event event = eventRepository.save(Event.builder()
+            .title("단일 추억")
+            .description("단일 추억에 대한 설명입니다.")
+            .location(Location.builder()
+                .address("단일 주소")
+                .name("단일 장소")
+                .latitude(BigDecimal.valueOf(10.0F))
+                .longitude(BigDecimal.valueOf(20.0F))
+                .code(1)
+                .build())
+            .period(Period.builder()
+                .startTime(LocalDateTime.of(2023, 1, 1, 10, 0))
+                .endTime(LocalDateTime.of(2023, 1, 1, 11, 0))
+                .build())
+            .community(community)
+            .associate(associate)
+            .build());
+        Memory memory = memoryRepository.save(Memory.builder().event(event).build());
+        memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate).build());
+        memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate2).build());
+
+        // when
+        Long associateCount = memoryAssociateRepository.countAssociatesByMemoryId(memory.getId());
+
+        // then
+        assertThat(associateCount).isEqualTo(2L);
+    }
+
+    @Test
+    @DisplayName("삭제된 연관 관계는 단일 메모리 ID로 조회되지 않는다.")
+    void countAssociatesByMemoryId_삭제된_연관_관계는_조회되지_않는다() {
+        // given
+        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1011L));
+        Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+        Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
+        Associate associate2 = associateRepository.save(Associate.create("다른어소시에이트", member, community));
+
+        Event event = eventRepository.save(Event.builder()
+            .title("단일 추억")
+            .description("단일 추억에 대한 설명입니다.")
+            .location(Location.builder()
+                .address("단일 주소")
+                .name("단일 장소")
+                .latitude(BigDecimal.valueOf(10.0F))
+                .longitude(BigDecimal.valueOf(20.0F))
+                .code(1)
+                .build())
+            .period(Period.builder()
+                .startTime(LocalDateTime.of(2023, 1, 1, 10, 0))
+                .endTime(LocalDateTime.of(2023, 1, 1, 11, 0))
+                .build())
+            .community(community)
+            .associate(associate)
+            .build());
+        Memory memory = memoryRepository.save(Memory.builder().event(event).build());
+        memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate).build());
+        MemoryAssociate deletedAssociate = memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate2).build());
+        memoryAssociateRepository.delete(deletedAssociate);
+
+        // when
+        Long associateCount = memoryAssociateRepository.countAssociatesByMemoryId(memory.getId());
+
+        // then
+        assertThat(associateCount).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("메모리 ID에 해당하는 연관 관계가 없으면 0을 반환한다.")
+    void countAssociatesByMemoryId_연관_관계_없음() {
+        // given
+        Long nonExistentMemoryId = 9999L;
+
+        // when
+        Long associateCount = memoryAssociateRepository.countAssociatesByMemoryId(nonExistentMemoryId);
+
+        // then
+        assertThat(associateCount).isEqualTo(0L);
+    }
+
+    @Test
     @DisplayName("메모리와 삭제되지 않은 상태로 메모리 연관 관계를 조회한다")
     void findAllByMemoryAndDeletedAtIsNull_메모리_연관_관계를_조회한다() {
         // given
