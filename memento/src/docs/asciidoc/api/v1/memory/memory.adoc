@@ -9,6 +9,10 @@ include::memory-read.adoc[]
 
 '''
 
+include::memory-read-all.adoc[]
+
+'''
+
 include::memory-update.adoc[]
 
 '''
