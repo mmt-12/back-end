@@ -1,5 +1,7 @@
 package com.memento.server.config.filter;
 
+import static com.memento.server.common.error.ErrorCodes.TOKEN_NOT_VALID;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -11,6 +13,7 @@ import org.springframework.util.StringUtils;
 import com.memento.server.api.service.auth.MemberPrincipal;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
 import com.memento.server.api.service.auth.jwt.MemberClaim;
+import com.memento.server.common.exception.MementoException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.GenericFilter;
@@ -63,7 +66,7 @@ public class JwtFilter extends GenericFilter {
 		}
 
 		if (!StringUtils.hasText(token) || !jwtTokenProvider.validateToken(token)) {
-			throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+			throw new MementoException(TOKEN_NOT_VALID);
 		}
 
 		MemberClaim memberClaim = jwtTokenProvider.extractMemberClaim(token);

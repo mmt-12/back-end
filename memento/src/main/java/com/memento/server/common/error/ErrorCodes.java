@@ -107,6 +107,8 @@ public enum ErrorCodes implements ErrorCode {
 	POST_IMAGE_SAVE_FAIL(BAD_REQUEST, 13001, "포스트 이미지 저장에 실패하였습니다."),
 	POST_IMAGE_DUPLICATED(BAD_REQUEST, 13002, "중복된 이미지는 저장할 수 없습니다."),
 
+	TOKEN_NOT_VALID(UNAUTHORIZED, 14000, "토큰이 유효하지 않습니다."),
+
 	;
 	private final HttpStatus status;
 	private final int code;
