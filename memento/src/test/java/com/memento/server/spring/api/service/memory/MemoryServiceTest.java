@@ -24,6 +24,7 @@ import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
 import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
+import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
 import com.memento.server.api.service.memory.MemoryService;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
@@ -90,6 +91,69 @@ class MemoryServiceTest {
 		associateRepository.deleteAllInBatch();
 		eventRepository.deleteAllInBatch();
 	}
+
+	@Test
+	@DisplayName("단일 기억을 조회한다.")
+	void read_success() {
+		// given
+		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
+		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
+		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
+
+		Event event = eventRepository.save(
+			Event.builder()
+				.title("단일 기억")
+				.description("단일 기억에 대한 설명")
+				.location(Location.builder()
+					.address("주소")
+					.name("장소")
+					.latitude(BigDecimal.valueOf(1.0))
+					.longitude(BigDecimal.valueOf(1.0))
+					.code(1)
+					.build())
+				.period(Period.builder()
+					.startTime(LocalDateTime.now().minusDays(2))
+					.endTime(LocalDateTime.now().minusDays(1))
+					.build())
+				.community(community)
+				.associate(associate)
+				.build());
+		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
+
+		Post post = postRepository.save(Post.builder().content("포스트").memory(memory).associate(associate).build());
+		postImageRepository.save(PostImage.builder().url("image1.jpg").hash(Hash.builder().hash("hash1").build()).post(post).build());
+		postImageRepository.save(PostImage.builder().url("image2.jpg").hash(Hash.builder().hash("hash2").build()).post(post).build());
+
+		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate).build());
+		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate).build()); // Duplicate for count
+
+		// when
+		ReadMemoryResponse response = memoryService.read(memory.getId());
+
+		// then
+		assertThat(response).isNotNull();
+		assertThat(response.id()).isEqualTo(memory.getId());
+		assertThat(response.title()).isEqualTo("단일 기억");
+		assertThat(response.description()).isEqualTo("단일 기억에 대한 설명");
+		assertThat(response.pictures()).hasSize(2);
+		assertThat(response.memberAmount()).isEqualTo(2L);
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 기억을 단일 조회하면 예외가 발생한다.")
+	void read_memoryNotFound() {
+		// given
+		Long nonExistentMemoryId = 9999L;
+
+		// when // then
+		assertThatThrownBy(() -> memoryService.read(nonExistentMemoryId))
+			.isInstanceOf(MementoException.class)
+			.satisfies(ex -> {
+				MementoException e = (MementoException)ex;
+				assertThat(e.getErrorCode()).isEqualTo(MEMORY_NOT_FOUND);
+			});
+	}
+
 
 	@Test
 	@DisplayName("모든 기억을 조회한다.")

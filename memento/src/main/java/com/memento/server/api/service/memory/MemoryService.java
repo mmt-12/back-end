@@ -21,6 +21,7 @@ import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
 import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
+import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
 import com.memento.server.api.service.eventMessage.EventMessagePublisher;
 import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
 import com.memento.server.common.exception.MementoException;
@@ -55,6 +56,15 @@ public class MemoryService {
 	private final AssociateRepository associateRepository;
 
 	private final EventMessagePublisher eventMessagePublisher;
+
+	public ReadMemoryResponse read(Long memoryId) {
+		Memory memory = memoryRepository.findById(memoryId).orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
+
+		List<PostImage> images = postImageRepository.findAllByMemoryId(memoryId);
+		Long associateCount = memoryAssociateRepository.countAssociatesByMemoryId(memoryId);
+
+		return ReadMemoryResponse.from(memory, images, associateCount);
+	}
 
 	public ReadAllMemoryResponse readAll(Long communityId, ReadAllMemoryRequest request) {
 		Long cursor = request.cursor();

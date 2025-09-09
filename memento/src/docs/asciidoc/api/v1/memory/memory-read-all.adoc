@@ -1,0 +1,22 @@
+[[memory-read-all-test]]
+=== 기억 목록 조회
+
+==== HTTP Request
+
+include::{snippets}/memory-read-all-test/http-request.adoc[]
+
+==== Path Parameters
+
+include::{snippets}/memory-read-all-test/path-parameters.adoc[]
+
+==== Query Parameters
+
+include::{snippets}/memory-read-all-test/query-parameters.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/memory-read-all-test/http-response.adoc[]
+
+==== Response Fields
+
+include::{snippets}/memory-read-all-test/response-fields.adoc[]

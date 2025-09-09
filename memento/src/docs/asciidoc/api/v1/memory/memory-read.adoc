@@ -1,5 +1,5 @@
 [[memory-read-test]]
-=== 기억 목록 조회
+=== 기억 상세 조회
 
 ==== HTTP Request
 
@@ -8,10 +8,6 @@ include::{snippets}/memory-read-test/http-request.adoc[]
 ==== Path Parameters
 
 include::{snippets}/memory-read-test/path-parameters.adoc[]
-
-==== Query Parameters
-
-include::{snippets}/memory-read-test/query-parameters.adoc[]
 
 ==== HTTP Response
 
