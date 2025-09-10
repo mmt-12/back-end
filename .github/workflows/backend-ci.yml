@@ -25,6 +25,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # (옵션) 경로 확인
+      - name: Debug layout
+        run: |
+          pwd
+          ls -al
+          ls -al memento || true
+
       - name: Set tags (main -> prod, otherwise dev)
         id: tags
         run: |
@@ -34,11 +41,11 @@ jobs:
           echo "chan=$CHAN"   >> $GITHUB_OUTPUT
           echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
 
-      - name: Build & Push (Dockerfile at repo root)
+      - name: Build & Push (Dockerfile at memento/Dockerfile)
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./Dockerfile
+          context: ./memento
+          file: ./memento/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
