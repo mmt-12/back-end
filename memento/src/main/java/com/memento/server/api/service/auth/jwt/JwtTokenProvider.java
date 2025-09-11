@@ -10,6 +10,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.IncorrectClaimException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.MissingClaimException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.memento.server.utility.json.JsonMapper;
@@ -72,16 +73,10 @@ public class JwtTokenProvider {
 			JWTVerifier verifier = JWT.require(Algorithm.HMAC512(jwtProperties.secret())).build();
 			verifier.verify(token);
 			return true;
-		} catch (TokenExpiredException e) {
-			log.info("만료된 토큰입니다.");
-		} catch (MissingClaimException e) {
-			log.info("토큰에 누락이 있습니다.");
-		} catch (IncorrectClaimException e) {
-			log.info("토큰에 잘못된 값이 있습니다.");
-		} catch (Exception e) {
-			log.info("토큰 검증 오류 {}", e);
+		} catch (JWTVerificationException e) {
+			log.info("토큰 검증 실패: {}", e.getMessage());
+			return false;
 		}
-		return false;
 	}
 
 	public MemberClaim extractMemberClaim(String token) { // todo: 개선하기
