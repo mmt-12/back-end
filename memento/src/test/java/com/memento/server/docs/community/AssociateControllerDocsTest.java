@@ -103,7 +103,7 @@ public class AssociateControllerDocsTest extends RestDocsSupport {
 	void searchAll() throws Exception {
 		// given
 		setAuthentication(1L, 1L, 1L);
-		when(associateService.searchAll(any(), any(), any(), any())).thenReturn(
+		when(associateService.searchAll(any(), any())).thenReturn(
 			AssociateListResponse.builder()
 				.communityName("SSAFY 12기 12반")
 				.associates(
@@ -122,8 +122,6 @@ public class AssociateControllerDocsTest extends RestDocsSupport {
 							.build()
 					)
 				)
-				.nextCursor(5L)
-				.hasNext(true)
 				.build()
 		);
 
@@ -137,9 +135,7 @@ public class AssociateControllerDocsTest extends RestDocsSupport {
 					parameterWithName("communityId").description("그룹 아이디")
 				),
 				queryParameters(
-					parameterWithName("keyword").optional().description("키워드"),
-					parameterWithName("cursor").optional().description("커서값"),
-					parameterWithName("size").optional().description("검색 크기")
+					parameterWithName("keyword").optional().description("키워드")
 				),
 				responseFields(
 					fieldWithPath("communityName").description("그룹 이름"),
@@ -150,9 +146,7 @@ public class AssociateControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("associates[].introduction").description("참여자 소개문"),
 					subsectionWithPath("associates[].achievement").description("참여자 업적"),
 					fieldWithPath("associates[].achievement.id").description("업적 아이디"),
-					fieldWithPath("associates[].achievement.name").description("업적 이름"),
-					fieldWithPath("nextCursor").description("다음 커서값"),
-					fieldWithPath("hasNext").description("다음 페이지 여부")
+					fieldWithPath("associates[].achievement.name").description("업적 이름")
 				)
 			));
 	}
