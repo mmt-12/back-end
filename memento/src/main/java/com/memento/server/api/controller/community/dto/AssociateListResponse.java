@@ -12,9 +12,7 @@ import lombok.Builder;
 @Builder
 public record AssociateListResponse(
 	String communityName,
-	List<AssociateResponse> associates,
-	Long nextCursor,
-	Boolean hasNext
+	List<AssociateResponse> associates
 ) {
 
 	@Builder
@@ -54,14 +52,7 @@ public record AssociateListResponse(
 		}
 	}
 
-	public static AssociateListResponse from(List<Associate> associates, Community community, Integer size) {
-		boolean hasNext = false;
-		if (associates.size() > size) {
-			hasNext = true;
-			associates = associates.subList(0, size);
-		}
-		Long nextCursor = associates.isEmpty() ? null : associates.getLast().getId();
-
+	public static AssociateListResponse from(List<Associate> associates, Community community) {
 		List<AssociateResponse> associatesResult = new ArrayList<>();
 		for (Associate associate : associates) {
 			associatesResult.add(AssociateResponse.from(associate));
@@ -70,8 +61,6 @@ public record AssociateListResponse(
 		return AssociateListResponse.builder()
 			.communityName(community.getName())
 			.associates(associatesResult)
-			.nextCursor(nextCursor)
-			.hasNext(hasNext)
 			.build();
 	}
 }

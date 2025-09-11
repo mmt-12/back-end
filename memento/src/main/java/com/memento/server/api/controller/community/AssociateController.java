@@ -1,6 +1,6 @@
 package com.memento.server.api.controller.community;
 
-import static com.memento.server.common.error.ErrorCodes.COMMUNITY_NOT_CURRENT;
+import static com.memento.server.common.error.ErrorCodes.COMMUNITY_NOT_MATCH;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,12 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.memento.server.annotation.AssociateId;
 import com.memento.server.annotation.CommunityId;
+import com.memento.server.api.controller.community.dto.AssociateListResponse;
 import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
 import com.memento.server.api.controller.community.dto.UpdateAssociateRequest;
-import com.memento.server.api.controller.community.dto.AssociateListResponse;
 import com.memento.server.api.service.community.AssociateService;
 import com.memento.server.common.exception.MementoException;
-import com.memento.server.common.error.ErrorCodes;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,7 @@ public class AssociateController {
 		@PathVariable Long associateId
 	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
+			throw new MementoException(COMMUNITY_NOT_MATCH);
 		}
 
 		return ResponseEntity.ok(associateService.search(communityId, associateId));
@@ -47,15 +46,13 @@ public class AssociateController {
 	public ResponseEntity<AssociateListResponse> searchAll(
 		@CommunityId Long currentCommunityId,
 		@PathVariable Long communityId,
-		@RequestParam(required = false, defaultValue = "") String keyword,
-		@RequestParam(required = false) Long cursor,
-		@RequestParam(required = false, defaultValue = "10") Integer size
+		@RequestParam(required = false, defaultValue = "") String keyword
 	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(COMMUNITY_NOT_CURRENT);
+			throw new MementoException(COMMUNITY_NOT_MATCH);
 		}
 
-		return ResponseEntity.ok(associateService.searchAll(communityId, keyword, cursor, size));
+		return ResponseEntity.ok(associateService.searchAll(communityId, keyword));
 	}
 
 	@PutMapping()
@@ -66,7 +63,7 @@ public class AssociateController {
 		@Valid @RequestBody UpdateAssociateRequest request
 	) {
 		if (!currentCommunityId.equals(communityId)) {
-			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
+			throw new MementoException(COMMUNITY_NOT_MATCH);
 		}
 		associateService.update(
 			communityId,

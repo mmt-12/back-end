@@ -34,23 +34,13 @@ public class AssociateService {
 
 	public AssociateListResponse searchAll(
 		Long communityId,
-		String keyword,
-		Long cursor,
-		Integer size
+		String keyword
 	) {
-		Optional<Community> communityOptional = communityRepository.findByIdAndDeletedAtIsNull(communityId);
-		if (communityOptional.isEmpty()) {
-			throw new MementoException(COMMUNITY_NOT_FOUND);
-		}
+		Community community = communityRepository.findByIdAndDeletedAtIsNull(communityId)
+			.orElseThrow(() -> new MementoException(COMMUNITY_NOT_FOUND));
+		List<Associate> associates = associateRepository.findAllByCommunityIdAndKeyword(communityId, keyword);
 
-		List<Associate> associates = associateRepository.findAllByCommunityIdAndKeywordWithCursor(
-			communityId,
-			keyword,
-			cursor,
-			PageRequest.of(0, size + 1)
-		);
-
-		return AssociateListResponse.from(associates, communityOptional.get(), size);
+		return AssociateListResponse.from(associates, community);
 	}
 
 	public CommunityListResponse searchAllMyAssociate(Long memberId) {
@@ -59,10 +49,10 @@ public class AssociateService {
 		return CommunityListResponse.from(associates);
 	}
 
-	public Associate validAssociate(Long communityId, Long associateId){
+	public Associate validAssociate(Long communityId, Long associateId) {
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
 			.orElseThrow(() -> new MementoException(ErrorCodes.ASSOCIATE_NOT_EXISTENCE));
-		if(!communityId.equals(associate.getCommunity().getId())){
+		if (!communityId.equals(associate.getCommunity().getId())) {
 			throw new MementoException(ErrorCodes.ASSOCIATE_COMMUNITY_NOT_MATCH);
 		}
 
@@ -89,19 +79,27 @@ public class AssociateService {
 	}
 
 	@Transactional
-	public void update(Long communityId, Long associateId, String profileImageUrl, String nickname, Long achievementId, String introduction) {
+	public void update(Long communityId, Long associateId, String profileImageUrl, String nickname, Long achievementId,
+		String introduction) {
 		Associate associate = validAssociate(communityId, associateId);
 		String newProfileImageUrl = associate.getProfileImageUrl();
 		String newNickname = associate.getNickname();
 		Achievement newAchievement = associate.getAchievement();
 		String newIntroduction = associate.getIntroduction();
 
-		if (profileImageUrl != null) {newProfileImageUrl = profileImageUrl;}
-		if (nickname != null) {newNickname = nickname;}
+		if (profileImageUrl != null) {
+			newProfileImageUrl = profileImageUrl;
+		}
+		if (nickname != null) {
+			newNickname = nickname;
+		}
 		if (achievementId != null) {
 			newAchievement = achievementRepository.findById(achievementId)
-				.orElseThrow(() -> new MementoException(ErrorCodes.ACHIEVEMENT_NOT_EXISTENCE));}
-		if (introduction != null) {newIntroduction = introduction;}
+				.orElseThrow(() -> new MementoException(ErrorCodes.ACHIEVEMENT_NOT_EXISTENCE));
+		}
+		if (introduction != null) {
+			newIntroduction = introduction;
+		}
 
 		associate.updateProfile(newProfileImageUrl, newNickname, newAchievement, newIntroduction);
 	}
