@@ -1,33 +1,31 @@
 package com.memento.server.config.filter;
 
-import static com.memento.server.common.error.ErrorCodes.TOKEN_NOT_VALID;
-
 import java.io.IOException;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.memento.server.api.service.auth.MemberPrincipal;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
 import com.memento.server.api.service.auth.jwt.MemberClaim;
-import com.memento.server.common.exception.MementoException;
 
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.GenericFilter;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
-public class JwtFilter extends GenericFilter {
+public class JwtFilter extends OncePerRequestFilter {
 
 	private final JwtTokenProvider jwtTokenProvider;
 	private final AntPathMatcher pathMatcher = new AntPathMatcher();
@@ -36,7 +34,6 @@ public class JwtFilter extends GenericFilter {
 		"/favicon.ico",
 		"/api/v1/sign-in",
 		"/api/v1/auth/redirect",
-		"/error",
 		"/h2-console/**"
 	);
 
@@ -45,28 +42,25 @@ public class JwtFilter extends GenericFilter {
 	}
 
 	@Override
-	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
-		throws IOException, ServletException {
-		HttpServletRequest request = (HttpServletRequest)req;
-		HttpServletResponse response = (HttpServletResponse)res;
-		String token = resolveToken(request);
+	protected boolean shouldNotFilter(HttpServletRequest request) {
 		String path = request.getRequestURI();
+		return WHITELIST.stream().anyMatch(p -> pathMatcher.match(p, path))
+			|| path.contains(".well-known")
+			|| path.contains("com.chrome.devtools.json");
+	}
 
-		if (isWhitelisted(path)) {
-			chain.doFilter(request, response);
-			return;
-		}
-
-		if (path.contains(".well-known") || path.contains("com.chrome.devtools.json")) {
-			response.setStatus(HttpServletResponse.SC_OK);
-			response.setContentType("application/json");
-			response.setCharacterEncoding("UTF-8");
-			response.getWriter().write("{\"status\": \"ok\", \"message\": \"Chrome DevTools auto request ignored\"}");
-			return;
-		}
+	@Override
+	public void doFilterInternal(
+		@NotNull HttpServletRequest request,
+		@NotNull HttpServletResponse response,
+		@NotNull FilterChain chain
+	) throws IOException, ServletException {
+		String token = resolveToken(request);
 
 		if (!StringUtils.hasText(token) || !jwtTokenProvider.validateToken(token)) {
-			throw new MementoException(TOKEN_NOT_VALID);
+			SecurityContextHolder.clearContext();
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing token");
+			return;
 		}
 
 		MemberClaim memberClaim = jwtTokenProvider.extractMemberClaim(token);

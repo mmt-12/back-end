@@ -12,13 +12,12 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.memento.server.config.filter.JwtFilter;
-import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
 
 @TestConfiguration
 public class TestSecurityConfig {
 
 	@Autowired
-	private JwtTokenProvider jwtTokenProvider;
+	private JwtFilter jwtFilter;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -31,7 +30,7 @@ public class TestSecurityConfig {
 				.requestMatchers("/api/v1/sign-in", "/api/v1/auth/redirect").permitAll()
 				.requestMatchers("/error").permitAll()
 				.anyRequest().authenticated())
-			.addFilterBefore(new JwtFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 			.cors(Customizer.withDefaults())
 			.build();
 	}
