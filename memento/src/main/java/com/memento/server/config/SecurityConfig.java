@@ -17,7 +17,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.memento.server.config.filter.JwtFilter;
-import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-	private final JwtTokenProvider jwtTokenProvider;
+	private final JwtFilter jwtFilter;
 
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
@@ -54,7 +53,7 @@ public class SecurityConfig {
 				.requestMatchers("/api/v1/sign-in", "/api/v1/auth/redirect").permitAll()
 				.requestMatchers("/error").permitAll()
 				.anyRequest().authenticated())
-			.addFilterBefore(new JwtFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 			.cors(Customizer.withDefaults())
 			.build();
 	}
