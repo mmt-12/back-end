@@ -49,7 +49,7 @@ public class SecurityConfig {
 			.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
 			.sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
 			.authorizeHttpRequests(authorize -> authorize
-				.requestMatchers(PathRequest.toH2Console()).permitAll()
+				// .requestMatchers(PathRequest.toH2Console()).permitAll()
 				.requestMatchers("/favicon.ico").permitAll()
 				.requestMatchers("/api/v1/sign-in", "/api/v1/auth/redirect").permitAll()
 				.requestMatchers("/error").permitAll()
