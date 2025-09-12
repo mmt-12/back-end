@@ -1,7 +1,5 @@
 package com.memento.server.api.controller.guestBook;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +33,7 @@ public class GuestBookController {
 	@PostMapping()
 	public ResponseEntity<Void> create(
 		@CommunityId Long currentCommunityId,
+		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long associateId,
 		@Valid @RequestBody CreateGuestBookRequest request
@@ -43,13 +42,14 @@ public class GuestBookController {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
-		guestBookService.create(communityId, associateId, request.type(), request.contentId(), request.content());
+		guestBookService.create(communityId, currentAssociateId, associateId, request.type(), request.contentId(), request.content());
 		return ResponseEntity.ok().build();
 	}
 
 	@PostMapping("/bubble")
 	public ResponseEntity<Void> creatBubble(
 		@CommunityId Long currentCommunityId,
+		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long associateId,
 		@RequestPart MultipartFile voice
@@ -58,7 +58,7 @@ public class GuestBookController {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
-		guestBookService.createBubble(communityId, associateId, voice);
+		guestBookService.createBubble(communityId, currentAssociateId, associateId, voice);
 		return ResponseEntity.ok().build();
 	}
 

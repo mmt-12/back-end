@@ -1,6 +1,7 @@
 package com.memento.server.domain.achievement;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +23,8 @@ public interface AchievementRepository extends JpaRepository<Achievement, Long> 
     LEFT JOIN AchievementAssociate aa ON a.id = aa.achievement.id AND aa.associate.id = :associateId AND aa.deletedAt IS NULL
     """)
 	List<SearchAchievementDto> findAllWithObtainedRecord(@Param("associateId") Long associateId);
+
+	Optional<Achievement> findByIdAndDeletedAtNull(Long achievementId);
+
+	int countByType(AchievementType achievementType);
 }

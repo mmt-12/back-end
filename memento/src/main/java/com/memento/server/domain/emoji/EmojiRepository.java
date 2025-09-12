@@ -8,4 +8,6 @@ public interface EmojiRepository extends JpaRepository<Emoji, Long>, EmojiReposi
 	Optional<Emoji> findByIdAndDeletedAtIsNull(Long id);
 
 	boolean existsByNameAndDeletedAtIsNull(String name);
+
+	int countByAssociateIdAndDeletedAtNull(Long associateId);
 }

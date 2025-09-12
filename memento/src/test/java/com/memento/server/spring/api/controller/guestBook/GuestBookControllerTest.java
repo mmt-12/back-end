@@ -48,7 +48,7 @@ public class GuestBookControllerTest extends ControllerTestSupport {
 			.content("example")
 			.build();
 
-		doNothing().when(guestBookService).create(anyLong(), anyLong(), eq(GuestBookType.TEXT), isNull(), anyString());
+		doNothing().when(guestBookService).create(anyLong(), anyLong(), anyLong(), eq(GuestBookType.TEXT), isNull(), anyString());
 
 		// when & then
 		mockMvc.perform(
@@ -73,7 +73,7 @@ public class GuestBookControllerTest extends ControllerTestSupport {
 			.content(null)
 			.build();
 
-		doNothing().when(guestBookService).create(anyLong(), anyLong(), eq(GuestBookType.EMOJI), anyLong(), isNull());
+		doNothing().when(guestBookService).create(anyLong(), anyLong(), anyLong(), eq(GuestBookType.EMOJI), anyLong(), isNull());
 
 		// when & then
 		mockMvc.perform(
@@ -98,7 +98,7 @@ public class GuestBookControllerTest extends ControllerTestSupport {
 			.content("example")
 			.build();
 
-		doNothing().when(guestBookService).create(anyLong(), anyLong(), eq(GuestBookType.TEXT), isNull(), anyString());
+		doNothing().when(guestBookService).create(anyLong(), anyLong(), anyLong(), eq(GuestBookType.TEXT), isNull(), anyString());
 
 		// when & then
 		mockMvc.perform(
@@ -126,7 +126,7 @@ public class GuestBookControllerTest extends ControllerTestSupport {
 			.content("a".repeat(256))
 			.build();
 
-		doNothing().when(guestBookService).create(anyLong(), anyLong(), eq(GuestBookType.TEXT), isNull(), anyString());
+		doNothing().when(guestBookService).create(anyLong(), anyLong(), anyLong(), eq(GuestBookType.TEXT), isNull(), anyString());
 
 		// when & then
 		mockMvc.perform(

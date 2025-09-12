@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.memento.server.api.controller.auth.dto.AuthGuestResponse;
 import com.memento.server.api.controller.auth.dto.AuthMemberResponse;
 import com.memento.server.api.controller.auth.dto.AuthResponse;
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
 import com.memento.server.api.service.auth.jwt.MemberClaim;
@@ -21,7 +22,7 @@ import com.memento.server.client.oauth.KakaoClient;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
-import com.memento.server.domain.community.Community;
+import com.memento.server.domain.community.SignInAchievementEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +36,7 @@ public class AuthService {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final KakaoOpenIdDecoder kakaoOpenIdDecoder;
 	private final AssociateRepository associateRepository;
+	private final AchievementEventPublisher achievementEventPublisher;
 
 	public String getAuthUrl() {
 		return kakaoClient.getAuthUrl();
@@ -58,6 +60,9 @@ public class AuthService {
 					.build();
 				JwtToken token = jwtTokenProvider.createToken(memberClaim);
 
+				achievementEventPublisher.publishSignInAchievement(SignInAchievementEvent.builder()
+					.associateId(associate.getId())
+					.build());
 				return AuthMemberResponse.builder()
 					.memberId(member.getId())
 					.name(member.getName())

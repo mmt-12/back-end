@@ -109,6 +109,8 @@ public enum ErrorCodes implements ErrorCode {
 
 	TOKEN_NOT_VALID(UNAUTHORIZED, 14000, "토큰이 유효하지 않습니다."),
 
+	STATS_NOT_FOUND(BAD_REQUEST, 15000, "참여자의 업적 기록이 존재하지 않습니다."),
+
 	;
 	private final HttpStatus status;
 	private final int code;

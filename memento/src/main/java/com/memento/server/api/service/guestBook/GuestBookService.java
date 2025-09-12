@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.eventMessage.EventMessagePublisher;
 import com.memento.server.api.service.eventMessage.dto.GuestBookNotification;
 import com.memento.server.api.service.minio.MinioService;
@@ -20,6 +21,8 @@ import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.emoji.Emoji;
 import com.memento.server.domain.emoji.EmojiRepository;
 import com.memento.server.domain.guestBook.GuestBook;
+import com.memento.server.domain.guestBook.GuestBookAchievementEvent;
+import com.memento.server.domain.guestBook.GuestBookExclusiveAchievementEvent;
 import com.memento.server.domain.guestBook.GuestBookRepository;
 import com.memento.server.domain.guestBook.GuestBookType;
 import com.memento.server.domain.voice.Voice;
@@ -38,6 +41,7 @@ public class GuestBookService {
 	private final VoiceRepository voiceRepository;
 	private final EmojiRepository emojiRepository;
 	private final EventMessagePublisher eventMessagePublisher;
+	private final AchievementEventPublisher achievementEventPublisher;
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -50,7 +54,8 @@ public class GuestBookService {
 	}
 
 	@Transactional
-	public void create(Long communityId, Long associateId, GuestBookType type, Long contentId, String content) {
+	public void create(Long communityId, Long registerId, Long associateId, GuestBookType type, Long contentId, String content) {
+		Associate register = validAssociate(communityId, registerId);
 		Associate associate = validAssociate(communityId, associateId);
 
 		GuestBook guestBook = null;
@@ -78,22 +83,42 @@ public class GuestBookService {
 				.build();
 		}
 		
-		guestBookRepository.save(guestBook);
+		GuestBook result = guestBookRepository.save(guestBook);
 		eventMessagePublisher.publishNotification(GuestBookNotification.from(associateId));
+		achievementEventPublisher.publishGuestBookAchievement(GuestBookAchievementEvent.from(register.getId(), result.getId(), GuestBookAchievementEvent.Type.COUNT));
+		if(result.getType().equals(GuestBookType.TEXT)){
+			achievementEventPublisher.publishGuestBookAchievement(GuestBookAchievementEvent.from(register.getId(), result.getId(), GuestBookAchievementEvent.Type.WORD));
+		}
+		if(associate.getCommunity().getId() == 1L){
+			achievementEventPublisher.publishGuestBookExclusiveAchievement(GuestBookExclusiveAchievementEvent.from(
+				register.getId(),
+				register.getMember().getBirthday(),
+				associate.getMember().getBirthday()
+			));
+		}
 	}
 
 	@Transactional
-	public void createBubble(Long communityId, Long associateId, MultipartFile voice) {
+	public void createBubble(Long communityId, Long registerId,Long associateId, MultipartFile voice) {
+		Associate register = validAssociate(communityId, registerId);
 		Associate associate = validAssociate(communityId, associateId);
 
 		String url = saveVoice(associate, voice);
 
-		guestBookRepository.save(GuestBook.builder()
+		GuestBook result = guestBookRepository.save(GuestBook.builder()
 				.associate(associate)
 				.content(url)
 				.type(GuestBookType.VOICE)
 				.build());
 		eventMessagePublisher.publishNotification(GuestBookNotification.from(associateId));
+		achievementEventPublisher.publishGuestBookAchievement(GuestBookAchievementEvent.from(associateId, result.getId(), GuestBookAchievementEvent.Type.COUNT));
+		if(associate.getCommunity().getId() == 1L){
+			achievementEventPublisher.publishGuestBookExclusiveAchievement(GuestBookExclusiveAchievementEvent.from(
+				register.getId(),
+				register.getMember().getBirthday(),
+				associate.getMember().getBirthday()
+			));
+		}
 	}
 
 	public SearchGuestBookResponse search(Long communityId, Long associateId, int size, Long cursor) {

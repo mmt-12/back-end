@@ -1,5 +1,7 @@
 package com.memento.server.domain.mbti;
 
+import java.util.Map;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -33,4 +35,15 @@ public interface MbtiTestRepository extends JpaRepository<MbtiTest, Long> {
 """)
 	MbtiSearchDto countMbtiByToAssociate(@Param("associateId") Long associateId);
 
+	@Query(value = """
+    SELECT
+    COUNT(DISTINCT mbti) AS total_count,
+    COALESCE(SUM(mbti IN ('ISFP','ISFJ','INFP','INFJ','ESFP','ESFJ','ENFP','ENFJ')), 0) AS f_count,
+    COALESCE(SUM(mbti IN ('ISTP','ISTJ','INTP','INTJ','ESTP','ESTJ','ENTP','ENTJ')), 0) AS t_count
+    FROM mbti_test
+    WHERE to_associate_id = :toAssociateId
+""", nativeQuery = true)
+	Map<String, Object> countAllByToAssociate(@Param("toAssociateId") Long toAssociateId);
+
+	int countByFromAssociateId(Long fromAssociateId);
 }

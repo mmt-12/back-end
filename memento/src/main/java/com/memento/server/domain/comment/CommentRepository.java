@@ -43,4 +43,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
 	List<Comment> findAllByPostIdAndDeletedAtNull(Long id);
 	Optional<Comment> findByIdAndDeletedAtIsNull(Long commentId);
+
+	int countByAssociateIdAndDeletedAtNull(Long associateId);
 }

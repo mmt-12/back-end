@@ -1,6 +1,5 @@
 package com.memento.server.domain.post;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -47,4 +46,11 @@ public interface PostImageRepository extends JpaRepository<PostImage, Long> {
 	List<PostImage> findAllByPostIdInAndDeletedAtNull(List<Long> postIds);
 
 	List<PostImage> findAllByHashInAndDeletedAtIsNull(List<Hash> hashes);
+
+	@Query("""
+        SELECT COUNT(pi)
+        FROM PostImage pi
+        WHERE pi.post.associate.id = :associateId
+    """)
+	int countByAssociateId(@Param("associateId") Long associateId);
 }

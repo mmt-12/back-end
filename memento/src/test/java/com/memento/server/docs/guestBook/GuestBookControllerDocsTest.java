@@ -77,7 +77,7 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 			.content("example")
 			.build();
 
-		doNothing().when(guestBookService).create(anyLong(), anyLong(), eq(GuestBookType.TEXT), isNull(), anyString());
+		doNothing().when(guestBookService).create(anyLong(), anyLong(), anyLong(), eq(GuestBookType.TEXT), isNull(), anyString());
 
 		// when & then
 		mockMvc.perform(
@@ -94,7 +94,6 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("content").type(STRING).description("내용")
 				)
 			));
-
 	}
 
 	@Test
@@ -112,7 +111,7 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 			.content(null)
 			.build();
 
-		doNothing().when(guestBookService).create(anyLong(), anyLong(), eq(GuestBookType.EMOJI), anyLong(), isNull());
+		doNothing().when(guestBookService).create(anyLong(), anyLong(), anyLong(), eq(GuestBookType.EMOJI), anyLong(), isNull());
 
 		// when & then
 		mockMvc.perform(
