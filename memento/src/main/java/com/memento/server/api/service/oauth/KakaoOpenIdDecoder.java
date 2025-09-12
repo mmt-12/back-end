@@ -32,7 +32,7 @@ public class KakaoOpenIdDecoder {
 
 		PublicKey key = kakaoKeyMemory.getPublicKeyByKid(header.kid());
 		Algorithm algorithm = Algorithm.RSA256((RSAPublicKey)key, null);
-		JWTVerifier verifier = JWT.require(algorithm).build();
+		JWTVerifier verifier = JWT.require(algorithm).acceptLeeway(2).build();
 		verifier.verify(token);
 
 		return payload;
