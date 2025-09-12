@@ -1,5 +1,7 @@
 package com.memento.server.config.filter;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -59,7 +61,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
 		if (!StringUtils.hasText(token) || !jwtTokenProvider.validateToken(token)) {
 			SecurityContextHolder.clearContext();
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing token");
+			response.sendError(SC_UNAUTHORIZED, "토큰이 없거나 검증에 실패했습니다.");
 			return;
 		}
 
