@@ -232,7 +232,7 @@ gradle-app.setting
 
 src/test/resources/application.yml
 src/main/resources/application.yml
-src/main/resources/serviceAccountKey.json
+src/main/resources/memento-serviceAccountKey.json
 
 .claude
 
