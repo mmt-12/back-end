@@ -109,6 +109,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID}
       KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET}
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/serviceAccountKey.json
     ports:
       - 8081:8080
     depends_on:
@@ -118,6 +119,8 @@ services:
         condition: service_healthy
       memento-minio-dev:
         condition: service_healthy
+    volumes:
+      - ../secret/memento-serviceAccountKey.json:/run/secrets/serviceAccountKey.json:ro
     networks:
       - memento-dev-network
 
