@@ -91,15 +91,13 @@ public class AssociateServiceTest{
 		Associate associate11 = associateRepository.save(Associate.create("카카", member11, community));
 
 		// when
-		AssociateListResponse associateListResponse = associateService.searchAll(community.getId(), "", null, 10);
+		AssociateListResponse associateListResponse = associateService.searchAll(community.getId(), "");
 
 		// then
 		assertThat(associateListResponse.communityName()).isEqualTo(community.getName());
-		assertThat(associateListResponse.associates().size()).isEqualTo(10);
+		assertThat(associateListResponse.associates().size()).isEqualTo(11);
 		assertThat(associateListResponse.associates().getFirst().nickname()).isEqualTo(associate11.getNickname());
-		assertThat(associateListResponse.associates().getLast().nickname()).isEqualTo(associate2.getNickname());
-		assertThat(associateListResponse.nextCursor()).isEqualTo(associate2.getId());
-		assertThat(associateListResponse.hasNext()).isEqualTo(true);
+		assertThat(associateListResponse.associates().getLast().nickname()).isEqualTo(associate1.getNickname());
 	}
 
 	@Test
@@ -113,99 +111,12 @@ public class AssociateServiceTest{
 		Associate associate2 = associateRepository.save(Associate.create("아아아", member2, community));
 
 		// when
-		AssociateListResponse associateListResponse = associateService.searchAll(community.getId(), "홍홍", null, 10);
+		AssociateListResponse associateListResponse = associateService.searchAll(community.getId(), "홍홍");
 
 		// then
 		assertThat(associateListResponse.communityName()).isEqualTo(community.getName());
 		assertThat(associateListResponse.associates().size()).isEqualTo(1);
 		assertThat(associateListResponse.associates().getFirst().nickname()).isEqualTo(associate1.getNickname());
-		assertThat(associateListResponse.nextCursor()).isEqualTo(associate1.getId());
-		assertThat(associateListResponse.hasNext()).isEqualTo(false);
-	}
-
-	@Test
-	@DisplayName("커뮤니티 참여자 목록을 커서 방식으로 조회한다.")
-	void searchAll_withCursor() {
-		// given
-		Member member1 = memberRepository.save(Member.create("김가가", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
-		Member member2 = memberRepository.save(Member.create("김나나", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
-		Member member3 = memberRepository.save(Member.create("김다다", "muge@test.com", LocalDate.of(1990, 1, 1), 1003L));
-		Member member4 = memberRepository.save(Member.create("김라라", "muge@test.com", LocalDate.of(1990, 1, 1), 1004L));
-		Member member5 = memberRepository.save(Member.create("김마마", "muge@test.com", LocalDate.of(1990, 1, 1), 1005L));
-		Member member6 = memberRepository.save(Member.create("김바바", "muge@test.com", LocalDate.of(1990, 1, 1), 1006L));
-		Member member7 = memberRepository.save(Member.create("김사사", "muge@test.com", LocalDate.of(1990, 1, 1), 1007L));
-		Member member8 = memberRepository.save(Member.create("김아아", "muge@test.com", LocalDate.of(1990, 1, 1), 1008L));
-		Member member9 = memberRepository.save(Member.create("김자자", "muge@test.com", LocalDate.of(1990, 1, 1), 1009L));
-		Member member10 = memberRepository.save(Member.create("김차차", "muge@test.com", LocalDate.of(1990, 1, 1), 1010L));
-		Member member11 = memberRepository.save(Member.create("김카카", "muge@test.com", LocalDate.of(1990, 1, 1), 1011L));
-		Community community = communityRepository.save(Community.create("comm", member1));
-		Associate associate1 = associateRepository.save(Associate.create("가가", member1, community));
-		Associate associate2 = associateRepository.save(Associate.create("나나", member2, community));
-		Associate associate3 = associateRepository.save(Associate.create("다다", member3, community));
-		Associate associate4 = associateRepository.save(Associate.create("라라", member4, community));
-		Associate associate5 = associateRepository.save(Associate.create("마마", member5, community));
-		Associate associate6 = associateRepository.save(Associate.create("바바", member6, community));
-		Associate associate7 = associateRepository.save(Associate.create("사사", member7, community));
-		Associate associate8 = associateRepository.save(Associate.create("아아", member8, community));
-		Associate associate9 = associateRepository.save(Associate.create("자자", member9, community));
-		Associate associate10 = associateRepository.save(Associate.create("차차", member10, community));
-		Associate associate11 = associateRepository.save(Associate.create("카카", member11, community));
-
-		// when
-		AssociateListResponse associateListResponse = associateService.searchAll(community.getId(), "",
-			associate11.getId(), 10);
-
-		// then
-		assertThat(associateListResponse.communityName()).isEqualTo(community.getName());
-		assertThat(associateListResponse.associates().size()).isEqualTo(10);
-		assertThat(associateListResponse.associates().getFirst().nickname()).isEqualTo(associate10.getNickname());
-		assertThat(associateListResponse.associates().getLast().nickname()).isEqualTo(associate1.getNickname());
-		assertThat(associateListResponse.nextCursor()).isEqualTo(associate1.getId());
-		assertThat(associateListResponse.hasNext()).isEqualTo(false);
-	}
-
-	@Test
-	@DisplayName("커뮤니티 참여자 목록을 커서 방식과 키워드로 조회한다.")
-	void searchAll_WithKeywordCursor() {
-		// given
-		Member member1 = memberRepository.save(Member.create("김가가", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
-		Member member2 = memberRepository.save(Member.create("김나나", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
-		Member member3 = memberRepository.save(Member.create("김다다", "muge@test.com", LocalDate.of(1990, 1, 1), 1003L));
-		Member member4 = memberRepository.save(Member.create("김라라", "muge@test.com", LocalDate.of(1990, 1, 1), 1004L));
-		Member member5 = memberRepository.save(Member.create("김마마", "muge@test.com", LocalDate.of(1990, 1, 1), 1005L));
-		Member member6 = memberRepository.save(Member.create("김바바", "muge@test.com", LocalDate.of(1990, 1, 1), 1006L));
-		Member member7 = memberRepository.save(Member.create("김사사", "muge@test.com", LocalDate.of(1990, 1, 1), 1007L));
-		Member member8 = memberRepository.save(Member.create("김아아", "muge@test.com", LocalDate.of(1990, 1, 1), 1008L));
-		Member member9 = memberRepository.save(Member.create("김자자", "muge@test.com", LocalDate.of(1990, 1, 1), 1009L));
-		Member member10 = memberRepository.save(Member.create("김차차", "muge@test.com", LocalDate.of(1990, 1, 1), 1010L));
-		Member member11 = memberRepository.save(Member.create("김카카", "muge@test.com", LocalDate.of(1990, 1, 1), 1011L));
-		Member member12 = memberRepository.save(
-			Member.create("김가가2", "muge@test.com", LocalDate.of(1990, 1, 1), 1012L));
-		Community community = communityRepository.save(Community.create("comm", member1));
-		Associate associate1 = associateRepository.save(Associate.create("가가", member1, community));
-		Associate associate2 = associateRepository.save(Associate.create("나나", member2, community));
-		Associate associate3 = associateRepository.save(Associate.create("가가2", member3, community));
-		Associate associate4 = associateRepository.save(Associate.create("가가3", member4, community));
-		Associate associate5 = associateRepository.save(Associate.create("가가4", member5, community));
-		Associate associate6 = associateRepository.save(Associate.create("가가5", member6, community));
-		Associate associate7 = associateRepository.save(Associate.create("가가6", member7, community));
-		Associate associate8 = associateRepository.save(Associate.create("가가7", member8, community));
-		Associate associate9 = associateRepository.save(Associate.create("가가8", member9, community));
-		Associate associate10 = associateRepository.save(Associate.create("가가9", member10, community));
-		Associate associate11 = associateRepository.save(Associate.create("가가10", member11, community));
-		Associate associate12 = associateRepository.save(Associate.create("가가11", member12, community));
-
-		// when
-		AssociateListResponse associateListResponse = associateService.searchAll(community.getId(), "가가",
-			associate12.getId(), 10);
-
-		// then
-		assertThat(associateListResponse.communityName()).isEqualTo(community.getName());
-		assertThat(associateListResponse.associates().size()).isEqualTo(10);
-		assertThat(associateListResponse.associates().getFirst().nickname()).isEqualTo(associate11.getNickname());
-		assertThat(associateListResponse.associates().getLast().nickname()).isEqualTo(associate1.getNickname());
-		assertThat(associateListResponse.nextCursor()).isEqualTo(associate1.getId());
-		assertThat(associateListResponse.hasNext()).isEqualTo(false);
 	}
 
 	@Test
@@ -215,7 +126,7 @@ public class AssociateServiceTest{
 
 		// when & then
 		assertThatThrownBy(() ->
-			associateService.searchAll(1L, "", null, 10)
+			associateService.searchAll(1L, "")
 		)
 			.isInstanceOf(MementoException.class)
 			.satisfies(ex -> {

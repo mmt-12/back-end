@@ -229,16 +229,14 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        List<Associate> foundAssociates = associateRepository.findAllByCommunityIdAndKeywordWithCursor(
+        List<Associate> foundAssociates = associateRepository.findAllByCommunityIdAndKeyword(
                 community.getId(),
-                "Apple",
-                null,
-                pageable
+                "Apple"
         );
 
         // then
         assertThat(foundAssociates).hasSize(1);
-        assertThat(foundAssociates.get(0).getNickname()).containsIgnoringCase("Apple");
+        assertThat(foundAssociates.getFirst().getNickname()).containsIgnoringCase("Apple");
     }
 
     @Test

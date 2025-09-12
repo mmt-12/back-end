@@ -8,8 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.memento.server.domain.member.Member;
-
 public interface AssociateRepository extends JpaRepository<Associate, Long> {
 	Optional<Associate> findByIdAndDeletedAtNull(Long associateId);
 
@@ -18,15 +16,12 @@ public interface AssociateRepository extends JpaRepository<Associate, Long> {
 		FROM Associate a
 		WHERE a.community.id = :communityId
 		  AND (:keyword IS NULL OR a.nickname LIKE CONCAT('%', :keyword, '%'))
-		  AND (:cursor IS NULL OR a.id < :cursor)
 		  AND (a.deletedAt IS NULL)
 		ORDER BY a.id DESC
 		""")
-	List<Associate> findAllByCommunityIdAndKeywordWithCursor(
+	List<Associate> findAllByCommunityIdAndKeyword(
 		@Param("communityId") Long communityId,
-		@Param("keyword") String keyword,
-		@Param("cursor") Long cursor,
-		Pageable pageable
+		@Param("keyword") String keyword
 	);
 
 	List<Associate> findAllByMemberIdAndDeletedAtIsNull(Long memberId);
