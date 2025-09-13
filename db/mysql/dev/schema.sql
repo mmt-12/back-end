@@ -276,6 +276,7 @@ CREATE TABLE IF NOT EXISTS guest_books (
     id BIGINT NOT NULL AUTO_INCREMENT,
     type ENUM('TEXT', 'EMOJI', 'VOICE') NOT NULL,
     content VARCHAR(510) NOT NULL,
+    name VARCHAR(102) NULL,
     associate_id BIGINT NOT NULL,
     created_at DATETIME(6) NOT NULL,
     modified_at DATETIME(6) NULL,
