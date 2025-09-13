@@ -97,6 +97,7 @@ public class GuestBookServiceTest extends IntegrationsTestSupport {
 
 		//then
 		assertThat(response.guestBooks().getFirst().getContent()).isEqualTo("test");
+		assertThat(response.guestBooks().getFirst().getName()).isNull();
 		assertThat(response.guestBooks().getFirst().getType()).isEqualTo(GuestBookType.TEXT);
 	}
 

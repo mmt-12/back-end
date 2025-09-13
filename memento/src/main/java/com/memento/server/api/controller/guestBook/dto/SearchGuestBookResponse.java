@@ -23,6 +23,7 @@ public record SearchGuestBookResponse(
 		Long id;
 		GuestBookType type;
 		String content;
+		String name;
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
 		LocalDateTime createdAt;
 	}

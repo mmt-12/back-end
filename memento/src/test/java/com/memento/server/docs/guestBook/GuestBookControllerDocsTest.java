@@ -207,6 +207,7 @@ public class GuestBookControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("guestBooks[].id").type(NUMBER).description("방명록 ID"),
 					fieldWithPath("guestBooks[].type").type(STRING).description("방명록 종류"),
 					fieldWithPath("guestBooks[].content").type(STRING).description("방명록 내용"),
+					fieldWithPath("guestBooks[].name").type(STRING).optional().description("방명록 리액션 이름, null 가능"),
 					fieldWithPath("guestBooks[].createdAt").type(STRING).description("방명록 생성 시각"),
 					fieldWithPath("nextCursor").type(NUMBER).description("다음 커서 값"),
 					fieldWithPath("hasNext").type(BOOLEAN).description("다음 값 존재 여부")

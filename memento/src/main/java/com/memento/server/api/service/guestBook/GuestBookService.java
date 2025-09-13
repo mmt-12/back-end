@@ -66,6 +66,7 @@ public class GuestBookService {
 			guestBook = GuestBook.builder()
 				.associate(associate)
 				.content(voice.getUrl())
+				.name(voice.getName())
 				.type(type)
 				.build();
 		}else{
@@ -74,6 +75,7 @@ public class GuestBookService {
 			guestBook = GuestBook.builder()
 				.associate(associate)
 				.content(emoji.getUrl())
+				.name(emoji.getName())
 				.type(type)
 				.build();
 		}
@@ -119,6 +121,7 @@ public class GuestBookService {
 				.id(g.getId())
 				.type(g.getType())
 				.content(g.getContent())
+				.name(g.getName())
 				.createdAt(g.getCreatedAt())
 				.build())
 			.toList();
