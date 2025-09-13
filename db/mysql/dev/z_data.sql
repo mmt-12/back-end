@@ -28,7 +28,7 @@ VALUES
 (2, 2, 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (3, 3, 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-INSERT INTO achievements (id, name, criteria, type, created_at, modified_at, deleted_at)
+INSERT INTO achievements (id, name, criteria, `type`, created_at, modified_at, deleted_at)
 VALUES
 (1, '시간빌게이츠', 'Earn the 시간빌게이츠 badge', 'OPEN', NOW(6), NULL, NULL),
 (2, '관상가', 'Earn the 관상가 badge', 'OPEN', NOW(6), NULL, NULL),
@@ -240,19 +240,19 @@ INSERT INTO members (id, name, email, birthday, kakao_id, created_at, modified_a
 -- -------------------------------------------------
 INSERT INTO associates (id, nickname, profile_image_url, introduction, achievement_id, member_id, community_id, created_at, modified_at, deleted_at) VALUES
 (4,  'DanaD',   'https://picsum.photos/seed/dana/256/256',   'backend과 커피를 사랑합니다.', 6,  5,  1, NOW(6), NULL, NULL),
-(5,  'EvanE',   'https://picsum.photos/seed/evan/256/256',   '데브옵스 빌드 장인.',           14, 6,  1, NOW(6), NULL, NULL),
-(6,  'FiFi',    'https://picsum.photos/seed/fiona/256/256',  '취미로 사진 찍어요 📸',         9,  7,  1, NOW(6), NULL, NULL),
-(7,  'G-Force', 'https://picsum.photos/seed/george/256/256', '프론트엔드 실험가.',            22, 8,  1, NOW(6), NULL, NULL),
+(5,  'EvanE',   'https://picsum.photos/seed/evan/256/256',   '데브옵스 빌드 장인.',  14, 6,  1, NOW(6), NULL, NULL),
+(6,  'FiFi',    'https://picsum.photos/seed/fiona/256/256',  '취미로 사진 찍어요 📸',9,  7,  1, NOW(6), NULL, NULL),
+(7,  'G-Force', 'https://picsum.photos/seed/george/256/256', '프론트엔드 실험가.',   22, 8,  1, NOW(6), NULL, NULL),
 (8,  'HanaH',   'https://picsum.photos/seed/hana/256/256',   '데이터로 수다 떠는 사람.',       13, 9,  1, NOW(6), NULL, NULL),
-(9,  'IanDev',  'https://picsum.photos/seed/ian/256/256',    'Rust 덕후.',                    23, 10, 1, NOW(6), NULL, NULL),
-(10, 'Jisu',    'https://picsum.photos/seed/jisoo/256/256',  'UI/UX 관심 많아요.',             2,  11, 1, NOW(6), NULL, NULL),
-(11, 'Ken',     'https://picsum.photos/seed/kenta/256/256',  '테스트 자동화 애호가.',          6,  12, 1, NOW(6), NULL, NULL),
-(12, 'LenaL',   'https://picsum.photos/seed/lena/256/256',   'PM & 도큐멘터리스트.',           1,  13, 1, NOW(6), NULL, NULL),
-(13, 'Min',     'https://picsum.photos/seed/minho/256/256',  '알고리즘이 재밌다!',             17, 14, 1, NOW(6), NULL, NULL),
-(14, 'Nor',     'https://picsum.photos/seed/nora/256/256',   '밈 수집가.',                     6,  15, 1, NOW(6), NULL, NULL),
+(9,  'IanDev',  'https://picsum.photos/seed/ian/256/256',    'Rust 덕후.',  23, 10, 1, NOW(6), NULL, NULL),
+(10, 'Jisu',    'https://picsum.photos/seed/jisoo/256/256',  'UI/UX 관심 많아요.',    2,  11, 1, NOW(6), NULL, NULL),
+(11, 'Ken',     'https://picsum.photos/seed/kenta/256/256',  '테스트 자동화 애호가.', 6,  12, 1, NOW(6), NULL, NULL),
+(12, 'LenaL',   'https://picsum.photos/seed/lena/256/256',   'PM & 도큐멘터리스트.',  1,  13, 1, NOW(6), NULL, NULL),
+(13, 'Min',     'https://picsum.photos/seed/minho/256/256',  '알고리즘이 재밌다!',    17, 14, 1, NOW(6), NULL, NULL),
+(14, 'Nor',     'https://picsum.photos/seed/nora/256/256',   '밈 수집가.',   6,  15, 1, NOW(6), NULL, NULL),
 (15, 'Oz',      'https://picsum.photos/seed/oscar/256/256',  '클라우드 네이티브 lover.',       18, 16, 1, NOW(6), NULL, NULL),
-(16, 'Pri',     'https://picsum.photos/seed/priya/256/256',  'ML이랑 요가 좋아요.',            3,  17, 1, NOW(6), NULL, NULL),
-(17, 'Q',       'https://picsum.photos/seed/quinn/256/256',  '게임잼 참가러.',                 11, 18, 1, NOW(6), NULL, NULL);
+(16, 'Pri',     'https://picsum.photos/seed/priya/256/256',  'ML이랑 요가 좋아요.',   3,  17, 1, NOW(6), NULL, NULL),
+(17, 'Q',       'https://picsum.photos/seed/quinn/256/256',  '게임잼 참가러.',        11, 18, 1, NOW(6), NULL, NULL);
 
 -- -------------------------------------------------
 -- Diverse associate_stats (IDs continue from 3)
@@ -261,7 +261,7 @@ INSERT INTO associate_stats (id, associate_id, consecutive_attendance_days, last
 (4,  4,  5,  '2025-09-05 08:30:00', 10, 22, 3, 1, 1, 8,  2, 6, 1, 1, 0),
 (5,  5,  2,  '2025-09-03 21:12:00',  4,  9, 1, 2, 1, 3,  1, 4, 0, 0, 1),
 (6,  6,  12, '2025-08-29 10:05:00', 18, 15, 2, 1, 1, 12, 3, 7, 2, 2, 0),
-(7,  7,  0,  NULL,                   0,  0, 0, 0, 0, 0,  0, 0, 0, 0, 0),
+(7,  7,  0,  NULL, 0,  0, 0, 0, 0, 0,  0, 0, 0, 0, 0),
 (8,  8,  7,  '2025-09-07 13:44:00', 21, 19, 5, 1, 1, 9,  2, 8, 1, 1, 0),
 (9,  9,  1,  '2025-09-09 09:02:00',  2,  5, 1, 1, 1, 2,  0, 2, 0, 0, 1),
 (10, 10, 3,  '2025-09-01 18:26:00',  9,  6, 0, 1, 1, 4,  1, 1, 1, 1, 0),
@@ -269,7 +269,7 @@ INSERT INTO associate_stats (id, associate_id, consecutive_attendance_days, last
 (12, 12, 4,  '2025-09-04 07:55:00',  6, 10, 0, 1, 1, 5,  1, 4, 0, 0, 1),
 (13, 13, 6,  '2025-09-06 12:15:00', 12, 11, 1, 1, 1, 7,  2, 5, 2, 2, 0),
 (14, 14, 8,  '2025-09-02 23:40:00', 25, 20, 4, 2, 1, 10, 3, 6, 1, 1, 0),
-(15, 15, 0,  NULL,                   0,  0, 0, 0, 0, 0,  0, 0, 0, 0, 0),
+(15, 15, 0,  NULL, 0,  0, 0, 0, 0, 0,  0, 0, 0, 0, 0),
 (16, 16, 11, '2025-09-10 06:32:00', 17, 18, 3, 1, 1, 11, 4, 9, 2, 1, 1),
 (17, 17, 2,  '2025-09-05 15:07:00',  5,  7, 1, 1, 1, 3,  1, 2, 0, 0, 1);
 
@@ -444,3 +444,137 @@ INSERT INTO post_images (id, url, hash, post_id, created_at, modified_at, delete
 (30, 'https://picsum.photos/seed/retrospective/1200/800', 'hash_ext1', 28, NOW(6), NULL, NULL),
 (31, 'https://picsum.photos/seed/chicken_sauce/1200/800', 'hash_ext2', 29, NOW(6), NULL, NULL),
 (32, 'https://picsum.photos/seed/beefarm_notes/1200/800', 'hash_ext3', 30, NOW(6), NULL, NULL);
+
+-- =====================================================
+-- Emoji catalog (images via picsum)
+-- =====================================================
+INSERT INTO emoji (id, name, url, associate_id, created_at, modified_at, deleted_at) VALUES
+(1, 'party_parrot',   'https://picsum.photos/seed/emoji_party/128/128',      14, NOW(6), NULL, NULL),
+(2, 'thumbs_up',      'https://picsum.photos/seed/emoji_thumbsup/128/128',   7,  NOW(6), NULL, NULL),
+(3, 'mind_blown',     'https://picsum.photos/seed/emoji_mindblown/128/128',  6,  NOW(6), NULL, NULL),
+(4, 'fire',  'https://picsum.photos/seed/emoji_fire/128/128',       12, NOW(6), NULL, NULL),
+(5, 'camera','https://picsum.photos/seed/emoji_camera/128/128',     6,  NOW(6), NULL, NULL),
+(6, 'bicycle',        'https://picsum.photos/seed/emoji_bicycle/128/128',    7,  NOW(6), NULL, NULL),
+(7, 'chicken',        'https://picsum.photos/seed/emoji_chicken/128/128',    2,  NOW(6), NULL, NULL),
+(8, 'coffee','https://picsum.photos/seed/emoji_coffee/128/128',     4,  NOW(6), NULL, NULL);
+
+-- =====================================================
+-- Voices (dummy mp3 urls; temporary=false for a few)
+-- =====================================================
+INSERT INTO voices (id, name, url, temporary, associate_id, created_at, modified_at, deleted_at) VALUES
+(1, 'ride-cheer',     'https://github.com/user-attachments/files/22308692/alien-voice-102709.mp3',FALSE, 11, NOW(6), NULL, NULL),
+(2, 'gg-busan',       'https://github.com/user-attachments/files/22308696/alien-voice-sfx-005-297914.mp3',   FALSE,  6,  NOW(6), NULL, NULL),
+(3, 'study-break',    'https://github.com/user-attachments/files/22308693/annoyed-female-disgust-voice-352713.mp3',FALSE,  10, NOW(6), NULL, NULL),
+(4, 'jeju-kickoff',   'https://github.com/user-attachments/files/22308695/female-compasive-voice-98423.mp3',        FALSE, 16, NOW(6), NULL, NULL),
+(5, 'good-morning',   'https://github.com/user-attachments/files/22308697/game-over-deep-male-voice-clip-352695.mp3',        FALSE,  8,  NOW(6), NULL, NULL);
+
+-- =====================================================
+-- Profile images (all picsum); registrant_id = who uploaded
+-- =====================================================
+INSERT INTO profile_images (id, url, associate_id, registrant_id, created_at, modified_at, deleted_at) VALUES
+(1, 'https://picsum.photos/seed/profile_dana/512/512',   4,  7,  NOW(6), NULL, NULL),
+(2, 'https://picsum.photos/seed/profile_hana/512/512',   8,  12, NOW(6), NULL, NULL),
+(3, 'https://picsum.photos/seed/profile_fiona/512/512',  6,  6,  NOW(6), NULL, NULL),
+(4, 'https://picsum.photos/seed/profile_quinn/512/512',  17, 10, NOW(6), NULL, NULL),
+(5, 'https://picsum.photos/seed/profile_jisoo/512/512',  10, 11, NOW(6), NULL, NULL);
+
+-- (optionally reflect counts)
+UPDATE associate_stats SET uploaded_profile_image_count = uploaded_profile_image_count + 1, registered_profile_image_count = registered_profile_image_count + 1 WHERE associate_id IN (4,6,8,10,17);
+
+-- =====================================================
+-- Comments on posts (EMOJI or VOICE). 
+-- For EMOJI, comments.url points to the emoji image; for VOICE, to the voice file.
+-- =====================================================
+INSERT INTO comments (id, url, `type`, post_id, associate_id, created_at, modified_at, deleted_at) VALUES
+-- EMOJI reactions
+(1,  'https://picsum.photos/seed/emoji_bicycle/128/128',  'EMOJI', 13, 7,  NOW(6), NULL, NULL),  -- on m5
+(2,  'https://picsum.photos/seed/emoji_camera/128/128',   'EMOJI', 14, 6,  NOW(6), NULL, NULL),
+(3,  'https://picsum.photos/seed/emoji_fire/128/128',     'EMOJI', 16, 12, NOW(6), NULL, NULL),  -- m6
+(4,  'https://picsum.photos/seed/emoji_thumbsup/128/128', 'EMOJI', 18, 15, NOW(6), NULL, NULL),  -- m7
+(5,  'https://picsum.photos/seed/emoji_party/128/128',    'EMOJI', 21, 9,  NOW(6), NULL, NULL),  -- m8
+(6,  'https://picsum.photos/seed/emoji_coffee/128/128',   'EMOJI', 25, 8,  NOW(6), NULL, NULL),  -- m11
+(7,  'https://picsum.photos/seed/emoji_camera/128/128',   'EMOJI', 26, 6,  NOW(6), NULL, NULL),  -- m12
+(8,  'https://picsum.photos/seed/emoji_chicken/128/128',  'EMOJI', 29, 1,  NOW(6), NULL, NULL),  -- on existing memory 2
+-- VOICE comments
+(9,  'https://github.com/user-attachments/files/22308691/medieval-gamer-voice-darkness-hunts-us-what-youx27ve-learned-stay-226596.mp3','VOICE', 15, 11, NOW(6), NULL, NULL),
+(10, 'https://github.com/user-attachments/files/22308694/well-done-cartoon-voice-32459.mp3',  'VOICE', 19, 6,  NOW(6), NULL, NULL),
+(11, 'https://github.com/user-attachments/files/22308690/wow-female-voice-156878.mp3',  'VOICE', 20, 10, NOW(6), NULL, NULL);
+
+-- =====================================================
+-- Guest books (TEXT / EMOJI / VOICE)
+-- =====================================================
+INSERT INTO guest_books (id, `type`, content, associate_id, created_at, modified_at, deleted_at) VALUES
+(1, 'TEXT',  '방문 감사! 오늘도 파이팅 💪', 4,  NOW(6), NULL, NULL),
+(2, 'EMOJI', 'https://picsum.photos/seed/emoji_thumbsup/128/128', 8, NOW(6), NULL, NULL),
+(3, 'TEXT',  '사진 너무 예뻐요. 다음 출사도 함께 가요!', 6, NOW(6), NULL, NULL),
+(4, 'VOICE', 'https://github.com/user-attachments/files/22308693/annoyed-female-disgust-voice-352713.mp3', 10, NOW(6), NULL, NULL),
+(5, 'TEXT',  '신규 합류한 사람입니다. 잘 부탁드려요 🙌', 17, NOW(6), NULL, NULL);
+
+UPDATE associate_stats SET guest_book_count = guest_book_count + 1 WHERE associate_id IN (4,6,8,10,17);
+
+-- =====================================================
+-- Notifications (mix of types; all within community 1 members)
+-- actor_id: who triggered; receiver_id: who sees it.
+-- =====================================================
+INSERT INTO notifications (id, title, content, is_read, `type`, actor_id, post_id, memory_id, receiver_id, created_at, modified_at, deleted_at) VALUES
+(1,  '새 포스트',     'G-Force 님이 한강 라이딩에 글을 올렸습니다.',     FALSE, 'POST',     7,  13, 5,   11, NOW(6), NULL, NULL),
+(2,  '리액션',        'Ken 님이 반응(🔥)을 남겼습니다.',        FALSE, 'REACTION',  11, 16, 6,   12, NOW(6), NULL, NULL),
+(3,  '새 메모리',     '부산 워케이션 메모리가 생성됐습니다.',   TRUE,  'MEMORY',    15, NULL, 7,   6,  NOW(6), NULL, NULL),
+(4,  '업적 달성',     'FiFi 님이 "파파라치" 업적을 획득!',      FALSE, 'ACHIEVE',   6,  NULL, NULL, 6,  NOW(6), NULL, NULL),
+(5,  '게스트북',      '방명록에 새로운 메시지가 있어요.',       FALSE, 'GUESTBOOK', 4,  NULL, NULL, 8,  NOW(6), NULL, NULL),
+(6,  'MBTI 결과',     'Pri 가 Min 의 MBTI를 ENTP로 기록했어요.',TRUE,  'MBTI',      16, NULL, NULL, 13, NOW(6), NULL, NULL),
+(7,  '새 이미지',     'Jisu 님이 프로필 이미지를 등록했습니다.', FALSE, 'NEWIMAGE',  10, NULL, NULL, 10, NOW(6), NULL, NULL),
+(8,  '생일 알림',     '오늘은 Hana 의 생일이에요! 축하해요 🎂',   FALSE, 'BIRTHDAY',  8,  NULL, NULL, 8,  NOW(6), NULL, NULL),
+(9,  '새 포스트',     'Pri 가 제주 해커톤 준비글을 올렸어요.',  FALSE, 'POST',      16, 24, 10,  5,  NOW(6), NULL, NULL),
+(10, '새 반응',       'Nor 가 사진 출사 글에 반응(📸) 했어요.',  TRUE,  'REACTION',  14, 26, 12,  6,  NOW(6), NULL, NULL),
+(11, '새 포스트',     'Min 이 남이섬 사진 업로드.',    FALSE, 'POST',      13, 22, 9,   6,  NOW(6), NULL, NULL),
+(12, '새 멤버 소식',  'Oz 가 커뮤니티 소식을 전했습니다.',      TRUE,  'ASSOCIATE',  15, NULL, NULL, 1,  NOW(6), NULL, NULL);
+
+-- =====================================================
+-- MBTI tests (who tested whom, and the result they set)
+-- =====================================================
+INSERT INTO mbti_test (id, mbti, from_associate_id, to_associate_id, created_at, modified_at, deleted_at) VALUES
+(1,  'ENTP', 16, 13, NOW(6), NULL, NULL),
+(2,  'INFJ',  6,  8, NOW(6), NULL, NULL),
+(3,  'ISTJ', 10, 12, NOW(6), NULL, NULL),
+(4,  'ENFP',  7,  4, NOW(6), NULL, NULL),
+(5,  'ESTP', 14, 11, NOW(6), NULL, NULL),
+(6,  'INTP',  9,  6, NOW(6), NULL, NULL),
+(7,  'ISFJ',  8,  7, NOW(6), NULL, NULL),
+(8,  'ESFP', 12, 10, NOW(6), NULL, NULL),
+(9,  'ENTJ', 15,  5, NOW(6), NULL, NULL),
+(10, 'INFP', 13,  9, NOW(6), NULL, NULL),
+(11, 'ISTP',  4, 16, NOW(6), NULL, NULL),
+(12, 'ESTJ', 11,  8, NOW(6), NULL, NULL),
+(13, 'ISFP',  6, 13, NOW(6), NULL, NULL),
+(14, 'ENFJ', 17,  6, NOW(6), NULL, NULL),
+(15, 'INTJ',  5,  4, NOW(6), NULL, NULL);
+
+-- reflect some MBTI counts
+UPDATE associate_stats SET mbti_test_count = mbti_test_count + 1 WHERE associate_id IN (4,5,6,7,8,9,10,11,12,13,14,15,16,17);
+UPDATE associate_stats SET f_mbti_count = f_mbti_count + 1 WHERE associate_id IN (6,8,10,12,13,16);
+UPDATE associate_stats SET t_mbti_count = t_mbti_count + 1 WHERE associate_id IN (4,5,7,9,11,14,15,17);
+
+-- =====================================================
+-- Achievement ownerships
+-- (re-using achievement ids defined earlier)
+-- =====================================================
+INSERT INTO achievement_associate (id, achievement_id, associate_id, created_at, modified_at, deleted_at) VALUES
+(1,  9,   6,  NOW(6), NULL, NULL),   -- 파파라치 ↔ FiFi(사진가)
+(2,  6,  11,  NOW(6), NULL, NULL),   -- 리액션공장 ↔ Ken
+(3, 22,   7,  NOW(6), NULL, NULL),   -- 뤼전드 ↔ G-Force
+(4, 13,   8,  NOW(6), NULL, NULL),   -- GMG ↔ HanaH
+(5, 18,  15,  NOW(6), NULL, NULL),   -- 팅팅팅 ↔ Oz
+(6,  3,  16,  NOW(6), NULL, NULL),   -- 다중인격 ↔ Pri
+(7,  2,  10,  NOW(6), NULL, NULL),   -- 관상가 ↔ Jisu
+(8, 17,  13,  NOW(6), NULL, NULL);   -- 씽씽씽 ↔ Min
+
+-- =====================================================
+-- Extra variety: more pics for existing/new posts (continue IDs)
+-- =====================================================
+INSERT INTO post_images (id, url, hash, post_id, created_at, modified_at, deleted_at) VALUES
+(33, 'https://picsum.photos/seed/extra_m5_1/1200/800',  'hash_m5_extra1', 13, NOW(6), NULL, NULL),
+(34, 'https://picsum.photos/seed/extra_m7_1/1200/800',  'hash_m7_extra1', 18, NOW(6), NULL, NULL),
+(35, 'https://picsum.photos/seed/extra_m9_1/1200/800',  'hash_m9_extra1', 22, NOW(6), NULL, NULL);
+
+UPDATE associate_stats SET uploaded_post_image_count = uploaded_post_image_count + 1 WHERE associate_id IN (4,6,7,8,10,11,12,13,15,16);

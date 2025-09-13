@@ -46,6 +46,9 @@ public class GuestBook extends BaseEntity {
 	@Column(name = "content", length = 510, nullable = false)
 	private String content;
 
+	@Column(name = "name", length = 102)
+	private String name;
+
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "associate_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Associate associate;

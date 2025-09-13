@@ -78,7 +78,7 @@ public class PostController {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
-		postService.create(communityId, currentAssociateId, memoryId, request.content(), pictures);
+		postService.create(communityId, memoryId, currentAssociateId, request.content(), pictures);
 		return ResponseEntity.ok().build();
 	}
 
