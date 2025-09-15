@@ -4,14 +4,12 @@ import lombok.Builder;
 
 @Builder
 public record PostImageAchievementEvent(
-	Long associateId,
-	Long postId
+	Long associateId
 ) {
 
-	public static PostImageAchievementEvent from(Long associateId, Long postId){
+	public static PostImageAchievementEvent from(Long associateId){
 		return PostImageAchievementEvent.builder()
 			.associateId(associateId)
-			.postId(postId)
 			.build();
 	}
 }

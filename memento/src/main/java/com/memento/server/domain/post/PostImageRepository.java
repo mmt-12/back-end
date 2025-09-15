@@ -51,6 +51,7 @@ public interface PostImageRepository extends JpaRepository<PostImage, Long> {
         SELECT COUNT(pi)
         FROM PostImage pi
         WHERE pi.post.associate.id = :associateId
+        AND pi.deletedAt IS NULL
     """)
 	int countByAssociateId(@Param("associateId") Long associateId);
 }

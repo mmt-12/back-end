@@ -151,7 +151,7 @@ public class PostService {
 		List<PostImage> images = saveImages(post, pictures);
 		postImageRepository.saveAll(images);
 
-		achievementEventPublisher.publishPostImageAchievement(PostImageAchievementEvent.from(associate.getId(), post.getId()));
+		achievementEventPublisher.publishPostImageAchievement(PostImageAchievementEvent.from(associate.getId()));
 	}
 
 	@Transactional
@@ -181,7 +181,7 @@ public class PostService {
 			postImageRepository.saveAll(newImages);
 		}
 
-		achievementEventPublisher.publishPostImageAchievement(PostImageAchievementEvent.from(associate.getId(), post.getId()));
+		achievementEventPublisher.publishPostImageAchievement(PostImageAchievementEvent.from(associate.getId()));
 	}
 
 	@Transactional
