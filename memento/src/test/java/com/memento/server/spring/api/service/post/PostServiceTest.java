@@ -313,6 +313,9 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
+		Associate associate2 = AssociateFixtures.associate(member, community);
+		associateRepository.save(associate2);
+
 		Event event = EventFixtures.event(community, associate);
 		eventRepository.save(event);
 
@@ -346,36 +349,50 @@ public class PostServiceTest extends IntegrationsTestSupport {
 			.build();
 
 		Comment comment3 = Comment.builder()
+			.associate(associate2)
+			.post(post1)
+			.url("emoji1.png")
+			.type(CommentType.EMOJI)
+			.build();
+
+		Comment comment4 = Comment.builder()
+			.associate(associate2)
+			.post(post1)
+			.url("emoji1.png")
+			.type(CommentType.EMOJI)
+			.build();
+
+		Comment comment5 = Comment.builder()
 			.associate(associate)
 			.post(post1)
 			.url("test.mp3")
 			.type(CommentType.VOICE)
 			.build();
 
-		commentRepository.saveAll(List.of(comment1, comment2, comment3));
+		commentRepository.saveAll(List.of(comment1, comment2, comment3, comment4, comment5));
 
-		Comment comment4 = Comment.builder()
+		Comment comment6 = Comment.builder()
 			.associate(associate)
 			.post(post2)
 			.url("emoji4.png")
 			.type(CommentType.EMOJI)
 			.build();
 
-		Comment comment5 = Comment.builder()
+		Comment comment7 = Comment.builder()
 			.associate(associate)
 			.post(post2)
 			.url("emoji5.png")
 			.type(CommentType.EMOJI)
 			.build();
 
-		Comment comment6 = Comment.builder()
+		Comment comment8 = Comment.builder()
 			.associate(associate)
 			.post(post2)
 			.url("test.mp3")
 			.type(CommentType.VOICE)
 			.build();
 
-		commentRepository.saveAll(List.of(comment4, comment5, comment6));
+		commentRepository.saveAll(List.of(comment6, comment7, comment8));
 
 		//when
 		SearchAllPostResponse response = postService.searchAll(community.getId(), memory.getId(), associate.getId(), 10, null);
@@ -386,6 +403,8 @@ public class PostServiceTest extends IntegrationsTestSupport {
 
 		SearchPostResponse firstPost = response.posts().getFirst();
 		assertThat(firstPost.content()).isEqualTo("content");
+
+		SearchPostResponse secondPost = response.posts().get(1);
 
 		// author 검증
 		assertThat(firstPost.author()).isNotNull();
@@ -399,11 +418,18 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		SearchPostResponse.Comment commentsDto = firstPost.comments();
 		assertThat(commentsDto).isNotNull();
 
+		SearchPostResponse.Comment commentsDto2 = secondPost.comments();
+
 		// EMOJI 순서 확인
 		List<com.memento.server.api.controller.post.dto.read.Emoji> emojis = commentsDto.getEmojis();
 		assertThat(emojis).hasSize(2);
 		assertThat(emojis.get(0).getUrl()).isEqualTo("emoji5.png");
 		assertThat(emojis.get(1).getUrl()).isEqualTo("emoji4.png");
+
+		List<com.memento.server.api.controller.post.dto.read.Emoji> emojis2 = commentsDto2.getEmojis();
+		assertThat(emojis2).hasSize(2);
+		assertThat(emojis2.get(0).getCount()).isEqualTo(3);
+		assertThat(emojis2.get(0).getUrl()).isEqualTo("emoji1.png");
 
 		// VOICE 순서 확인
 		List<com.memento.server.api.controller.post.dto.read.Voice> voices = commentsDto.getVoices();

@@ -2,6 +2,7 @@ package com.memento.server.api.service.post;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -236,9 +237,11 @@ public class PostService {
 					.url(url)
 					.name(dtoList.get(0).getName())
 					.authors(authors)
+					.count(dtoList.size())
 					.isInvolved(isInvolved)
 					.build();
 			})
+			.sorted(Comparator.comparing(Emoji::getCount).reversed())
 			.collect(Collectors.toList());
 
 		// Voice 변환
@@ -262,9 +265,11 @@ public class PostService {
 					.url(url)
 					.name(dtoList.get(0).getName())
 					.authors(authors)
+					.count(dtoList.size())
 					.isInvolved(isInvolved)
 					.build();
 			})
+			.sorted(Comparator.comparing(Voice::getCount).reversed())
 			.collect(Collectors.toList());
 
 		// TemporaryVoice 변환
@@ -286,8 +291,10 @@ public class PostService {
 					.url(url)
 					.name(dtoList.get(0).getName())
 					.authors(authors)
+					.count(dtoList.size())
 					.build();
 			})
+			.sorted(Comparator.comparing(TemporaryVoice::getCount).reversed())
 			.collect(Collectors.toList());
 
 		// === CommentResponse ===
