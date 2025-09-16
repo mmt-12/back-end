@@ -1,5 +1,7 @@
 package com.memento.server.api.service.post.dto;
 
+import java.time.LocalDateTime;
+
 import com.memento.server.domain.comment.CommentType;
 import com.memento.server.domain.community.Associate;
 
@@ -16,6 +18,7 @@ public class PostCommentDto {
 	private Associate associate;
 	private String url;
 	private CommentType type;
+	private LocalDateTime createdAt;
 	private String name;
 	private Boolean isTemporary;
 }

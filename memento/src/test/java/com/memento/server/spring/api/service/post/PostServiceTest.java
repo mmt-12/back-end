@@ -164,10 +164,13 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		assertThat(response.comments()).isNotNull();
 		// EMOJI, VOICE
 		assertThat(response.comments().getEmojis()).hasSize(1);
+		assertThat(response.comments().getEmojis().getFirst().getId()).isEqualTo(emoji.getId());
 		assertThat(response.comments().getEmojis().getFirst().getUrl()).isEqualTo(emoji.getUrl());
 		assertThat(response.comments().getEmojis().getFirst().getName()).isEqualTo(emoji.getName());
+		assertThat(response.comments().getEmojis().getFirst().getAuthors().getFirst().getCommentId()).isEqualTo(comment1.getId());
 		assertThat(response.comments().getVoices()).hasSize(1);
 		assertThat(response.comments().getVoices().getFirst().getName()).isEqualTo(voice.getName());
+		assertThat(response.comments().getVoices().getFirst().getAuthors().getFirst().getCommentId()).isEqualTo(comment2.getId());
 		assertThat(response.comments().getTemporaryVoices()).isEmpty();
 	}
 

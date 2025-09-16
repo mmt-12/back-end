@@ -18,6 +18,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             c.associate,
             c.url,
             c.type,
+            c.createdAt,
             case
                when c.type = com.memento.server.domain.comment.CommentType.VOICE then v.name
                when c.type = com.memento.server.domain.comment.CommentType.EMOJI then e.name
@@ -34,7 +35,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
            and c.type = com.memento.server.domain.comment.CommentType.EMOJI
         where c.post.id in :postIds
           and c.deletedAt is null
-        order by c.post.id, c.createdAt
+        order by c.post.id, c.id DESC, c.createdAt DESC
    """)
 	List<PostCommentDto> findPostCommentsByPostIds(
 		@Param("postIds") List<Long> postIds,
@@ -43,4 +44,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
 	List<Comment> findAllByPostIdAndDeletedAtNull(Long id);
 	Optional<Comment> findByIdAndDeletedAtIsNull(Long commentId);
+
+	int countByAssociateIdAndDeletedAtNull(Long associateId);
 }

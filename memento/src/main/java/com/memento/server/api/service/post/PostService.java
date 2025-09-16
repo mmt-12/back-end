@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
@@ -213,13 +214,15 @@ public class PostService {
 		// Emoji 변환
 		List<Emoji> emojis = comments.stream()
 			.filter(c -> c.getType() == CommentType.EMOJI)
-			.collect(Collectors.groupingBy(PostCommentDto::getUrl))
+			.collect(Collectors.groupingBy(PostCommentDto::getUrl,
+				LinkedHashMap::new,
+				Collectors.toList()))
 			.entrySet().stream()
 			.map(entry -> {
 				String url = entry.getKey();
 				List<PostCommentDto> dtoList = entry.getValue();
 				List<CommentAuthor> authors = dtoList.stream()
-					.map(dto -> CommentAuthor.from(dto.getAssociate()))
+					.map(CommentAuthor::from)
 					.toList();
 				boolean isInvolved = dtoList.stream()
 					.anyMatch(dto -> dto.getAssociate().getId().equals(associate.getId()));
@@ -237,13 +240,15 @@ public class PostService {
 		// Voice 변환
 		List<Voice> voices = comments.stream()
 			.filter(c -> c.getType() == CommentType.VOICE && !c.getIsTemporary())
-			.collect(Collectors.groupingBy(PostCommentDto::getUrl))
+			.collect(Collectors.groupingBy(PostCommentDto::getUrl,
+				LinkedHashMap::new,
+				Collectors.toList()))
 			.entrySet().stream()
 			.map(entry -> {
 				String url = entry.getKey();
 				List<PostCommentDto> dtoList = entry.getValue();
 				List<CommentAuthor> authors = dtoList.stream()
-					.map(dto -> CommentAuthor.from(dto.getAssociate()))
+					.map(CommentAuthor::from)
 					.toList();
 				boolean isInvolved = dtoList.stream()
 					.anyMatch(dto -> dto.getAssociate().getId().equals(associate.getId()));
@@ -261,13 +266,15 @@ public class PostService {
 		// TemporaryVoice 변환
 		List<TemporaryVoice> temporaryVoices = comments.stream()
 			.filter(c -> c.getType() == CommentType.VOICE && c.getIsTemporary())
-			.collect(Collectors.groupingBy(PostCommentDto::getUrl))
+			.collect(Collectors.groupingBy(PostCommentDto::getUrl,
+				LinkedHashMap::new,
+				Collectors.toList()))
 			.entrySet().stream()
 			.map(entry -> {
 				String url = entry.getKey();
 				List<PostCommentDto> dtoList = entry.getValue();
 				List<CommentAuthor> authors = dtoList.stream()
-					.map(dto -> CommentAuthor.from(dto.getAssociate()))
+					.map(CommentAuthor::from)
 					.toList();
 
 				return TemporaryVoice.builder()

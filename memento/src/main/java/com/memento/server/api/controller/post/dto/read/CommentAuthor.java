@@ -3,6 +3,7 @@ package com.memento.server.api.controller.post.dto.read;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.memento.server.api.service.post.dto.PostCommentDto;
 import com.memento.server.domain.community.Associate;
 
 import lombok.AllArgsConstructor;
@@ -18,11 +19,14 @@ public class CommentAuthor extends Author{
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	LocalDateTime createdAt;
 
-	public static CommentAuthor from(Associate associate) {
+	public static CommentAuthor from(PostCommentDto dto) {
+		Associate associate = dto.getAssociate();
 		return CommentAuthor.builder()
 			.id(associate.getId())
 			.nickname(associate.getNickname())
 			.imageUrl(associate.getProfileImageUrl())
+			.commentId(dto.getId())
+			.createdAt(dto.getCreatedAt())
 			.build();
 	}
 }
