@@ -19,6 +19,7 @@ public class PostCommentDto {
 	private String url;
 	private CommentType type;
 	private LocalDateTime createdAt;
+	private Long reactionId;
 	private String name;
 	private Boolean isTemporary;
 }

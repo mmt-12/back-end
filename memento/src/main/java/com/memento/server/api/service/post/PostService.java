@@ -232,7 +232,7 @@ public class PostService {
 					.anyMatch(dto -> dto.getAssociate().getId().equals(associate.getId()));
 
 				return Emoji.builder()
-					.id(dtoList.get(0).getId())
+					.id(dtoList.get(0).getReactionId())
 					.url(url)
 					.name(dtoList.get(0).getName())
 					.authors(authors)
@@ -258,7 +258,7 @@ public class PostService {
 					.anyMatch(dto -> dto.getAssociate().getId().equals(associate.getId()));
 
 				return Voice.builder()
-					.id(dtoList.get(0).getId())
+					.id(dtoList.get(0).getReactionId())
 					.url(url)
 					.name(dtoList.get(0).getName())
 					.authors(authors)
@@ -282,7 +282,7 @@ public class PostService {
 					.toList();
 
 				return TemporaryVoice.builder()
-					.id(dtoList.get(0).getId())
+					.id(dtoList.get(0).getReactionId())
 					.url(url)
 					.name(dtoList.get(0).getName())
 					.authors(authors)
