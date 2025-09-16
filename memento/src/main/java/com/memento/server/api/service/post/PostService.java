@@ -109,7 +109,11 @@ public class PostService {
 		Map<Long, List<PostCommentDto>> commentsByPostId = commentRepository
 			.findPostCommentsByPostIds(postIds, associate.getId())
 			.stream()
-			.collect(Collectors.groupingBy(PostCommentDto::getPostId));
+			.collect(Collectors.groupingBy(
+				PostCommentDto::getPostId,
+				LinkedHashMap::new,
+				Collectors.toList()
+			));
 
 		List<SearchPostResponse> responses = posts.stream().limit(size)
 			.map(post -> mapToSearchPostResponse(post, associate, imagesByPostId, commentsByPostId))
