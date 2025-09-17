@@ -7,8 +7,6 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.memento.server.api.service.notification.dto.request.NotificationListQueryRequest;
-import com.memento.server.api.service.notification.dto.response.NotificationResponse;
-import com.memento.server.api.service.notification.dto.response.QNotificationResponse;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -21,19 +19,9 @@ public class NotificationRepositoryImpl implements NotificationRepositoryCustom 
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public List<NotificationResponse> findNotificationsByAssociateWithCursor(NotificationListQueryRequest request) {
+	public List<Notification> findNotificationsByAssociateWithCursor(NotificationListQueryRequest request) {
 		return queryFactory
-			.select(new QNotificationResponse(
-				notification.id,
-				notification.title,
-				notification.content,
-				notification.isRead,
-				notification.type.stringValue(),
-				notification.actorId,
-				notification.memoryId,
-				notification.postId,
-				notification.createdAt
-			))
+			.select(new QNotification(notification))
 			.from(notification)
 			.where(
 				eqReceiverId(request.associateId()),

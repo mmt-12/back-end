@@ -9,6 +9,7 @@ import com.memento.server.api.service.notification.dto.request.NotificationListQ
 import com.memento.server.api.service.notification.dto.response.NotificationListResponse;
 import com.memento.server.api.service.notification.dto.response.NotificationResponse;
 import com.memento.server.api.service.notification.dto.response.NotificationUnreadResponse;
+import com.memento.server.domain.notification.Notification;
 import com.memento.server.domain.notification.NotificationRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,18 +21,24 @@ public class NotificationService {
 
 	private final NotificationRepository notificationRepository;
 
+	@Transactional
 	public NotificationListResponse getNotifications(NotificationListQueryRequest request) {
-		List<NotificationResponse> notifications = notificationRepository.findNotificationsByAssociateWithCursor(
-			request);
+		List<Notification> notifications = notificationRepository.findNotificationsByAssociateWithCursor(request);
 
 		boolean hasNext = notifications.size() > request.size();
 		if (hasNext) {
 			notifications = notifications.subList(0, request.size());
 		}
 
-		Long nextCursor = notifications.isEmpty() ? null : notifications.get(notifications.size() - 1).id();
+		Long nextCursor = notifications.isEmpty() ? null : notifications.getLast().getId();
 
-		return NotificationListResponse.of(notifications, nextCursor, hasNext);
+		notifications.stream().filter(notification -> !notification.getIsRead()).forEach(Notification::markAsRead);
+
+		List<NotificationResponse> notificationResponses = notifications.stream()
+			.map(NotificationResponse::from)
+			.toList();
+
+		return NotificationListResponse.of(notificationResponses, nextCursor, hasNext);
 	}
 
 	public NotificationUnreadResponse getUnread(Long associateId) {
