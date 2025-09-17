@@ -307,6 +307,7 @@ public class PostService {
 		// === 최종 Response ===
 		return SearchPostResponse.builder()
 			.id(post.getId())
+			.createdAt(post.getCreatedAt())
 			.author(PostAuthor.builder()
 				.id(post.getAssociate().getId())
 				.imageUrl(post.getAssociate().getProfileImageUrl())
