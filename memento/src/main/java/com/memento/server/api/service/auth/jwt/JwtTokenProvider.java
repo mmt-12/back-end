@@ -9,10 +9,7 @@ import org.springframework.stereotype.Component;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.IncorrectClaimException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.exceptions.MissingClaimException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.memento.server.utility.json.JsonMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -79,7 +76,7 @@ public class JwtTokenProvider {
 		}
 	}
 
-	public MemberClaim extractMemberClaim(String token) { // todo: 개선하기
+	public MemberClaim extractMemberClaim(String token) {
 		String payloadString = JWT.decode(token).getPayload();
 		String payload = new String(Base64.getUrlDecoder().decode(payloadString));
 		Map map = JsonMapper.readValue(payload, Map.class);
