@@ -2,10 +2,12 @@ package com.memento.server.api.service.post;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
@@ -108,7 +110,11 @@ public class PostService {
 		Map<Long, List<PostCommentDto>> commentsByPostId = commentRepository
 			.findPostCommentsByPostIds(postIds, associate.getId())
 			.stream()
-			.collect(Collectors.groupingBy(PostCommentDto::getPostId));
+			.collect(Collectors.groupingBy(
+				PostCommentDto::getPostId,
+				LinkedHashMap::new,
+				Collectors.toList()
+			));
 
 		List<SearchPostResponse> responses = posts.stream().limit(size)
 			.map(post -> mapToSearchPostResponse(post, associate, imagesByPostId, commentsByPostId))
@@ -213,70 +219,82 @@ public class PostService {
 		// Emoji 변환
 		List<Emoji> emojis = comments.stream()
 			.filter(c -> c.getType() == CommentType.EMOJI)
-			.collect(Collectors.groupingBy(PostCommentDto::getUrl))
+			.collect(Collectors.groupingBy(PostCommentDto::getUrl,
+				LinkedHashMap::new,
+				Collectors.toList()))
 			.entrySet().stream()
 			.map(entry -> {
 				String url = entry.getKey();
 				List<PostCommentDto> dtoList = entry.getValue();
 				List<CommentAuthor> authors = dtoList.stream()
-					.map(dto -> CommentAuthor.from(dto.getAssociate()))
+					.map(CommentAuthor::from)
 					.toList();
 				boolean isInvolved = dtoList.stream()
 					.anyMatch(dto -> dto.getAssociate().getId().equals(associate.getId()));
 
 				return Emoji.builder()
-					.id(dtoList.get(0).getId())
+					.id(dtoList.get(0).getReactionId())
 					.url(url)
 					.name(dtoList.get(0).getName())
 					.authors(authors)
+					.count(dtoList.size())
 					.isInvolved(isInvolved)
 					.build();
 			})
+			.sorted(Comparator.comparing(Emoji::getCount).reversed())
 			.collect(Collectors.toList());
 
 		// Voice 변환
 		List<Voice> voices = comments.stream()
 			.filter(c -> c.getType() == CommentType.VOICE && !c.getIsTemporary())
-			.collect(Collectors.groupingBy(PostCommentDto::getUrl))
+			.collect(Collectors.groupingBy(PostCommentDto::getUrl,
+				LinkedHashMap::new,
+				Collectors.toList()))
 			.entrySet().stream()
 			.map(entry -> {
 				String url = entry.getKey();
 				List<PostCommentDto> dtoList = entry.getValue();
 				List<CommentAuthor> authors = dtoList.stream()
-					.map(dto -> CommentAuthor.from(dto.getAssociate()))
+					.map(CommentAuthor::from)
 					.toList();
 				boolean isInvolved = dtoList.stream()
 					.anyMatch(dto -> dto.getAssociate().getId().equals(associate.getId()));
 
 				return Voice.builder()
-					.id(dtoList.get(0).getId())
+					.id(dtoList.get(0).getReactionId())
 					.url(url)
 					.name(dtoList.get(0).getName())
 					.authors(authors)
+					.count(dtoList.size())
 					.isInvolved(isInvolved)
 					.build();
 			})
+			.sorted(Comparator.comparing(Voice::getCount).reversed())
 			.collect(Collectors.toList());
 
 		// TemporaryVoice 변환
 		List<TemporaryVoice> temporaryVoices = comments.stream()
 			.filter(c -> c.getType() == CommentType.VOICE && c.getIsTemporary())
-			.collect(Collectors.groupingBy(PostCommentDto::getUrl))
+			.collect(Collectors.groupingBy(PostCommentDto::getUrl,
+				LinkedHashMap::new,
+				Collectors.toList()))
 			.entrySet().stream()
 			.map(entry -> {
 				String url = entry.getKey();
 				List<PostCommentDto> dtoList = entry.getValue();
 				List<CommentAuthor> authors = dtoList.stream()
-					.map(dto -> CommentAuthor.from(dto.getAssociate()))
+					.map(CommentAuthor::from)
 					.toList();
 
 				return TemporaryVoice.builder()
-					.id(dtoList.get(0).getId())
+					.id(dtoList.get(0).getReactionId())
 					.url(url)
 					.name(dtoList.get(0).getName())
 					.authors(authors)
+					.count(dtoList.size())
 					.build();
 			})
+			.sorted(Comparator.comparing(TemporaryVoice::getCount).reversed())
 			.collect(Collectors.toList());
 
 		// === CommentResponse ===

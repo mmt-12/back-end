@@ -16,4 +16,5 @@ public abstract class Reaction {
 	String url;
 	String name;
 	List<CommentAuthor> authors;
+	int count;
 }
