@@ -33,10 +33,12 @@ public class JwtFilter extends OncePerRequestFilter {
 	private final MemberClaimValidator memberClaimValidator;
 	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-	private static final List<String> WHITELIST = List.of(
+    private static final List<String> WHITELIST = List.of(
 		"/favicon.ico",
 		"/api/v1/sign-in",
 		"/api/v1/auth/redirect",
+		"/v1/sign-in",
+		"/v1/auth/redirect",
 		"/h2-console/**"
 	);
 
@@ -58,6 +60,13 @@ public class JwtFilter extends OncePerRequestFilter {
 		@NotNull HttpServletResponse response,
 		@NotNull FilterChain chain
 	) throws IOException, ServletException {
+		// Ensure whitelist passes through regardless of token state
+		String path = request.getRequestURI();
+		if (isWhitelisted(path)) {
+			chain.doFilter(request, response);
+			return;
+		}
+
 		String token = resolveToken(request);
 
 		if (!StringUtils.hasText(token) || !jwtTokenProvider.validateToken(token)) {
