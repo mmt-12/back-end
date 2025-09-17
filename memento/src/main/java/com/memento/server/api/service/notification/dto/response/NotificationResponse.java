@@ -35,9 +35,4 @@ public record NotificationResponse(
 			.createdAt(notification.getCreatedAt())
 			.build();
 	}
-
-	@QueryProjection
-	public NotificationResponse{
-
-	}
 }

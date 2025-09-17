@@ -62,16 +62,16 @@ class NotificationRepositoryTest extends IntegrationsTestSupport {
 		NotificationListQueryRequest request = NotificationListQueryRequest.of(fixtures.associate.getId(), null, 10);
 
 		// when
-		List<NotificationResponse> notifications = notificationRepository.findNotificationsByAssociateWithCursor(request);
+		List<Notification> notifications = notificationRepository.findNotificationsByAssociateWithCursor(request);
 
 		// then
 		assertThat(notifications).hasSize(3);
-		assertThat(notifications.get(0).title()).isEqualTo(savedNotification3.getTitle());
-		assertThat(notifications.get(1).title()).isEqualTo(savedNotification2.getTitle());
-		assertThat(notifications.get(2).title()).isEqualTo(savedNotification1.getTitle());
-		assertThat(notifications.get(0).isRead()).isFalse();
-		assertThat(notifications.get(1).isRead()).isTrue();
-		assertThat(notifications.get(2).isRead()).isFalse();
+		assertThat(notifications.get(0).getTitle()).isEqualTo(savedNotification3.getTitle());
+		assertThat(notifications.get(1).getTitle()).isEqualTo(savedNotification2.getTitle());
+		assertThat(notifications.get(2).getTitle()).isEqualTo(savedNotification1.getTitle());
+		assertThat(notifications.get(0).getIsRead()).isFalse();
+		assertThat(notifications.get(1).getIsRead()).isTrue();
+		assertThat(notifications.get(2).getIsRead()).isFalse();
 	}
 
 	@Test
@@ -92,12 +92,12 @@ class NotificationRepositoryTest extends IntegrationsTestSupport {
 			fixtures.associate.getId(), savedNotification2.getId(), 10);
 
 		// when
-		List<NotificationResponse> notifications = notificationRepository.findNotificationsByAssociateWithCursor(request);
+		List<Notification> notifications = notificationRepository.findNotificationsByAssociateWithCursor(request);
 
 		// then
 		assertThat(notifications).hasSize(1);
-		assertThat(notifications.get(0).title()).isEqualTo(savedNotification1.getTitle());
-		assertThat(notifications.get(0).id()).isEqualTo(savedNotification1.getId());
+		assertThat(notifications.getFirst().getTitle()).isEqualTo(savedNotification1.getTitle());
+		assertThat(notifications.getFirst().getId()).isEqualTo(savedNotification1.getId());
 	}
 
 	@Test
@@ -118,12 +118,12 @@ class NotificationRepositoryTest extends IntegrationsTestSupport {
 		NotificationListQueryRequest request = NotificationListQueryRequest.of(fixtures.associate.getId(), null, 10);
 
 		// when
-		List<NotificationResponse> notifications = notificationRepository.findNotificationsByAssociateWithCursor(request);
+		List<Notification> notifications = notificationRepository.findNotificationsByAssociateWithCursor(request);
 
 		// then
 		assertThat(notifications).hasSize(1);
-		assertThat(notifications.get(0).title()).isEqualTo(savedNotification1.getTitle());
-		assertThat(notifications.get(0).id()).isEqualTo(savedNotification1.getId());
+		assertThat(notifications.getFirst().getTitle()).isEqualTo(savedNotification1.getTitle());
+		assertThat(notifications.getFirst().getId()).isEqualTo(savedNotification1.getId());
 	}
 
 	@Test
@@ -134,7 +134,7 @@ class NotificationRepositoryTest extends IntegrationsTestSupport {
 		NotificationListQueryRequest request = NotificationListQueryRequest.of(fixtures.associate.getId(), null, 10);
 
 		// when
-		List<NotificationResponse> notifications = notificationRepository.findNotificationsByAssociateWithCursor(request);
+		List<Notification> notifications = notificationRepository.findNotificationsByAssociateWithCursor(request);
 
 		// then
 		assertThat(notifications).isEmpty();
@@ -214,11 +214,11 @@ class NotificationRepositoryTest extends IntegrationsTestSupport {
 		NotificationListQueryRequest request = NotificationListQueryRequest.of(fixtures1.associate.getId(), null, 10);
 
 		// when
-		List<NotificationResponse> notifications = notificationRepository.findNotificationsByAssociateWithCursor(request);
+		List<Notification> notifications = notificationRepository.findNotificationsByAssociateWithCursor(request);
 
 		// then
 		assertThat(notifications).hasSize(1);
-		assertThat(notifications.get(0).title()).isEqualTo(notification1.getTitle());
+		assertThat(notifications.getFirst().getTitle()).isEqualTo(notification1.getTitle());
 	}
 
 	@Test
