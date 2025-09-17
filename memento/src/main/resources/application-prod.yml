@@ -45,7 +45,7 @@ minio:
 kakao:
   client-id: ${KAKAO_CLIENT_ID}
   client-secret: ${KAKAO_CLIENT_SECRET}
-  redirect-uri: http://localhost:3000/landing
+  redirect-uri: http://memento.ai.kr/landing
   kauth-host: https://kauth.kakao.com
   kapi-host: https://kapi.kakao.com
 
