@@ -70,7 +70,7 @@ public class JwtTokenProvider {
 
 	public boolean validateToken(String token) {
 		try {
-			JWTVerifier verifier = JWT.require(Algorithm.HMAC512(jwtProperties.secret())).build();
+			JWTVerifier verifier = JWT.require(Algorithm.HMAC512(jwtProperties.secret())).acceptLeeway(5).build();
 			verifier.verify(token);
 			return true;
 		} catch (JWTVerificationException e) {

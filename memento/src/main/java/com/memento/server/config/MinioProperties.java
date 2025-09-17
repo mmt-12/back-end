@@ -14,6 +14,7 @@ import lombok.Setter;
 @ConfigurationProperties(prefix = "minio")
 public class MinioProperties {
 	private String url;
+	private String publicUrl;
 	private String accessKey;
 	private String secretKey;
 	private Map<String, String> buckets;

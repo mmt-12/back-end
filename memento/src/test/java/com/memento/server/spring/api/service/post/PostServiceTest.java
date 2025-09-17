@@ -164,10 +164,13 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		assertThat(response.comments()).isNotNull();
 		// EMOJI, VOICE
 		assertThat(response.comments().getEmojis()).hasSize(1);
+		assertThat(response.comments().getEmojis().getFirst().getId()).isEqualTo(emoji.getId());
 		assertThat(response.comments().getEmojis().getFirst().getUrl()).isEqualTo(emoji.getUrl());
 		assertThat(response.comments().getEmojis().getFirst().getName()).isEqualTo(emoji.getName());
+		assertThat(response.comments().getEmojis().getFirst().getAuthors().getFirst().getCommentId()).isEqualTo(comment1.getId());
 		assertThat(response.comments().getVoices()).hasSize(1);
 		assertThat(response.comments().getVoices().getFirst().getName()).isEqualTo(voice.getName());
+		assertThat(response.comments().getVoices().getFirst().getAuthors().getFirst().getCommentId()).isEqualTo(comment2.getId());
 		assertThat(response.comments().getTemporaryVoices()).isEmpty();
 	}
 
@@ -296,6 +299,147 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		assertThat(response.posts().getFirst().comments().getVoices()).hasSize(1);
 		assertThat(response.posts().getFirst().comments().getTemporaryVoices()).isEmpty();
 	}
+
+	@Test
+	@DisplayName("포스트 목록 조회 - 정렬 확인")
+	void searchAllSortedTest() {
+		//given
+		Member member = MemberFixtures.member();
+		memberRepository.save(member);
+
+		Community community = CommunityFixtures.community(member);
+		communityRepository.save(community);
+
+		Associate associate = AssociateFixtures.associate(member, community);
+		associateRepository.save(associate);
+
+		Associate associate2 = AssociateFixtures.associate(member, community);
+		associateRepository.save(associate2);
+
+		Event event = EventFixtures.event(community, associate);
+		eventRepository.save(event);
+
+		Memory memory = MemoryFixtures.memory(event);
+		memoryRepository.save(memory);
+
+		Post post1 = PostFixtures.post(memory, associate);
+		postRepository.save(post1);
+
+		Post post2 = PostFixtures.post(memory, associate);
+		postRepository.save(post2);
+
+		Voice voice = VoiceFixtures.permanentVoice("test", "test.mp3", associate);
+		voiceRepository.save(voice);
+
+		Emoji emoji = EmojiFixtures.emoji();
+		emojiRepository.save(emoji);
+
+		Comment comment1 = Comment.builder()
+			.associate(associate)
+			.post(post1)
+			.url("emoji1.png")
+			.type(CommentType.EMOJI)
+			.build();
+
+		Comment comment2 = Comment.builder()
+			.associate(associate)
+			.post(post1)
+			.url("emoji2.png")
+			.type(CommentType.EMOJI)
+			.build();
+
+		Comment comment3 = Comment.builder()
+			.associate(associate2)
+			.post(post1)
+			.url("emoji1.png")
+			.type(CommentType.EMOJI)
+			.build();
+
+		Comment comment4 = Comment.builder()
+			.associate(associate2)
+			.post(post1)
+			.url("emoji1.png")
+			.type(CommentType.EMOJI)
+			.build();
+
+		Comment comment5 = Comment.builder()
+			.associate(associate)
+			.post(post1)
+			.url("test.mp3")
+			.type(CommentType.VOICE)
+			.build();
+
+		commentRepository.saveAll(List.of(comment1, comment2, comment3, comment4, comment5));
+
+		Comment comment6 = Comment.builder()
+			.associate(associate)
+			.post(post2)
+			.url("emoji4.png")
+			.type(CommentType.EMOJI)
+			.build();
+
+		Comment comment7 = Comment.builder()
+			.associate(associate)
+			.post(post2)
+			.url("emoji5.png")
+			.type(CommentType.EMOJI)
+			.build();
+
+		Comment comment8 = Comment.builder()
+			.associate(associate)
+			.post(post2)
+			.url("test.mp3")
+			.type(CommentType.VOICE)
+			.build();
+
+		commentRepository.saveAll(List.of(comment6, comment7, comment8));
+
+		//when
+		SearchAllPostResponse response = postService.searchAll(community.getId(), memory.getId(), associate.getId(), 10, null);
+
+		//then
+		assertThat(response.nextCursor()).isNull();
+		assertThat(response.hasNext()).isFalse();
+
+		SearchPostResponse firstPost = response.posts().getFirst();
+		assertThat(firstPost.content()).isEqualTo("content");
+
+		SearchPostResponse secondPost = response.posts().get(1);
+
+		// author 검증
+		assertThat(firstPost.author()).isNotNull();
+		assertThat(firstPost.author().getId()).isEqualTo(associate.getId());
+
+		// pictures 검증
+		assertThat(firstPost.pictures()).isNotNull();
+		assertThat(firstPost.pictures()).isEmpty();
+
+		// comments 검증
+		SearchPostResponse.Comment commentsDto = firstPost.comments();
+		assertThat(commentsDto).isNotNull();
+
+		SearchPostResponse.Comment commentsDto2 = secondPost.comments();
+
+		// EMOJI 순서 확인
+		List<com.memento.server.api.controller.post.dto.read.Emoji> emojis = commentsDto.getEmojis();
+		assertThat(emojis).hasSize(2);
+		assertThat(emojis.get(0).getUrl()).isEqualTo("emoji5.png");
+		assertThat(emojis.get(1).getUrl()).isEqualTo("emoji4.png");
+
+		List<com.memento.server.api.controller.post.dto.read.Emoji> emojis2 = commentsDto2.getEmojis();
+		assertThat(emojis2).hasSize(2);
+		assertThat(emojis2.get(0).getCount()).isEqualTo(3);
+		assertThat(emojis2.get(0).getUrl()).isEqualTo("emoji1.png");
+
+		// VOICE 순서 확인
+		List<com.memento.server.api.controller.post.dto.read.Voice> voices = commentsDto.getVoices();
+		assertThat(voices).hasSize(1);
+		assertThat(voices.get(0).getUrl()).isEqualTo("test.mp3");
+
+		// 임시 음성
+		assertThat(commentsDto.getTemporaryVoices()).isEmpty();
+	}
+
 
 	@Test
 	@DisplayName("포스트 목록 조회 페이지네이션")

@@ -496,9 +496,9 @@ INSERT INTO comments (id, url, `type`, post_id, associate_id, created_at, modifi
 (7,  'https://picsum.photos/seed/emoji_camera/128/128',   'EMOJI', 26, 6,  NOW(6), NULL, NULL),  -- m12
 (8,  'https://picsum.photos/seed/emoji_chicken/128/128',  'EMOJI', 29, 1,  NOW(6), NULL, NULL),  -- on existing memory 2
 -- VOICE comments
-(9,  'https://github.com/user-attachments/files/22308691/medieval-gamer-voice-darkness-hunts-us-what-youx27ve-learned-stay-226596.mp3','VOICE', 15, 11, NOW(6), NULL, NULL),
-(10, 'https://github.com/user-attachments/files/22308694/well-done-cartoon-voice-32459.mp3',  'VOICE', 19, 6,  NOW(6), NULL, NULL),
-(11, 'https://github.com/user-attachments/files/22308690/wow-female-voice-156878.mp3',  'VOICE', 20, 10, NOW(6), NULL, NULL);
+(9,  'https://github.com/user-attachments/files/22308696/alien-voice-sfx-005-297914.mp3','VOICE', 15, 11, NOW(6), NULL, NULL),
+(10, 'https://github.com/user-attachments/files/22308693/annoyed-female-disgust-voice-352713.mp3',  'VOICE', 19, 6,  NOW(6), NULL, NULL),
+(11, 'https://github.com/user-attachments/files/22308697/game-over-deep-male-voice-clip-352695.mp3',  'VOICE', 20, 10, NOW(6), NULL, NULL);
 
 -- =====================================================
 -- Guest books (TEXT / EMOJI / VOICE)
