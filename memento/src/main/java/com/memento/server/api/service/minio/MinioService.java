@@ -45,7 +45,7 @@ public class MinioService {
 				);
 			}
 
-			return minioProperties.getUrl() + "/" + bucket + "/" + filename;
+			return minioProperties.getPublicUrl() + "/" + bucket + "/" + filename;
 		} catch (Exception e) {
 			throw new MementoException(MINIO_EXCEPTION);
 		}
@@ -53,7 +53,7 @@ public class MinioService {
 
 	public void removeFile(String url) {
 		try {
-			String baseUrl = minioProperties.getUrl() + "/";
+			String baseUrl = minioProperties.getPublicUrl() + "/";
 			String pathAfterUrl = url.substring(baseUrl.length());
 			String[] parts = pathAfterUrl.split("/", 2);
 			String bucket = parts[0];

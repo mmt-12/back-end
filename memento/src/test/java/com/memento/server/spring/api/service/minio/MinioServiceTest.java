@@ -47,16 +47,16 @@ public class MinioServiceTest {
 		MultipartFile file = new MockMultipartFile("test", "test.jpg", "image/jpeg", "test content".getBytes());
 		FileType fileType = POST;
 		String bucketName = "post-bucket";
-		String minioUrl = "http://localhost:9000";
+		String publicUrl = "http://localhost:9000";
 
 		given(minioProperties.getBucketName(fileType)).willReturn(bucketName);
-		given(minioProperties.getUrl()).willReturn(minioUrl);
+		given(minioProperties.getPublicUrl()).willReturn(publicUrl);
 
 		// when
 		String result = minioService.createFile(file, fileType);
 
 		// then
-		assertThat(result).startsWith(minioUrl + "/" + bucketName + "/");
+		assertThat(result).startsWith(publicUrl + "/" + bucketName + "/");
 		assertThat(result).endsWith(".jpg");
 		verify(minioClient).putObject(any(PutObjectArgs.class));
 	}
@@ -83,13 +83,12 @@ public class MinioServiceTest {
 	@DisplayName("파일을 삭제한다.")
 	void removeFile() throws Exception {
 		// given
-		String minioUrl = "http://localhost:9000";
+		String publicUrl = "http://localhost:9000";
 		String bucketName = "post-bucket";
 		String filename = "test-file.jpg";
-		String url = minioUrl + "/" + bucketName + "/" + filename;
+		String url = publicUrl + "/" + bucketName + "/" + filename;
 		
-		given(minioProperties.getUrl()).willReturn(minioUrl);
-		
+		given(minioProperties.getPublicUrl()).willReturn(publicUrl);
 		// when
 		minioService.removeFile(url);
 		
@@ -101,12 +100,12 @@ public class MinioServiceTest {
 	@DisplayName("파일 삭제 중 예외 발생 시 MementoException을 던진다.")
 	void removeFileThrowsException() throws Exception {
 		// given
-		String minioUrl = "http://localhost:9000";
+		String publicUrl = "http://localhost:9000";
 		String bucketName = "voice-bucket";
 		String filename = "test-voice.wav";
-		String url = minioUrl + "/" + bucketName + "/" + filename;
+		String url = publicUrl + "/" + bucketName + "/" + filename;
 		
-		given(minioProperties.getUrl()).willReturn(minioUrl);
+		given(minioProperties.getPublicUrl()).willReturn(publicUrl);
 		doThrow(new RuntimeException("MinIO error")).when(minioClient).removeObject(any(RemoveObjectArgs.class));
 		
 		// when & then
