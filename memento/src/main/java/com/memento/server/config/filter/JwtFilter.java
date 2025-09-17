@@ -69,7 +69,7 @@ public class JwtFilter extends OncePerRequestFilter {
 		MemberClaim memberClaim = jwtTokenProvider.extractMemberClaim(token);
 		if (!memberClaimValidator.isValid(memberClaim)) {
 			SecurityContextHolder.clearContext();
-			response.sendError(SC_UNAUTHORIZED, "토큰이 없거나 검증에 실패했습니다.");
+			response.sendError(SC_UNAUTHORIZED, "MemberClaim 검증에 실패했습니다.");
 			return;
 		}
 
