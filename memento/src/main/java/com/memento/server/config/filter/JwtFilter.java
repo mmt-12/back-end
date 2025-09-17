@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtFilter extends OncePerRequestFilter {
 
 	private final JwtTokenProvider jwtTokenProvider;
+	private final MemberClaimValidator memberClaimValidator;
 	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
 	private static final List<String> WHITELIST = List.of(
@@ -66,6 +67,12 @@ public class JwtFilter extends OncePerRequestFilter {
 		}
 
 		MemberClaim memberClaim = jwtTokenProvider.extractMemberClaim(token);
+		if (!memberClaimValidator.isValid(memberClaim)) {
+			SecurityContextHolder.clearContext();
+			response.sendError(SC_UNAUTHORIZED, "토큰이 없거나 검증에 실패했습니다.");
+			return;
+		}
+
 		MemberPrincipal memberPrincipal = new MemberPrincipal(memberClaim.memberId(), memberClaim.associateId(),
 			memberClaim.communityId());
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

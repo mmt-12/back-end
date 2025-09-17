@@ -37,7 +37,11 @@ import com.memento.server.api.service.post.PostService;
 import com.memento.server.api.service.profileImage.ProfileImageService;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.common.validator.FileValidator;
+import com.memento.server.config.filter.MemberClaimValidator;
 import com.memento.server.spring.config.TestSecurityConfig;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @WebMvcTest({
 	VoiceController.class,
@@ -105,7 +109,11 @@ public abstract class ControllerTestSupport {
 	@MockitoBean
 	protected FileValidator fileValidator;
 
+	@MockitoBean
+	protected MemberClaimValidator memberClaimValidator;
+
 	protected RequestPostProcessor withJwt(Long memberId, Long associateId, Long communityId) {
+		when(memberClaimValidator.isValid(any())).thenReturn(true);
 		String token = createTestToken(memberId, associateId, communityId);
 		return request -> {
 			request.addHeader("Authorization", "Bearer " + token);
@@ -114,9 +122,9 @@ public abstract class ControllerTestSupport {
 	}
 
 	protected RequestPostProcessor withInvalidJwt() {
+		String token = createTestToken(1L, 1L, 1L);
 		return request -> {
-			request.addHeader("Authorization", "Bearer "
-				+ "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30");
+			request.addHeader("Authorization", "Bearer " + token);
 			return request;
 		};
 	}
