@@ -134,6 +134,7 @@ public abstract class ControllerTestSupport {
 			.memberId(memberId)
 			.associateId(associateId)
 			.communityId(communityId)
+			.isMember(true)
 			.build();
 
 		return jwtTokenProvider.createToken(claim).accessToken();

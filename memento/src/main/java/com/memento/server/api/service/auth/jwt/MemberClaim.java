@@ -9,19 +9,15 @@ import lombok.Builder;
 public record MemberClaim(
 	Long memberId,
 	Long associateId,
-	Long communityId
+	Long communityId,
+	Boolean isMember
 ) {
-	public static MemberClaim from(Member member) {
-		return MemberClaim.builder()
-			.memberId(member.getId())
-			.build();
-	}
-
 	public static MemberClaim from(Member member, Associate associate) {
 		return MemberClaim.builder()
 			.memberId(member.getId())
 			.associateId(associate.getId())
 			.communityId(associate.getCommunity().getId())
+			.isMember(true)
 			.build();
 	}
 }
