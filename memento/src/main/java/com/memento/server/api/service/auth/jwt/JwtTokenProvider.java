@@ -30,6 +30,7 @@ public class JwtTokenProvider {
 			.withClaim("memberId", memberClaim.memberId())
 			.withClaim("associateId", memberClaim.associateId())
 			.withClaim("communityId", memberClaim.communityId())
+			.withClaim("isMember", memberClaim.isMember())
 			.withExpiresAt(accessTokenExpiresAt)
 			.sign(Algorithm.HMAC512(jwtProperties.secret()));
 
@@ -49,6 +50,7 @@ public class JwtTokenProvider {
 			.withClaim("memberId", memberClaim.memberId())
 			.withClaim("associateId", memberClaim.associateId())
 			.withClaim("communityId", memberClaim.communityId())
+			.withClaim("isMember", memberClaim.isMember())
 			.withExpiresAt(accessTokenExpiresAt)
 			.sign(Algorithm.HMAC512(jwtProperties.secret()));
 
@@ -84,6 +86,7 @@ public class JwtTokenProvider {
 			.memberId(map.get("memberId") != null ? ((Number)map.get("memberId")).longValue() : null)
 			.associateId(map.get("associateId") != null ? ((Number)map.get("associateId")).longValue() : null)
 			.communityId(map.get("communityId") != null ? ((Number)map.get("communityId")).longValue() : null)
+			.isMember((Boolean) map.get("isMember"))
 			.build();
 	}
 }
