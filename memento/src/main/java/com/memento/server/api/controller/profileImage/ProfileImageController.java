@@ -70,6 +70,7 @@ public class ProfileImageController {
 	@GetMapping()
 	public ResponseEntity<SearchProfileImageResponse> search(
 		@CommunityId Long currentCommunityId,
+		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long associateId,
 		@RequestParam(required = false, defaultValue = "10") int size,
@@ -78,6 +79,6 @@ public class ProfileImageController {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
-		return ResponseEntity.ok(profileImageService.search(communityId, associateId, size, cursor));
+		return ResponseEntity.ok(profileImageService.search(communityId, associateId, currentAssociateId, size, cursor));
 	}
 }

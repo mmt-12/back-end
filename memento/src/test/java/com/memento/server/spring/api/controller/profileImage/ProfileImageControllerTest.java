@@ -219,7 +219,7 @@ public class ProfileImageControllerTest extends ControllerTestSupport {
 			.hasNext(false)
 			.build();
 
-		when(profileImageService.search(anyLong(), anyLong(), anyInt(), anyLong())).thenReturn(response);
+		when(profileImageService.search(anyLong(), anyLong(), anyLong(), anyInt(), anyLong())).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(
@@ -252,7 +252,7 @@ public class ProfileImageControllerTest extends ControllerTestSupport {
 			.hasNext(false)
 			.build();
 
-		when(profileImageService.search(anyLong(), anyLong(),anyInt(), anyLong())).thenReturn(response);
+		when(profileImageService.search(anyLong(), anyLong(), anyLong(), anyInt(), anyLong())).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(
