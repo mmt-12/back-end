@@ -57,6 +57,7 @@ public class AuthService {
 					.memberId(member.getId())
 					.communityId(associate.getCommunity().getId())
 					.associateId(associate.getId())
+					.isMember(true)
 					.build();
 				JwtToken token = jwtTokenProvider.createToken(memberClaim);
 
@@ -72,6 +73,7 @@ public class AuthService {
 			.orElseGet(() -> {
 				MemberClaim memberClaim = MemberClaim.builder()
 					.memberId(kakaoId)
+					.isMember(false)
 					.build();
 				JwtToken token = jwtTokenProvider.createTempToken(memberClaim);
 

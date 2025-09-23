@@ -343,6 +343,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("posts[].comments.emojis[].url").type(STRING).description("이모지 경로"),
 					fieldWithPath("posts[].comments.emojis[].name").type(STRING).description("이모지 이름"),
 					fieldWithPath("posts[].comments.emojis[].involved").type(BOOLEAN).description("이모지 등록 여부"),
+					fieldWithPath("posts[].comments.emojis[].count").type(NUMBER).description("이모지 공감 갯수"),
 					fieldWithPath("posts[].comments.emojis[].authors").type(ARRAY).description("이모지 등록자 목록"),
 					fieldWithPath("posts[].comments.emojis[].authors[].commentId").type(NUMBER).description("이미지 댓글 아이디"),
 					fieldWithPath("posts[].comments.emojis[].authors[].id").type(NUMBER).description("이모지 등록자 아이디"),
@@ -363,6 +364,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("posts[].comments.voices[].url").type(STRING).description("보이스 경로"),
 					fieldWithPath("posts[].comments.voices[].name").type(STRING).description("보이스 이름"),
 					fieldWithPath("posts[].comments.voices[].involved").type(BOOLEAN).description("보이스 등록 여부"),
+					fieldWithPath("posts[].comments.voices[].count").type(NUMBER).description("보이스 공감 갯수"),
 					fieldWithPath("posts[].comments.voices[].authors").type(ARRAY).description("보이스 등록자 목록"),
 					fieldWithPath("posts[].comments.voices[].authors[].commentId").type(NUMBER).description("보이스 댓글 아이디"),
 					fieldWithPath("posts[].comments.voices[].authors[].id").type(NUMBER).description("보이스 등록자 아이디"),
@@ -382,6 +384,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("posts[].comments.temporaryVoices[].id").type(NUMBER).description("버블 아이디"),
 					fieldWithPath("posts[].comments.temporaryVoices[].url").type(STRING).description("버블 경로"),
 					fieldWithPath("posts[].comments.temporaryVoices[].name").type(STRING).description("버블 이름"),
+					fieldWithPath("posts[].comments.temporaryVoices[].count").type(NUMBER).description("버블 공감 갯수"),
 					fieldWithPath("posts[].comments.temporaryVoices[].authors").type(ARRAY).description("버블 등록자 목록"),
 					fieldWithPath("posts[].comments.temporaryVoices[].authors[].commentId").type(NUMBER).description("버블 댓글 아이디"),
 					fieldWithPath("posts[].comments.temporaryVoices[].authors[].id").type(NUMBER)

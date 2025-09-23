@@ -120,12 +120,12 @@ public class ProfileImageServiceTest extends IntegrationsTestSupport {
 		Long cursor = null;
 
 		// when
-		SearchProfileImageResponse response = profileImageService.search(community.getId(), associate.getId(), 10, cursor);
+		SearchProfileImageResponse response = profileImageService.search(community.getId(), associate.getId(), registrant.getId(), 10, cursor);
 
 		//then
 		assertThat(response.profileImages().size()).isEqualTo(2);
 		assertThat(response.profileImages().getFirst().getUrl()).isEqualTo("test2.png");
-		assertThat(response.profileImages().getFirst().isRegister()).isFalse();
+		assertThat(response.profileImages().getFirst().isRegister()).isTrue();
 		assertThat(response.hasNext()).isFalse();
 		assertThat(response.nextCursor()).isNull();
 	}
@@ -163,7 +163,7 @@ public class ProfileImageServiceTest extends IntegrationsTestSupport {
 		Long cursor = null;
 
 		// when
-		SearchProfileImageResponse response = profileImageService.search(community.getId(), associate.getId(), 1, cursor);
+		SearchProfileImageResponse response = profileImageService.search(community.getId(), associate.getId(), registrant.getId(),1, cursor);
 
 		//then
 		assertThat(response.nextCursor()).isEqualTo(profileImage1.getId());

@@ -77,8 +77,9 @@ public class ProfileImageService {
 		profileImage.markDeleted();
 	}
 
-	public SearchProfileImageResponse search(Long communityId, Long associateId, int size, Long cursor) {
+	public SearchProfileImageResponse search(Long communityId, Long associateId, Long currentAssociateId, int size, Long cursor) {
 		Associate associate = validAssociate(communityId, associateId);
+		Associate currentAssociate = validAssociate(communityId, currentAssociateId);
 
 		Pageable pageable = PageRequest.of(0, size+1);
 
@@ -95,7 +96,7 @@ public class ProfileImageService {
 			.map(p -> SearchProfileImageResponse.ProfileImage.builder()
 				.id(p.getId())
 				.url(p.getUrl())
-				.isRegister(Objects.equals(p.getRegistrant().getId(), associate.getId()))
+				.isRegister(Objects.equals(p.getRegistrant().getId(), currentAssociate.getId()))
 				.build())
 			.toList();
 

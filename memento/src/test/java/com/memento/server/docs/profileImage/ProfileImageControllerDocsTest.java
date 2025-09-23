@@ -130,7 +130,7 @@ public class ProfileImageControllerDocsTest extends RestDocsSupport {
 			.hasNext(false)
 			.build();
 
-		when(profileImageService.search(anyLong(), anyLong(), anyInt(), anyLong())).thenReturn(response);
+		when(profileImageService.search(anyLong(), anyLong(), anyLong(), anyInt(), anyLong())).thenReturn(response);
 
 		// when & then
 		mockMvc.perform(

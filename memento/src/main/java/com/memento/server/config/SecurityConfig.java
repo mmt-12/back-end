@@ -54,7 +54,9 @@ public class SecurityConfig {
 			.authorizeHttpRequests(authorize -> authorize
 				// .requestMatchers(PathRequest.toH2Console()).permitAll()
 				.requestMatchers("/favicon.ico").permitAll()
-				.requestMatchers("/api/v1/sign-in", "/api/v1/auth/redirect").permitAll()
+				// OAuth callback/entry must be public (cover legacy /v1 and /api/v1)
+				.requestMatchers("/api/v1/sign-in", "/api/v1/auth/redirect",
+					"/v1/sign-in", "/v1/auth/redirect").permitAll()
 				.requestMatchers("/error").permitAll()
 				.anyRequest().authenticated())
 			.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

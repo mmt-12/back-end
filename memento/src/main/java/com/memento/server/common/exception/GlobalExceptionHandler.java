@@ -6,6 +6,8 @@ import static org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -111,5 +113,14 @@ public class GlobalExceptionHandler {
 		log.error("Unhandled Exception 발생: {}", e.getMessage(), e);
 		return ResponseEntity.internalServerError()
 			.body(ErrorResponse.of(INTERNAL_SERVER_ERROR));
+	}
+
+	@ExceptionHandler({HttpClientErrorException.class, RestClientResponseException.class})
+	public ResponseEntity<ErrorResponse> handleRestClientErrors(RestClientResponseException e) {
+		// 카카오 토큰 교환 등 외부 API 4xx 오류를 적절히 매핑하여 500으로 포장되지 않게 함
+		String body = e.getResponseBodyAsString();
+		log.warn("External API client error: status={}, body={}", e.getStatusCode(), body);
+		// Kakao invalid_grant(code 재사용/만료) 등은 400으로 내려 사용자 재시도를 유도
+		return ResponseEntity.badRequest().body(ErrorResponse.of(INVALID_INPUT_VALUE));
 	}
 }
