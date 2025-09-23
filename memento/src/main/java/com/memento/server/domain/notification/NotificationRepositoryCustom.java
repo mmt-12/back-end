@@ -7,7 +7,7 @@ import com.memento.server.api.service.notification.dto.response.NotificationResp
 
 public interface NotificationRepositoryCustom {
 
-	List<NotificationResponse> findNotificationsByAssociateWithCursor(NotificationListQueryRequest request);
+	List<Notification> findNotificationsByAssociateWithCursor(NotificationListQueryRequest request);
 	
 	int countUnreadNotificationsByAssociate(Long associateId);
 }

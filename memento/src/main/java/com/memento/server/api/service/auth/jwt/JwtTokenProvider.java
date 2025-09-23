@@ -9,10 +9,7 @@ import org.springframework.stereotype.Component;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.IncorrectClaimException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.exceptions.MissingClaimException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.memento.server.utility.json.JsonMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -33,6 +30,7 @@ public class JwtTokenProvider {
 			.withClaim("memberId", memberClaim.memberId())
 			.withClaim("associateId", memberClaim.associateId())
 			.withClaim("communityId", memberClaim.communityId())
+			.withClaim("isMember", memberClaim.isMember())
 			.withExpiresAt(accessTokenExpiresAt)
 			.sign(Algorithm.HMAC512(jwtProperties.secret()));
 
@@ -52,6 +50,7 @@ public class JwtTokenProvider {
 			.withClaim("memberId", memberClaim.memberId())
 			.withClaim("associateId", memberClaim.associateId())
 			.withClaim("communityId", memberClaim.communityId())
+			.withClaim("isMember", memberClaim.isMember())
 			.withExpiresAt(accessTokenExpiresAt)
 			.sign(Algorithm.HMAC512(jwtProperties.secret()));
 
@@ -70,7 +69,7 @@ public class JwtTokenProvider {
 
 	public boolean validateToken(String token) {
 		try {
-			JWTVerifier verifier = JWT.require(Algorithm.HMAC512(jwtProperties.secret())).build();
+			JWTVerifier verifier = JWT.require(Algorithm.HMAC512(jwtProperties.secret())).acceptLeeway(5).build();
 			verifier.verify(token);
 			return true;
 		} catch (JWTVerificationException e) {
@@ -79,7 +78,7 @@ public class JwtTokenProvider {
 		}
 	}
 
-	public MemberClaim extractMemberClaim(String token) { // todo: 개선하기
+	public MemberClaim extractMemberClaim(String token) {
 		String payloadString = JWT.decode(token).getPayload();
 		String payload = new String(Base64.getUrlDecoder().decode(payloadString));
 		Map map = JsonMapper.readValue(payload, Map.class);
@@ -87,6 +86,7 @@ public class JwtTokenProvider {
 			.memberId(map.get("memberId") != null ? ((Number)map.get("memberId")).longValue() : null)
 			.associateId(map.get("associateId") != null ? ((Number)map.get("associateId")).longValue() : null)
 			.communityId(map.get("communityId") != null ? ((Number)map.get("communityId")).longValue() : null)
+			.isMember((Boolean) map.get("isMember"))
 			.build();
 	}
 }

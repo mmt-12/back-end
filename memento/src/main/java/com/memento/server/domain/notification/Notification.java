@@ -65,4 +65,8 @@ public class Notification extends BaseEntity {
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "receiver_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Associate receiver;
+
+	public void markAsRead() {
+		this.isRead = true;
+	}
 }
