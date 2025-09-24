@@ -47,7 +47,7 @@ public class AchievementController {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
-		achievementService.create(currentAssociateId, request.achievementId());
+		achievementService.create(currentAssociateId, request.content());
 		return ResponseEntity.ok().build();
 	}
 }

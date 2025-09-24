@@ -58,7 +58,13 @@ public class AchievementService {
 			.build();
 	}
 
-	public void create(Long associateId, Long achievementId) {
-		achievementEventPublisher.publishCommonAchievement(CommonAchievementEvent.from(associateId, achievementId));
+	public void create(Long associateId, String content) {
+		switch (content){
+			case "HOME":
+				achievementEventPublisher.publishCommonAchievement(CommonAchievementEvent.from(associateId, 15L));
+				break;
+			default:
+				throw new MementoException(ErrorCodes.ACHIEVEMENT_NOT_EXISTENCE);
+		}
 	}
 }

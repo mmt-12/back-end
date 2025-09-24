@@ -4,6 +4,6 @@ import lombok.Builder;
 
 @Builder
 public record CreateAchievementRequest(
-	Long achievementId
+	String content
 ) {
 }

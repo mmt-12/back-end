@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
 import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
+import com.memento.server.api.service.achievement.AchievementService;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
 import com.memento.server.api.service.auth.jwt.MemberClaim;
@@ -34,7 +35,6 @@ import com.memento.server.api.service.memory.MemoryService;
 import com.memento.server.api.service.post.PostService;
 import com.memento.server.api.service.profileImage.ProfileImageService;
 import com.memento.server.associate.AssociateFixtures;
-import com.memento.server.client.sse.SseEmitterRepository;
 import com.memento.server.comment.CommentFixtures;
 import com.memento.server.common.fixture.CommonFixtures;
 import com.memento.server.community.CommunityFixtures;
@@ -153,6 +153,9 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
+
+	@Autowired
+	private AchievementService achievementService;
 
 	@AfterEach
 	void afterEach() {
@@ -974,6 +977,31 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 		MemberClaim memberClaim = jwtTokenProvider.extractMemberClaim(jwtToken.accessToken());
 		// then
 		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(22L, memberClaim.associateId()))
+			.isTrue();
+	}
+
+	@Test
+	@DisplayName("홈스윗홈")
+	void createTest() {
+		// given
+		Member member = MemberFixtures.member();
+		memberRepository.save(member);
+
+		Community community = CommunityFixtures.community(member);
+		communityRepository.save(community);
+
+		Associate associate = AssociateFixtures.associate(member, community);
+		associateRepository.save(associate);
+
+		associateStatsRepository.save(AssociateStats.builder()
+			.associate(associate)
+			.build());
+
+		// when
+		achievementService.create(associate.getId(), "HOME");
+
+		// then
+		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(15L, associate.getId()))
 			.isTrue();
 	}
 }

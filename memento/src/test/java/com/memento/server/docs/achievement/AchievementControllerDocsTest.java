@@ -3,6 +3,7 @@ package com.memento.server.docs.achievement;
 import static java.sql.JDBCType.ARRAY;
 import static java.sql.JDBCType.BOOLEAN;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -13,7 +14,6 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.JsonFieldType.NULL;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -94,10 +94,10 @@ public class AchievementControllerDocsTest extends RestDocsSupport {
 
 		long communityId = 1L;
 		CreateAchievementRequest request = CreateAchievementRequest.builder()
-			.achievementId(1L)
+			.content("HOME")
 			.build();
 
-		doNothing().when(achievementService).create(anyLong(), anyLong());
+		doNothing().when(achievementService).create(anyLong(), eq("HOME"));
 		// when & then
 		mockMvc.perform(
 				post(PATH + "/achievements", communityId)
@@ -108,7 +108,7 @@ public class AchievementControllerDocsTest extends RestDocsSupport {
 			.andDo(document("achievement-create-test",
 				preprocessRequest(prettyPrint()),
 				requestFields(
-					fieldWithPath("achievementId").type(NUMBER).description("달성 업적 아이디")
+					fieldWithPath("content").type(STRING).description("달성 업적")
 				)
 			));
 	}
