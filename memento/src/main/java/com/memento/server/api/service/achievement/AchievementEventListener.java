@@ -119,7 +119,7 @@ public class AchievementEventListener {
 			);
 
 			emitter.send(SseEmitter.event()
-				.name("achievement")
+				.name("message")
 				.data(data)
 			);
 		} catch (Exception e) {
