@@ -4,6 +4,7 @@ import static com.memento.server.config.MinioProperties.FileType.EMOJI;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,17 +18,23 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
 import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
+import com.memento.server.api.service.auth.jwt.JwtToken;
+import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
+import com.memento.server.api.service.auth.jwt.MemberClaim;
 import com.memento.server.api.service.comment.CommentService;
 import com.memento.server.api.service.comment.dto.request.EmojiCommentCreateServiceRequest;
 import com.memento.server.api.service.emoji.EmojiService;
 import com.memento.server.api.service.emoji.dto.request.EmojiCreateServiceRequest;
 import com.memento.server.api.service.guestBook.GuestBookService;
 import com.memento.server.api.service.mbti.MbtiService;
+import com.memento.server.api.service.member.MemberService;
 import com.memento.server.api.service.memory.MemoryService;
 import com.memento.server.api.service.post.PostService;
 import com.memento.server.api.service.profileImage.ProfileImageService;
 import com.memento.server.associate.AssociateFixtures;
+import com.memento.server.client.sse.SseEmitterRepository;
 import com.memento.server.comment.CommentFixtures;
 import com.memento.server.common.fixture.CommonFixtures;
 import com.memento.server.community.CommunityFixtures;
@@ -98,34 +105,54 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private AchievementRepository achievementRepository;
+
 	@Autowired
 	private MbtiService mbtiService;
+
 	@Autowired
 	private MbtiTestRepository mbtiTestRepository;
+
 	@Autowired
 	private GuestBookService guestBookService;
+
 	@Autowired
 	private MemoryService memoryService;
+
 	@Autowired
 	private EventRepository eventRepository;
+
 	@Autowired
 	private MemoryRepository memoryRepository;
+
 	@Autowired
 	private PostService postService;
+
 	@Autowired
 	private PostImageRepository postImageRepository;
+
 	@Autowired
 	private PostRepository postRepository;
+
 	@Autowired
 	private EmojiService emojiService;
+
 	@Autowired
 	private EmojiRepository emojiRepository;
+
 	@Autowired
 	private CommentService commentService;
+
 	@Autowired
 	private CommentRepository commentRepository;
+
 	@Autowired
 	private GuestBookRepository guestBookRepository;
+
+	@Autowired
+	private MemberService memberService;
+
+	@Autowired
+	private JwtTokenProvider jwtTokenProvider;
 
 	@AfterEach
 	void afterEach() {
@@ -888,77 +915,65 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 			.isTrue();
 	}
 
-	// communityId 1인 경우에만 성공
-	// @Test
-	// @DisplayName("방명록 전용 업적")
-	// void guestBookExclusiveTest() {
-	// 	// given
-	// 	Member member1 = Member.builder()
-	// 		.name("준수")
-	// 		.email("test")
-	// 		.birthday(LocalDate.of(1999,10,13))
-	// 		.kakaoId(1L)
-	// 		.build();
-	// 	memberRepository.save(member1);
-	//
-	// 	Community community = CommunityFixtures.community(member1);
-	// 	communityRepository.save(community);
-	//
-	// 	Associate register = AssociateFixtures.associate(member1, community);
-	// 	associateRepository.save(register);
-	//
-	// 	Member member2 = Member.builder()
-	// 		.name("경완")
-	// 		.email("test")
-	// 		.birthday(LocalDate.of(1997,5,20))
-	// 		.kakaoId(1L)
-	// 		.build();
-	// 	memberRepository.save(member2);
-	//
-	// 	Associate associate = AssociateFixtures.associate(member2, community);
-	// 	associateRepository.save(associate);
-	//
-	// 	associateStatsRepository.save(AssociateStats.builder()
-	// 		.associate(register)
-	// 		.build());
-	//
-	// 	String content = "test";
-	//
-	// 	// when
-	// 	guestBookService.create(community.getId(), register.getId(), associate.getId(), GuestBookType.TEXT, null, content);
-	//
-	// 	// then
-	// 	assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(27L, register.getId()))
-	// 		.isTrue();
-	// }
+	@Test
+	@DisplayName("방명록 전용 업적")
+	void guestBookExclusiveTest() {
+		// given
+		Member member1 = Member.builder()
+			.name("준수")
+			.email("test")
+			.birthday(LocalDate.of(1999,10,13))
+			.kakaoId(1L)
+			.build();
+		memberRepository.save(member1);
 
-	// communityId 1인 경우에만 성공
-	// @Test
-	// @DisplayName("가입 전용 업적")
-	// void associateExclusiveTest() {
-	// 	// given
-	// 	Member member = Member.builder()
-	// 		.name("준수")
-	// 		.email("test")
-	// 		.birthday(LocalDate.of(1999,10,13))
-	// 		.kakaoId(1L)
-	// 		.build();
-	// 	memberRepository.save(member);
-	//
-	// 	Community community = CommunityFixtures.community(member);
-	// 	communityRepository.save(community);
-	//
-	// 	Associate associate = AssociateFixtures.associate(member, community);
-	// 	associateRepository.save(associate);
-	//
-	// 	associateStatsRepository.save(AssociateStats.builder()
-	// 		.associate(associate)
-	// 		.build());
-	//
-	// 	// when
-	//
-	// 	// then
-	// 	assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(22L, associate.getId()))
-	// 		.isTrue();
-	// }
+		Community community = CommunityFixtures.community(member1, "SSAFY 12기 12반");
+		communityRepository.save(community);
+
+		Associate register = AssociateFixtures.associate(member1, community);
+		associateRepository.save(register);
+
+		Member member2 = Member.builder()
+			.name("경완")
+			.email("test")
+			.birthday(LocalDate.of(1997,5,20))
+			.kakaoId(1L)
+			.build();
+		memberRepository.save(member2);
+
+		Associate associate = AssociateFixtures.associate(member2, community);
+		associateRepository.save(associate);
+
+		associateStatsRepository.save(AssociateStats.builder()
+			.associate(register)
+			.build());
+
+		String content = "test";
+
+		// when
+		guestBookService.create(community.getId(), register.getId(), associate.getId(), GuestBookType.TEXT, null, content);
+
+		// then
+		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(27L, register.getId()))
+			.isTrue();
+	}
+
+	@Test
+	@DisplayName("가입 전용 업적")
+	void associateExclusiveTest() {
+		// given
+		Long kakaoId = 1L;
+		String name = "오준수";
+		String email = "test@test.com";
+		LocalDate birthday = LocalDate.of(1999, 10, 13);
+
+		// when
+		MemberSignUpResponse response = memberService.signUp(kakaoId, name, email, birthday);
+
+		JwtToken jwtToken = response.token();
+		MemberClaim memberClaim = jwtTokenProvider.extractMemberClaim(jwtToken.accessToken());
+		// then
+		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(22L, memberClaim.associateId()))
+			.isTrue();
+	}
 }

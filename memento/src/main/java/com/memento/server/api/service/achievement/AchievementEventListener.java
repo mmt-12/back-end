@@ -15,7 +15,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.memento.server.client.sse.SseEmitterRepository;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.achievement.Achievement;
@@ -40,10 +42,8 @@ import com.memento.server.domain.guestBook.GuestBookExclusiveAchievementEvent;
 import com.memento.server.domain.guestBook.GuestBookRepository;
 import com.memento.server.domain.mbti.MbtiAchievementEvent;
 import com.memento.server.domain.mbti.MbtiTestRepository;
-import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.memory.MemoryAchievementEvent;
 import com.memento.server.domain.memory.MemoryAssociateRepository;
-import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.domain.post.PostImageAchievementEvent;
 import com.memento.server.domain.post.PostImageRepository;
 import com.memento.server.domain.profileImage.ProfileImageAchievementEvent;
@@ -71,7 +71,7 @@ public class AchievementEventListener {
 	private final EmojiRepository emojiRepository;
 	private final VoiceRepository voiceRepository;
 	private final CommentRepository commentRepository;
-	private final MemoryRepository memoryRepository;
+	private final SseEmitterRepository sseEmitterRepository;
 
 	public void getAchievement(Long associateId, Long achievementId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -84,6 +84,7 @@ public class AchievementEventListener {
 			.achievement(achievement)
 			.associate(associate)
 			.build());
+		sendAchievementSse(associate.getId(), achievement);
 
 		// 업적헌터#kill
 		if(achievement.getType() == AchievementType.OPEN){
@@ -97,7 +98,32 @@ public class AchievementEventListener {
 					.achievement(lastAchievement)
 					.associate(associate)
 					.build());
+				sendAchievementSse(associate.getId(), lastAchievement);
 			}
+		}
+	}
+
+	private void sendAchievementSse(Long associateId, Achievement achievement) {
+		SseEmitter emitter = sseEmitterRepository.get(associateId);
+		if (emitter == null) return;
+
+		try {
+			Map<String, Object> data = Map.of(
+				"type", "ACHIEVE",
+				"value", Map.of(
+					"id", achievement.getId(),
+					"name", achievement.getName(),
+					"criteria", achievement.getCriteria(),
+					"type", achievement.getType().name()
+				)
+			);
+
+			emitter.send(SseEmitter.event()
+				.name("achievement")
+				.data(data)
+			);
+		} catch (Exception e) {
+			sseEmitterRepository.remove(associateId);
 		}
 	}
 

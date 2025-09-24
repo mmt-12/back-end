@@ -10,7 +10,7 @@ public record AssociateExclusiveAchievementEvent(
 	LocalDate birthDay
 ) {
 
-	public AssociateExclusiveAchievementEvent from(Long associateId, LocalDate birthDay){
+	public static AssociateExclusiveAchievementEvent from(Long associateId, LocalDate birthDay){
 		return AssociateExclusiveAchievementEvent.builder()
 			.associateId(associateId)
 			.birthDay(birthDay)

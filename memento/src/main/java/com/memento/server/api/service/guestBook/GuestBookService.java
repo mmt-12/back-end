@@ -91,7 +91,7 @@ public class GuestBookService {
 		if(result.getType().equals(GuestBookType.TEXT)){
 			achievementEventPublisher.publishGuestBookAchievement(GuestBookAchievementEvent.from(register.getId(), result.getId(), GuestBookAchievementEvent.Type.WORD));
 		}
-		if(associate.getCommunity().getId() == 1L){
+		if(associate.getCommunity().getName().equals("SSAFY 12기 12반")){
 			achievementEventPublisher.publishGuestBookExclusiveAchievement(GuestBookExclusiveAchievementEvent.from(
 				register.getId(),
 				register.getMember().getBirthday(),

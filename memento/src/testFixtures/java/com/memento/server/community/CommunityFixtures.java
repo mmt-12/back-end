@@ -25,4 +25,11 @@ public class CommunityFixtures {
 			.member(member)
 			.build();
 	}
+
+	public static Community community(Member member, String name) {
+		return Community.builder()
+			.name(name)
+			.member(member)
+			.build();
+	}
 }

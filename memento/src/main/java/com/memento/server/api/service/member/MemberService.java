@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
 import com.memento.server.api.service.auth.jwt.MemberClaim;
@@ -17,6 +18,7 @@ import com.memento.server.api.service.eventMessage.EventMessagePublisher;
 import com.memento.server.api.service.eventMessage.dto.AssociateNotification;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.community.AssociateExclusiveAchievementEvent;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
@@ -35,6 +37,7 @@ public class MemberService {
 	private final AssociateRepository associateRepository;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final EventMessagePublisher eventMessagePublisher;
+	private final AchievementEventPublisher achievementEventPublisher;
 
 	public Optional<Member> findMemberWithKakaoId(Long kakaoId) {
 		return memberRepository.findByKakaoIdAndDeletedAtIsNull(kakaoId);
@@ -58,6 +61,10 @@ public class MemberService {
 
 		MemberClaim memberClaim = MemberClaim.from(member, associate);
 		JwtToken token = jwtTokenProvider.createToken(memberClaim);
+
+		if(community.getName().equals("SSAFY 12기 12반")){
+			achievementEventPublisher.publishAssociateExclusiveAchievement(AssociateExclusiveAchievementEvent.from(associate.getId(), member.getBirthday()));
+		}
 		return MemberSignUpResponse.from(member, token);
 	}
 
