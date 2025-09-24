@@ -11,7 +11,6 @@ public class SseEmitterRepository {
 	private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
 	public void save(Long associateId, SseEmitter emitter){
-		System.out.println("SseEmitterRepository save: " + associateId);
 		emitters.put(associateId, emitter);
 	}
 
