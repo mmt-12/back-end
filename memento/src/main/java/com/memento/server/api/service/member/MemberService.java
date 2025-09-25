@@ -4,6 +4,7 @@ import static com.memento.server.common.error.ErrorCodes.MEMBER_DUPLICATE;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_NOT_FOUND;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -62,6 +63,8 @@ public class MemberService {
 		Associate associate = associateRepository.save(Associate.create(name, member, community));
 		associateStatsRepository.save(AssociateStats.builder()
 				.associate(associate)
+				.consecutiveAttendanceDays(1)
+				.lastAttendedAt(LocalDateTime.now())
 			.build());
 		eventMessagePublisher.publishNotification(AssociateNotification.from(community.getId(), associate.getId()));
 
