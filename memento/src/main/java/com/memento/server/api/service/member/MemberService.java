@@ -4,6 +4,7 @@ import static com.memento.server.common.error.ErrorCodes.MEMBER_DUPLICATE;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_NOT_FOUND;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateExclusiveAchievementEvent;
 import com.memento.server.domain.community.AssociateRepository;
+import com.memento.server.domain.community.AssociateStats;
+import com.memento.server.domain.community.AssociateStatsRepository;
 import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
 import com.memento.server.domain.member.Member;
@@ -38,6 +41,7 @@ public class MemberService {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final EventMessagePublisher eventMessagePublisher;
 	private final AchievementEventPublisher achievementEventPublisher;
+	private final AssociateStatsRepository associateStatsRepository;
 
 	public Optional<Member> findMemberWithKakaoId(Long kakaoId) {
 		return memberRepository.findByKakaoIdAndDeletedAtIsNull(kakaoId);
@@ -57,6 +61,11 @@ public class MemberService {
 		Community community = communityOptional.orElse(
 			communityRepository.save(Community.create("SSAFY 12기 12반", member)));
 		Associate associate = associateRepository.save(Associate.create(name, member, community));
+		associateStatsRepository.save(AssociateStats.builder()
+				.associate(associate)
+				.consecutiveAttendanceDays(1)
+				.lastAttendedAt(LocalDateTime.now())
+			.build());
 		eventMessagePublisher.publishNotification(AssociateNotification.from(community.getId(), associate.getId()));
 
 		MemberClaim memberClaim = MemberClaim.from(member, associate);

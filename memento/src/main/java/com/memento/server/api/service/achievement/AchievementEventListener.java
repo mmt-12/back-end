@@ -4,7 +4,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -149,7 +148,7 @@ public class AchievementEventListener {
 		long days = ChronoUnit.DAYS.between(lastDate, today.toLocalDate());
 
 		if (days == 1) {
-			int count = stats.updateConsecutiveAttendanceDays();
+			int count = stats.updateConsecutiveAttendanceDays(stats.getConsecutiveAttendanceDays());
 			stats.updateLastAttendedAt(today);
 
 			// 시간빌게이츠
@@ -157,6 +156,9 @@ public class AchievementEventListener {
 				&& count >= 15) {
 				getAchievement(event.associateId(), 1L);
 			}
+		}else if(days > 1){
+			stats.updateConsecutiveAttendanceDays(0);
+			stats.updateLastAttendedAt(today);
 		}
 	}
 

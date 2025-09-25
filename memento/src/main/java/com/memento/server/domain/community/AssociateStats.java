@@ -119,8 +119,8 @@ public class AssociateStats {
 		return this.usedReactionCount = count;
 	}
 
-	public int updateConsecutiveAttendanceDays() {
-		return this.consecutiveAttendanceDays += 1;
+	public int updateConsecutiveAttendanceDays(int count) {
+		return this.consecutiveAttendanceDays = count + 1;
 	}
 
 	public void updateLastAttendedAt(LocalDateTime now) {
