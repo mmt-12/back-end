@@ -18,8 +18,8 @@ spring:
         format_sql: false
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 25MB
+      max-request-size: 500MB
 
   data:
     redis:
@@ -59,7 +59,7 @@ jwt:
 file:
   upload:
     voice:
-      max-size-bytes: 10485760 # 10MB
+      max-size-bytes: 26214400 # 25MB
       allowed-types:
         - audio/mpeg
         - audio/wav
@@ -68,7 +68,7 @@ file:
         - audio/ogg
         - audio/webm
     image:
-      max-size-bytes: 5242880 # 5MB
+      max-size-bytes: 26214400 # 25MB
       allowed-types:
         - image/jpeg
         - image/jpg
@@ -76,5 +76,5 @@ file:
         - image/gif
         - image/webp
     post:
-      max-total-size-bytes: 52428800 # 50MB
+      max-total-size-bytes: 524288000 # 500MB
       max-file-count: 10
