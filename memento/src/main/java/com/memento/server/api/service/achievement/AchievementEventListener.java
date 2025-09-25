@@ -157,7 +157,7 @@ public class AchievementEventListener {
 				getAchievement(event.associateId(), 1L);
 			}
 		}else if(days > 1){
-			stats.updateConsecutiveAttendanceDays(1);
+			stats.updateConsecutiveAttendanceDays(0);
 			stats.updateLastAttendedAt(today);
 		}
 	}
