@@ -8,7 +8,11 @@ import com.memento.server.api.controller.achievement.dto.SearchAchievementRespon
 import com.memento.server.api.service.achievement.dto.SearchAchievementDto;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
+import com.memento.server.domain.achievement.Achievement;
+import com.memento.server.domain.achievement.AchievementAssociate;
+import com.memento.server.domain.achievement.AchievementAssociateRepository;
 import com.memento.server.domain.achievement.AchievementRepository;
+import com.memento.server.domain.achievement.CommonAchievementEvent;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 
@@ -21,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class AchievementService {
 	private final AssociateRepository associateRepository;
 	private final AchievementRepository achievementRepository;
+	private final AchievementEventPublisher achievementEventPublisher;
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -51,5 +56,15 @@ public class AchievementService {
 		return SearchAchievementResponse.builder()
 			.achievements(achievementList)
 			.build();
+	}
+
+	public void create(Long associateId, String content) {
+		switch (content){
+			case "HOME":
+				achievementEventPublisher.publishCommonAchievement(CommonAchievementEvent.from(associateId, 15L));
+				break;
+			default:
+				throw new MementoException(ErrorCodes.ACHIEVEMENT_NOT_EXISTENCE);
+		}
 	}
 }

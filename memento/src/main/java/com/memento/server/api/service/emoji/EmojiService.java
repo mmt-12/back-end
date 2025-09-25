@@ -11,6 +11,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.api.service.emoji.dto.request.EmojiCreateServiceRequest;
 import com.memento.server.api.service.emoji.dto.request.EmojiListQueryRequest;
@@ -22,6 +23,8 @@ import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.emoji.Emoji;
 import com.memento.server.domain.emoji.EmojiRepository;
+import com.memento.server.domain.reaction.ReactionAchievementEvent;
+
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -32,6 +35,7 @@ public class EmojiService {
 	private final EmojiRepository emojiRepository;
 	private final AssociateRepository associateRepository;
 	private final MinioService minioService;
+	private final AchievementEventPublisher achievementEventPublisher;
 
 	@Transactional
 	public void createEmoji(EmojiCreateServiceRequest request) {
@@ -46,6 +50,8 @@ public class EmojiService {
 		String url = minioService.createFile(request.emoji(), EMOJI);
 		Emoji emoji = Emoji.create(request.name(), url, associate);
 		emojiRepository.save(emoji);
+
+		achievementEventPublisher.publishReactionAchievement(ReactionAchievementEvent.fromRegistrant(associate.getId(), ReactionAchievementEvent.Type.REGISTRANT, emoji.getId(), ReactionAchievementEvent.ReactionType.EMOJI));
 	}
 
 	public EmojiListResponse getEmoji(EmojiListQueryRequest request) {

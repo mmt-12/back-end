@@ -24,6 +24,7 @@ import com.memento.server.api.controller.post.dto.read.Emoji;
 import com.memento.server.api.controller.post.dto.read.PostAuthor;
 import com.memento.server.api.controller.post.dto.read.TemporaryVoice;
 import com.memento.server.api.controller.post.dto.read.Voice;
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.api.service.post.dto.PostCommentDto;
 import com.memento.server.common.error.ErrorCodes;
@@ -39,6 +40,7 @@ import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.domain.post.Hash;
 import com.memento.server.domain.post.Post;
 import com.memento.server.domain.post.PostImage;
+import com.memento.server.domain.post.PostImageAchievementEvent;
 import com.memento.server.domain.post.PostImageRepository;
 import com.memento.server.domain.post.PostRepository;
 
@@ -55,6 +57,7 @@ public class PostService {
 	private final MemoryRepository memoryRepository;
 	private final CommentRepository commentRepository;
 	private final MinioService minioService;
+	private final AchievementEventPublisher achievementEventPublisher;
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -153,6 +156,8 @@ public class PostService {
 
 		List<PostImage> images = saveImages(post, pictures);
 		postImageRepository.saveAll(images);
+
+		achievementEventPublisher.publishPostImageAchievement(PostImageAchievementEvent.from(associate.getId()));
 	}
 
 	@Transactional
@@ -181,6 +186,8 @@ public class PostService {
 			List<PostImage> newImages = saveImages(post, newPictures);
 			postImageRepository.saveAll(newImages);
 		}
+
+		achievementEventPublisher.publishPostImageAchievement(PostImageAchievementEvent.from(associate.getId()));
 	}
 
 	@Transactional

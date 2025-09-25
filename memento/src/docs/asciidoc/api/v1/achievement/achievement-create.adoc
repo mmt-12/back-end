@@ -1,0 +1,10 @@
+[[achievement-create-test]]
+=== 업적 조회
+
+==== HTTP Request
+include::{snippets}/achievement-create-test/http-create.adoc[]
+include::{snippets}/achievement-create-test/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/achievement-create-test/http-response.adoc[]
+NOTE: 응답이 존재하지 않습니다.

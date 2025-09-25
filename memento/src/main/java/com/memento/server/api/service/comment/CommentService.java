@@ -11,6 +11,7 @@ import static com.memento.server.config.MinioProperties.FileType.VOICE;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.comment.dto.request.CommentDeleteServiceRequest;
 import com.memento.server.api.service.comment.dto.request.EmojiCommentCreateServiceRequest;
 import com.memento.server.api.service.comment.dto.request.TemporaryVoiceCommentCreateServiceRequest;
@@ -26,6 +27,7 @@ import com.memento.server.domain.emoji.Emoji;
 import com.memento.server.domain.emoji.EmojiRepository;
 import com.memento.server.domain.post.Post;
 import com.memento.server.domain.post.PostRepository;
+import com.memento.server.domain.reaction.ReactionAchievementEvent;
 import com.memento.server.domain.voice.Voice;
 import com.memento.server.domain.voice.VoiceRepository;
 
@@ -42,6 +44,7 @@ public class CommentService {
 	private final PostRepository postRepository;
 	private final CommentRepository commentRepository;
 	private final MinioService minioService;
+	private final AchievementEventPublisher achievementEventPublisher;
 
 	@Transactional
 	public void createEmojiComment(EmojiCommentCreateServiceRequest request) {
@@ -54,6 +57,9 @@ public class CommentService {
 
 		Comment comment = Comment.createEmojiComment(emoji.getUrl(), post, associate);
 		commentRepository.save(comment);
+
+		achievementEventPublisher.publishReactionAchievement(
+			ReactionAchievementEvent.fromUse(associate.getId(), ReactionAchievementEvent.Type.USE));
 	}
 
 	@Transactional
@@ -67,6 +73,8 @@ public class CommentService {
 
 		Comment comment = Comment.createVoiceComment(voice.getUrl(), post, associate);
 		commentRepository.save(comment);
+
+		achievementEventPublisher.publishReactionAchievement(ReactionAchievementEvent.fromUse(associate.getId(), ReactionAchievementEvent.Type.USE));
 	}
 
 	@Transactional

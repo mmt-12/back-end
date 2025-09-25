@@ -2,6 +2,7 @@ package com.memento.server.spring.api.service.guestBook;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 import java.io.IOException;
@@ -147,13 +148,16 @@ public class GuestBookServiceTest extends IntegrationsTestSupport {
 		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
+		Associate register = AssociateFixtures.associate(member, community);
+		associateRepository.save(register);
+
 		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
 		String content = "test";
 
 		// when
-		guestBookService.create(community.getId(), associate.getId(), GuestBookType.TEXT, null, content);
+		guestBookService.create(community.getId(), register.getId(), associate.getId(), GuestBookType.TEXT, null, content);
 
 		// then
 		GuestBook guestBook = guestBookRepository.findAll().get(0);
@@ -172,6 +176,9 @@ public class GuestBookServiceTest extends IntegrationsTestSupport {
 		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
+		Associate register = AssociateFixtures.associate(member, community);
+		associateRepository.save(register);
+
 		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
@@ -179,7 +186,7 @@ public class GuestBookServiceTest extends IntegrationsTestSupport {
 		emojiRepository.save(emoji);
 
 		// when
-		guestBookService.create(community.getId(), associate.getId(), GuestBookType.EMOJI, emoji.getId(), null);
+		guestBookService.create(community.getId(), register.getId(), associate.getId(), GuestBookType.EMOJI, emoji.getId(), null);
 
 		// then
 		GuestBook guestBook = guestBookRepository.findAll().get(0);
@@ -198,6 +205,9 @@ public class GuestBookServiceTest extends IntegrationsTestSupport {
 		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
+		Associate register = AssociateFixtures.associate(member, community);
+		associateRepository.save(register);
+
 		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
@@ -205,7 +215,7 @@ public class GuestBookServiceTest extends IntegrationsTestSupport {
 		voiceRepository.save(voice);
 
 		// when
-		guestBookService.create(community.getId(), associate.getId(), GuestBookType.VOICE, voice.getId(), null);
+		guestBookService.create(community.getId(), register.getId(), associate.getId(), GuestBookType.VOICE, voice.getId(), null);
 
 		// then
 		GuestBook guestBook = guestBookRepository.findAll().get(0);
@@ -224,11 +234,14 @@ public class GuestBookServiceTest extends IntegrationsTestSupport {
 		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
+		Associate register = AssociateFixtures.associate(member, community);
+		associateRepository.save(register);
+
 		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
 		// when & then
-		assertThrows(MementoException.class, () -> guestBookService.create(community.getId(), associate.getId(), GuestBookType.VOICE, 1L, null));
+		assertThrows(MementoException.class, () -> guestBookService.create(community.getId(), register.getId(), associate.getId(), GuestBookType.VOICE, 1L, null));
 	}
 
 	@Test
@@ -241,6 +254,9 @@ public class GuestBookServiceTest extends IntegrationsTestSupport {
 		Community community = CommunityFixtures.community(member);
 		communityRepository.save(community);
 
+		Associate register = AssociateFixtures.associate(member, community);
+		associateRepository.save(register);
+
 		Associate associate = AssociateFixtures.associate(member, community);
 		associateRepository.save(associate);
 
@@ -250,7 +266,7 @@ public class GuestBookServiceTest extends IntegrationsTestSupport {
 			.willReturn(url);
 
 		// when
-		guestBookService.createBubble(community.getId(), associate.getId(), file);
+		guestBookService.createBubble(community.getId(), register.getId(), associate.getId(), file);
 
 		// then
 		GuestBook guestBook = guestBookRepository.findAll().get(0);

@@ -25,4 +25,8 @@ public interface ProfileImageRepository extends JpaRepository<ProfileImage, Long
 	Optional<ProfileImage> findByIdAndDeletedAtIsNull(Long profileImageId);
 
 	List<ProfileImage> findAllByAssociateId(Long associateId);
+
+	int countByAssociateIdAndDeletedAtNull(Long associateId);
+
+	int countByRegistrantIdAndDeletedAtNull(Long associateId);
 }

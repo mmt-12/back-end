@@ -22,6 +22,7 @@ import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
 import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.eventMessage.EventMessagePublisher;
 import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
 import com.memento.server.common.exception.MementoException;
@@ -34,6 +35,7 @@ import com.memento.server.domain.event.EventRepository;
 import com.memento.server.domain.event.Location;
 import com.memento.server.domain.event.Period;
 import com.memento.server.domain.memory.Memory;
+import com.memento.server.domain.memory.MemoryAchievementEvent;
 import com.memento.server.domain.memory.MemoryAssociate;
 import com.memento.server.domain.memory.MemoryAssociateRepository;
 import com.memento.server.domain.memory.MemoryRepository;
@@ -56,6 +58,7 @@ public class MemoryService {
 	private final AssociateRepository associateRepository;
 
 	private final EventMessagePublisher eventMessagePublisher;
+	private final AchievementEventPublisher achievementEventPublisher;
 
 	public ReadMemoryResponse read(Long memoryId) {
 		Memory memory = memoryRepository.findById(memoryId).orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
@@ -146,6 +149,8 @@ public class MemoryService {
 		memoryAssociateRepository.saveAll(memoryAssociates);
 
 		eventMessagePublisher.publishNotification(MemoryNotification.from(memory.getId(), associateId));
+		achievementEventPublisher.publishMemoryAchievement(MemoryAchievementEvent.from(List.of(associate.getId()), MemoryAchievementEvent.Type.CREATE));
+		achievementEventPublisher.publishMemoryAchievement(MemoryAchievementEvent.from(associates.stream().map(Associate::getId).toList(), MemoryAchievementEvent.Type.JOINED));
 		return CreateUpdateMemoryResponse.from(memory);
 	}
 
@@ -192,6 +197,7 @@ public class MemoryService {
 				.build());
 		}
 		memoryAssociateRepository.saveAll(newMemoryAssociates);
+		achievementEventPublisher.publishMemoryAchievement(MemoryAchievementEvent.from(newList, MemoryAchievementEvent.Type.JOINED));
 
 		return CreateUpdateMemoryResponse.from(memory);
 	}

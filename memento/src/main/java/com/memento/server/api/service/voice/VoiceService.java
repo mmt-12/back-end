@@ -11,6 +11,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.api.service.voice.dto.request.PermanentVoiceCreateServiceRequest;
 import com.memento.server.api.service.voice.dto.request.TemporaryVoiceCreateServiceRequest;
@@ -21,6 +22,7 @@ import com.memento.server.api.service.voice.dto.response.VoiceResponse;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
+import com.memento.server.domain.reaction.ReactionAchievementEvent;
 import com.memento.server.domain.voice.Voice;
 import com.memento.server.domain.voice.VoiceRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,7 @@ public class VoiceService {
 	private final VoiceRepository voiceRepository;
 	private final AssociateRepository associateRepository;
 	private final MinioService minioService;
+	private final AchievementEventPublisher achievementEventPublisher;
 
 	public Long createTemporaryVoice(TemporaryVoiceCreateServiceRequest request) {
 		return null;
@@ -51,6 +54,9 @@ public class VoiceService {
 		String url = minioService.createFile(request.voice(), VOICE);
 		Voice voice = Voice.createPermanent(request.name(), url, associate);
 		voiceRepository.save(voice);
+
+		achievementEventPublisher.publishReactionAchievement(
+			ReactionAchievementEvent.fromRegistrant(associate.getId(), ReactionAchievementEvent.Type.REGISTRANT, voice.getId(), ReactionAchievementEvent.ReactionType.VOICE));
 	}
 
 	public VoiceListResponse getVoices(VoiceListQueryRequest request) {

@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.memento.server.domain.member.Member;
+
 public interface AssociateRepository extends JpaRepository<Associate, Long> {
 	Optional<Associate> findByIdAndDeletedAtNull(Long associateId);
 
@@ -39,4 +41,6 @@ public interface AssociateRepository extends JpaRepository<Associate, Long> {
 	Optional<Associate> findByPostId(Long postId);
 
 	Optional<Associate> findByMemberIdAndDeletedAtIsNull(Long memberId);
+
+	int countByCommunityId(Long communityId);
 }

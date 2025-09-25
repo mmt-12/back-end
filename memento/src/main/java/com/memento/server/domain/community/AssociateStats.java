@@ -74,4 +74,56 @@ public class AssociateStats {
 
 	@Column(name = "t_mbti_count", nullable = false)
 	private int tMbtiCount;
+
+	public int updateUploadedProfileImageCount(int count) {
+		return this.uploadedProfileImageCount = count;
+	}
+
+	public int updateRegisteredProfileImageCount(int count) {
+		return this.registeredProfileImageCount = count;
+	}
+
+	public int updateMbtiTestCount(int count) {
+		return this.mbtiTestCount = count;
+	}
+
+	public int updateFMbtiCount(int count) {
+		return this.fMbtiCount = count;
+	}
+
+	public int updateTMbtiCount(int count) {
+		return this.tMbtiCount = count;
+	}
+
+	public int updateGuestBookCount(int count) {
+		return this.guestBookCount = count;
+	}
+
+	public int updateCreatedMemoryCount(int count) {
+		return this.createdMemoryCount = count;
+	}
+
+	public int updateJoinedMemoryCount(int count) {
+		return this.joinedMemoryCount = count;
+	}
+
+	public int updateUploadedPostImageCount(int count) {
+		return this.uploadedPostImageCount = count;
+	}
+
+	public int updateRegisteredReactionCount(int count) {
+		return this.uploadedReactionCount = count;
+	}
+
+	public int updateUsedReactionCount(int count){
+		return this.usedReactionCount = count;
+	}
+
+	public int updateConsecutiveAttendanceDays() {
+		return this.consecutiveAttendanceDays += 1;
+	}
+
+	public void updateLastAttendedAt(LocalDateTime now) {
+		this.lastAttendedAt = LocalDateTime.now();
+	}
 }
