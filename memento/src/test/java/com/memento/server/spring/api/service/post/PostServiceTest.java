@@ -574,7 +574,7 @@ public class PostServiceTest extends IntegrationsTestSupport {
 	}
 
 	@Test
-	@DisplayName("중복 이미지는 저장할 수 없다")
+	@DisplayName("중복 이미지는 저장된 이미지 url을 사용한다")
 	public void createHashTest() {
 		//given
 		Member member = MemberFixtures.member();
@@ -593,21 +593,69 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		memoryRepository.save(memory);
 
 		MultipartFile file1 = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
-		String url1 = "https://example.com/test.png";
+		String url1 = "https://example.com/test1.png";
 		given(minioService.createFile(file1, MinioProperties.FileType.POST))
 			.willReturn(url1);
 
 		MultipartFile file2 = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
-		String url2 = "https://example.com/test.png";
+		String url2 = "https://example.com/test2.png";
 		given(minioService.createFile(file2, MinioProperties.FileType.POST))
 			.willReturn(url2);
 
 		String content = "test";
 
-		//when & then
-		assertThrows(MementoException.class, () -> {
-			postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file1, file2));
-		});
+		// when
+		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file1, file2));
+
+		// then
+		List<PostImage> savedImages = postImageRepository.findAll();
+		assertThat(savedImages).hasSize(2);
+		String firstUrl = savedImages.get(0).getUrl();
+		String secondUrl = savedImages.get(1).getUrl();
+		assertThat(firstUrl).isEqualTo(secondUrl);
+	}
+
+	@Test
+	@DisplayName(" 저장된 이미지 url을 사용한다")
+	public void createDuplicateTest() {
+		//given
+		Member member = MemberFixtures.member();
+		memberRepository.save(member);
+
+		Community community = CommunityFixtures.community(member);
+		communityRepository.save(community);
+
+		Associate associate = AssociateFixtures.associate(member, community);
+		associateRepository.save(associate);
+
+		Event event = EventFixtures.event(community, associate);
+		eventRepository.save(event);
+
+		Memory memory = MemoryFixtures.memory(event);
+		memoryRepository.save(memory);
+
+		MultipartFile file1 = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		String url1 = "https://example.com/test1.png";
+		given(minioService.createFile(file1, MinioProperties.FileType.POST))
+			.willReturn(url1);
+
+		MultipartFile file2 = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		String url2 = "https://example.com/test2.png";
+		given(minioService.createFile(file2, MinioProperties.FileType.POST))
+			.willReturn(url2);
+
+		String content = "test";
+
+		// when
+		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file1));
+		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file2));
+
+		// then
+		List<PostImage> savedImages = postImageRepository.findAll();
+		assertThat(savedImages).hasSize(2);
+		String firstUrl = savedImages.get(0).getUrl();
+		String secondUrl = savedImages.get(1).getUrl();
+		assertThat(firstUrl).isEqualTo(secondUrl);
 	}
 
 	@Test

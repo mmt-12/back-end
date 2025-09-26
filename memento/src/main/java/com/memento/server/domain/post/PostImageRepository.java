@@ -45,8 +45,6 @@ public interface PostImageRepository extends JpaRepository<PostImage, Long> {
 
 	List<PostImage> findAllByPostIdInAndDeletedAtNull(List<Long> postIds);
 
-	List<PostImage> findAllByHashInAndDeletedAtIsNull(List<Hash> hashes);
-
 	@Query("""
         SELECT COUNT(pi)
         FROM PostImage pi
@@ -54,4 +52,6 @@ public interface PostImageRepository extends JpaRepository<PostImage, Long> {
         AND pi.deletedAt IS NULL
     """)
 	int countByAssociateId(@Param("associateId") Long associateId);
+
+	List<PostImage> findAllByHashInAndDeletedAtIsNull(List<Hash> hashes);
 }

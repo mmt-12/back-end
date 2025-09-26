@@ -3,10 +3,9 @@ package com.memento.server.api.service.post;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 
@@ -334,46 +333,59 @@ public class PostService {
 	public List<PostImage> saveImages(Post post, List<MultipartFile> pictures) {
 		List<PostImage> images = new ArrayList<>();
 		List<Hash> hashes = new ArrayList<>();
-		for(MultipartFile image : pictures){
-			Hash hash = null;
-			String url = null;
-			try{
-				url = minioService.createFile(image, MinioProperties.FileType.POST);
+
+		for(MultipartFile picture : pictures) {
+			try {
 				MessageDigest digest = MessageDigest.getInstance("SHA-256");
-				byte[] bytes = image.getBytes();
-				byte[] hashBytes = digest.digest(bytes);
+				byte[] hashBytes = digest.digest(picture.getBytes());
 
 				StringBuilder sb = new StringBuilder();
-				for(byte b : hashBytes) {
+				for (byte b : hashBytes) {
 					sb.append(String.format("%02x", b));
 				}
-				hash = Hash.builder()
+				hashes.add(Hash.builder()
 					.hash(sb.toString())
-					.build();
-			}catch (Exception e){
+					.build());
+			} catch (Exception e) {
 				throw new MementoException(ErrorCodes.POST_IMAGE_SAVE_FAIL);
 			}
+		}
 
-			images.add(PostImage.builder()
+		List<PostImage> existingImages = postImageRepository.findAllByHashInAndDeletedAtIsNull(hashes);
+		Map<Hash, PostImage> existingMap = existingImages.stream()
+			.collect(Collectors.toMap(PostImage::getHash, image -> image));
+
+		Map<Hash, PostImage> hashToImage = new HashMap<>();
+
+		for (int i = 0; i < pictures.size(); i++) {
+			MultipartFile image = pictures.get(i);
+			Hash hash = hashes.get(i);
+
+			if (existingMap.containsKey(hash)) {
+				hashToImage.putIfAbsent(hash, existingMap.get(hash));
+				images.add(PostImage.builder()
+					.url(existingMap.get(hash).getUrl())
+					.post(post)
+					.hash(hash)
+					.build());
+			} else if (hashToImage.containsKey(hash)) {
+				images.add(PostImage.builder()
+					.url(hashToImage.get(hash).getUrl())
+					.post(post)
+					.hash(hash)
+					.build());
+			} else {
+				String url = minioService.createFile(image, MinioProperties.FileType.POST);
+				PostImage newImage = PostImage.builder()
 					.url(url)
 					.post(post)
 					.hash(hash)
-				.build());
-			hashes.add(hash);
-		}
+					.build();
 
-		Set<String> uniqueHashes = new HashSet<>();
-		for (Hash hash : hashes) {
-			if (!uniqueHashes.add(hash.getHash())) {
-				throw new MementoException(ErrorCodes.POST_IMAGE_DUPLICATED);
+				hashToImage.put(hash, newImage);
+				images.add(newImage);
 			}
 		}
-
-		List<PostImage> duplicatedImage = postImageRepository.findAllByHashInAndDeletedAtIsNull(hashes);
-		if(!duplicatedImage.isEmpty()){
-			throw new MementoException(ErrorCodes.POST_IMAGE_DUPLICATED);
-		}
-
 		return images;
 	}
 }
