@@ -1,0 +1,58 @@
+package com.memento.server.config.async;
+
+import java.util.Arrays;
+
+import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.memento.server.common.exception.MementoException;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Configuration
+@EnableAsync
+public class AsyncConfig implements AsyncConfigurer {
+
+	@Bean("appExecutor")
+	public ThreadPoolTaskExecutor appExecutor(){
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(10);
+		executor.setMaxPoolSize(20);
+		executor.setQueueCapacity(50);
+
+		executor.setThreadNamePrefix("fcm-async-");
+		executor.initialize();
+		return executor;
+	}
+
+	@Override
+	public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+		return (ex, method, params) -> {
+			String methodName = method.getDeclaringClass().getSimpleName() + "." + method.getName();
+
+			// 의도적 예외 (비즈니스 로직 예외)
+			if (ex instanceof MementoException) {
+				MementoException mementoEx = (MementoException) ex;
+				log.warn("FCM Async 비즈니스 예외 발생 - Method: {}, ErrorCode: {}, Message: {}",
+					methodName, mementoEx.getErrorCode(), ex.getMessage());
+
+			// Firebase 관련 예외
+			} else if (ex instanceof FirebaseMessagingException) {
+				FirebaseMessagingException fcmEx = (FirebaseMessagingException) ex;
+				log.error("FCM 전송 실패 - Method: {}, ErrorCode: {}, Message: {}",
+					methodName, fcmEx.getErrorCode(), ex.getMessage(), ex);
+
+			// 시스템 예외 (예상치 못한 예외)
+			} else {
+				log.error("FCM Async 시스템 예외 발생 - Method: {}, Parameters: {}, Exception: {}",
+					methodName, Arrays.toString(params), ex.getMessage(), ex);
+			}
+		};
+	}
+}
