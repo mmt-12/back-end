@@ -376,8 +376,8 @@ public class PostService {
 		}
 
 		List<PostImage> existingImages = postImageRepository.findAllByHashInAndDeletedAtIsNull(hashes);
-		Map<Hash, PostImage> existingMap = existingImages.stream()
-			.collect(Collectors.toMap(PostImage::getHash, image -> image));
+		Map<Hash, List<PostImage>> existingMap = existingImages.stream()
+			.collect(Collectors.groupingBy(PostImage::getHash));
 
 		Map<Hash, PostImage> hashToImage = new HashMap<>();
 
@@ -386,9 +386,8 @@ public class PostService {
 			Hash hash = hashes.get(i);
 
 			if (existingMap.containsKey(hash)) {
-				hashToImage.putIfAbsent(hash, existingMap.get(hash));
 				images.add(PostImage.builder()
-					.url(existingMap.get(hash).getUrl())
+					.url(existingMap.get(hash).get(0).getUrl())
 					.post(post)
 					.hash(hash)
 					.build());

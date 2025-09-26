@@ -612,6 +612,8 @@ public class PostServiceTest extends IntegrationsTestSupport {
 
 		MultipartFile file1 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
 		MultipartFile file2 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+		MultipartFile file3 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+		MultipartFile file4 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
 
 		String url = "https://example.com/test.png";
 		given(minioService.createFile(any(MultipartFile.class), eq(MinioProperties.FileType.POST)))
@@ -620,11 +622,11 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		String content = "test";
 
 		// when
-		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file1, file2));
+		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file1, file2, file3, file4));
 
 		// then
 		List<PostImage> savedImages = postImageRepository.findAll();
-		assertThat(savedImages).hasSize(2);
+		assertThat(savedImages).hasSize(4);
 		String firstUrl = savedImages.get(0).getUrl();
 		String secondUrl = savedImages.get(1).getUrl();
 		assertThat(firstUrl).isEqualTo(secondUrl);
@@ -656,6 +658,8 @@ public class PostServiceTest extends IntegrationsTestSupport {
 
 		MultipartFile file1 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
 		MultipartFile file2 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+		MultipartFile file3 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+		MultipartFile file4 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
 
 		String url = "https://example.com/test.png";
 		given(minioService.createFile(any(MultipartFile.class), eq(MinioProperties.FileType.POST)))
@@ -666,10 +670,11 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		// when
 		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file1));
 		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file2));
+		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file3));
 
 		// then
 		List<PostImage> savedImages = postImageRepository.findAll();
-		assertThat(savedImages).hasSize(2);
+		assertThat(savedImages).hasSize(3);
 		String firstUrl = savedImages.get(0).getUrl();
 		String secondUrl = savedImages.get(1).getUrl();
 		assertThat(firstUrl).isEqualTo(secondUrl);
