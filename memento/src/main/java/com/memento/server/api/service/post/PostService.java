@@ -1,5 +1,7 @@
 package com.memento.server.api.service.post;
 
+import java.awt.image.BufferedImage;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -8,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
+
+import javax.imageio.ImageIO;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -336,16 +340,36 @@ public class PostService {
 
 		for(MultipartFile picture : pictures) {
 			try {
+				InputStream is = picture.getInputStream();
+				BufferedImage image = ImageIO.read(is);
+				if (image == null) {
+					throw new IllegalArgumentException("이미지 읽기 실패");
+				}
+
+				int width = image.getWidth();
+				int height = image.getHeight();
+				byte[] pixels = new byte[width * height * 4];
+				int idx = 0;
+				for (int y = 0; y < height; y++) {
+					for (int x = 0; x < width; x++) {
+						int rgb = image.getRGB(x, y);
+						pixels[idx++] = (byte) ((rgb >> 24) & 0xFF);
+						pixels[idx++] = (byte) ((rgb >> 16) & 0xFF);
+						pixels[idx++] = (byte) ((rgb >> 8) & 0xFF);
+						pixels[idx++] = (byte) (rgb & 0xFF);
+					}
+				}
+
 				MessageDigest digest = MessageDigest.getInstance("SHA-256");
-				byte[] hashBytes = digest.digest(picture.getBytes());
+				byte[] hashBytes = digest.digest(pixels);
 
 				StringBuilder sb = new StringBuilder();
 				for (byte b : hashBytes) {
 					sb.append(String.format("%02x", b));
 				}
-				hashes.add(Hash.builder()
-					.hash(sb.toString())
-					.build());
+
+				hashes.add(Hash.builder().hash(sb.toString()).build());
+
 			} catch (Exception e) {
 				throw new MementoException(ErrorCodes.POST_IMAGE_SAVE_FAIL);
 			}

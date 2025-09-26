@@ -2,9 +2,16 @@ package com.memento.server.spring.api.service.post;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -575,7 +582,7 @@ public class PostServiceTest extends IntegrationsTestSupport {
 
 	@Test
 	@DisplayName("중복 이미지는 저장된 이미지 url을 사용한다")
-	public void createHashTest() {
+	public void createHashTest() throws IOException {
 		//given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -592,15 +599,17 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
-		MultipartFile file1 = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
-		String url1 = "https://example.com/test1.png";
-		given(minioService.createFile(file1, MinioProperties.FileType.POST))
-			.willReturn(url1);
+		BufferedImage bufferedImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(bufferedImage, "png", baos);
+		byte[] imageBytes = baos.toByteArray();
 
-		MultipartFile file2 = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
-		String url2 = "https://example.com/test2.png";
-		given(minioService.createFile(file2, MinioProperties.FileType.POST))
-			.willReturn(url2);
+		MultipartFile file1 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+		MultipartFile file2 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+
+		String url = "https://example.com/test.png";
+		given(minioService.createFile(any(MultipartFile.class), eq(MinioProperties.FileType.POST)))
+			.willReturn(url);
 
 		String content = "test";
 
@@ -616,8 +625,8 @@ public class PostServiceTest extends IntegrationsTestSupport {
 	}
 
 	@Test
-	@DisplayName(" 저장된 이미지 url을 사용한다")
-	public void createDuplicateTest() {
+	@DisplayName("저장된 이미지 url을 사용한다")
+	public void createDuplicateTest() throws IOException {
 		//given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -634,15 +643,17 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
-		MultipartFile file1 = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
-		String url1 = "https://example.com/test1.png";
-		given(minioService.createFile(file1, MinioProperties.FileType.POST))
-			.willReturn(url1);
+		BufferedImage bufferedImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(bufferedImage, "png", baos);
+		byte[] imageBytes = baos.toByteArray();
 
-		MultipartFile file2 = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
-		String url2 = "https://example.com/test2.png";
-		given(minioService.createFile(file2, MinioProperties.FileType.POST))
-			.willReturn(url2);
+		MultipartFile file1 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+		MultipartFile file2 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+
+		String url = "https://example.com/test.png";
+		given(minioService.createFile(any(MultipartFile.class), eq(MinioProperties.FileType.POST)))
+			.willReturn(url);
 
 		String content = "test";
 
