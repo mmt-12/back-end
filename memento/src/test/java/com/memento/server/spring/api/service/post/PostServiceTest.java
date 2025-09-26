@@ -2,9 +2,16 @@ package com.memento.server.spring.api.service.post;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -477,7 +484,7 @@ public class PostServiceTest extends IntegrationsTestSupport {
 
 	@Test
 	@DisplayName("포스트 생성")
-	public void createTest() {
+	public void createTest() throws IOException {
 		//given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -494,9 +501,15 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
-		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		BufferedImage bufferedImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(bufferedImage, "png", baos);
+		byte[] imageBytes = baos.toByteArray();
+
+		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+
 		String url = "https://example.com/test.png";
-		given(minioService.createFile(file, MinioProperties.FileType.POST))
+		given(minioService.createFile(any(MultipartFile.class), eq(MinioProperties.FileType.POST)))
 			.willReturn(url);
 
 		String content = "test";
@@ -574,8 +587,8 @@ public class PostServiceTest extends IntegrationsTestSupport {
 	}
 
 	@Test
-	@DisplayName("중복 이미지는 저장할 수 없다")
-	public void createHashTest() {
+	@DisplayName("중복 이미지는 저장된 이미지 url을 사용한다")
+	public void createHashTest() throws IOException {
 		//given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -592,27 +605,84 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
-		MultipartFile file1 = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
-		String url1 = "https://example.com/test.png";
-		given(minioService.createFile(file1, MinioProperties.FileType.POST))
-			.willReturn(url1);
+		BufferedImage bufferedImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(bufferedImage, "png", baos);
+		byte[] imageBytes = baos.toByteArray();
 
-		MultipartFile file2 = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
-		String url2 = "https://example.com/test.png";
-		given(minioService.createFile(file2, MinioProperties.FileType.POST))
-			.willReturn(url2);
+		MultipartFile file1 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+		MultipartFile file2 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+		MultipartFile file3 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+		MultipartFile file4 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+
+		String url = "https://example.com/test.png";
+		given(minioService.createFile(any(MultipartFile.class), eq(MinioProperties.FileType.POST)))
+			.willReturn(url);
 
 		String content = "test";
 
-		//when & then
-		assertThrows(MementoException.class, () -> {
-			postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file1, file2));
-		});
+		// when
+		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file1, file2, file3, file4));
+
+		// then
+		List<PostImage> savedImages = postImageRepository.findAll();
+		assertThat(savedImages).hasSize(4);
+		String firstUrl = savedImages.get(0).getUrl();
+		String secondUrl = savedImages.get(1).getUrl();
+		assertThat(firstUrl).isEqualTo(secondUrl);
+	}
+
+	@Test
+	@DisplayName("저장된 이미지 url을 사용한다")
+	public void createDuplicateTest() throws IOException {
+		//given
+		Member member = MemberFixtures.member();
+		memberRepository.save(member);
+
+		Community community = CommunityFixtures.community(member);
+		communityRepository.save(community);
+
+		Associate associate = AssociateFixtures.associate(member, community);
+		associateRepository.save(associate);
+
+		Event event = EventFixtures.event(community, associate);
+		eventRepository.save(event);
+
+		Memory memory = MemoryFixtures.memory(event);
+		memoryRepository.save(memory);
+
+		BufferedImage bufferedImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(bufferedImage, "png", baos);
+		byte[] imageBytes = baos.toByteArray();
+
+		MultipartFile file1 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+		MultipartFile file2 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+		MultipartFile file3 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+		MultipartFile file4 = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+
+		String url = "https://example.com/test.png";
+		given(minioService.createFile(any(MultipartFile.class), eq(MinioProperties.FileType.POST)))
+			.willReturn(url);
+
+		String content = "test";
+
+		// when
+		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file1));
+		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file2));
+		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file3));
+
+		// then
+		List<PostImage> savedImages = postImageRepository.findAll();
+		assertThat(savedImages).hasSize(3);
+		String firstUrl = savedImages.get(0).getUrl();
+		String secondUrl = savedImages.get(1).getUrl();
+		assertThat(firstUrl).isEqualTo(secondUrl);
 	}
 
 	@Test
 	@DisplayName("포스트 수정")
-	public void updateTest(){
+	public void updateTest() throws IOException {
 		//given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -629,9 +699,15 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
-		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		BufferedImage bufferedImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(bufferedImage, "png", baos);
+		byte[] imageBytes = baos.toByteArray();
+
+		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+
 		String url = "https://example.com/test.png";
-		given(minioService.createFile(file, MinioProperties.FileType.POST))
+		given(minioService.createFile(any(MultipartFile.class), eq(MinioProperties.FileType.POST)))
 			.willReturn(url);
 
 		String content = "change";
@@ -650,7 +726,7 @@ public class PostServiceTest extends IntegrationsTestSupport {
 
 	@Test
 	@DisplayName("다른 참여자의 포스트는 수정할 수 없다")
-	public void updateWithDifferentAssociateTest(){
+	public void updateWithDifferentAssociateTest() throws IOException {
 		//given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -670,9 +746,15 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Memory memory = MemoryFixtures.memory(event);
 		memoryRepository.save(memory);
 
-		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		BufferedImage bufferedImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(bufferedImage, "png", baos);
+		byte[] imageBytes = baos.toByteArray();
+
+		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+
 		String url = "https://example.com/test.png";
-		given(minioService.createFile(file, MinioProperties.FileType.POST))
+		given(minioService.createFile(any(MultipartFile.class), eq(MinioProperties.FileType.POST)))
 			.willReturn(url);
 
 		String content = "change";
@@ -687,7 +769,7 @@ public class PostServiceTest extends IntegrationsTestSupport {
 
 	@Test
 	@DisplayName("포스트 삭제")
-	public void deleteTest() {
+	public void deleteTest() throws IOException {
 		// given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -707,9 +789,15 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Post post = PostFixtures.post(memory, associate);
 		postRepository.save(post);
 
-		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		BufferedImage bufferedImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(bufferedImage, "png", baos);
+		byte[] imageBytes = baos.toByteArray();
+
+		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+
 		String url = "https://example.com/test.png";
-		given(minioService.createFile(file, MinioProperties.FileType.POST))
+		given(minioService.createFile(any(MultipartFile.class), eq(MinioProperties.FileType.POST)))
 			.willReturn(url);
 
 		List<PostImage> images = postService.saveImages(post, List.of(file));
@@ -739,7 +827,7 @@ public class PostServiceTest extends IntegrationsTestSupport {
 
 	@Test
 	@DisplayName("다른 참여자의 포스트는 삭제할 수 없다")
-	public void deleteWithDifferentAssociateTest(){
+	public void deleteWithDifferentAssociateTest() throws IOException {
 		// given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -762,9 +850,15 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		Post post = PostFixtures.post(memory, associate);
 		postRepository.save(post);
 
-		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		BufferedImage bufferedImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(bufferedImage, "png", baos);
+		byte[] imageBytes = baos.toByteArray();
+
+		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
+
 		String url = "https://example.com/test.png";
-		given(minioService.createFile(file, MinioProperties.FileType.POST))
+		given(minioService.createFile(any(MultipartFile.class), eq(MinioProperties.FileType.POST)))
 			.willReturn(url);
 
 		List<PostImage> images = postService.saveImages(post, List.of(file));
