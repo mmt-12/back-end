@@ -6,3 +6,6 @@
 **/.idea/
 
 .claude/
+
+# VScode
+.vscode/
