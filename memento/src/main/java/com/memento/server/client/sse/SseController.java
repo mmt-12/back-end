@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.memento.server.annotation.AssociateId;
+import com.memento.server.common.error.ErrorCodes;
+import com.memento.server.common.exception.MementoException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +22,11 @@ public class SseController {
 	public SseEmitter subscribe(
 		@AssociateId Long currentAssociateId
 	) {
-		SseEmitter emitter = new SseEmitter(60 * 1000L);
+		SseEmitter emitter = new SseEmitter(0L);
+
+		if(currentAssociateId == null){
+			throw new MementoException(ErrorCodes.ASSOCIATE_NOT_AUTHORITY);
+		}
 
 		sseEmitterRepository.save(currentAssociateId, emitter);
 

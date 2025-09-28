@@ -39,7 +39,8 @@ public class JwtFilter extends OncePerRequestFilter {
 		"/api/v1/auth/redirect",
 		"/v1/sign-in",
 		"/v1/auth/redirect",
-		"/h2-console/**"
+		"/h2-console/**",
+		"/api/v1/sse/**"
 	);
 
 	private boolean isWhitelisted(String path) {
