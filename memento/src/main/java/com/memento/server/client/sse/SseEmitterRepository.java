@@ -18,6 +18,10 @@ public class SseEmitterRepository {
 		return emitters.get(associateId);
 	}
 
+	public Map<Long, SseEmitter> getAllEmitters() {
+		return emitters;
+	}
+
 	public void remove(Long associateId){
 		emitters.remove(associateId);
 	}
