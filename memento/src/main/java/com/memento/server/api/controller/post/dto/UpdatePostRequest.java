@@ -10,6 +10,6 @@ public record UpdatePostRequest(
 	@Size(max = 510, message = "content는 최대 크기가 510입니다.")
 	String content,
 
-	List<Long> oldPictures
+	List<String> oldPictures
 ) {
 }

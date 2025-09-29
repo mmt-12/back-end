@@ -4,9 +4,14 @@ import static com.memento.server.config.MinioProperties.FileType.EMOJI;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -744,7 +749,7 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 
 	@Test
 	@DisplayName("전문찍새")
-	public void postImageTest() {
+	public void postImageTest() throws IOException {
 		//given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -778,7 +783,12 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 				.build());
 		}
 
-		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "test".getBytes());
+		BufferedImage bufferedImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(bufferedImage, "png", baos);
+		byte[] imageBytes = baos.toByteArray();
+
+		MultipartFile file = new MockMultipartFile("image", "test.png", "image/png", imageBytes);
 		String url = "https://example.com/test.png";
 		given(minioService.createFile(file, MinioProperties.FileType.POST))
 			.willReturn(url);
