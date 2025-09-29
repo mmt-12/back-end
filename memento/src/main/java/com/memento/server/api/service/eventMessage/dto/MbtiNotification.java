@@ -4,12 +4,12 @@ import lombok.Builder;
 
 @Builder
 public record MbtiNotification(
-	Long associateId
+	Long receiverId
 ) implements NotificationEvent {
 
-	public static MbtiNotification from(Long associateId) {
+	public static MbtiNotification from(Long receiverId) {
 		return MbtiNotification.builder()
-			.associateId(associateId)
+			.receiverId(receiverId)
 			.build();
 	}
 }

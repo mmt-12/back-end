@@ -35,6 +35,7 @@ public class ProfileImageService {
 	private final MinioService minioService;
 	private final EventMessagePublisher eventMessagePublisher;
 	private final AchievementEventPublisher achievementEventPublisher;
+	private final EventMessagePublisher messagePublisher;
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -60,6 +61,7 @@ public class ProfileImageService {
 		eventMessagePublisher.publishNotification(NewImageNotification.from(associateId));
 		achievementEventPublisher.publishProfileImageAchievement(ProfileImageAchievementEvent.from(associateId, ProfileImageAchievementEvent.Type.REGISTERED));
 		achievementEventPublisher.publishProfileImageAchievement(ProfileImageAchievementEvent.from(registrantId, ProfileImageAchievementEvent.Type.UPLOADED));
+		messagePublisher.publishNotification(NewImageNotification.from(associateId));
 	}
 
 	@Transactional

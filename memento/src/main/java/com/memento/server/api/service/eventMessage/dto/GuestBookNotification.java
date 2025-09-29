@@ -4,12 +4,12 @@ import lombok.Builder;
 
 @Builder
 public record GuestBookNotification(
-	Long associateId
+	Long receiverId
 ) implements NotificationEvent {
 
-	public static GuestBookNotification from(Long associateId) {
+	public static GuestBookNotification from(Long receiverId) {
 		return GuestBookNotification.builder()
-			.associateId(associateId)
+			.receiverId(receiverId)
 			.build();
 	}
 }
