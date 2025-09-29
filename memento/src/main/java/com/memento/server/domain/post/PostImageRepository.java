@@ -43,7 +43,9 @@ public interface PostImageRepository extends JpaRepository<PostImage, Long> {
 
 	List<PostImage> findByPostIdAndDeletedAtNull(Long postId);
 
-	List<PostImage> findAllByPostIdInAndDeletedAtNull(List<Long> postIds);
+	List<PostImage> findAllByPostIdInAndDeletedAtNull(List<Long> postId);
+
+	List<PostImage> findAllByPostIdInAndDeletedAtNullOrderByCreatedAtDesc(List<Long> postIds);
 
 	@Query("""
         SELECT COUNT(pi)

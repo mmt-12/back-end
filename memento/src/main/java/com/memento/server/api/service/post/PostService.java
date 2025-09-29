@@ -87,7 +87,7 @@ public class PostService {
 		Post post = validPost(memoryId, postId);
 
 		Map<Post, List<PostImage>> imagesByPostId = postImageRepository
-			.findAllByPostIdInAndDeletedAtNull(List.of(postId))
+			.findAllByPostIdInAndDeletedAtNullOrderByCreatedAtDesc(List.of(postId))
 			.stream()
 			.collect(Collectors.groupingBy(PostImage::getPost));
 
@@ -109,7 +109,7 @@ public class PostService {
 		List<Long> postIds = posts.stream().limit(size).map(Post::getId).toList();
 
 		Map<Post, List<PostImage>> imagesByPostId = postImageRepository
-			.findAllByPostIdInAndDeletedAtNull(postIds)
+			.findAllByPostIdInAndDeletedAtNullOrderByCreatedAtDesc(postIds)
 			.stream()
 			.collect(Collectors.groupingBy(PostImage::getPost));
 
