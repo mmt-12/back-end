@@ -164,7 +164,7 @@ public class PostService {
 		postImageRepository.saveAll(images);
 
 		achievementEventPublisher.publishPostImageAchievement(PostImageAchievementEvent.from(associate.getId()));
-		eventMessagePublisher.publishNotification(PostNotification.from());
+		eventMessagePublisher.publishNotification(PostNotification.from(memory));
 	}
 
 	@Transactional

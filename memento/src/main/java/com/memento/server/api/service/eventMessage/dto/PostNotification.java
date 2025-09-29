@@ -4,12 +4,14 @@ import lombok.Builder;
 
 @Builder
 public record PostNotification(
+	String memoryName,
 	Long memoryId,
 	Long postId
 ) implements NotificationEvent {
 
-	public static PostNotification from(Long memoryId, Long postId) {
+	public static PostNotification from(String memoryName, Long memoryId, Long postId) {
 		return PostNotification.builder()
+			.memoryName(memoryName)
 			.memoryId(memoryId)
 			.postId(postId)
 			.build();
