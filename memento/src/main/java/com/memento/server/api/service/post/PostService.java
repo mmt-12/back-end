@@ -164,7 +164,7 @@ public class PostService {
 	}
 
 	@Transactional
-	public void update(Long communityId, Long memoryId, Long associateId, Long postId, String content, List<Long> oldPictures, List<MultipartFile> newPictures) {
+	public void update(Long communityId, Long memoryId, Long associateId, Long postId, String content, List<String> oldPictures, List<MultipartFile> newPictures) {
 		Associate associate = validAssociate(communityId, associateId);
 		Post post = validPost(memoryId, postId);
 
@@ -178,7 +178,7 @@ public class PostService {
 
 		List<PostImage> images = postImageRepository.findByPostIdAndDeletedAtNull(postId);
 		List<PostImage> deleteImages = images.stream()
-			.filter(image -> !oldPictures.contains(image.getId()))
+			.filter(image -> !oldPictures.contains(image.getUrl()))
 			.toList();
 
 		for(PostImage image : deleteImages){

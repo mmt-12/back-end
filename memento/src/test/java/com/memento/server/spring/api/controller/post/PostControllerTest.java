@@ -264,7 +264,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
 		UpdatePostRequest request = UpdatePostRequest.builder()
 			.content("수정된 내용")
-			.oldPictures(new ArrayList<>(List.of(1L, 2L, 3L)))
+			.oldPictures(new ArrayList<>(List.of("test1.png", "test2.png", "test3.png")))
 			.build();
 		String requestJson = objectMapper.writeValueAsString(request);
 
@@ -310,7 +310,7 @@ public class PostControllerTest extends ControllerTestSupport {
 
 		UpdatePostRequest request = UpdatePostRequest.builder()
 			.content("수정된 내용")
-			.oldPictures(new ArrayList<>(List.of(1L, 2L, 3L)))
+			.oldPictures(new ArrayList<>(List.of("test1.png", "test2.png", "test3.png")))
 			.build();
 		String requestJson = objectMapper.writeValueAsString(request);
 
@@ -360,7 +360,7 @@ public class PostControllerTest extends ControllerTestSupport {
 		String content = "a".repeat(511);
 		UpdatePostRequest request = UpdatePostRequest.builder()
 			.content(content)
-			.oldPictures(new ArrayList<>(List.of(1L, 2L, 3L)))
+			.oldPictures(new ArrayList<>(List.of("test1.png", "test2.png", "test3.png")))
 			.build();
 		String requestJson = objectMapper.writeValueAsString(request);
 

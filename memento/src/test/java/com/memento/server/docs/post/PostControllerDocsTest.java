@@ -22,6 +22,7 @@ import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
@@ -37,8 +38,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.memento.server.api.controller.post.PostController;
@@ -470,7 +469,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 
 		UpdatePostRequest request = UpdatePostRequest.builder()
 			.content("수정된 내용")
-			.oldPictures(new ArrayList<>(List.of(1L, 2L, 3L)))
+			.oldPictures(new ArrayList<>(List.of("test1.png", "test2.png", "test3.png")))
 			.build();
 		String requestJson = objectMapper.writeValueAsString(request);
 
@@ -482,7 +481,7 @@ public class PostControllerDocsTest extends RestDocsSupport {
 		);
 
 		MockMultipartFile file = new MockMultipartFile(
-			"nswPictures",
+			"newPictures",
 			"newImage1.png",
 			"image/png",
 			"new image content 1".getBytes()
@@ -508,8 +507,12 @@ public class PostControllerDocsTest extends RestDocsSupport {
 				preprocessRequest(prettyPrint()),
 				requestParts(
 					partWithName("request").description("게시글 수정 요청"),
-					partWithName("nswPictures").optional()
+					partWithName("newPictures").optional()
 						.description("추가할 이미지 파일 리스트")
+				),
+				requestPartFields("request",
+					fieldWithPath("content").type(STRING).description("수정된 게시글 내용"),
+					fieldWithPath("oldPictures").type(ARRAY).description("기존 이미지 파일명 리스트")
 				)
 			));
 	}
