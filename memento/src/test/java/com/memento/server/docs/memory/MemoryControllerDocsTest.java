@@ -85,6 +85,15 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 					"https://aws.s3.memento/8",
 					"https://aws.s3.memento/9"
 				))
+				.author(ReadMemoryResponse.AuthorResponse.builder()
+					.id(1L)
+					.nickname("nickname")
+					.imageUrl("https://aws.s3.memento/1")
+					.achievement(ReadMemoryResponse.AuthorResponse.AchievementResponse.builder()
+						.id(1L)
+						.name("achievement")
+						.build())
+					.build())
 				.build()
 		);
 
@@ -113,7 +122,13 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("location.address").description("장소 주소"),
 					fieldWithPath("memberAmount").description("기억 참여자 수"),
 					fieldWithPath("pictureAmount").description("기억 사진 수"),
-					fieldWithPath("pictures").description("사진 url 목록")
+					fieldWithPath("pictures").description("사진 url 목록"),
+					subsectionWithPath("author").description("작성자 정보"),
+					fieldWithPath("author.id").description("작성자의 참여 아이디"),
+					fieldWithPath("author.nickname").description("작성자 닉네임"),
+					subsectionWithPath("author.achievement").description("작성자 업적"),
+					fieldWithPath("author.achievement.id").description("업적 아이디"),
+					fieldWithPath("author.achievement.name").description("업적 이름")
 				)
 			));
 	}
@@ -158,6 +173,15 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 								"https://aws.s3.memento/8",
 								"https://aws.s3.memento/9"
 							))
+							.author(ReadAllMemoryResponse.MemoryResponse.AuthorResponse.builder()
+								.id(1L)
+								.nickname("nickname")
+								.imageUrl("https://aws.s3.memento/1")
+								.achievement(ReadAllMemoryResponse.MemoryResponse.AuthorResponse.AchievementResponse.builder()
+									.id(1L)
+									.name("achievement")
+									.build())
+								.build())
 							.build()
 					)
 				)
@@ -203,7 +227,13 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("memories[].location.address").description("장소 주소"),
 					fieldWithPath("memories[].memberAmount").description("기억 참여자 수"),
 					fieldWithPath("memories[].pictureAmount").description("기억 사진 수"),
-					fieldWithPath("memories[].pictures").description("사진 url 목록")
+					fieldWithPath("memories[].pictures").description("사진 url 목록"),
+					subsectionWithPath("memories[].author").description("작성자 정보"),
+					fieldWithPath("memories[].author.id").description("작성자의 참여 아이디"),
+					fieldWithPath("memories[].author.nickname").description("작성자 닉네임"),
+					subsectionWithPath("memories[].author.achievement").description("작성자 업적"),
+					fieldWithPath("memories[].author.achievement.id").description("업적 아이디"),
+					fieldWithPath("memories[].author.achievement.name").description("업적 이름")
 				)
 			));
 	}

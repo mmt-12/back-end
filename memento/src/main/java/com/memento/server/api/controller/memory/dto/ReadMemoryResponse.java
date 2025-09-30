@@ -51,7 +51,7 @@ public record ReadMemoryResponse(
 				.id(author.id())
 				.imageUrl(author.imageUrl())
 				.nickname(author.nickname())
-				.achievement(AchievementResponse.from(author.achievement()))
+				.achievement(author.achievement() == null ? null : AchievementResponse.from(author.achievement()))
 				.build();
 		}
 	}

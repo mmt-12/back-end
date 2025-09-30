@@ -9,7 +9,6 @@ public record Author(
 	String nickname,
 	Achievement achievement
 ) {
-
 	@Builder
 	public record Achievement(
 		Long id,
