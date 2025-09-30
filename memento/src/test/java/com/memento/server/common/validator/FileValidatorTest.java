@@ -1,5 +1,6 @@
 package com.memento.server.common.validator;
 
+import static com.memento.server.common.error.ErrorCodes.IMAGE_FILE_TOO_LARGE;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
@@ -34,7 +35,7 @@ class FileValidatorTest {
 	@DisplayName("음성 파일 크기가 제한을 초과하면 예외가 발생한다")
 	void validateVoiceFile_FileTooLarge() {
 		// given - 10MB + 1바이트로 제한 초과 테스트
-		byte[] largeContent = new byte[10 * 1024 * 1024 + 1]; // 10MB + 1바이트
+		byte[] largeContent = new byte[25 * 1024 * 1024 + 1]; // 25MB + 1바이트
 		MockMultipartFile file = new MockMultipartFile(
 			"voice", "test.wav", "audio/wav", largeContent
 		);
@@ -87,7 +88,7 @@ class FileValidatorTest {
 	@DisplayName("이미지 파일 크기가 제한을 초과하면 예외가 발생한다")
 	void validateImageFile_FileTooLarge() {
 		// given - 5MB + 1바이트로 제한 초과 테스트
-		byte[] largeContent = new byte[5 * 1024 * 1024 + 1]; // 5MB + 1바이트
+		byte[] largeContent = new byte[25 * 1024 * 1024 + 1]; // 25MB + 1바이트
 		MockMultipartFile file = new MockMultipartFile(
 			"image", "test.jpg", "image/jpeg", largeContent
 		);
@@ -128,8 +129,8 @@ class FileValidatorTest {
 	@DisplayName("포스트 파일 개수가 제한을 초과하면 예외가 발생한다")
 	void validatePostImages_TooManyFiles() {
 		// given - 11개 파일로 제한(10개) 초과 테스트
-		MultipartFile[] files = new MultipartFile[11];
-		for (int i = 0; i < 11; i++) {
+		MultipartFile[] files = new MultipartFile[26];
+		for (int i = 0; i < 26; i++) {
 			files[i] = new MockMultipartFile("image" + i, "test" + i + ".jpg", "image/jpeg", "content".getBytes());
 		}
 
@@ -139,18 +140,18 @@ class FileValidatorTest {
 	}
 
 	@Test
-	@DisplayName("포스트 전체 파일 크기가 제한을 초과하면 예외가 발생한다")
-	void validatePostImages_TotalSizeTooLarge() {
-		// given - 50MB + 1바이트로 제한 초과 테스트
-		byte[] largeContent = new byte[26 * 1024 * 1024]; // 26MB씩 2개 = 52MB
+	@DisplayName("개별 포스트 이미지 파일 크기가 제한을 초과하면 예외가 발생한다")
+	void validatePostImages_IndividualFileTooLarge() {
+		// given - 개별 파일 크기 25MB 초과 테스트
+		byte[] largeContent = new byte[26 * 1024 * 1024]; // 26MB (25MB 초과)
 		MultipartFile[] files = {
-			new MockMultipartFile("image1", "test1.jpg", "image/jpeg", largeContent),
-			new MockMultipartFile("image2", "test2.jpg", "image/jpeg", largeContent)
+			new MockMultipartFile("image1", "test1.jpg", "image/jpeg", largeContent)
 		};
 
 		// when & then
 		assertThatThrownBy(() -> fileValidator.validatePostImages(files))
-			.isInstanceOf(MementoException.class);
+			.isInstanceOf(MementoException.class)
+			.hasFieldOrPropertyWithValue("errorCode", IMAGE_FILE_TOO_LARGE);
 	}
 
 	@Test

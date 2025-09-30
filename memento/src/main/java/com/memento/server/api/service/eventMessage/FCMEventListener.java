@@ -14,6 +14,7 @@ import static com.memento.server.domain.notification.NotificationType.REACTION;
 import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.Async;
@@ -31,7 +32,13 @@ import com.memento.server.api.service.eventMessage.dto.NewImageFCM;
 import com.memento.server.api.service.eventMessage.dto.PostFCM;
 import com.memento.server.api.service.eventMessage.dto.ReactionFCM;
 import com.memento.server.api.service.fcm.FCMService;
+import com.memento.server.api.service.fcm.dto.AssociateData;
+import com.memento.server.api.service.fcm.dto.BasicData;
+import com.memento.server.api.service.fcm.dto.BirthdayData;
 import com.memento.server.api.service.fcm.dto.FCMRequest;
+import com.memento.server.api.service.fcm.dto.ReceiverInfo;
+import com.memento.server.api.service.fcm.dto.MemoryData;
+import com.memento.server.api.service.fcm.dto.PostData;
 import com.memento.server.api.service.fcm.dto.ReactionData;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
@@ -76,19 +83,22 @@ public class FCMEventListener {
 		notificationRepository.save(notification);
 
 		ReactionData reactionData = ReactionData.of(event.memoryId(), event.postId());
-		FCMRequest request = FCMRequest.of(title, content, List.of(event.receiverId()), reactionData);
+		ReceiverInfo receiverInfo = ReceiverInfo.of(event.receiverId(), content);
+		FCMRequest request = FCMRequest.of(title, List.of(receiverInfo), reactionData);
 		fcmService.sendToAssociates(request);
 	}
 
-	// todo 연결 필요
 	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleAchievementNotification(AchievementFCM event) {
 		Associate receiver = associateRepository.findById(event.receiverId())
 			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
 
+		String title = ACHIEVE.getTitle();
+		String content = createAchievementMessageContent(receiver.getNickname());
+
 		Notification notification = Notification.builder()
-			.title(ACHIEVE.getTitle())
-			.content(createAchievementMessageContent(receiver.getNickname()))
+			.title(title)
+			.content(content)
 			.type(ACHIEVE)
 			.actorId(receiver.getId())
 			.receiver(receiver)
@@ -96,55 +106,76 @@ public class FCMEventListener {
 
 		notificationRepository.save(notification);
 
-		fcmService.sendToAssociates(FCMRequest.of());
+		BasicData achievementData = BasicData.of(ACHIEVE);
+		ReceiverInfo receiverInfo = ReceiverInfo.of(event.receiverId(), content);
+		FCMRequest request = FCMRequest.of(title, List.of(receiverInfo), achievementData);
+		fcmService.sendToAssociates(request);
 	}
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleGuestBookNotification(GuestBookFCM event) {
 		Associate receiver = associateRepository.getReferenceById(event.receiverId());
 
+		String title = GUESTBOOK.getTitle();
+		String content = createGuestBookMessageContent();
+
 		Notification notification = Notification.builder()
-			.title(GUESTBOOK.getTitle())
-			.content(createGuestBookMessageContent())
+			.title(title)
+			.content(content)
 			.type(GUESTBOOK)
 			.receiver(receiver)
 			.build();
 
 		notificationRepository.save(notification);
 
-		fcmService.sendToAssociates(FCMRequest.of());
+		BasicData guestBookData = BasicData.of(GUESTBOOK);
+		ReceiverInfo receiverInfo = ReceiverInfo.of(event.receiverId(), content);
+		FCMRequest request = FCMRequest.of(title, List.of(receiverInfo), guestBookData);
+		fcmService.sendToAssociates(request);
 	}
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleNewImageNotification(NewImageFCM event) {
-		Associate associate = associateRepository.getReferenceById(event.receiverId());
+		Associate receiver = associateRepository.getReferenceById(event.receiverId());
+
+		String title = NEWIMAGE.getTitle();
+		String content = createProfileImageMessageContent();
 
 		Notification notification = Notification.builder()
-			.title(NEWIMAGE.getTitle())
-			.content(createProfileImageMessageContent())
+			.title(title)
+			.content(content)
 			.type(NEWIMAGE)
-			.receiver(associate)
+			.receiver(receiver)
 			.build();
 
 		notificationRepository.save(notification);
 
-		fcmService.sendToAssociates(FCMRequest.of());
+		BasicData newImageData = BasicData.of(NEWIMAGE);
+		ReceiverInfo receiverInfo = ReceiverInfo.of(event.receiverId(), content);
+		FCMRequest request = FCMRequest.of(title, List.of(receiverInfo), newImageData);
+		fcmService.sendToAssociates(request);
 	}
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleMbtiNotification(MbtiFCM event) {
-		Associate associate = associateRepository.getReferenceById(event.receiverId());
+		Associate receiver = associateRepository.getReferenceById(event.receiverId());
+
+		String title = MBTI.getTitle();
+		String content = createMbtiMessageContent();
 
 		Notification notification = Notification.builder()
-			.title(MBTI.getTitle())
-			.content(createMbtiMessageContent())
+			.title(title)
+			.content(content)
 			.type(MBTI)
-			.receiver(associate)
+			.receiver(receiver)
 			.build();
 
 		notificationRepository.save(notification);
 
-		fcmService.sendToAssociates(FCMRequest.of());
+		BasicData mbtiData = BasicData.of(MBTI);
+		ReceiverInfo receiverInfo = ReceiverInfo.of(event.receiverId(), content);
+		FCMRequest request = FCMRequest.of(title, List.of(receiverInfo), mbtiData);
+		fcmService.sendToAssociates(request);
 	}
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
@@ -153,30 +184,40 @@ public class FCMEventListener {
 			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
 		List<Associate> associates = associateRepository.findAllByCommunityId(event.communityId());
 
-		List<Notification> notifications = associates.stream()
+		String title = BIRTHDAY.getTitle();
+		String contentForAssociates = createBirthdayMessageContentForAssociates(birthdayPerson.getNickname());
+		String contentForBirthdayPerson = createBirthdayMessageContentForBirthdayPerson(birthdayPerson.getNickname());
+
+		List<Notification> associateNotifications = associates.stream()
 			.filter(associate -> !associate.equals(birthdayPerson))
 			.map(associate -> Notification.builder()
-				.title(BIRTHDAY.getTitle())
-				.content(createBirthdayMessageContentForAssociates(birthdayPerson.getNickname()))
+				.title(title)
+				.content(contentForAssociates)
 				.type(BIRTHDAY)
 				.actorId(birthdayPerson.getId())
 				.receiver(associate)
 				.build())
 			.toList();
 
-		Notification notification = Notification.builder()
-			.title(BIRTHDAY.getTitle())
-			.content(createBirthdayMessageContentForBirthdayPerson(birthdayPerson.getNickname()))
+		Notification birthdayPersonNotification = Notification.builder()
+			.title(title)
+			.content(contentForBirthdayPerson)
 			.type(BIRTHDAY)
 			.actorId(birthdayPerson.getId())
 			.receiver(birthdayPerson)
 			.build();
 
-		notificationRepository.saveAll(notifications);
-		notificationRepository.save(notification);
+		List<Notification> allNotifications = new ArrayList<>(associateNotifications);
+		allNotifications.add(birthdayPersonNotification);
 
-		fcmService.sendToAssociates(FCMRequest.of());
-		fcmService.sendToAssociates(FCMRequest.of());
+		notificationRepository.saveAll(allNotifications);
+
+		BirthdayData birthdayData = BirthdayData.of(birthdayPerson.getId());
+		List<ReceiverInfo> allReceivers = allNotifications.stream()
+			.map(n -> ReceiverInfo.of(n.getReceiver().getId(), n.getContent()))
+			.toList();
+		FCMRequest request = FCMRequest.of(BIRTHDAY.getTitle(), allReceivers, birthdayData);
+		fcmService.sendToAssociates(request);
 	}
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
@@ -184,10 +225,11 @@ public class FCMEventListener {
 		List<Associate> associates = memoryAssociateRepository.findAssociatesByMemoryIdAndDeletedAtIsNull(
 			event.memoryId());
 
+		String title = MEMORY.getTitle();
 		List<Notification> notificationList = associates.stream()
 			.filter(associate -> !associate.getId().equals(event.makeMemoryAssociateId()))
 			.map(associate -> Notification.builder()
-				.title(MEMORY.getTitle())
+				.title(title)
 				.content(createMemoryMessageContent(associate.getNickname()))
 				.type(MEMORY)
 				.actorId(event.makeMemoryAssociateId())
@@ -196,12 +238,19 @@ public class FCMEventListener {
 				.build())
 			.toList();
 
-		notificationRepository.saveAll(notificationList);
+		if (!notificationList.isEmpty()) {
+			notificationRepository.saveAll(notificationList);
 
-		fcmService.sendToAssociates(FCMRequest.of());
+			List<ReceiverInfo> receiverInfos = notificationList.stream()
+				.map(n -> ReceiverInfo.of(n.getReceiver().getId(), n.getContent()))
+				.toList();
+
+			MemoryData memoryData = MemoryData.of(event.memoryId());
+			FCMRequest request = FCMRequest.of(title, receiverInfos, memoryData);
+			fcmService.sendToAssociates(request);
+		}
 	}
 
-	// todo POST: 기억에 새 포스트 등록
 	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handlePostNotification(PostFCM event) {
 		Memory memory = memoryRepository.findByIdWithEventAndDeletedAtIsNull(event.memoryId())
@@ -209,11 +258,13 @@ public class FCMEventListener {
 		List<Associate> associates = memoryAssociateRepository.findAssociatesByMemoryIdAndDeletedAtIsNull(
 			event.memoryId());
 
+		String title = POST.getTitle();
+		String content = createPostMessageContent(memory.getEvent().getTitle());
 		List<Notification> notificationList = associates.stream()
 			.filter(associate -> !associate.getId().equals(event.makePostAssociateId()))
 			.map(associate -> Notification.builder()
-				.title(POST.getTitle())
-				.content(createPostMessageContent(memory.getEvent().getTitle()))
+				.title(title)
+				.content(content)
 				.type(POST)
 				.actorId(event.makePostAssociateId())
 				.postId(event.postId())
@@ -222,30 +273,48 @@ public class FCMEventListener {
 				.build())
 			.toList();
 
-		notificationRepository.saveAll(notificationList);
+		if (!notificationList.isEmpty()) {
+			notificationRepository.saveAll(notificationList);
 
-		fcmService.sendToAssociates(FCMRequest.of());
+			List<ReceiverInfo> receiverInfos = notificationList.stream()
+				.map(n -> ReceiverInfo.of(n.getReceiver().getId(), n.getContent()))
+				.toList();
+
+			PostData postData = PostData.of(event.postId(), event.memoryId());
+			FCMRequest request = FCMRequest.of(title, receiverInfos, postData);
+			fcmService.sendToAssociates(request);
+		}
 	}
 
-	// todo ASSOCIATE: 새로운 참가자 등장
 	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleAssociateNotification(AssociateFCM event) {
 		List<Associate> associates = associateRepository.findAllByCommunityId(event.communityId());
 
+		String title = ASSOCIATE.getTitle();
+		String content = createAssociateMessageContent(event.nickname());
+
 		List<Notification> notifications = associates.stream()
 			.filter(associate -> !associate.getId().equals(event.associateId()))
 			.map(associate -> Notification.builder()
-				.title(ASSOCIATE.getTitle())
-				.content(createAssociateMessageContent(event.nickname()))
+				.title(title)
+				.content(content)
 				.type(ASSOCIATE)
 				.actorId(event.associateId())
 				.receiver(associate)
 				.build())
 			.toList();
 
-		notificationRepository.saveAll(notifications);
+		if(!notifications.isEmpty()) {
+			notificationRepository.saveAll(notifications);
 
-		fcmService.sendToAssociates(FCMRequest.of());
+			List<ReceiverInfo> receiverInfos = notifications.stream()
+				.map(n -> ReceiverInfo.of(n.getReceiver().getId(), content))
+				.toList();
+
+			AssociateData associateData = AssociateData.of(event.associateId());
+			FCMRequest request = FCMRequest.of(title, receiverInfos, associateData);
+			fcmService.sendToAssociates(request);
+		}
 	}
 
 	private String createReactionMessageContent(String nickname) {

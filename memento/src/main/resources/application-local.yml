@@ -87,4 +87,4 @@ file:
         - image/webp
     post:
       max-total-size-bytes: 524288000 # 500MB
-      max-file-count: 10
+      max-file-count: 20

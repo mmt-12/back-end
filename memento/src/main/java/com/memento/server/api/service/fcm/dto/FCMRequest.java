@@ -7,16 +7,14 @@ import lombok.Builder;
 @Builder
 public record FCMRequest(
 	String title,
-	String content,
-	List<Long> receiverIds,
+	List<ReceiverInfo> receiverInfos,
 	FCMData dataDto
 ) {
 
-	public static FCMRequest of(String title, String content, List<Long> receiverIds, FCMData dataDto) {
+	public static FCMRequest of(String title, List<ReceiverInfo> receiverInfos, FCMData dataDto) {
 		return FCMRequest.builder()
 			.title(title)
-			.content(content)
-			.receiverIds(receiverIds)
+			.receiverInfos(receiverInfos)
 			.dataDto(dataDto)
 			.build();
 	}

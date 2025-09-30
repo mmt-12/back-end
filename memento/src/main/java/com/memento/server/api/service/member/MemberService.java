@@ -62,7 +62,7 @@ public class MemberService {
 				.consecutiveAttendanceDays(1)
 				.lastAttendedAt(LocalDateTime.now())
 			.build());
-		FCMEventPublisher.publishNotification(AssociateFCM.from(community.getId(), associate.getId()));
+		FCMEventPublisher.publishNotification(AssociateFCM.from(associate.getNickname(), community.getId(), associate.getId()));
 
 		MemberClaim memberClaim = MemberClaim.from(member, associate);
 		JwtToken token = jwtTokenProvider.createToken(memberClaim);

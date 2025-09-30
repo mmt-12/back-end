@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
 import com.memento.server.common.exception.MementoException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -40,10 +39,6 @@ public class AsyncConfig implements AsyncConfigurer {
 				MementoException mementoEx = (MementoException) ex;
 				log.warn("FCM Async 비즈니스 예외 발생 - Method: {}, ErrorCode: {}, Message: {}",
 					methodName, mementoEx.getErrorCode(), ex.getMessage());
-			} else if (ex instanceof FirebaseMessagingException) {
-				FirebaseMessagingException fcmEx = (FirebaseMessagingException) ex;
-				log.error("FCM 전송 실패 - Method: {}, ErrorCode: {}, Message: {}",
-					methodName, fcmEx.getErrorCode(), ex.getMessage(), ex);
 			} else {
 				log.error("FCM Async 시스템 예외 발생 - Method: {}, Parameters: {}, Exception: {}",
 					methodName, Arrays.toString(params), ex.getMessage(), ex);

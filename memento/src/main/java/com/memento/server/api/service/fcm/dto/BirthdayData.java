@@ -1,5 +1,7 @@
 package com.memento.server.api.service.fcm.dto;
 
+import static com.memento.server.domain.notification.NotificationType.BIRTHDAY;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,18 +10,20 @@ import com.memento.server.domain.notification.NotificationType;
 import lombok.Builder;
 
 @Builder
-public record BasicData(
-	NotificationType type
+public record BirthdayData(
+	NotificationType type,
+	Long associateId
 ) implements FCMData {
 
 	@Override
 	public Map<String, String> toDataMap() {
 		Map<String, String> data = new HashMap<>();
 		data.put("type", type.name());
+		data.put("associateId", String.valueOf(associateId));
 		return data;
 	}
 
-	public static BasicData of(NotificationType type) {
-		return BasicData.builder().type(type).build();
+	public static BirthdayData of(Long associateId) {
+		return BirthdayData.builder().type(BIRTHDAY).associateId(associateId).build();
 	}
 }
