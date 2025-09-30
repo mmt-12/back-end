@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface FCMTokenRepository extends JpaRepository<FCMToken, Long> {
 	List<FCMToken> findByAssociateId(Long associateId);
 	void deleteByToken(String token);
-	boolean existsByToken(String token);
+	List<FCMToken> findAllByAssociateIds(List<Long> associateIds);
 }

@@ -11,8 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.profileImage.dto.SearchProfileImageResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
-import com.memento.server.api.service.eventMessage.EventMessagePublisher;
-import com.memento.server.api.service.eventMessage.dto.NewImageNotification;
+import com.memento.server.api.service.eventMessage.FCMEventPublisher;
+import com.memento.server.api.service.eventMessage.dto.NewImageFCM;
 import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
@@ -33,9 +33,8 @@ public class ProfileImageService {
 	private final AssociateRepository associateRepository;
 	private final ProfileImageRepository profileImageRepository;
 	private final MinioService minioService;
-	private final EventMessagePublisher eventMessagePublisher;
+	private final FCMEventPublisher fcmEventPublisher;
 	private final AchievementEventPublisher achievementEventPublisher;
-	private final EventMessagePublisher messagePublisher;
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -58,10 +57,9 @@ public class ProfileImageService {
 				.associate(associate)
 				.registrant(registrant)
 				.build());
-		eventMessagePublisher.publishNotification(NewImageNotification.from(associateId));
 		achievementEventPublisher.publishProfileImageAchievement(ProfileImageAchievementEvent.from(associateId, ProfileImageAchievementEvent.Type.REGISTERED));
 		achievementEventPublisher.publishProfileImageAchievement(ProfileImageAchievementEvent.from(registrantId, ProfileImageAchievementEvent.Type.UPLOADED));
-		messagePublisher.publishNotification(NewImageNotification.from(associateId));
+		fcmEventPublisher.publishNotification(NewImageFCM.from(associateId));
 	}
 
 	@Transactional

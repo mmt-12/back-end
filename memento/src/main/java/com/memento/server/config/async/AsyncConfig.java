@@ -36,19 +36,14 @@ public class AsyncConfig implements AsyncConfigurer {
 		return (ex, method, params) -> {
 			String methodName = method.getDeclaringClass().getSimpleName() + "." + method.getName();
 
-			// 의도적 예외 (비즈니스 로직 예외)
 			if (ex instanceof MementoException) {
 				MementoException mementoEx = (MementoException) ex;
 				log.warn("FCM Async 비즈니스 예외 발생 - Method: {}, ErrorCode: {}, Message: {}",
 					methodName, mementoEx.getErrorCode(), ex.getMessage());
-
-			// Firebase 관련 예외
 			} else if (ex instanceof FirebaseMessagingException) {
 				FirebaseMessagingException fcmEx = (FirebaseMessagingException) ex;
 				log.error("FCM 전송 실패 - Method: {}, ErrorCode: {}, Message: {}",
 					methodName, fcmEx.getErrorCode(), ex.getMessage(), ex);
-
-			// 시스템 예외 (예상치 못한 예외)
 			} else {
 				log.error("FCM Async 시스템 예외 발생 - Method: {}, Parameters: {}, Exception: {}",
 					methodName, Arrays.toString(params), ex.getMessage(), ex);

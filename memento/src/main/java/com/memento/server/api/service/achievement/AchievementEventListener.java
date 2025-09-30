@@ -16,7 +16,6 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.memento.server.api.service.eventMessage.EventMessagePublisher;
 import com.memento.server.client.sse.SseEmitterRepository;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;

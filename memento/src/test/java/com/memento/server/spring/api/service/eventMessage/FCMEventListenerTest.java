@@ -12,14 +12,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.memento.server.api.service.eventMessage.EventMessageConsumer;
-import com.memento.server.api.service.eventMessage.dto.AssociateNotification;
-import com.memento.server.api.service.eventMessage.dto.GuestBookNotification;
-import com.memento.server.api.service.eventMessage.dto.MbtiNotification;
-import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
-import com.memento.server.api.service.eventMessage.dto.NewImageNotification;
-import com.memento.server.api.service.eventMessage.dto.PostNotification;
-import com.memento.server.api.service.eventMessage.dto.ReactionNotification;
+import com.memento.server.api.service.eventMessage.FCMEventListener;
+import com.memento.server.api.service.eventMessage.dto.AssociateFCM;
+import com.memento.server.api.service.eventMessage.dto.GuestBookFCM;
+import com.memento.server.api.service.eventMessage.dto.MbtiFCM;
+import com.memento.server.api.service.eventMessage.dto.MemoryFCM;
+import com.memento.server.api.service.eventMessage.dto.NewImageFCM;
+import com.memento.server.api.service.eventMessage.dto.PostFCM;
+import com.memento.server.api.service.eventMessage.dto.ReactionFCM;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
@@ -40,10 +40,10 @@ import com.memento.server.domain.post.Post;
 import com.memento.server.domain.post.PostRepository;
 import com.memento.server.spring.api.service.IntegrationsTestSupport;
 
-public class EventMessageConsumerTest extends IntegrationsTestSupport {
+public class FCMEventListenerTest extends IntegrationsTestSupport {
 
 	@Autowired
-	private EventMessageConsumer eventMessageConsumer;
+	private FCMEventListener FCMEventListener;
 
 	@Autowired
 	private NotificationRepository notificationRepository;
@@ -130,8 +130,8 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 			.build());
 
 		// when
-		ReactionNotification eventMessage = ReactionNotification.from(post.getId());
-		eventMessageConsumer.handleReactionNotification(eventMessage);
+		ReactionFCM eventMessage = ReactionFCM.from(post.getId());
+		FCMEventListener.handleReactionNotification(eventMessage);
 
 		// then
 		List<Notification> all = notificationRepository.findAll();
@@ -187,8 +187,8 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 			.build());
 
 		// when
-		PostNotification eventMessage = PostNotification.from(memory.getId(), associate.getId(), post.getId());
-		eventMessageConsumer.handlePostNotification(eventMessage);
+		PostFCM eventMessage = PostFCM.of(memory.getId(), associate.getId(), post.getId());
+		FCMEventListener.handlePostNotification(eventMessage);
 
 		// then
 		List<Notification> all = notificationRepository.findAll();
@@ -204,8 +204,8 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 		Associate associate = associateRepository.save(Associate.create("가가", member, community));
 
 		// when
-		GuestBookNotification eventMessage = GuestBookNotification.from(associate.getId());
-		eventMessageConsumer.handleGuestBookNotification(eventMessage);
+		GuestBookFCM eventMessage = GuestBookFCM.from(associate.getId());
+		FCMEventListener.handleGuestBookNotification(eventMessage);
 
 		// then
 		List<Notification> all = notificationRepository.findAll();
@@ -221,8 +221,8 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 		Associate associate = associateRepository.save(Associate.create("가가", member, community));
 
 		// when
-		NewImageNotification eventMessage = NewImageNotification.from(associate.getId());
-		eventMessageConsumer.handleNewImageNotification(eventMessage);
+		NewImageFCM eventMessage = NewImageFCM.from(associate.getId());
+		FCMEventListener.handleNewImageNotification(eventMessage);
 
 		// then
 		List<Notification> all = notificationRepository.findAll();
@@ -238,8 +238,8 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 		Associate associate = associateRepository.save(Associate.create("가가", member, community));
 
 		// when
-		MbtiNotification eventMessage = MbtiNotification.from(associate.getId());
-		eventMessageConsumer.handleMbtiNotification(eventMessage);
+		MbtiFCM eventMessage = MbtiFCM.from(associate.getId());
+		FCMEventListener.handleMbtiNotification(eventMessage);
 
 		// then
 		List<Notification> all = notificationRepository.findAll();
@@ -258,8 +258,8 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 		associateRepository.save(Associate.create("가가", member2, community));
 
 		// when
-		AssociateNotification eventMessage = AssociateNotification.from(community.getId(), member3.getId());
-		eventMessageConsumer.handleAssociateNotification(eventMessage);
+		AssociateFCM eventMessage = AssociateFCM.from(community.getId(), member3.getId());
+		FCMEventListener.handleAssociateNotification(eventMessage);
 
 		// then
 		List<Notification> all = notificationRepository.findAll();
@@ -310,8 +310,8 @@ public class EventMessageConsumerTest extends IntegrationsTestSupport {
 			.build());
 
 		// when
-		MemoryNotification eventMessage = MemoryNotification.from(memory.getId(), associate.getId());
-		eventMessageConsumer.handleMemoryNotification(eventMessage);
+		MemoryFCM eventMessage = MemoryFCM.from(memory.getId(), associate.getId());
+		FCMEventListener.handleMemoryNotification(eventMessage);
 
 		// then
 		List<Notification> all = notificationRepository.findAll();

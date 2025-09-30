@@ -25,8 +25,8 @@ import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
 import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
-import com.memento.server.api.service.eventMessage.EventMessagePublisher;
-import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
+import com.memento.server.api.service.fcm.FCMEventPublisher;
+import com.memento.server.api.service.fcm.dto.event.MemoryFCM;
 import com.memento.server.api.service.memory.dto.Author;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.achievement.Achievement;
@@ -60,9 +60,8 @@ public class MemoryService {
 	private final CommunityRepository communityRepository;
 	private final EventRepository eventRepository;
 	private final AssociateRepository associateRepository;
-
-	private final EventMessagePublisher eventMessagePublisher;
 	private final AchievementEventPublisher achievementEventPublisher;
+	private final FCMEventPublisher fcmEventPublisher;
 
 	public ReadMemoryResponse read(Long memoryId) {
 		Memory memory = memoryRepository.findById(memoryId).orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
@@ -180,9 +179,10 @@ public class MemoryService {
 		}
 		memoryAssociateRepository.saveAll(memoryAssociates);
 
-		eventMessagePublisher.publishNotification(MemoryNotification.from(memory.getId(), associateId));
 		achievementEventPublisher.publishMemoryAchievement(MemoryAchievementEvent.from(List.of(associate.getId()), MemoryAchievementEvent.Type.CREATE));
 		achievementEventPublisher.publishMemoryAchievement(MemoryAchievementEvent.from(associates.stream().map(Associate::getId).toList(), MemoryAchievementEvent.Type.JOINED));
+		fcmEventPublisher.publishNotification(MemoryFCM.from(memory.getId(), associateId));
+
 		return CreateUpdateMemoryResponse.from(memory);
 	}
 

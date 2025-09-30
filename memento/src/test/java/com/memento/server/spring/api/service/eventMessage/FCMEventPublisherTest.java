@@ -16,8 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.memento.server.api.service.eventMessage.EventMessagePublisher;
-import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
+import com.memento.server.api.service.eventMessage.FCMEventPublisher;
+import com.memento.server.api.service.eventMessage.dto.MemoryFCM;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
@@ -37,10 +37,10 @@ import com.memento.server.domain.notification.NotificationRepository;
 import com.memento.server.spring.api.service.IntegrationsTestSupport;
 
 @EnableAsync
-public class EventMessagePublisherTest extends IntegrationsTestSupport {
+public class FCMEventPublisherTest extends IntegrationsTestSupport {
 
 	@Autowired
-	private EventMessagePublisher eventMessagePublisher;
+	private FCMEventPublisher FCMEventPublisher;
 
 	@Autowired
 	private NotificationRepository notificationRepository;
@@ -123,7 +123,7 @@ public class EventMessagePublisherTest extends IntegrationsTestSupport {
 				.memory(memory)
 				.associate(associate3)
 				.build());
-			eventMessagePublisher.publishNotification(MemoryNotification.from(memory.getId(), associate.getId()));
+			FCMEventPublisher.publishNotification(MemoryFCM.from(memory.getId(), associate.getId()));
 			return null;
 		});
 

@@ -28,8 +28,8 @@ import com.memento.server.api.controller.post.dto.read.PostAuthor;
 import com.memento.server.api.controller.post.dto.read.TemporaryVoice;
 import com.memento.server.api.controller.post.dto.read.Voice;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
-import com.memento.server.api.service.eventMessage.EventMessagePublisher;
-import com.memento.server.api.service.eventMessage.dto.PostNotification;
+import com.memento.server.api.service.eventMessage.FCMEventPublisher;
+import com.memento.server.api.service.eventMessage.dto.PostFCM;
 import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.api.service.post.dto.PostCommentDto;
 import com.memento.server.common.error.ErrorCodes;
@@ -63,7 +63,7 @@ public class PostService {
 	private final CommentRepository commentRepository;
 	private final MinioService minioService;
 	private final AchievementEventPublisher achievementEventPublisher;
-	private final EventMessagePublisher eventMessagePublisher;
+	private final FCMEventPublisher fcmEventPublisher;
 
 	public Associate validAssociate(Long communityId, Long associateId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -164,7 +164,7 @@ public class PostService {
 		postImageRepository.saveAll(images);
 
 		achievementEventPublisher.publishPostImageAchievement(PostImageAchievementEvent.from(associate.getId()));
-		eventMessagePublisher.publishNotification(PostNotification.from(memory));
+		fcmEventPublisher.publishNotification(PostFCM.of(associate.getId(), memory.getId(), post.getId()));
 	}
 
 	@Transactional

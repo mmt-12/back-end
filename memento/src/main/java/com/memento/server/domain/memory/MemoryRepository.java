@@ -32,4 +32,12 @@ public interface MemoryRepository extends JpaRepository<Memory, Long> {
 	);
 
 	Optional<Memory> findByIdAndDeletedAtIsNull(Long id);
+
+	@Query("""
+		SELECT m
+		FROM Memory m
+		JOIN FETCH m.event e
+		WHERE m.id = :id AND m.deletedAt IS NULL
+		""")
+	Optional<Memory> findByIdWithEventAndDeletedAtIsNull(@Param("id") Long id);
 }

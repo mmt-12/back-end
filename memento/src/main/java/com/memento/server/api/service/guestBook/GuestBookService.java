@@ -10,8 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
-import com.memento.server.api.service.eventMessage.EventMessagePublisher;
-import com.memento.server.api.service.eventMessage.dto.GuestBookNotification;
+import com.memento.server.api.service.eventMessage.FCMEventPublisher;
+import com.memento.server.api.service.eventMessage.dto.GuestBookFCM;
 import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
@@ -40,7 +40,7 @@ public class GuestBookService {
 	private final GuestBookRepository guestBookRepository;
 	private final VoiceRepository voiceRepository;
 	private final EmojiRepository emojiRepository;
-	private final EventMessagePublisher eventMessagePublisher;
+	private final FCMEventPublisher fcmEventPublisher;
 	private final AchievementEventPublisher achievementEventPublisher;
 
 	public Associate validAssociate(Long communityId, Long associateId){
@@ -86,7 +86,7 @@ public class GuestBookService {
 		}
 		
 		GuestBook result = guestBookRepository.save(guestBook);
-		eventMessagePublisher.publishNotification(GuestBookNotification.from(associateId));
+
 		achievementEventPublisher.publishGuestBookAchievement(GuestBookAchievementEvent.from(register.getId(), result.getId(), GuestBookAchievementEvent.Type.COUNT));
 		if(result.getType().equals(GuestBookType.TEXT)){
 			achievementEventPublisher.publishGuestBookAchievement(GuestBookAchievementEvent.from(register.getId(), result.getId(), GuestBookAchievementEvent.Type.WORD));
@@ -98,6 +98,8 @@ public class GuestBookService {
 				associate.getMember().getBirthday()
 			));
 		}
+
+		fcmEventPublisher.publishNotification(GuestBookFCM.from(associateId));
 	}
 
 	@Transactional
@@ -112,7 +114,7 @@ public class GuestBookService {
 				.content(url)
 				.type(GuestBookType.VOICE)
 				.build());
-		eventMessagePublisher.publishNotification(GuestBookNotification.from(associateId));
+
 		achievementEventPublisher.publishGuestBookAchievement(GuestBookAchievementEvent.from(associateId, result.getId(), GuestBookAchievementEvent.Type.COUNT));
 		if(associate.getCommunity().getId() == 1L){
 			achievementEventPublisher.publishGuestBookExclusiveAchievement(GuestBookExclusiveAchievementEvent.from(
@@ -121,6 +123,8 @@ public class GuestBookService {
 				associate.getMember().getBirthday()
 			));
 		}
+
+		fcmEventPublisher.publishNotification(GuestBookFCM.from(associateId));
 	}
 
 	public SearchGuestBookResponse search(Long communityId, Long associateId, int size, Long cursor) {

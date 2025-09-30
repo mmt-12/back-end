@@ -1,6 +1,7 @@
 package com.memento.server.api.service.eventMessage;
 
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_EXISTENCE;
+import static com.memento.server.common.error.ErrorCodes.MEMORY_NOT_FOUND;
 import static com.memento.server.domain.notification.NotificationType.ACHIEVE;
 import static com.memento.server.domain.notification.NotificationType.ASSOCIATE;
 import static com.memento.server.domain.notification.NotificationType.BIRTHDAY;
@@ -13,7 +14,6 @@ import static com.memento.server.domain.notification.NotificationType.REACTION;
 import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.Async;
@@ -21,28 +21,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import com.memento.server.api.service.eventMessage.dto.AchievementNotification;
-import com.memento.server.api.service.eventMessage.dto.AssociateNotification;
-import com.memento.server.api.service.eventMessage.dto.BirthdayNotification;
-import com.memento.server.api.service.eventMessage.dto.GuestBookNotification;
-import com.memento.server.api.service.eventMessage.dto.MbtiNotification;
-import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
-import com.memento.server.api.service.eventMessage.dto.NewImageNotification;
-import com.memento.server.api.service.eventMessage.dto.PostNotification;
-import com.memento.server.api.service.eventMessage.dto.ReactionNotification;
+import com.memento.server.api.service.eventMessage.dto.AchievementFCM;
+import com.memento.server.api.service.eventMessage.dto.AssociateFCM;
+import com.memento.server.api.service.eventMessage.dto.BirthdayFCM;
+import com.memento.server.api.service.eventMessage.dto.GuestBookFCM;
+import com.memento.server.api.service.eventMessage.dto.MbtiFCM;
+import com.memento.server.api.service.eventMessage.dto.MemoryFCM;
+import com.memento.server.api.service.eventMessage.dto.NewImageFCM;
+import com.memento.server.api.service.eventMessage.dto.PostFCM;
+import com.memento.server.api.service.eventMessage.dto.ReactionFCM;
 import com.memento.server.api.service.fcm.FCMService;
-import com.memento.server.api.service.fcm.dto.AchievementMessageDto;
-import com.memento.server.api.service.fcm.dto.BirthdayMessageDto;
-import com.memento.server.api.service.fcm.dto.GuestBookMessageDto;
-import com.memento.server.api.service.fcm.dto.MbtiMessageDto;
-import com.memento.server.api.service.fcm.dto.MemoryMessageDto;
-import com.memento.server.api.service.fcm.dto.ProfileImageMessageDto;
-import com.memento.server.api.service.fcm.dto.ReactionMessageDto;
-import com.memento.server.api.service.fcm.dto.ReceiverInfo;
+import com.memento.server.api.service.fcm.dto.FCMRequest;
+import com.memento.server.api.service.fcm.dto.ReactionData;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.memory.Memory;
+import com.memento.server.domain.memory.MemoryAssociateRepository;
 import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.domain.notification.Notification;
 import com.memento.server.domain.notification.NotificationRepository;
@@ -53,65 +48,75 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional(propagation = REQUIRES_NEW)
 @RequiredArgsConstructor
-public class EventMessageConsumer {
+public class FCMEventListener {
 
 	private final FCMService fcmService;
 	private final NotificationRepository notificationRepository;
 	private final AssociateRepository associateRepository;
+	private final MemoryRepository memoryRepository;
+	private final MemoryAssociateRepository memoryAssociateRepository;
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
-	public void handleReactionNotification(ReactionNotification event) {
-		Associate associate = associateRepository.getReferenceById(event.receiverId());
+	public void handleReactionNotification(ReactionFCM event) {
+		Associate receiver = associateRepository.getReferenceById(event.receiverId());
+
+		String title = REACTION.getTitle();
+		String content = createReactionMessageContent(event.actorNickname());
+
 		Notification notification = Notification.builder()
-			.title(event.title())
-			.content(event.content())
+			.title(title)
+			.content(content)
 			.type(REACTION)
 			.actorId(event.actorId())
 			.postId(event.postId())
 			.memoryId(event.memoryId())
-			.receiver(associate)
+			.receiver(receiver)
 			.build();
 
 		notificationRepository.save(notification);
 
-		fcmService.sendReactionNotification(ReactionMessageDto.from(notification));
+		ReactionData reactionData = ReactionData.of(event.memoryId(), event.postId());
+		FCMRequest request = FCMRequest.of(title, content, List.of(event.receiverId()), reactionData);
+		fcmService.sendToAssociates(request);
 	}
 
 	// todo 연결 필요
 	@TransactionalEventListener(phase = AFTER_COMMIT)
-	public void handleAchievementNotification(AchievementNotification event) {
-		Associate associate = associateRepository.getReferenceById(event.receiverId());
+	public void handleAchievementNotification(AchievementFCM event) {
+		Associate receiver = associateRepository.findById(event.receiverId())
+			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
 
 		Notification notification = Notification.builder()
 			.title(ACHIEVE.getTitle())
-			.content(createAchievementMessageContent(associate.getNickname()))
+			.content(createAchievementMessageContent(receiver.getNickname()))
 			.type(ACHIEVE)
-			.receiver(associate)
+			.actorId(receiver.getId())
+			.receiver(receiver)
 			.build();
 
 		notificationRepository.save(notification);
 
-		fcmService.sendAchievementNotification(AchievementMessageDto.from(notification));
+		fcmService.sendToAssociates(FCMRequest.of());
 	}
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
-	public void handleGuestBookNotification(GuestBookNotification event) {
-		Associate associate = associateRepository.getReferenceById(event.receiverId());
+	public void handleGuestBookNotification(GuestBookFCM event) {
+		Associate receiver = associateRepository.getReferenceById(event.receiverId());
 
 		Notification notification = Notification.builder()
 			.title(GUESTBOOK.getTitle())
 			.content(createGuestBookMessageContent())
 			.type(GUESTBOOK)
-			.receiver(associate)
+			.receiver(receiver)
 			.build();
 
 		notificationRepository.save(notification);
 
-		fcmService.sendGuestBookNotification(GuestBookMessageDto.from(notification));
+		fcmService.sendToAssociates(FCMRequest.of());
 	}
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
-	public void handleNewImageNotification(NewImageNotification event) {
+	public void handleNewImageNotification(NewImageFCM event) {
 		Associate associate = associateRepository.getReferenceById(event.receiverId());
 
 		Notification notification = Notification.builder()
@@ -123,11 +128,11 @@ public class EventMessageConsumer {
 
 		notificationRepository.save(notification);
 
-		fcmService.sendProfileImageNotification(ProfileImageMessageDto.from(notification));
+		fcmService.sendToAssociates(FCMRequest.of());
 	}
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
-	public void handleMbtiNotification(MbtiNotification event) {
+	public void handleMbtiNotification(MbtiFCM event) {
 		Associate associate = associateRepository.getReferenceById(event.receiverId());
 
 		Notification notification = Notification.builder()
@@ -139,12 +144,12 @@ public class EventMessageConsumer {
 
 		notificationRepository.save(notification);
 
-		fcmService.sendMbtiNotification(MbtiMessageDto.from(notification));
+		fcmService.sendToAssociates(FCMRequest.of());
 	}
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
-	public void handleBirthdayNotification(BirthdayNotification event) {
-		Associate birthdayPerson = associateRepository.findById(event.associateId())
+	public void handleBirthdayNotification(BirthdayFCM event) {
+		Associate birthdayPerson = associateRepository.findById(event.birthdayAssociateId())
 			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
 		List<Associate> associates = associateRepository.findAllByCommunityId(event.communityId());
 
@@ -159,99 +164,92 @@ public class EventMessageConsumer {
 				.build())
 			.toList();
 
-		notifications.add(Notification.builder()
+		Notification notification = Notification.builder()
 			.title(BIRTHDAY.getTitle())
 			.content(createBirthdayMessageContentForBirthdayPerson(birthdayPerson.getNickname()))
 			.type(BIRTHDAY)
 			.actorId(birthdayPerson.getId())
 			.receiver(birthdayPerson)
-			.build());
+			.build();
 
 		notificationRepository.saveAll(notifications);
+		notificationRepository.save(notification);
 
-		List<ReceiverInfo> receivers = notifications.stream()
-			.map(notification -> ReceiverInfo.builder()
-				.receiverId(notification.getReceiver().getId())
-				.content(notification.getContent())
-				.build())
-			.toList();
-
-		BirthdayMessageDto birthdayMessageDto = BirthdayMessageDto.from(BIRTHDAY.getTitle(), BIRTHDAY,
-			birthdayPerson.getId(), receivers);
-
-		fcmService.sendBirthdayNotification(birthdayMessageDto);
+		fcmService.sendToAssociates(FCMRequest.of());
+		fcmService.sendToAssociates(FCMRequest.of());
 	}
 
 	@TransactionalEventListener(phase = AFTER_COMMIT)
-	public void handleMemoryNotification(MemoryNotification event) {
-		List<Associate> associates = associateRepository.findAllByMemoryId(event.memoryId());
+	public void handleMemoryNotification(MemoryFCM event) {
+		List<Associate> associates = memoryAssociateRepository.findAssociatesByMemoryIdAndDeletedAtIsNull(
+			event.memoryId());
 
 		List<Notification> notificationList = associates.stream()
-			.filter(associate -> !associate.getId().equals(event.authorId()))
+			.filter(associate -> !associate.getId().equals(event.makeMemoryAssociateId()))
 			.map(associate -> Notification.builder()
 				.title(MEMORY.getTitle())
 				.content(createMemoryMessageContent(associate.getNickname()))
 				.type(MEMORY)
-				.receiver(associate)
+				.actorId(event.makeMemoryAssociateId())
 				.memoryId(event.memoryId())
+				.receiver(associate)
 				.build())
 			.toList();
 
 		notificationRepository.saveAll(notificationList);
 
-		List<ReceiverInfo> receivers = notificationList.stream()
-			.map(notification -> ReceiverInfo.builder()
-				.receiverId(notification.getReceiver().getId())
-				.content(notification.getContent())
-				.build())
-			.toList();
-
-		MemoryMessageDto memoryMessageDto = MemoryMessageDto.from(MEMORY.getTitle(), MEMORY, event.memoryId(),
-			receivers);
-
-		fcmService.sendMemoryCreatedNotification(memoryMessageDto);
+		fcmService.sendToAssociates(FCMRequest.of());
 	}
 
 	// todo POST: 기억에 새 포스트 등록
 	@TransactionalEventListener(phase = AFTER_COMMIT)
-	public void handlePostNotification(PostNotification event) {
-		List<Associate> associates = associateRepository.findAllByMemoryId(event.memoryId());
+	public void handlePostNotification(PostFCM event) {
+		Memory memory = memoryRepository.findByIdWithEventAndDeletedAtIsNull(event.memoryId())
+			.orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
+		List<Associate> associates = memoryAssociateRepository.findAssociatesByMemoryIdAndDeletedAtIsNull(
+			event.memoryId());
 
-		List<Notification> notificationList = new ArrayList<>();
-		for (Associate associate : associates) {
-			if (associate.getId().equals(event.actorId()))
-				continue;
-			notificationList.add(Notification.builder()
+		List<Notification> notificationList = associates.stream()
+			.filter(associate -> !associate.getId().equals(event.makePostAssociateId()))
+			.map(associate -> Notification.builder()
 				.title(POST.getTitle())
-				.content(POST.getTitle())
+				.content(createPostMessageContent(memory.getEvent().getTitle()))
 				.type(POST)
-				.receiver(associate)
+				.actorId(event.makePostAssociateId())
 				.postId(event.postId())
 				.memoryId(event.memoryId())
-				.build());
-		}
+				.receiver(associate)
+				.build())
+			.toList();
 
 		notificationRepository.saveAll(notificationList);
+
+		fcmService.sendToAssociates(FCMRequest.of());
 	}
 
 	// todo ASSOCIATE: 새로운 참가자 등장
 	@TransactionalEventListener(phase = AFTER_COMMIT)
-	public void handleAssociateNotification(AssociateNotification event) {
+	public void handleAssociateNotification(AssociateFCM event) {
 		List<Associate> associates = associateRepository.findAllByCommunityId(event.communityId());
 
-		List<Notification> notificationList = new ArrayList<>();
-		for (Associate associate : associates) {
-			if (associate.getId().equals(event.associateId()))
-				continue;
-			notificationList.add(Notification.builder()
+		List<Notification> notifications = associates.stream()
+			.filter(associate -> !associate.getId().equals(event.associateId()))
+			.map(associate -> Notification.builder()
 				.title(ASSOCIATE.getTitle())
-				.content(ASSOCIATE.getTitle())
+				.content(createAssociateMessageContent(event.nickname()))
 				.type(ASSOCIATE)
+				.actorId(event.associateId())
 				.receiver(associate)
-				.build());
-		}
+				.build())
+			.toList();
 
-		notificationRepository.saveAll(notificationList);
+		notificationRepository.saveAll(notifications);
+
+		fcmService.sendToAssociates(FCMRequest.of());
+	}
+
+	private String createReactionMessageContent(String nickname) {
+		return String.format("%s님이 포스트에 반응을 남겼어요.", nickname);
 	}
 
 	private String createMemoryMessageContent(String nickname) {
@@ -280,5 +278,13 @@ public class EventMessageConsumer {
 
 	private String createBirthdayMessageContentForBirthdayPerson(String nickname) {
 		return String.format("%s님 생일 축하드립니다!! 방명록에서 축하의 메세지를 확인해보세요.", nickname);
+	}
+
+	private String createPostMessageContent(String eventTitle) {
+		return String.format("%s에 새로운 포스트가 올라왔어요. 확인해보세요.", eventTitle);
+	}
+
+	private String createAssociateMessageContent(String nickname) {
+		return String.format("%s님이 가입했어요. 방명록에 환영의 메세지를 남겨주세요!", nickname);
 	}
 }
