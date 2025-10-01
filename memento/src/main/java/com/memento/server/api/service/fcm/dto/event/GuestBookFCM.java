@@ -1,4 +1,4 @@
-package com.memento.server.api.service.eventMessage.dto;
+package com.memento.server.api.service.fcm.dto.event;
 
 import lombok.Builder;
 

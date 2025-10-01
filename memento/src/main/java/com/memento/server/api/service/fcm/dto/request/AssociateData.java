@@ -1,6 +1,6 @@
-package com.memento.server.api.service.fcm.dto;
+package com.memento.server.api.service.fcm.dto.request;
 
-import static com.memento.server.domain.notification.NotificationType.BIRTHDAY;
+import static com.memento.server.domain.notification.NotificationType.ASSOCIATE;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,7 @@ import com.memento.server.domain.notification.NotificationType;
 import lombok.Builder;
 
 @Builder
-public record BirthdayData(
+public record AssociateData(
 	NotificationType type,
 	Long associateId
 ) implements FCMData {
@@ -23,7 +23,7 @@ public record BirthdayData(
 		return data;
 	}
 
-	public static BirthdayData of(Long associateId) {
-		return BirthdayData.builder().type(BIRTHDAY).associateId(associateId).build();
+	public static AssociateData of(Long associateId) {
+		return AssociateData.builder().type(ASSOCIATE).associateId(associateId).build();
 	}
 }

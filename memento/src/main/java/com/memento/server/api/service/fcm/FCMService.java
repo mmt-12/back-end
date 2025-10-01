@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.memento.server.api.service.fcm.dto.FCMRequest;
-import com.memento.server.api.service.fcm.dto.ReceiverInfo;
+import com.memento.server.api.service.fcm.dto.request.FCMRequest;
+import com.memento.server.api.service.fcm.dto.request.ReceiverInfo;
 import com.memento.server.client.fcm.FCMSender;
 import com.memento.server.domain.fcm.FCMToken;
 import com.memento.server.domain.fcm.FCMTokenRepository;

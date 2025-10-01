@@ -1,9 +1,9 @@
-package com.memento.server.api.service.eventMessage;
+package com.memento.server.api.service.fcm;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import com.memento.server.api.service.eventMessage.dto.FCMEvent;
+import com.memento.server.api.service.fcm.dto.event.FCMEvent;
 
 import lombok.RequiredArgsConstructor;
 

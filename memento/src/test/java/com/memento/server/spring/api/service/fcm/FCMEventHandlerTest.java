@@ -1,4 +1,4 @@
-package com.memento.server.spring.api.service.eventMessage;
+package com.memento.server.spring.api.service.fcm;
 
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_EXISTENCE;
 import static com.memento.server.common.error.ErrorCodes.MEMORY_NOT_FOUND;
@@ -13,7 +13,6 @@ import static com.memento.server.domain.notification.NotificationType.POST;
 import static com.memento.server.domain.notification.NotificationType.REACTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
@@ -22,26 +21,25 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import com.memento.server.api.service.eventMessage.FCMEventListener;
-import com.memento.server.api.service.eventMessage.dto.AchievementFCM;
-import com.memento.server.api.service.eventMessage.dto.AssociateFCM;
-import com.memento.server.api.service.eventMessage.dto.BirthdayFCM;
-import com.memento.server.api.service.eventMessage.dto.GuestBookFCM;
-import com.memento.server.api.service.eventMessage.dto.MbtiFCM;
-import com.memento.server.api.service.eventMessage.dto.MemoryFCM;
-import com.memento.server.api.service.eventMessage.dto.NewImageFCM;
-import com.memento.server.api.service.eventMessage.dto.PostFCM;
-import com.memento.server.api.service.eventMessage.dto.ReactionFCM;
+import com.memento.server.api.service.fcm.FCMEventHandler;
+import com.memento.server.api.service.fcm.dto.event.AchievementFCM;
+import com.memento.server.api.service.fcm.dto.event.AssociateFCM;
+import com.memento.server.api.service.fcm.dto.event.BirthdayFCM;
+import com.memento.server.api.service.fcm.dto.event.GuestBookFCM;
+import com.memento.server.api.service.fcm.dto.event.MbtiFCM;
+import com.memento.server.api.service.fcm.dto.event.MemoryFCM;
+import com.memento.server.api.service.fcm.dto.event.NewImageFCM;
+import com.memento.server.api.service.fcm.dto.event.PostFCM;
+import com.memento.server.api.service.fcm.dto.event.ReactionFCM;
 import com.memento.server.api.service.fcm.FCMService;
-import com.memento.server.api.service.fcm.dto.FCMRequest;
+import com.memento.server.api.service.fcm.dto.request.FCMRequest;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
@@ -59,17 +57,17 @@ import com.memento.server.domain.memory.MemoryAssociateRepository;
 import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.domain.notification.Notification;
 import com.memento.server.domain.notification.NotificationRepository;
+import com.memento.server.domain.notification.NotificationType;
 import com.memento.server.domain.post.Post;
 import com.memento.server.domain.post.PostRepository;
 import com.memento.server.spring.api.service.IntegrationsTestSupport;
 
-@ExtendWith(MockitoExtension.class)
-public class FCMEventListenerTest extends IntegrationsTestSupport {
+public class FCMEventHandlerTest extends IntegrationsTestSupport {
 
 	@Autowired
-	private FCMEventListener fcmEventListener;
+	private FCMEventHandler fcmEventHandler;
 
-	@Mock
+	@MockitoBean
 	private FCMService fcmService;
 
 	@Autowired
@@ -95,6 +93,13 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private PostRepository postRepository;
+
+	private FCMTestFixtures commonFixtures;
+
+	@BeforeEach
+	public void setUp() {
+		commonFixtures = createSingleReceiverTestFixtures();
+	}
 
 	@AfterEach
 	public void tearDown() {
@@ -122,51 +127,25 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 		);
 
 		// when
-		fcmEventListener.handleReactionNotification(event);
+		fcmEventHandler.handleReactionNotification(event);
 
 		// then
-		// 1. Notification 생성 검증
-		List<Notification> notifications = notificationRepository.findAll();
-		assertThat(notifications).hasSize(1);
-
-		Notification notification = notifications.get(0);
-		assertThat(notification.getTitle()).isEqualTo(REACTION.getTitle());
-		assertThat(notification.getContent()).contains(fixtures.actor.getNickname() + "님이 포스트에 반응을 남겼어요");
-		assertThat(notification.getType()).isEqualTo(REACTION);
-		assertThat(notification.getReceiver().getId()).isEqualTo(fixtures.receiver.getId());
-
-		// 2. FCMService 호출 검증
-		ArgumentCaptor<FCMRequest> captor = ArgumentCaptor.forClass(FCMRequest.class);
-		verify(fcmService).sendToAssociates(captor.capture());
-
-		FCMRequest request = captor.getValue();
-		assertThat(request.title()).isEqualTo(REACTION.getTitle());
-		assertThat(request.receiverInfos()).hasSize(1);
-		assertThat(request.receiverInfos().get(0).id()).isEqualTo(fixtures.receiver.getId());
+		assertSingleNotification(REACTION, fixtures.actor.getNickname() + "님이 포스트에 반응을 남겼어요");
+		assertSingleReceiverFCMRequest(REACTION, fixtures.receiver.getId());
 	}
 
 	@Test
 	@DisplayName("업적 달성 알림을 생성하고 FCM 전송을 요청한다")
 	void handleAchievementNotification() {
 		// given
-		FCMTestFixtures fixtures = createSingleReceiverTestFixtures();
-		AchievementFCM event = AchievementFCM.of(fixtures.receiver.getId());
+		AchievementFCM event = AchievementFCM.of(commonFixtures.receiver.getId());
 
 		// when
-		fcmEventListener.handleAchievementNotification(event);
+		fcmEventHandler.handleAchievementNotification(event);
 
 		// then
-		// 1. Notification 생성 검증
-		List<Notification> notifications = notificationRepository.findAll();
-		assertThat(notifications).hasSize(1);
-
-		Notification notification = notifications.get(0);
-		assertThat(notification.getTitle()).isEqualTo(ACHIEVE.getTitle());
-		assertThat(notification.getContent()).contains(fixtures.receiver.getNickname() + "님, 새로운 업적을 달성했어요");
-		assertThat(notification.getType()).isEqualTo(ACHIEVE);
-
-		// 2. FCMService 호출 검증
-		verify(fcmService).sendToAssociates(any(FCMRequest.class));
+		assertSingleNotification(ACHIEVE, commonFixtures.receiver.getNickname() + "님, 새로운 업적을 달성했어요");
+		assertSingleReceiverFCMRequest(ACHIEVE, commonFixtures.receiver.getId());
 	}
 
 	@Test
@@ -176,7 +155,7 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 		AchievementFCM event = AchievementFCM.of(999L);
 
 		// when & then
-		assertThatThrownBy(() -> fcmEventListener.handleAchievementNotification(event))
+		assertThatThrownBy(() -> fcmEventHandler.handleAchievementNotification(event))
 			.isInstanceOf(MementoException.class)
 			.hasFieldOrPropertyWithValue("errorCode", ASSOCIATE_NOT_EXISTENCE);
 	}
@@ -185,72 +164,42 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 	@DisplayName("방명록 알림을 생성하고 FCM 전송을 요청한다")
 	void handleGuestBookNotification() {
 		// given
-		FCMTestFixtures fixtures = createSingleReceiverTestFixtures();
-		GuestBookFCM event = GuestBookFCM.from(fixtures.receiver.getId());
+		GuestBookFCM event = GuestBookFCM.from(commonFixtures.receiver.getId());
 
 		// when
-		fcmEventListener.handleGuestBookNotification(event);
+		fcmEventHandler.handleGuestBookNotification(event);
 
 		// then
-		// 1. Notification 생성 검증
-		List<Notification> notifications = notificationRepository.findAll();
-		assertThat(notifications).hasSize(1);
-
-		Notification notification = notifications.get(0);
-		assertThat(notification.getTitle()).isEqualTo(GUESTBOOK.getTitle());
-		assertThat(notification.getContent()).isEqualTo("누군가가 내 방명록에 글을 작성했어요.");
-		assertThat(notification.getType()).isEqualTo(GUESTBOOK);
-
-		// 2. FCMService 호출 검증
-		verify(fcmService).sendToAssociates(any(FCMRequest.class));
+		assertSingleNotification(GUESTBOOK, "누군가가 내 방명록에 글을 작성했어요");
+		assertSingleReceiverFCMRequest(GUESTBOOK, commonFixtures.receiver.getId());
 	}
 
 	@Test
 	@DisplayName("새 이미지 알림을 생성하고 FCM 전송을 요청한다")
 	void handleNewImageNotification() {
 		// given
-		FCMTestFixtures fixtures = createSingleReceiverTestFixtures();
-		NewImageFCM event = NewImageFCM.from(fixtures.receiver.getId());
+		NewImageFCM event = NewImageFCM.from(commonFixtures.receiver.getId());
 
 		// when
-		fcmEventListener.handleNewImageNotification(event);
+		fcmEventHandler.handleNewImageNotification(event);
 
 		// then
-		// 1. Notification 생성 검증
-		List<Notification> notifications = notificationRepository.findAll();
-		assertThat(notifications).hasSize(1);
-
-		Notification notification = notifications.get(0);
-		assertThat(notification.getTitle()).isEqualTo(NEWIMAGE.getTitle());
-		assertThat(notification.getContent()).isEqualTo("새로운 프로필 이미지가 등록되었습니다.");
-		assertThat(notification.getType()).isEqualTo(NEWIMAGE);
-
-		// 2. FCMService 호출 검증
-		verify(fcmService).sendToAssociates(any(FCMRequest.class));
+		assertSingleNotification(NEWIMAGE, "새로운 프로필 이미지가 등록되었습니다");
+		assertSingleReceiverFCMRequest(NEWIMAGE, commonFixtures.receiver.getId());
 	}
 
 	@Test
 	@DisplayName("MBTI 알림을 생성하고 FCM 전송을 요청한다")
 	void handleMbtiNotification() {
 		// given
-		FCMTestFixtures fixtures = createSingleReceiverTestFixtures();
-		MbtiFCM event = MbtiFCM.from(fixtures.receiver.getId());
+		MbtiFCM event = MbtiFCM.from(commonFixtures.receiver.getId());
 
 		// when
-		fcmEventListener.handleMbtiNotification(event);
+		fcmEventHandler.handleMbtiNotification(event);
 
 		// then
-		// 1. Notification 생성 검증
-		List<Notification> notifications = notificationRepository.findAll();
-		assertThat(notifications).hasSize(1);
-
-		Notification notification = notifications.get(0);
-		assertThat(notification.getTitle()).isEqualTo(MBTI.getTitle());
-		assertThat(notification.getContent()).isEqualTo("새로운 MBTI 평가가 추가되었습니다. 결과를 확인 해보세요.");
-		assertThat(notification.getType()).isEqualTo(MBTI);
-
-		// 2. FCMService 호출 검증
-		verify(fcmService).sendToAssociates(any(FCMRequest.class));
+		assertSingleNotification(MBTI, "새로운 MBTI 평가가 추가되었습니다. 결과를 확인 해보세요");
+		assertSingleReceiverFCMRequest(MBTI, commonFixtures.receiver.getId());
 	}
 
 	@Test
@@ -261,7 +210,7 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 		BirthdayFCM event = BirthdayFCM.from(fixtures.community.getId(), fixtures.birthdayPerson.getId());
 
 		// when
-		fcmEventListener.handleBirthdayNotification(event);
+		fcmEventHandler.handleBirthdayNotification(event);
 
 		// then
 		// 1. Notification 생성 검증 (생일자 + 다른 멤버들)
@@ -270,22 +219,22 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 
 		// 생일자가 아닌 멤버들의 알림 검증
 		List<Notification> associateNotifications = notifications.stream()
-			.filter(n -> !n.getReceiver().equals(fixtures.birthdayPerson))
+			.filter(n -> !n.getReceiver().getId().equals(fixtures.birthdayPerson.getId()))
 			.toList();
 		assertThat(associateNotifications).hasSize(2);
-		assertThat(associateNotifications.get(0).getContent())
+		assertThat(associateNotifications.getFirst().getContent())
 			.contains("오늘은 " + fixtures.birthdayPerson.getNickname() + "님의 생일입니다");
 
 		// 생일자의 알림 검증
 		Notification birthdayNotification = notifications.stream()
-			.filter(n -> n.getReceiver().equals(fixtures.birthdayPerson))
+			.filter(n -> n.getReceiver().getId().equals(fixtures.birthdayPerson.getId()))
 			.findFirst()
 			.orElseThrow();
 		assertThat(birthdayNotification.getContent())
 			.contains(fixtures.birthdayPerson.getNickname() + "님 생일 축하드립니다");
 
 		// 2. FCMService 호출 검증
-		verify(fcmService).sendToAssociates(any(FCMRequest.class));
+		assertMultipleReceiverFCMRequest(BIRTHDAY, 3);
 	}
 
 	@Test
@@ -296,7 +245,7 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 		BirthdayFCM event = BirthdayFCM.from(fixtures.community.getId(), 999L);
 
 		// when & then
-		assertThatThrownBy(() -> fcmEventListener.handleBirthdayNotification(event))
+		assertThatThrownBy(() -> fcmEventHandler.handleBirthdayNotification(event))
 			.isInstanceOf(MementoException.class)
 			.hasFieldOrPropertyWithValue("errorCode", ASSOCIATE_NOT_EXISTENCE);
 	}
@@ -309,7 +258,7 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 		MemoryFCM event = MemoryFCM.from(fixtures.memory.getId(), fixtures.actor.getId());
 
 		// when
-		fcmEventListener.handleMemoryNotification(event);
+		fcmEventHandler.handleMemoryNotification(event);
 
 		// then
 		// 1. Notification 생성 검증 (메모리 생성자 제외)
@@ -324,11 +273,7 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 		});
 
 		// 2. FCMService 호출 검증
-		ArgumentCaptor<FCMRequest> captor = ArgumentCaptor.forClass(FCMRequest.class);
-		verify(fcmService).sendToAssociates(captor.capture());
-
-		FCMRequest request = captor.getValue();
-		assertThat(request.receiverInfos()).hasSize(2);
+		assertMultipleReceiverFCMRequest(MEMORY, 2);
 	}
 
 	@Test
@@ -339,7 +284,7 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 		PostFCM event = PostFCM.of(fixtures.actor.getId(), fixtures.memory.getId(), fixtures.post.getId());
 
 		// when
-		fcmEventListener.handlePostNotification(event);
+		fcmEventHandler.handlePostNotification(event);
 
 		// then
 		// 1. Notification 생성 검증
@@ -353,7 +298,7 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 		});
 
 		// 2. FCMService 호출 검증
-		verify(fcmService).sendToAssociates(any(FCMRequest.class));
+		assertMultipleReceiverFCMRequest(POST, 2);
 	}
 
 	@Test
@@ -363,7 +308,7 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 		PostFCM event = PostFCM.of(1L, 999L, 1L);
 
 		// when & then
-		assertThatThrownBy(() -> fcmEventListener.handlePostNotification(event))
+		assertThatThrownBy(() -> fcmEventHandler.handlePostNotification(event))
 			.isInstanceOf(MementoException.class)
 			.hasFieldOrPropertyWithValue("errorCode", MEMORY_NOT_FOUND);
 	}
@@ -376,7 +321,7 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 		AssociateFCM event = AssociateFCM.from("새멤버", fixtures.community.getId(), fixtures.newMember.getId());
 
 		// when
-		fcmEventListener.handleAssociateNotification(event);
+		fcmEventHandler.handleAssociateNotification(event);
 
 		// then
 		// 1. Notification 생성 검증 (새 참가자 제외)
@@ -390,10 +335,88 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 		});
 
 		// 2. FCMService 호출 검증
-		verify(fcmService).sendToAssociates(any(FCMRequest.class));
+		assertMultipleReceiverFCMRequest(ASSOCIATE, 2);
 	}
 
-	// Test Fixtures
+	@Test
+	@DisplayName("존재하지 않는 Associate ID로 리액션 알림 시 예외가 발생한다")
+	void handleReactionNotificationWithNonExistentAssociate() {
+		// given
+		ReactionFCM event = ReactionFCM.of("actor", 1L, 1L, 1L, 999L);
+
+		// when & then
+		assertThatThrownBy(() -> fcmEventHandler.handleReactionNotification(event))
+			.isInstanceOf(MementoException.class)
+			.hasFieldOrPropertyWithValue("errorCode", ASSOCIATE_NOT_EXISTENCE);
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 Associate ID로 방명록 알림 시 예외가 발생한다")
+	void handleGuestBookNotificationWithNonExistentAssociate() {
+		// given
+		GuestBookFCM event = GuestBookFCM.from(999L);
+
+		// when & then
+		assertThatThrownBy(() -> fcmEventHandler.handleGuestBookNotification(event))
+			.isInstanceOf(MementoException.class)
+			.hasFieldOrPropertyWithValue("errorCode", ASSOCIATE_NOT_EXISTENCE);
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 Associate ID로 새 이미지 알림 시 예외가 발생한다")
+	void handleNewImageNotificationWithNonExistentAssociate() {
+		// given
+		NewImageFCM event = NewImageFCM.from(999L);
+
+		// when & then
+		assertThatThrownBy(() -> fcmEventHandler.handleNewImageNotification(event))
+			.isInstanceOf(MementoException.class)
+			.hasFieldOrPropertyWithValue("errorCode", ASSOCIATE_NOT_EXISTENCE);
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 Associate ID로 MBTI 알림 시 예외가 발생한다")
+	void handleMbtiNotificationWithNonExistentAssociate() {
+		// given
+		MbtiFCM event = MbtiFCM.from(999L);
+
+		// when & then
+		assertThatThrownBy(() -> fcmEventHandler.handleMbtiNotification(event))
+			.isInstanceOf(MementoException.class)
+			.hasFieldOrPropertyWithValue("errorCode", ASSOCIATE_NOT_EXISTENCE);
+	}
+
+	private void assertSingleNotification(NotificationType type, String expectedContent) {
+		List<Notification> notifications = notificationRepository.findAll();
+		assertThat(notifications).hasSize(1);
+
+		Notification notification = notifications.getFirst();
+		assertThat(notification.getTitle()).isEqualTo(type.getTitle());
+		assertThat(notification.getContent()).contains(expectedContent);
+		assertThat(notification.getType()).isEqualTo(type);
+	}
+
+	private void assertSingleReceiverFCMRequest(NotificationType type, Long receiverId) {
+		ArgumentCaptor<FCMRequest> captor = ArgumentCaptor.forClass(FCMRequest.class);
+
+		verify(fcmService).sendToAssociates(captor.capture());
+
+		FCMRequest request = captor.getValue();
+		assertThat(request.title()).isEqualTo(type.getTitle());
+		assertThat(request.receiverInfos()).hasSize(1);
+		assertThat(request.receiverInfos().getFirst().id()).isEqualTo(receiverId);
+	}
+
+	private void assertMultipleReceiverFCMRequest(NotificationType type, int receiverCount) {
+		ArgumentCaptor<FCMRequest> captor = ArgumentCaptor.forClass(FCMRequest.class);
+
+		verify(fcmService).sendToAssociates(captor.capture());
+
+		FCMRequest request = captor.getValue();
+		assertThat(request.title()).isEqualTo(type.getTitle());
+		assertThat(request.receiverInfos()).hasSize(receiverCount);
+	}
+
 	private FCMTestFixtures createSingleReceiverTestFixtures() {
 		Member member = memberRepository.save(
 			Member.create("테스터", "test@example.com", LocalDate.of(1990, 1, 1), 1001L));
@@ -470,7 +493,6 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 		Event event = eventRepository.save(createTestEvent(community, actor));
 		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
 
-		// MemoryAssociate 관계 생성
 		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(actor).build());
 		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(member1Associate).build());
 		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(member2Associate).build());
@@ -526,20 +548,19 @@ public class FCMEventListenerTest extends IntegrationsTestSupport {
 			.location(Location.builder()
 				.address("테스트 주소")
 				.name("테스트 장소")
-				.latitude(BigDecimal.valueOf(37.5665))
-				.longitude(BigDecimal.valueOf(126.9780))
+				.latitude(BigDecimal.ONE)
+				.longitude(BigDecimal.ONE)
 				.code(1)
 				.build())
 			.period(Period.builder()
-				.startTime(LocalDateTime.now().minusDays(1))
-				.endTime(LocalDateTime.now())
+				.startTime(LocalDateTime.of(2025, 1, 1, 0, 0))
+				.endTime(LocalDateTime.of(2025, 1, 2, 0, 0))
 				.build())
 			.community(community)
 			.associate(associate)
 			.build();
 	}
 
-	// Test Fixtures Builder
 	public static class FCMTestFixtures {
 		public Associate actor;
 		public Associate receiver;

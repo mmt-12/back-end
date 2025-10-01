@@ -10,12 +10,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.profileImage.dto.SearchProfileImageResponse;
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
+import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.profileImage.ProfileImageService;
 import com.memento.server.associate.AssociateFixtures;
 import com.memento.server.common.exception.MementoException;
@@ -48,6 +49,12 @@ public class ProfileImageServiceTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private AssociateRepository associateRepository;
+
+	@MockitoBean
+	private FCMEventPublisher fcmEventPublisher;
+
+	@MockitoBean
+	private AchievementEventPublisher achievementEventPublisher;
 
 	@AfterEach
 	void afterEach(){

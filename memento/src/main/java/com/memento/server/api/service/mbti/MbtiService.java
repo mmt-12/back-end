@@ -5,8 +5,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.memento.server.api.controller.mbti.dto.SearchMbtiResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
-import com.memento.server.api.service.eventMessage.FCMEventPublisher;
-import com.memento.server.api.service.eventMessage.dto.MbtiFCM;
+import com.memento.server.api.service.fcm.FCMEventPublisher;
+import com.memento.server.api.service.fcm.dto.event.MbtiFCM;
 import com.memento.server.api.service.mbti.dto.MbtiSearchDto;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;

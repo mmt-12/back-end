@@ -1,4 +1,4 @@
-package com.memento.server.api.service.eventMessage;
+package com.memento.server.api.service.fcm;
 
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_EXISTENCE;
 import static com.memento.server.common.error.ErrorCodes.MEMORY_NOT_FOUND;
@@ -12,34 +12,30 @@ import static com.memento.server.domain.notification.NotificationType.NEWIMAGE;
 import static com.memento.server.domain.notification.NotificationType.POST;
 import static com.memento.server.domain.notification.NotificationType.REACTION;
 import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
-import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionalEventListener;
 
-import com.memento.server.api.service.eventMessage.dto.AchievementFCM;
-import com.memento.server.api.service.eventMessage.dto.AssociateFCM;
-import com.memento.server.api.service.eventMessage.dto.BirthdayFCM;
-import com.memento.server.api.service.eventMessage.dto.GuestBookFCM;
-import com.memento.server.api.service.eventMessage.dto.MbtiFCM;
-import com.memento.server.api.service.eventMessage.dto.MemoryFCM;
-import com.memento.server.api.service.eventMessage.dto.NewImageFCM;
-import com.memento.server.api.service.eventMessage.dto.PostFCM;
-import com.memento.server.api.service.eventMessage.dto.ReactionFCM;
-import com.memento.server.api.service.fcm.FCMService;
-import com.memento.server.api.service.fcm.dto.AssociateData;
-import com.memento.server.api.service.fcm.dto.BasicData;
-import com.memento.server.api.service.fcm.dto.BirthdayData;
-import com.memento.server.api.service.fcm.dto.FCMRequest;
-import com.memento.server.api.service.fcm.dto.ReceiverInfo;
-import com.memento.server.api.service.fcm.dto.MemoryData;
-import com.memento.server.api.service.fcm.dto.PostData;
-import com.memento.server.api.service.fcm.dto.ReactionData;
+import com.memento.server.api.service.fcm.dto.event.AchievementFCM;
+import com.memento.server.api.service.fcm.dto.event.AssociateFCM;
+import com.memento.server.api.service.fcm.dto.event.BirthdayFCM;
+import com.memento.server.api.service.fcm.dto.event.GuestBookFCM;
+import com.memento.server.api.service.fcm.dto.event.MbtiFCM;
+import com.memento.server.api.service.fcm.dto.event.MemoryFCM;
+import com.memento.server.api.service.fcm.dto.event.NewImageFCM;
+import com.memento.server.api.service.fcm.dto.event.PostFCM;
+import com.memento.server.api.service.fcm.dto.event.ReactionFCM;
+import com.memento.server.api.service.fcm.dto.request.AssociateData;
+import com.memento.server.api.service.fcm.dto.request.BasicData;
+import com.memento.server.api.service.fcm.dto.request.BirthdayData;
+import com.memento.server.api.service.fcm.dto.request.FCMRequest;
+import com.memento.server.api.service.fcm.dto.request.ReceiverInfo;
+import com.memento.server.api.service.fcm.dto.request.MemoryData;
+import com.memento.server.api.service.fcm.dto.request.PostData;
+import com.memento.server.api.service.fcm.dto.request.ReactionData;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
@@ -51,11 +47,10 @@ import com.memento.server.domain.notification.NotificationRepository;
 
 import lombok.RequiredArgsConstructor;
 
-@Async("appExecutor")
 @Service
 @Transactional(propagation = REQUIRES_NEW)
 @RequiredArgsConstructor
-public class FCMEventListener {
+public class FCMEventHandler {
 
 	private final FCMService fcmService;
 	private final NotificationRepository notificationRepository;
@@ -63,9 +58,9 @@ public class FCMEventListener {
 	private final MemoryRepository memoryRepository;
 	private final MemoryAssociateRepository memoryAssociateRepository;
 
-	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleReactionNotification(ReactionFCM event) {
-		Associate receiver = associateRepository.getReferenceById(event.receiverId());
+		Associate receiver = associateRepository.findById(event.receiverId())
+			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
 
 		String title = REACTION.getTitle();
 		String content = createReactionMessageContent(event.actorNickname());
@@ -88,7 +83,6 @@ public class FCMEventListener {
 		fcmService.sendToAssociates(request);
 	}
 
-	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleAchievementNotification(AchievementFCM event) {
 		Associate receiver = associateRepository.findById(event.receiverId())
 			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
@@ -112,9 +106,9 @@ public class FCMEventListener {
 		fcmService.sendToAssociates(request);
 	}
 
-	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleGuestBookNotification(GuestBookFCM event) {
-		Associate receiver = associateRepository.getReferenceById(event.receiverId());
+		Associate receiver = associateRepository.findById(event.receiverId())
+			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
 
 		String title = GUESTBOOK.getTitle();
 		String content = createGuestBookMessageContent();
@@ -134,9 +128,9 @@ public class FCMEventListener {
 		fcmService.sendToAssociates(request);
 	}
 
-	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleNewImageNotification(NewImageFCM event) {
-		Associate receiver = associateRepository.getReferenceById(event.receiverId());
+		Associate receiver = associateRepository.findById(event.receiverId())
+			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
 
 		String title = NEWIMAGE.getTitle();
 		String content = createProfileImageMessageContent();
@@ -156,9 +150,9 @@ public class FCMEventListener {
 		fcmService.sendToAssociates(request);
 	}
 
-	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleMbtiNotification(MbtiFCM event) {
-		Associate receiver = associateRepository.getReferenceById(event.receiverId());
+		Associate receiver = associateRepository.findById(event.receiverId())
+			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
 
 		String title = MBTI.getTitle();
 		String content = createMbtiMessageContent();
@@ -178,7 +172,6 @@ public class FCMEventListener {
 		fcmService.sendToAssociates(request);
 	}
 
-	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleBirthdayNotification(BirthdayFCM event) {
 		Associate birthdayPerson = associateRepository.findById(event.birthdayAssociateId())
 			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_EXISTENCE));
@@ -220,7 +213,6 @@ public class FCMEventListener {
 		fcmService.sendToAssociates(request);
 	}
 
-	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleMemoryNotification(MemoryFCM event) {
 		List<Associate> associates = memoryAssociateRepository.findAssociatesByMemoryIdAndDeletedAtIsNull(
 			event.memoryId());
@@ -251,7 +243,6 @@ public class FCMEventListener {
 		}
 	}
 
-	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handlePostNotification(PostFCM event) {
 		Memory memory = memoryRepository.findByIdWithEventAndDeletedAtIsNull(event.memoryId())
 			.orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
@@ -286,7 +277,6 @@ public class FCMEventListener {
 		}
 	}
 
-	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleAssociateNotification(AssociateFCM event) {
 		List<Associate> associates = associateRepository.findAllByCommunityId(event.communityId());
 

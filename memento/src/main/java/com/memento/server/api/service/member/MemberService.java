@@ -15,8 +15,8 @@ import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
 import com.memento.server.api.service.auth.jwt.MemberClaim;
-import com.memento.server.api.service.eventMessage.FCMEventPublisher;
-import com.memento.server.api.service.eventMessage.dto.AssociateFCM;
+import com.memento.server.api.service.fcm.FCMEventPublisher;
+import com.memento.server.api.service.fcm.dto.event.AssociateFCM;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateExclusiveAchievementEvent;
@@ -39,7 +39,7 @@ public class MemberService {
 	private final CommunityRepository communityRepository;
 	private final AssociateRepository associateRepository;
 	private final JwtTokenProvider jwtTokenProvider;
-	private final FCMEventPublisher FCMEventPublisher;
+	private final FCMEventPublisher fcmEventPublisher;
 	private final AchievementEventPublisher achievementEventPublisher;
 	private final AssociateStatsRepository associateStatsRepository;
 
@@ -62,7 +62,6 @@ public class MemberService {
 				.consecutiveAttendanceDays(1)
 				.lastAttendedAt(LocalDateTime.now())
 			.build());
-		FCMEventPublisher.publishNotification(AssociateFCM.from(associate.getNickname(), community.getId(), associate.getId()));
 
 		MemberClaim memberClaim = MemberClaim.from(member, associate);
 		JwtToken token = jwtTokenProvider.createToken(memberClaim);
@@ -70,6 +69,8 @@ public class MemberService {
 		if(community.getName().equals("SSAFY 12기 12반")){
 			achievementEventPublisher.publishAssociateExclusiveAchievement(AssociateExclusiveAchievementEvent.from(associate.getId(), member.getBirthday()));
 		}
+
+		fcmEventPublisher.publishNotification(AssociateFCM.from(associate.getNickname(), community.getId(), associate.getId()));
 		return MemberSignUpResponse.from(member, token);
 	}
 

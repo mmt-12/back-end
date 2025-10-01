@@ -17,8 +17,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.voice.VoiceService;
 import com.memento.server.api.service.voice.dto.request.PermanentVoiceCreateServiceRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
@@ -60,6 +62,9 @@ public class VoiceServiceTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private VoiceService voiceService;
+
+	@MockitoBean
+	private AchievementEventPublisher achievementEventPublisher;
 
 	@AfterEach
 	public void tearDown() {

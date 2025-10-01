@@ -12,6 +12,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.service.comment.CommentService;
@@ -19,6 +20,8 @@ import com.memento.server.api.service.comment.dto.request.CommentDeleteServiceRe
 import com.memento.server.api.service.comment.dto.request.EmojiCommentCreateServiceRequest;
 import com.memento.server.api.service.comment.dto.request.TemporaryVoiceCommentCreateServiceRequest;
 import com.memento.server.api.service.comment.dto.request.VoiceCommentCreateServiceRequest;
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
+import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.comment.CommentFixtures;
 import com.memento.server.common.exception.MementoException;
 
@@ -97,6 +100,12 @@ public class CommentServiceTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private MinioProperties minioProperties;
+
+	@MockitoBean
+	private FCMEventPublisher fcmEventPublisher;
+
+	@MockitoBean
+	private AchievementEventPublisher achievementEventPublisher;
 
 	@AfterEach
 	public void tearDown() {

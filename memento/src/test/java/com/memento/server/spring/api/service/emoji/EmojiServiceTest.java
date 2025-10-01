@@ -17,8 +17,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.emoji.EmojiService;
 import com.memento.server.api.service.emoji.dto.request.EmojiCreateServiceRequest;
 import com.memento.server.api.service.emoji.dto.request.EmojiListQueryRequest;
@@ -60,6 +62,9 @@ public class EmojiServiceTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private EmojiService emojiService;
+
+	@MockitoBean
+	private AchievementEventPublisher achievementEventPublisher;
 
 	@AfterEach
 	public void tearDown() {

@@ -17,13 +17,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.post.dto.SearchAllPostResponse;
 import com.memento.server.api.controller.post.dto.SearchPostResponse;
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
+import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.post.PostService;
 import com.memento.server.associate.AssociateFixtures;
 import com.memento.server.common.exception.MementoException;
@@ -92,6 +93,12 @@ public class PostServiceTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private PostImageRepository postImageRepository;
+
+	@MockitoBean
+	private FCMEventPublisher fcmEventPublisher;
+
+	@MockitoBean
+	private AchievementEventPublisher achievementEventPublisher;
 
 	@BeforeEach
 	void beforeEach() {

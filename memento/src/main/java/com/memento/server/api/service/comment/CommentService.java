@@ -16,8 +16,8 @@ import com.memento.server.api.service.comment.dto.request.CommentDeleteServiceRe
 import com.memento.server.api.service.comment.dto.request.EmojiCommentCreateServiceRequest;
 import com.memento.server.api.service.comment.dto.request.TemporaryVoiceCommentCreateServiceRequest;
 import com.memento.server.api.service.comment.dto.request.VoiceCommentCreateServiceRequest;
-import com.memento.server.api.service.eventMessage.FCMEventPublisher;
-import com.memento.server.api.service.eventMessage.dto.ReactionFCM;
+import com.memento.server.api.service.fcm.FCMEventPublisher;
+import com.memento.server.api.service.fcm.dto.event.ReactionFCM;
 import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.comment.Comment;

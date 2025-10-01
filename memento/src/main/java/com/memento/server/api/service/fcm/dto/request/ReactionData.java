@@ -1,6 +1,6 @@
-package com.memento.server.api.service.fcm.dto;
+package com.memento.server.api.service.fcm.dto.request;
 
-import static com.memento.server.domain.notification.NotificationType.POST;
+import static com.memento.server.domain.notification.NotificationType.REACTION;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,22 +10,22 @@ import com.memento.server.domain.notification.NotificationType;
 import lombok.Builder;
 
 @Builder
-public record PostData(
+public record ReactionData(
 	NotificationType type,
-	Long postId,
-	Long memoryId
+	Long memoryId,
+	Long postId
 ) implements FCMData {
 
 	@Override
 	public Map<String, String> toDataMap() {
 		Map<String, String> data = new HashMap<>();
 		data.put("type", type.name());
-		data.put("postId", String.valueOf(postId));
 		data.put("memoryId", String.valueOf(memoryId));
+		data.put("postId", String.valueOf(postId));
 		return data;
 	}
 
-	public static PostData of(Long postId, Long memoryId) {
-		return PostData.builder().type(POST).postId(postId).memoryId(memoryId).build();
+	public static ReactionData of(Long memoryId, Long postId) {
+		return ReactionData.builder().type(REACTION).memoryId(memoryId).postId(postId).build();
 	}
 }

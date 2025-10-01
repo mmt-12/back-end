@@ -1,4 +1,4 @@
-package com.memento.server.api.service.fcm.dto;
+package com.memento.server.api.service.fcm.dto.request;
 
 import java.util.Map;
 
