@@ -10,7 +10,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,9 @@ import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.eventMessage.EventMessagePublisher;
 import com.memento.server.api.service.eventMessage.dto.MemoryNotification;
+import com.memento.server.api.service.memory.dto.Author;
 import com.memento.server.common.exception.MementoException;
+import com.memento.server.domain.achievement.Achievement;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
@@ -66,7 +70,19 @@ public class MemoryService {
 		List<PostImage> images = postImageRepository.findAllByMemoryId(memoryId);
 		Long associateCount = memoryAssociateRepository.countAssociatesByMemoryId(memoryId);
 
-		return ReadMemoryResponse.from(memory, images, associateCount);
+		Associate associate = memory.getEvent().getAssociate();
+		Achievement achievement = associate.getAchievement();
+		Author author = Author.builder()
+			.id(associate.getId())
+			.nickname(associate.getNickname())
+			.imageUrl(associate.getProfileImageUrl())
+			.achievement(achievement == null ? null : Author.Achievement.builder()
+				.id(achievement.getId())
+				.name(achievement.getName())
+				.build())
+			.build();
+
+		return ReadMemoryResponse.from(memory, images, associateCount, author);
 	}
 
 	public ReadAllMemoryResponse readAll(Long communityId, ReadAllMemoryRequest request) {
@@ -102,11 +118,27 @@ public class MemoryService {
 		}
 		Long nextCursor = memories.isEmpty() ? null : memories.getLast().getId();
 
+		Map<Long, Author> authorMap = new HashMap<>();
+		for (Memory memory : memories) {
+			Associate associate = memory.getEvent().getAssociate();
+			Achievement achievement = associate.getAchievement();
+			Author author = Author.builder()
+				.id(associate.getId())
+				.nickname(associate.getNickname())
+				.imageUrl(associate.getProfileImageUrl())
+				.achievement(achievement == null ? null : Author.Achievement.builder()
+					.id(achievement.getId())
+					.name(achievement.getName())
+					.build())
+				.build();
+			authorMap.put(memory.getId(), author);
+		}
+
 		List<Long> memoryIds = memories.stream().map(Memory::getId).toList();
 		List<PostImage> images = postImageRepository.findAllByMemoryIds(memoryIds);
 		List<MemoryAssociateCount> associateCounts = memoryAssociateRepository.countAssociatesByMemoryIds(memoryIds);
 
-		return ReadAllMemoryResponse.from(memories, images, associateCounts, hasNext, nextCursor);
+		return ReadAllMemoryResponse.from(memories, images, associateCounts, hasNext, nextCursor, authorMap);
 	}
 
 	@Transactional

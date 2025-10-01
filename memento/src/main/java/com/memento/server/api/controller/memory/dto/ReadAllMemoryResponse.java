@@ -6,8 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse.AuthorResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse.LocationResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse.PeriodResponse;
+import com.memento.server.api.service.memory.dto.Author;
+import com.memento.server.api.service.memory.dto.Author.Achievement;
 import com.memento.server.domain.event.Event;
 import com.memento.server.domain.event.Location;
 import com.memento.server.domain.event.Period;
@@ -32,8 +35,39 @@ public record ReadAllMemoryResponse(
 		LocationResponse location,
 		Integer memberAmount,
 		Integer pictureAmount,
-		List<String> pictures
+		List<String> pictures,
+		AuthorResponse author
 	) {
+
+		@Builder
+		public record AuthorResponse(
+			Long id,
+			String imageUrl,
+			String nickname,
+			AchievementResponse achievement
+		) {
+			@Builder
+			public record AchievementResponse(
+				Long id,
+				String name
+			) {
+				public static AchievementResponse from(Achievement achievement) {
+					return AchievementResponse.builder()
+						.id(achievement.id())
+						.name(achievement.name())
+						.build();
+				}
+			}
+
+			public static AuthorResponse from(Author author) {
+				return AuthorResponse.builder()
+					.id(author.id())
+					.imageUrl(author.imageUrl())
+					.nickname(author.nickname())
+					.achievement(author.achievement() == null ? null : AchievementResponse.from(author.achievement()))
+					.build();
+			}
+		}
 
 		@Builder
 		public record PeriodResponse(
@@ -73,7 +107,8 @@ public record ReadAllMemoryResponse(
 		List<PostImage> images,
 		List<MemoryAssociateCount> associateCounts,
 		boolean hasNext,
-		Long nextCursor
+		Long nextCursor,
+		Map<Long, Author> authorMap
 	) {
 		Map<Long, List<String>> pictureMap = new HashMap<>();
 		for (PostImage postImage : images) {
@@ -103,6 +138,7 @@ public record ReadAllMemoryResponse(
 					.memberAmount(associatesCountMap.getOrDefault(memory.getId(), 0))
 					.pictureAmount(pictures.size())
 					.pictures(pictures.subList(0, Math.min(pictures.size(), 9)))
+					.author(AuthorResponse.from(authorMap.get(memory.getId())))
 					.build()
 			);
 		}

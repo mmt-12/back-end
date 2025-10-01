@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.memento.server.api.service.memory.dto.Author;
 import com.memento.server.domain.event.Event;
 import com.memento.server.domain.event.Location;
 import com.memento.server.domain.event.Period;
@@ -21,8 +22,40 @@ public record ReadMemoryResponse(
 	LocationResponse location,
 	Integer memberAmount,
 	Integer pictureAmount,
-	List<String> pictures
+	List<String> pictures,
+	AuthorResponse author
 ) {
+	@Builder
+	public record AuthorResponse(
+		Long id,
+		String imageUrl,
+		String nickname,
+		AchievementResponse achievement
+	) {
+		@Builder
+		public record AchievementResponse(
+			Long id,
+			String name
+		) {
+			public static AchievementResponse from(
+				Author.Achievement achievement) {
+				return AchievementResponse.builder()
+					.id(achievement.id())
+					.name(achievement.name())
+					.build();
+			}
+		}
+
+		public static AuthorResponse from(Author author) {
+			return AuthorResponse.builder()
+				.id(author.id())
+				.imageUrl(author.imageUrl())
+				.nickname(author.nickname())
+				.achievement(author.achievement() == null ? null : AchievementResponse.from(author.achievement()))
+				.build();
+		}
+	}
+
 	@Builder
 	public record PeriodResponse(
 		LocalDateTime startTime,
@@ -58,7 +91,8 @@ public record ReadMemoryResponse(
 	public static ReadMemoryResponse from(
 		Memory memory,
 		List<PostImage> images,
-		Long associateCount
+		Long associateCount,
+		Author author
 	) {
 		Event event = memory.getEvent();
 		List<String> pictures = new ArrayList<>();
@@ -78,6 +112,7 @@ public record ReadMemoryResponse(
 			.memberAmount(Math.toIntExact(associateCount))
 			.pictureAmount(images.size())
 			.pictures(pictures)
+			.author(AuthorResponse.from(author))
 			.build();
 	}
 }
