@@ -3,19 +3,17 @@ package com.memento.server.api.service.auth;
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.TOKEN_NOT_VALID;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.memento.server.api.controller.auth.dto.AuthGuestResponse;
 import com.memento.server.api.controller.auth.dto.AuthMemberResponse;
 import com.memento.server.api.controller.auth.dto.AuthResponse;
+import com.memento.server.api.controller.auth.dto.TokenRefreshRequest;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
 import com.memento.server.api.service.auth.jwt.MemberClaim;
-import com.memento.server.api.service.member.MemberService;
 import com.memento.server.api.service.oauth.KakaoOpenIdDecoder;
 import com.memento.server.api.service.oauth.KakaoOpenIdPayload;
 import com.memento.server.api.service.oauth.KakaoToken;
@@ -88,12 +86,12 @@ public class AuthService {
 			});
 	}
 
-	public AuthResponse refreshToken(String refreshToken) {
-		if (!jwtTokenProvider.validateToken(refreshToken)) {
+	public AuthResponse refreshToken(TokenRefreshRequest request) {
+		if (!jwtTokenProvider.validateToken(request.refreshToken())) {
 			throw new MementoException(TOKEN_NOT_VALID);
 		}
 
-		MemberClaim refreshClaim = jwtTokenProvider.extractMemberClaim(refreshToken);
+		MemberClaim refreshClaim = jwtTokenProvider.extractMemberClaim(request.refreshToken());
 		Member member = memberRepository.findByIdAndDeletedAtIsNull(refreshClaim.memberId())
 			.orElseThrow(() -> new MementoException(TOKEN_NOT_VALID));
 		Associate associate = associateRepository.findByMemberIdAndDeletedAtIsNull(member.getId())

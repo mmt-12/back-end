@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
 import com.memento.server.api.controller.auth.dto.AuthResponse;
+import com.memento.server.api.controller.auth.dto.TokenRefreshRequest;
 import com.memento.server.api.service.auth.AuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/api/v1/auth/refresh")
-	public ResponseEntity<AuthResponse> refreshToken(@RequestBody String refreshToken) {
-		return ResponseEntity.ok(authService.refreshToken(refreshToken));
+	public ResponseEntity<AuthResponse> refreshToken(@RequestBody TokenRefreshRequest request) {
+		return ResponseEntity.ok(authService.refreshToken(request));
 	}
 }

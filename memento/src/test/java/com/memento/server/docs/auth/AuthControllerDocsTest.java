@@ -1,9 +1,12 @@
 package com.memento.server.docs.auth;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -23,6 +26,7 @@ import com.memento.server.api.controller.auth.AuthController;
 import com.memento.server.api.controller.auth.dto.AuthGuestResponse;
 import com.memento.server.api.controller.auth.dto.AuthMemberResponse;
 import com.memento.server.api.controller.auth.dto.AuthResponse;
+import com.memento.server.api.controller.auth.dto.TokenRefreshRequest;
 import com.memento.server.api.service.auth.AuthService;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.docs.RestDocsSupport;
@@ -34,6 +38,42 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 	@Override
 	protected Object initController() {
 		return new AuthController(authService);
+	}
+
+	@Test
+	@DisplayName("토큰 리프레시")
+	void refreshToken() throws Exception {
+		// given
+		TokenRefreshRequest request = new TokenRefreshRequest("refreshToken");
+		JwtToken jwtToken = JwtToken.builder()
+			.grantType("Bearer")
+			.accessToken("access-token-123")
+			.accessTokenExpiresAt(new Date())
+			.refreshToken("refresh-token-456")
+			.refreshTokenExpiresAt(new Date())
+			.build();
+		AuthResponse response = new AuthMemberResponse(123L, "name", jwtToken);
+		when(authService.refreshToken(any())).thenReturn(response);
+
+		// when & then
+		mockMvc.perform(post("/api/v1/auth/refresh")
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andDo(document("auth-refresh-token",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				responseFields(
+					fieldWithPath("memberId").description("사용자 ID"),
+					fieldWithPath("name").description("사용자 이름"),
+					subsectionWithPath("token").description("JWT 토큰 정보"),
+					fieldWithPath("token.grantType").description("토큰 타입"),
+					fieldWithPath("token.accessToken").description("액세스 토큰"),
+					fieldWithPath("token.accessTokenExpiresAt").description("액세스 토큰 만료 시각"),
+					fieldWithPath("token.refreshToken").description("리프레시 토큰"),
+					fieldWithPath("token.refreshTokenExpiresAt").description("리프레시 토큰 만료 시각")
+				)
+			));
 	}
 
 	@Test
