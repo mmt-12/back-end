@@ -22,6 +22,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
@@ -34,6 +35,7 @@ import com.memento.server.api.service.comment.CommentService;
 import com.memento.server.api.service.comment.dto.request.EmojiCommentCreateServiceRequest;
 import com.memento.server.api.service.emoji.EmojiService;
 import com.memento.server.api.service.emoji.dto.request.EmojiCreateServiceRequest;
+import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.guestBook.GuestBookService;
 import com.memento.server.api.service.mbti.MbtiService;
 import com.memento.server.api.service.member.MemberService;
@@ -166,6 +168,9 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private NotificationRepository notificationRepository;
+
+	@MockitoBean
+	private FCMEventPublisher fcmEventPublisher;
 
 	@AfterEach
 	void afterEach() {
