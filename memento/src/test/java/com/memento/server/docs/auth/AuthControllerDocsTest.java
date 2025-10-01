@@ -11,6 +11,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -63,6 +64,9 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 			.andDo(document("auth-refresh-token",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestFields(
+					fieldWithPath("refreshToken").description("리프레시 토큰")
+				),
 				responseFields(
 					fieldWithPath("memberId").description("사용자 ID"),
 					fieldWithPath("name").description("사용자 이름"),

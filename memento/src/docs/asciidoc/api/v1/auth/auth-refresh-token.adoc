@@ -1,0 +1,12 @@
+[[auth-refresh-token]]
+=== 토큰 갱신
+
+==== HTTP Request
+
+include::{snippets}/auth-refresh-token/http-request.adoc[]
+include::{snippets}/auth-refresh-token/request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/auth-redirect-test-member/http-response.adoc[]
+include::{snippets}/auth-redirect-test-member/response-fields.adoc[]
