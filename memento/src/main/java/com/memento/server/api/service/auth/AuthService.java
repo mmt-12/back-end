@@ -1,6 +1,7 @@
 package com.memento.server.api.service.auth;
 
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
+import static com.memento.server.common.error.ErrorCodes.TOKEN_NOT_VALID;
 
 import java.util.Optional;
 
@@ -23,6 +24,8 @@ import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.SignInAchievementEvent;
+import com.memento.server.domain.member.Member;
+import com.memento.server.domain.member.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,10 +35,10 @@ import lombok.RequiredArgsConstructor;
 public class AuthService {
 
 	private final KakaoClient kakaoClient;
-	private final MemberService memberService;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final KakaoOpenIdDecoder kakaoOpenIdDecoder;
 	private final AssociateRepository associateRepository;
+	private final MemberRepository memberRepository;
 	private final AchievementEventPublisher achievementEventPublisher;
 
 	public String getAuthUrl() {
@@ -47,7 +50,7 @@ public class AuthService {
 		KakaoOpenIdPayload openIdPayload = kakaoOpenIdDecoder.validateOpenIdToken(kakaoToken.idToken());
 		Long kakaoId = Long.parseLong(openIdPayload.sub());
 
-		return memberService.findMemberWithKakaoId(kakaoId)
+		return memberRepository.findByKakaoIdAndDeletedAtIsNull(kakaoId)
 			.<AuthResponse>map(member -> {
 				// 커뮤니티 자동 선택
 				Associate associate = associateRepository.findByMemberIdAndDeletedAtIsNull(member.getId())
@@ -83,5 +86,25 @@ public class AuthService {
 					.token(token)
 					.build();
 			});
+	}
+
+	public AuthResponse refreshToken(String refreshToken) {
+		if (!jwtTokenProvider.validateToken(refreshToken)) {
+			throw new MementoException(TOKEN_NOT_VALID);
+		}
+
+		MemberClaim refreshClaim = jwtTokenProvider.extractMemberClaim(refreshToken);
+		Member member = memberRepository.findByIdAndDeletedAtIsNull(refreshClaim.memberId())
+			.orElseThrow(() -> new MementoException(TOKEN_NOT_VALID));
+		Associate associate = associateRepository.findByMemberIdAndDeletedAtIsNull(member.getId())
+			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_FOUND));
+
+		MemberClaim memberClaim = MemberClaim.from(member, associate);
+		JwtToken token = jwtTokenProvider.createToken(memberClaim);
+		return AuthMemberResponse.builder()
+			.memberId(member.getId())
+			.name(member.getName())
+			.token(token)
+			.build();
 	}
 }

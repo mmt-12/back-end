@@ -37,8 +37,10 @@ public class JwtFilter extends OncePerRequestFilter {
 		"/favicon.ico",
 		"/api/v1/sign-in",
 		"/api/v1/auth/redirect",
+		"/api/v1/auth/refresh",
 		"/v1/sign-in",
 		"/v1/auth/redirect",
+		"/v1/auth/refresh",
 		"/h2-console/**"
 	);
 

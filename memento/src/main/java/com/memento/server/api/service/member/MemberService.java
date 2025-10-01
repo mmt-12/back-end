@@ -43,10 +43,6 @@ public class MemberService {
 	private final AchievementEventPublisher achievementEventPublisher;
 	private final AssociateStatsRepository associateStatsRepository;
 
-	public Optional<Member> findMemberWithKakaoId(Long kakaoId) {
-		return memberRepository.findByKakaoIdAndDeletedAtIsNull(kakaoId);
-	}
-
 	@Transactional
 	public MemberSignUpResponse signUp(Long kakaoId, String name, String email, LocalDate birthday) {
 		Optional<Member> memberOptional = memberRepository.findByKakaoIdAndDeletedAtIsNull(kakaoId);
