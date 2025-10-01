@@ -6,7 +6,7 @@ import static org.mockito.BDDMockito.given;
 
 import java.io.IOException;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +69,8 @@ public class GuestBookServiceTest extends IntegrationsTestSupport {
 	@MockitoBean
 	private AchievementEventPublisher achievementEventPublisher;
 
-	@BeforeEach
-	void BeforeEach() {
+	@AfterEach
+	void AfterEach() {
 		voiceRepository.deleteAll();
 		emojiRepository.deleteAll();
 		guestBookRepository.deleteAll();

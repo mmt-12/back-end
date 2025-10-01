@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -69,6 +70,7 @@ import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
 import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.memory.MemoryRepository;
+import com.memento.server.domain.notification.NotificationRepository;
 import com.memento.server.domain.post.Hash;
 import com.memento.server.domain.post.Post;
 import com.memento.server.domain.post.PostImage;
@@ -162,6 +164,9 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 	@Autowired
 	private AchievementService achievementService;
 
+	@Autowired
+	private NotificationRepository notificationRepository;
+
 	@AfterEach
 	void afterEach() {
 		commentRepository.deleteAll();
@@ -174,6 +179,7 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 		mbtiTestRepository.deleteAll();
 		profileImageRepository.deleteAll();
 		associateStatsRepository.deleteAll();
+		notificationRepository.deleteAll();
 		achievementAssociateRepository.deleteAll();
 		associateRepository.deleteAll();
 		communityRepository.deleteAll();
@@ -189,6 +195,11 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 				.name("test")
 				.build());
 		}
+	}
+
+	@AfterAll
+	void tearDown() {
+		achievementRepository.deleteAll();
 	}
 
 	@Test
@@ -594,7 +605,7 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 
 	@Test
 	@DisplayName("민들레?노브랜드?")
-	void memoryCreateTest() {
+	void memoryCreateTest() throws InterruptedException {
 		// given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -638,6 +649,7 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 			memoryService.create(community.getId(), creator.getId(), request);
 		}
 		// then
+		Thread.sleep(1000);
 		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(12L, creator.getId()))
 			.isTrue();
 	}
@@ -694,7 +706,7 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 
 	@Test
 	@DisplayName("GMG")
-	void memoryJoinedTest() {
+	void memoryJoinedTest() throws InterruptedException {
 		// given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -743,13 +755,14 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 		}
 
 		// then
+		Thread.sleep(1000);
 		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(13L, associate.getId()))
 			.isTrue();
 	}
 
 	@Test
 	@DisplayName("전문찍새")
-	public void postImageTest() throws IOException {
+	public void postImageTest() throws IOException, InterruptedException {
 		//given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -799,13 +812,14 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 		postService.create(community.getId(), memory.getId(), associate.getId(), content, List.of(file));
 
 		//then
+		Thread.sleep(1000);
 		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(10L, associate.getId()))
 			.isTrue();
 	}
 
 	@Test
 	@DisplayName("리액션공장")
-	void reactionCreateTest() {
+	void reactionCreateTest() throws InterruptedException {
 		// given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -841,13 +855,14 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 		emojiService.createEmoji(request);
 
 		// then
+		Thread.sleep(1000);
 		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(6L, associate.getId()))
 			.isTrue();
 	}
 
 	@Test
 	@DisplayName("씽씽씽")
-	void reactionNameTest() {
+	void reactionNameTest() throws InterruptedException {
 		// given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -879,13 +894,14 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 		emojiService.createEmoji(request);
 
 		// then
+		Thread.sleep(1000);
 		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(17L, associate.getId()))
 			.isTrue();
 	}
 
 	@Test
 	@DisplayName("이모지 댓글을 생성한다.")
-	void commentCreateTest() {
+	void commentCreateTest() throws InterruptedException {
 		// given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -924,13 +940,14 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 		commentService.createEmojiComment(request);
 
 		// then
+		Thread.sleep(1000);
 		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(7L, associate.getId()))
 			.isTrue();
 	}
 
 	@Test
 	@DisplayName("방명록 전용 업적")
-	void guestBookExclusiveTest() {
+	void guestBookExclusiveTest() throws InterruptedException {
 		// given
 		Member member1 = Member.builder()
 			.name("준수")
@@ -967,13 +984,14 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 		guestBookService.create(community.getId(), register.getId(), associate.getId(), GuestBookType.TEXT, null, content);
 
 		// then
+		Thread.sleep(1000);
 		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(27L, register.getId()))
 			.isTrue();
 	}
 
 	@Test
 	@DisplayName("가입 전용 업적")
-	void associateExclusiveTest() {
+	void associateExclusiveTest() throws InterruptedException {
 		// given
 		Long kakaoId = 1L;
 		String name = "오준수";
@@ -985,14 +1003,16 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 
 		JwtToken jwtToken = response.token();
 		MemberClaim memberClaim = jwtTokenProvider.extractMemberClaim(jwtToken.accessToken());
+
 		// then
+		Thread.sleep(1000);
 		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(22L, memberClaim.associateId()))
 			.isTrue();
 	}
 
 	@Test
 	@DisplayName("홈스윗홈")
-	void createTest() {
+	void createTest() throws InterruptedException {
 		// given
 		Member member = MemberFixtures.member();
 		memberRepository.save(member);
@@ -1011,6 +1031,7 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 		achievementService.create(associate.getId(), "HOME");
 
 		// then
+		Thread.sleep(1000);
 		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(15L, associate.getId()))
 			.isTrue();
 	}

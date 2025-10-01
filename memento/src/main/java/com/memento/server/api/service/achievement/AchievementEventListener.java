@@ -72,7 +72,7 @@ public class AchievementEventListener {
 	private final CommentRepository commentRepository;
 	private final SseEmitterRepository sseEmitterRepository;
 
-	public void getAchievement(Long associateId, Long achievementId){
+	private void getAchievement(Long associateId, Long achievementId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
 			.orElseThrow(() -> new MementoException(ErrorCodes.ASSOCIATE_NOT_EXISTENCE));
 

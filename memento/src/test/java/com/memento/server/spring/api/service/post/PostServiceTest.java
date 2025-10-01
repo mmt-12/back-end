@@ -13,7 +13,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,8 +100,8 @@ public class PostServiceTest extends IntegrationsTestSupport {
 	@MockitoBean
 	private AchievementEventPublisher achievementEventPublisher;
 
-	@BeforeEach
-	void beforeEach() {
+	@AfterEach
+	void afterEach() {
 		postImageRepository.deleteAll();
 		commentRepository.deleteAll();
 		emojiRepository.deleteAll();
