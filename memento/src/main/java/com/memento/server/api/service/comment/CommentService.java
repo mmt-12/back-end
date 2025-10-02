@@ -16,6 +16,8 @@ import com.memento.server.api.service.comment.dto.request.CommentDeleteServiceRe
 import com.memento.server.api.service.comment.dto.request.EmojiCommentCreateServiceRequest;
 import com.memento.server.api.service.comment.dto.request.TemporaryVoiceCommentCreateServiceRequest;
 import com.memento.server.api.service.comment.dto.request.VoiceCommentCreateServiceRequest;
+import com.memento.server.api.service.fcm.FCMEventPublisher;
+import com.memento.server.api.service.fcm.dto.event.ReactionFCM;
 import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.comment.Comment;
@@ -45,6 +47,7 @@ public class CommentService {
 	private final CommentRepository commentRepository;
 	private final MinioService minioService;
 	private final AchievementEventPublisher achievementEventPublisher;
+	private final FCMEventPublisher fcmEventPublisher;
 
 	@Transactional
 	public void createEmojiComment(EmojiCommentCreateServiceRequest request) {
@@ -60,6 +63,14 @@ public class CommentService {
 
 		achievementEventPublisher.publishReactionAchievement(
 			ReactionAchievementEvent.fromUse(associate.getId(), ReactionAchievementEvent.Type.USE));
+
+		fcmEventPublisher.publishNotification(
+			ReactionFCM.of(
+				associate.getNickname(),
+				associate.getId(),
+				post.getAssociate().getId(),
+				post.getMemory().getId(),
+				post.getId()));
 	}
 
 	@Transactional
@@ -74,7 +85,16 @@ public class CommentService {
 		Comment comment = Comment.createVoiceComment(voice.getUrl(), post, associate);
 		commentRepository.save(comment);
 
-		achievementEventPublisher.publishReactionAchievement(ReactionAchievementEvent.fromUse(associate.getId(), ReactionAchievementEvent.Type.USE));
+		achievementEventPublisher.publishReactionAchievement(
+			ReactionAchievementEvent.fromUse(associate.getId(), ReactionAchievementEvent.Type.USE));
+
+		fcmEventPublisher.publishNotification(
+			ReactionFCM.of(
+				associate.getNickname(),
+				associate.getId(),
+				post.getAssociate().getId(),
+				post.getMemory().getId(),
+				post.getId()));
 	}
 
 	@Transactional
@@ -90,6 +110,14 @@ public class CommentService {
 
 		Comment comment = Comment.createVoiceComment(url, post, associate);
 		commentRepository.save(comment);
+
+		fcmEventPublisher.publishNotification(
+			ReactionFCM.of(
+				associate.getNickname(),
+				associate.getId(),
+				post.getAssociate().getId(),
+				post.getMemory().getId(),
+				post.getId()));
 	}
 
 	@Transactional
@@ -99,7 +127,7 @@ public class CommentService {
 		Comment comment = commentRepository.findByIdAndDeletedAtIsNull(request.commentId())
 			.orElseThrow(() -> new MementoException(COMMENT_NOT_FOUND));
 
-		if(!comment.getAssociate().getId().equals(associate.getId())) {
+		if (!comment.getAssociate().getId().equals(associate.getId())) {
 			throw new MementoException(ASSOCIATE_NOT_AUTHORITY);
 		}
 

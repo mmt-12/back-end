@@ -34,23 +34,17 @@ public class FileValidator {
 		if (files == null || files.length == 0) {
 			return;
 		}
-		
+
 		FileUploadProperties.Post config = fileUploadProperties.getPost();
 
 		if (files.length > config.getMaxFileCount()) {
 			throw new MementoException(POST_TOO_MANY_FILES);
 		}
 
-		long totalSize = 0;
 		for (MultipartFile file : files) {
 			if (file != null && !file.isEmpty()) {
-				totalSize += file.getSize();
 				validateImageFile(file);
 			}
-		}
-
-		if (totalSize > config.getMaxTotalSizeBytes()) {
-			throw new MementoException(POST_FILES_TOO_LARGE);
 		}
 	}
 

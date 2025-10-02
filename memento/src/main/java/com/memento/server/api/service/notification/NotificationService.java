@@ -32,11 +32,11 @@ public class NotificationService {
 
 		Long nextCursor = notifications.isEmpty() ? null : notifications.getLast().getId();
 
-		notifications.stream().filter(notification -> !notification.getIsRead()).forEach(Notification::markAsRead);
-
 		List<NotificationResponse> notificationResponses = notifications.stream()
 			.map(NotificationResponse::from)
 			.toList();
+
+		notifications.stream().filter(notification -> !notification.getIsRead()).forEach(Notification::markAsRead);
 
 		return NotificationListResponse.of(notificationResponses, nextCursor, hasNext);
 	}

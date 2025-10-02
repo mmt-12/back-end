@@ -16,6 +16,8 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.memento.server.api.service.fcm.FCMEventPublisher;
+import com.memento.server.api.service.fcm.dto.event.AchievementFCM;
 import com.memento.server.client.sse.SseEmitterRepository;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
@@ -71,8 +73,9 @@ public class AchievementEventListener {
 	private final VoiceRepository voiceRepository;
 	private final CommentRepository commentRepository;
 	private final SseEmitterRepository sseEmitterRepository;
+	private final FCMEventPublisher fcmEventPublisher;
 
-	public void getAchievement(Long associateId, Long achievementId){
+	private void getAchievement(Long associateId, Long achievementId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
 			.orElseThrow(() -> new MementoException(ErrorCodes.ASSOCIATE_NOT_EXISTENCE));
 
@@ -84,6 +87,7 @@ public class AchievementEventListener {
 			.associate(associate)
 			.build());
 		sendAchievementSse(associate.getId(), achievement);
+		fcmEventPublisher.publishNotification(AchievementFCM.of(associate.getId()));
 
 		// 업적헌터#kill
 		if(achievement.getType() == AchievementType.OPEN){
@@ -98,6 +102,7 @@ public class AchievementEventListener {
 					.associate(associate)
 					.build());
 				sendAchievementSse(associate.getId(), lastAchievement);
+				fcmEventPublisher.publishNotification(AchievementFCM.of(associate.getId()));
 			}
 		}
 	}

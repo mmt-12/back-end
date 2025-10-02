@@ -74,3 +74,5 @@ include::api/v1/voice/voice.adoc[]
 include::api/v1/emoji/emoji.adoc[]
 
 include::api/v1/notification/notification.adoc[]
+
+include::api/v1/fcm/fcm.adoc[]

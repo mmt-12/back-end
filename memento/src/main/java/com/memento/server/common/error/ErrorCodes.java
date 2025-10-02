@@ -33,7 +33,6 @@ public enum ErrorCodes implements ErrorCode {
 	IMAGE_FILE_TOO_LARGE(BAD_REQUEST, 2013, "이미지 파일 크기가 제한을 초과합니다."),
 	IMAGE_INVALID_FORMAT(BAD_REQUEST, 2014, "지원하지 않는 이미지 파일 형식입니다."),
 	POST_TOO_MANY_FILES(BAD_REQUEST, 2015, "업로드할 수 있는 파일 개수를 초과했습니다."),
-	POST_FILES_TOO_LARGE(BAD_REQUEST, 2016, "전체 파일 크기가 제한을 초과합니다."),
 
 	EMOJI_NAME_REQUIRED(BAD_REQUEST, 3000, "이모지 이름은 필수입니다."),
 	EMOJI_NAME_BLANK(BAD_REQUEST, 3001, "이모지 이름은 공백일 수 없습니다."),
@@ -110,6 +109,9 @@ public enum ErrorCodes implements ErrorCode {
 	TOKEN_NOT_VALID(UNAUTHORIZED, 14000, "토큰이 유효하지 않습니다."),
 
 	STATS_NOT_FOUND(BAD_REQUEST, 15000, "참여자의 업적 기록이 존재하지 않습니다."),
+
+	FCMTOKEN_DUPLICATE(BAD_REQUEST, 16000, "이미 저장된 fcm token입니다."),
+	FCMTOKEN_TOO_LONG(BAD_REQUEST, 16001, "fcm token의 길이가 4096를 넘어갑니다."),
 
 	;
 	private final HttpStatus status;

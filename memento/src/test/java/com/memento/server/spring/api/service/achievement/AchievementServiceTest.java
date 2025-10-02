@@ -8,9 +8,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.memento.server.achievement.AchievementFixtures;
 import com.memento.server.api.controller.achievement.dto.SearchAchievementResponse;
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.achievement.AchievementService;
 import com.memento.server.associate.AssociateFixtures;
 import com.memento.server.community.CommunityFixtures;
@@ -45,6 +47,9 @@ public class AchievementServiceTest extends IntegrationsTestSupport {
 	protected AchievementRepository achievementRepository;
 	@Autowired
 	private AchievementAssociateRepository achievementAssociateRepository;
+
+	@MockitoBean
+	private AchievementEventPublisher achievementEventPublisher;
 
 	@AfterEach
 	void afterEach() {

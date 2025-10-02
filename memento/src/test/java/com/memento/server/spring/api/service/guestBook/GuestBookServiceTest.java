@@ -2,21 +2,21 @@ package com.memento.server.spring.api.service.guestBook;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 import java.io.IOException;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
+import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.guestBook.GuestBookService;
 import com.memento.server.associate.AssociateFixtures;
 import com.memento.server.common.exception.MementoException;
@@ -63,8 +63,14 @@ public class GuestBookServiceTest extends IntegrationsTestSupport {
 	@Autowired
 	private VoiceRepository voiceRepository;
 
-	@BeforeEach
-	void BeforeEach() {
+	@MockitoBean
+	private FCMEventPublisher fcmEventPublisher;
+
+	@MockitoBean
+	private AchievementEventPublisher achievementEventPublisher;
+
+	@AfterEach
+	void AfterEach() {
 		voiceRepository.deleteAll();
 		emojiRepository.deleteAll();
 		guestBookRepository.deleteAll();

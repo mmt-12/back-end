@@ -17,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
@@ -25,6 +26,8 @@ import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
 import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
+import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.memory.MemoryService;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
@@ -79,6 +82,12 @@ class MemoryServiceTest {
 
 	@Autowired
 	private TransactionTemplate transactionTemplate;
+
+	@MockitoBean
+	private FCMEventPublisher fcmEventPublisher;
+
+	@MockitoBean
+	private AchievementEventPublisher achievementEventPublisher;
 
 	@AfterEach
 	void afterEach() {

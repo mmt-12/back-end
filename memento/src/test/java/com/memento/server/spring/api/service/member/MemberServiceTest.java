@@ -12,10 +12,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.memento.server.api.controller.member.dto.CommunityListResponse;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
+import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.community.AssociateService;
+import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.member.MemberService;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
@@ -42,6 +45,12 @@ class MemberServiceTest {
 
 	@Autowired
 	private CommunityRepository communityRepository;
+
+	@MockitoBean
+	private FCMEventPublisher fcmEventPublisher;
+
+	@MockitoBean
+	private AchievementEventPublisher achievementEventPublisher;
 
 	@AfterEach
 	void afterEach() {
