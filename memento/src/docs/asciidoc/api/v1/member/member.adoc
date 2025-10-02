@@ -1,0 +1,12 @@
+[[Member-API]]
+== Member API
+
+include::signup.adoc[]
+
+'''
+
+include::update.adoc[]
+
+'''
+
+include::community-list.adoc[]

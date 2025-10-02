@@ -1,0 +1,16 @@
+[[Comment-API]]
+== Comment API
+
+include::comment-emoji-create.adoc[]
+
+'''
+
+include::comment-voice-create.adoc[]
+
+'''
+
+include::comment-temporary-voice-create.adoc[]
+
+'''
+
+include::comment-delete.adoc[]

@@ -1,0 +1,13 @@
+package com.memento.server.api.controller.member.dto;
+
+import java.time.LocalDate;
+
+import lombok.Builder;
+
+@Builder
+public record MemberSignUpRequest(
+	String name,
+	String email,
+	LocalDate birthday
+) {
+}

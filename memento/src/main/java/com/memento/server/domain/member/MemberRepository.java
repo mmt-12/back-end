@@ -1,0 +1,12 @@
+package com.memento.server.domain.member;
+
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface MemberRepository extends JpaRepository<Member, Long> {
+
+	Optional<Member> findByKakaoIdAndDeletedAtIsNull(Long kakaoId);
+
+	Optional<Member> findByIdAndDeletedAtIsNull(Long id);
+}

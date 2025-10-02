@@ -1,0 +1,18 @@
+[[memory-read-test]]
+=== 기억 상세 조회
+
+==== HTTP Request
+
+include::{snippets}/memory-read-test/http-request.adoc[]
+
+==== Path Parameters
+
+include::{snippets}/memory-read-test/path-parameters.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/memory-read-test/http-response.adoc[]
+
+==== Response Fields
+
+include::{snippets}/memory-read-test/response-fields.adoc[]

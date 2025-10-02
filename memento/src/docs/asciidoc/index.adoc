@@ -1,0 +1,78 @@
+ifndef::snippets[]
+:snippets: ../../build/generated-snippets
+endif::[]
+= REST API Reference
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+== Introduction
+
+본 문서는 시스템에서 제공하는 전체 REST API에 대해 기술합니다.
+각 API는 아래의 세부 목차로 구성되어 있습니다.
+
+=== Authentication
+
+**Auth API를 제외한 모든 API**는 인증이 필요합니다. 
+요청 시 반드시 `Authorization` 헤더에 JWT 토큰을 포함해야 합니다.
+
+[source,http]
+----
+Authorization: Bearer {access_token}
+----
+
+NOTE: Auth API는 로그인 및 토큰 발급을 위한 API로, 인증 없이 호출할 수 있습니다.
+
+[cols="2,9",options="header"]
+|===
+| 구분 | 설명
+
+| *HTTP Request*
+| API 호출 시 사용되는 HTTP 메서드, URL, 헤더 등을 포함한 전체 요청 정보를 기술합니다.
+
+| *Path Parameters*
+| URL 경로에 포함되는 변수 값(`{communityId}`, `{voiceId}` 등)에 대해 설명합니다.
+
+| *Request Parts*
+| `multipart/form-data` 형식의 요청에서 사용하는 각 Part(`data`, `voice` 등)의 명칭과 용도를 설명합니다.
+
+| *Request Part Fields*
+| multipart part 중 JSON 데이터(`data`)로 전달되는 필드들(`name`, `title` 등)의 제약 조건과 타입을 설명합니다.
+
+| *HTTP Response*
+| 요청 결과로 반환되는 응답 메시지의 전체 구조(HTTP 상태 코드, 바디 등)를 설명합니다.
+
+| *Response Fields*
+| 응답 메시지에서 JSON 페이로드에 포함된 필드의 구조 및 의미를 설명합니다.
+|===
+
+include::api/v1/auth/auth.adoc[]
+
+include::api/v1/member/member.adoc[]
+
+include::api/v1/memory/memory.adoc[]
+
+include::api/v1/associate/associate.adoc[]
+
+include::api/v1/achievement/achievement.adoc[]
+
+include::api/v1/guestBook/guestBook.adoc[]
+
+include::api/v1/mbti/mbti.adoc[]
+
+include::api/v1/profileImage/profileImage.adoc[]
+
+include::api/v1/post/post.adoc[]
+
+include::api/v1/comment/comment.adoc[]
+
+include::api/v1/voice/voice.adoc[]
+
+include::api/v1/emoji/emoji.adoc[]
+
+include::api/v1/notification/notification.adoc[]
+
+include::api/v1/fcm/fcm.adoc[]

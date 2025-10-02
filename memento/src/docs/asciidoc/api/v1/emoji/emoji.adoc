@@ -1,0 +1,12 @@
+[[Emoji-API]]
+== Emoji API
+
+include::emoji-create.adoc[]
+
+'''
+
+include::emoji-get.adoc[]
+
+'''
+
+include::emoji-remove.adoc[]

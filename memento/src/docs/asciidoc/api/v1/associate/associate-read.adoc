@@ -1,0 +1,10 @@
+[[associate-read-test]]
+=== 프로필 조회
+
+==== HTTP Request
+include::{snippets}/associate-read-test/http-request.adoc[]
+NOTE: 요청이 필요하지 않습니다.
+
+==== HTTP Response
+include::{snippets}/associate-read-test/http-response.adoc[]
+include::{snippets}/associate-read-test/response-fields.adoc[]

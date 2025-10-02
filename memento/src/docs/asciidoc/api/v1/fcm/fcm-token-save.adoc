@@ -1,0 +1,14 @@
+[[FCM-TOKEN-SAVE-API]]
+=== FCM TOKEN 등록
+
+==== HTTP Request
+include::{snippets}/fcm-token-save/http-request.adoc[]
+
+==== Request Body
+include::{snippets}/fcm-token-save/request-body.adoc[]
+
+==== Request Fields
+include::{snippets}/fcm-token-save/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/fcm-token-save/http-response.adoc[]

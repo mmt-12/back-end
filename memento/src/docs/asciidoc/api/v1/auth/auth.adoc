@@ -1,0 +1,12 @@
+[[Auth-API]]
+== Auth API
+
+include::auth-sign-in.adoc[]
+
+'''
+
+include::auth-redirect.adoc[]
+
+'''
+
+include::auth-refresh-token.adoc[]

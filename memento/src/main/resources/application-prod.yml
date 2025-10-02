@@ -1,0 +1,80 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 500MB
+
+  data:
+    redis:
+      host: memento-redis-prod
+      port: 6379
+
+logging:
+  level:
+    org.hibernate.SQL: info
+    org.hibernate.type.descriptor.sql: off
+
+minio:
+  url: ${MINIO_URL}
+  public-url: ${MINIO_PUBLIC_URL}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  buckets:
+    post: ${POST_BUCKET}
+    voice: ${VOICE_BUCKET}
+    emoji: ${EMOJI_BUCKET}
+    profile-image: ${PROFILE_IMAGE_BUCKET}
+
+kakao:
+  client-id: ${KAKAO_CLIENT_ID}
+  client-secret: ${KAKAO_CLIENT_SECRET}
+  redirect-uri: ${KAKAO_REDIRECT_URI}
+  kauth-host: https://kauth.kakao.com
+  kapi-host: https://kapi.kakao.com
+
+jwt:
+  grant-type: Bearer
+  secret: ${JWT_SECRET}
+  access-token-expire-time: 1209600000
+  refresh-token-expire-time: 604800000
+  temp-time: 1800000
+
+file:
+  upload:
+    voice:
+      max-size-bytes: 26214400 # 25MB
+      allowed-types:
+        - audio/mpeg
+        - audio/wav
+        - audio/mp4
+        - audio/aac
+        - audio/ogg
+        - audio/webm
+    image:
+      max-size-bytes: 26214400 # 25MB
+      allowed-types:
+        - image/jpeg
+        - image/jpg
+        - image/png
+        - image/gif
+        - image/webp
+    post:
+      max-total-size-bytes: 524288000 # 500MB
+      max-file-count: 20

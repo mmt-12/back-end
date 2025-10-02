@@ -1,0 +1,9 @@
+[[Notification-Get-API]]
+=== 알림 목록 조회
+
+==== HTTP Request
+include::{snippets}/notification-get/http-request.adoc[]
+
+==== HTTP Response
+include::{snippets}/notification-get/http-response.adoc[]
+include::{snippets}/notification-get/response-fields.adoc[]

@@ -1,0 +1,12 @@
+[[Voice-API]]
+== Voice API
+
+include::voice-create.adoc[]
+
+'''
+
+include::voice-get.adoc[]
+
+'''
+
+include::voice-remove.adoc[]
