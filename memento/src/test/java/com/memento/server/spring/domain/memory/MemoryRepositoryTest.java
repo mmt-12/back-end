@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import com.memento.server.api.service.memory.dto.MemoryItem;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
@@ -109,7 +110,7 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        List<Memory> memories = memoryRepository.findAllByConditions(
+        List<MemoryItem> memories = memoryRepository.findAllByConditions(
                 community.getId(),
                 null,
                 null,
@@ -120,7 +121,7 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
 
         // then
         assertThat(memories).hasSize(1);
-        assertThat(memories.get(0).getId()).isEqualTo(memory.getId());
+        assertThat(memories.get(0).id()).isEqualTo(memory.getId());
     }
 
     @Test
@@ -152,7 +153,7 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        List<Memory> memories = memoryRepository.findAllByConditions(
+        List<MemoryItem> memories = memoryRepository.findAllByConditions(
                 community.getId(),
                 "Keyword",
                 null,
@@ -163,7 +164,7 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
 
         // then
         assertThat(memories).hasSize(1);
-        assertThat(memories.get(0).getId()).isEqualTo(memory.getId());
+        assertThat(memories.get(0).id()).isEqualTo(memory.getId());
     }
 
     @Test
@@ -195,7 +196,7 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        List<Memory> memories = memoryRepository.findAllByConditions(
+        List<MemoryItem> memories = memoryRepository.findAllByConditions(
                 community.getId(),
                 null,
                 LocalDateTime.of(2023, 1, 1, 0, 0),
@@ -206,6 +207,6 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
 
         // then
         assertThat(memories).hasSize(1);
-        assertThat(memories.get(0).getId()).isEqualTo(memory.getId());
+        assertThat(memories.get(0).id()).isEqualTo(memory.getId());
     }
 }

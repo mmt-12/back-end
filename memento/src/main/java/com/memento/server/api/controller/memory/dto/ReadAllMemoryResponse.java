@@ -9,12 +9,7 @@ import java.util.Map;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse.AuthorResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse.LocationResponse;
 import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse.PeriodResponse;
-import com.memento.server.api.service.memory.dto.Author;
-import com.memento.server.api.service.memory.dto.Author.Achievement;
-import com.memento.server.domain.event.Event;
-import com.memento.server.domain.event.Location;
-import com.memento.server.domain.event.Period;
-import com.memento.server.domain.memory.Memory;
+import com.memento.server.api.service.memory.dto.MemoryItem;
 import com.memento.server.domain.memory.dto.MemoryAssociateCount;
 import com.memento.server.domain.post.PostImage;
 
@@ -51,20 +46,23 @@ public record ReadAllMemoryResponse(
 				Long id,
 				String name
 			) {
-				public static AchievementResponse from(Achievement achievement) {
-					return AchievementResponse.builder()
+				public static AchievementResponse from(MemoryItem.AchievementDto achievement) {
+					return achievement == null ? null : AchievementResponse.builder()
 						.id(achievement.id())
 						.name(achievement.name())
 						.build();
 				}
 			}
 
-			public static AuthorResponse from(Author author) {
+			public static AuthorResponse from(
+				MemoryItem.AssociateDto author,
+				MemoryItem.AchievementDto achievement
+			) {
 				return AuthorResponse.builder()
 					.id(author.id())
-					.imageUrl(author.imageUrl())
+					.imageUrl(author.profileImageUrl())
 					.nickname(author.nickname())
-					.achievement(author.achievement() == null ? null : AchievementResponse.from(author.achievement()))
+					.achievement(AchievementResponse.from(achievement))
 					.build();
 			}
 		}
@@ -74,10 +72,10 @@ public record ReadAllMemoryResponse(
 			LocalDateTime startTime,
 			LocalDateTime endTime
 		) {
-			public static PeriodResponse from(Period period) {
+			public static PeriodResponse from(MemoryItem.PeriodDto period) {
 				return PeriodResponse.builder()
-					.startTime(period.getStartTime())
-					.endTime(period.getEndTime())
+					.startTime(period.startTime())
+					.endTime(period.endTime())
 					.build();
 			}
 		}
@@ -90,25 +88,24 @@ public record ReadAllMemoryResponse(
 			Float longitude,
 			Integer code
 		) {
-			public static LocationResponse from(Location location) {
+			public static LocationResponse from(MemoryItem.LocationDto location) {
 				return LocationResponse.builder()
-					.address(location.getAddress())
-					.name(location.getName())
-					.latitude(location.getLatitude().floatValue())
-					.longitude(location.getLongitude().floatValue())
-					.code(location.getCode())
+					.address(location.address())
+					.name(location.name())
+					.latitude(location.latitude().floatValue())
+					.longitude(location.longitude().floatValue())
+					.code(location.code())
 					.build();
 			}
 		}
 	}
 
 	public static ReadAllMemoryResponse from(
-		List<Memory> memories,
+		List<MemoryItem> memories,
 		List<PostImage> images,
 		List<MemoryAssociateCount> associateCounts,
 		boolean hasNext,
-		Long nextCursor,
-		Map<Long, Author> authorMap
+		Long nextCursor
 	) {
 		Map<Long, List<String>> pictureMap = new HashMap<>();
 		for (PostImage postImage : images) {
@@ -124,21 +121,20 @@ public record ReadAllMemoryResponse(
 		}
 
 		List<MemoryResponse> memoryResponses = new ArrayList<>();
-		for (Memory memory : memories) {
-			Event event = memory.getEvent();
-			List<String> pictures = pictureMap.getOrDefault(memory.getId(), new ArrayList<>());
+		for (MemoryItem memory : memories) {
+			List<String> pictures = pictureMap.getOrDefault(memory.id(), new ArrayList<>());
 
 			memoryResponses.add(
 				MemoryResponse.builder()
-					.id(memory.getId())
-					.title(event.getTitle())
-					.description(event.getDescription())
-					.period(PeriodResponse.from(event.getPeriod()))
-					.location(LocationResponse.from(event.getLocation()))
-					.memberAmount(associatesCountMap.getOrDefault(memory.getId(), 0))
+					.id(memory.id())
+					.title(memory.title())
+					.description(memory.description())
+					.period(PeriodResponse.from(memory.period()))
+					.location(LocationResponse.from(memory.location()))
+					.memberAmount(associatesCountMap.getOrDefault(memory.id(), 0))
 					.pictureAmount(pictures.size())
 					.pictures(pictures.subList(0, Math.min(pictures.size(), 9)))
-					.author(AuthorResponse.from(authorMap.get(memory.getId())))
+					.author(AuthorResponse.from(memory.associate(), memory.achievement()))
 					.build()
 			);
 		}
