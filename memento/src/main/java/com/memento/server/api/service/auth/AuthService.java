@@ -87,7 +87,7 @@ public class AuthService {
 	}
 
 	public AuthResponse refreshToken(TokenRefreshRequest request) {
-		if (!jwtTokenProvider.validateToken(request.refreshToken())) {
+		if (jwtTokenProvider.isNotValidateToken(request.refreshToken())) {
 			throw new MementoException(TOKEN_NOT_VALID);
 		}
 
