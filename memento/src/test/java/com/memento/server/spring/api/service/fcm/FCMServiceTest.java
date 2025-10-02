@@ -3,7 +3,7 @@ package com.memento.server.spring.api.service.fcm;
 import static com.memento.server.domain.notification.NotificationType.ACHIEVE;
 import static com.memento.server.domain.notification.NotificationType.REACTION;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -239,6 +239,70 @@ public class FCMServiceTest extends IntegrationsTestSupport {
 		List<FCMToken> remainingTokens = fcmTokenRepository.findAll();
 		assertThat(remainingTokens).hasSize(1);
 		assertThat(remainingTokens.getFirst().getToken()).isEqualTo(fixtures.fcmToken2.getToken());
+	}
+
+	@Test
+	@DisplayName("FCM 토큰을 저장한다")
+	void saveFCMToken() {
+		// given
+		Member member = memberRepository.save(
+			Member.create("회원", "member@test.com", LocalDate.of(1990, 1, 1), 1001L));
+		Community community = communityRepository.save(Community.create("테스트 커뮤니티", member));
+		Associate associate = associateRepository.save(Associate.create("참여자", member, community));
+
+		com.memento.server.api.service.fcm.dto.request.SaveFCMTokenServiceRequest request =
+			com.memento.server.api.service.fcm.dto.request.SaveFCMTokenServiceRequest.of(
+				associate.getId(), "new_fcm_token_12345");
+
+		// when
+		fcmService.saveFCMToken(request);
+
+		// then
+		List<FCMToken> savedTokens = fcmTokenRepository.findAll();
+		assertThat(savedTokens).hasSize(1);
+		assertThat(savedTokens.getFirst().getToken()).isEqualTo("new_fcm_token_12345");
+		assertThat(savedTokens.getFirst().getAssociate().getId()).isEqualTo(associate.getId());
+	}
+
+	@Test
+	@DisplayName("중복된 FCM 토큰 저장 시 예외가 발생한다")
+	void saveDuplicateFCMToken() {
+		// given
+		Member member = memberRepository.save(
+			Member.create("회원", "member@test.com", LocalDate.of(1990, 1, 1), 1001L));
+		Community community = communityRepository.save(Community.create("테스트 커뮤니티", member));
+		Associate associate = associateRepository.save(Associate.create("참여자", member, community));
+
+		FCMToken existingToken = fcmTokenRepository.save(FCMToken.builder()
+			.token("duplicate_token")
+			.associate(associate)
+			.build());
+
+		com.memento.server.api.service.fcm.dto.request.SaveFCMTokenServiceRequest request =
+			com.memento.server.api.service.fcm.dto.request.SaveFCMTokenServiceRequest.of(
+				associate.getId(), "duplicate_token");
+
+		// when & then
+		assertThatThrownBy(() -> fcmService.saveFCMToken(request))
+			.isInstanceOf(com.memento.server.common.exception.MementoException.class)
+			.extracting("errorCode")
+			.isEqualTo(com.memento.server.common.error.ErrorCodes.FCMTOKEN_DUPLICATE);
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 Associate로 FCM 토큰 저장 시 예외가 발생한다")
+	void saveFCMTokenWithNonExistentAssociate() {
+		// given
+		Long nonExistentAssociateId = 999L;
+		com.memento.server.api.service.fcm.dto.request.SaveFCMTokenServiceRequest request =
+			com.memento.server.api.service.fcm.dto.request.SaveFCMTokenServiceRequest.of(
+				nonExistentAssociateId, "new_token");
+
+		// when & then
+		assertThatThrownBy(() -> fcmService.saveFCMToken(request))
+			.isInstanceOf(com.memento.server.common.exception.MementoException.class)
+			.extracting("errorCode")
+			.isEqualTo(com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND);
 	}
 
 	private FCMTestFixtures createSingleReceiverFixtures() {

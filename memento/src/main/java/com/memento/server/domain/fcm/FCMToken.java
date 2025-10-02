@@ -1,5 +1,6 @@
 package com.memento.server.domain.fcm;
 
+import static com.memento.server.common.error.ErrorCodes.FCMTOKEN_TOO_LONG;
 import static jakarta.persistence.ConstraintMode.NO_CONSTRAINT;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -8,6 +9,7 @@ import static lombok.AccessLevel.PROTECTED;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.memento.server.common.BaseEntity;
+import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 
 import jakarta.persistence.Column;
@@ -37,10 +39,17 @@ public class FCMToken extends BaseEntity {
 	@GeneratedValue(strategy = IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, length = 512, unique = true)
+	@Column(nullable = false, length = 4096, unique = true)
 	private String token;
 
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "associate_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Associate associate;
+
+	public static FCMToken create(String token, Associate associate) {
+		if(token.length() > 4096) {
+			throw new MementoException(FCMTOKEN_TOO_LONG);
+		}
+		return FCMToken.builder().token(token).associate(associate).build();
+	}
 }

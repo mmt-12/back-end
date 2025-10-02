@@ -1,19 +1,25 @@
 package com.memento.server.api.service.fcm;
 
-import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
+import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
+import static com.memento.server.common.error.ErrorCodes.FCMTOKEN_DUPLICATE;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.memento.server.api.service.fcm.dto.request.FCMRequest;
 import com.memento.server.api.service.fcm.dto.request.ReceiverInfo;
+import com.memento.server.api.service.fcm.dto.request.SaveFCMTokenServiceRequest;
 import com.memento.server.client.fcm.FCMSender;
+import com.memento.server.common.exception.MementoException;
+import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.fcm.FCMToken;
 import com.memento.server.domain.fcm.FCMTokenRepository;
 
@@ -23,11 +29,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(propagation = REQUIRES_NEW)
+@Transactional
 public class FCMService {
 
 	private final FCMSender sender;
 	private final FCMTokenRepository fcmTokenRepository;
+	private final AssociateRepository associateRepository;
 
 	public void sendToAssociates(FCMRequest request) {
 		Map<Long, ReceiverInfo> receiverMap = request.receiverInfos().stream()
@@ -52,6 +59,18 @@ public class FCMService {
 						e.getMessage());
 				}
 			}
+		}
+	}
+
+	public void saveFCMToken(SaveFCMTokenServiceRequest request) {
+		Associate associate = associateRepository.findByIdAndDeletedAtIsNull(request.associateId())
+			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_FOUND));
+		FCMToken fcmToken = FCMToken.create(request.token(), associate);
+
+		try {
+			fcmTokenRepository.save(fcmToken);
+		} catch (DataIntegrityViolationException e) {
+			throw new MementoException(FCMTOKEN_DUPLICATE);
 		}
 	}
 

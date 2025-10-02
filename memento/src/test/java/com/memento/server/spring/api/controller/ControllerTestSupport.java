@@ -13,6 +13,7 @@ import com.memento.server.api.controller.achievement.AchievementController;
 import com.memento.server.api.controller.comment.CommentController;
 import com.memento.server.api.controller.community.AssociateController;
 import com.memento.server.api.controller.emoji.EmojiController;
+import com.memento.server.api.controller.fcm.FCMController;
 import com.memento.server.api.controller.guestBook.GuestBookController;
 import com.memento.server.api.controller.mbti.MbtiController;
 import com.memento.server.api.controller.member.MemberController;
@@ -28,6 +29,7 @@ import com.memento.server.api.service.auth.jwt.MemberClaim;
 import com.memento.server.api.service.comment.CommentService;
 import com.memento.server.api.service.community.AssociateService;
 import com.memento.server.api.service.emoji.EmojiService;
+import com.memento.server.api.service.fcm.FCMService;
 import com.memento.server.api.service.guestBook.GuestBookService;
 import com.memento.server.api.service.mbti.MbtiService;
 import com.memento.server.api.service.member.MemberService;
@@ -49,6 +51,7 @@ import static org.mockito.Mockito.when;
 	CommentController.class,
 	AchievementController.class,
 	AssociateController.class,
+	FCMController.class,
 	GuestBookController.class,
 	MbtiController.class,
 	ProfileImageController.class,
@@ -111,6 +114,9 @@ public abstract class ControllerTestSupport {
 
 	@MockitoBean
 	protected MemberClaimValidator memberClaimValidator;
+
+	@MockitoBean
+	protected FCMService fcmService;
 
 	protected RequestPostProcessor withJwt(Long memberId, Long associateId, Long communityId) {
 		when(memberClaimValidator.isValid(any())).thenReturn(true);
