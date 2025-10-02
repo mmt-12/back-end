@@ -3,3 +3,5 @@
 
 include::achievement-read.adoc[]
 include::achievement-create.adoc[]
+include::achievement-exclusive.adoc[]
+include::achievement-attendance.adoc[]

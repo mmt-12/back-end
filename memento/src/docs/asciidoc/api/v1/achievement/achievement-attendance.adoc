@@ -1,0 +1,10 @@
+[[achievement-attendance-test]]
+=== 출석 업적 API
+
+==== HTTP Request
+include::{snippets}/achievement-attendance-test/http-request.adoc[]
+NOTE: 요청이 필요하지 않습니다.
+
+==== HTTP Response
+include::{snippets}/achievement-attendance-test/http-response.adoc[]
+NOTE: 응답이 존재하지 않습니다.

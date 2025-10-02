@@ -66,10 +66,6 @@ public class MemberService {
 		MemberClaim memberClaim = MemberClaim.from(member, associate);
 		JwtToken token = jwtTokenProvider.createToken(memberClaim);
 
-		if(community.getName().equals("SSAFY 12기 12반")){
-			achievementEventPublisher.publishAssociateExclusiveAchievement(AssociateExclusiveAchievementEvent.from(associate.getId(), member.getBirthday()));
-		}
-
 		fcmEventPublisher.publishNotification(AssociateFCM.from(associate.getNickname(), community.getId(), associate.getId()));
 		return MemberSignUpResponse.from(member, token);
 	}

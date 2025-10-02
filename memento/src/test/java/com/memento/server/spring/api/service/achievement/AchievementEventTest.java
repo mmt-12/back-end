@@ -25,12 +25,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
 import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
 import com.memento.server.api.service.achievement.AchievementService;
-import com.memento.server.api.service.auth.jwt.JwtToken;
-import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
-import com.memento.server.api.service.auth.jwt.MemberClaim;
 import com.memento.server.api.service.comment.CommentService;
 import com.memento.server.api.service.comment.dto.request.EmojiCommentCreateServiceRequest;
 import com.memento.server.api.service.emoji.EmojiService;
@@ -38,7 +34,6 @@ import com.memento.server.api.service.emoji.dto.request.EmojiCreateServiceReques
 import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.guestBook.GuestBookService;
 import com.memento.server.api.service.mbti.MbtiService;
-import com.memento.server.api.service.member.MemberService;
 import com.memento.server.api.service.memory.MemoryService;
 import com.memento.server.api.service.post.PostService;
 import com.memento.server.api.service.profileImage.ProfileImageService;
@@ -158,12 +153,6 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 	private GuestBookRepository guestBookRepository;
 
 	@Autowired
-	private MemberService memberService;
-
-	@Autowired
-	private JwtTokenProvider jwtTokenProvider;
-
-	@Autowired
 	private AchievementService achievementService;
 
 	@Autowired
@@ -248,6 +237,37 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 		AssociateStats associateStats = associateStatsRepository.findByAssociateId(associate.getId()).orElseThrow();
 		assertThat(associateStats.getRegisteredProfileImageCount()).isEqualTo(21);
 		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(8L, associate.getId()))
+			.isTrue();
+	}
+
+	@Test
+	@DisplayName("시간빌게이츠")
+	void attendanceTest() throws Exception {
+		// given
+		Member member = MemberFixtures.member();
+		memberRepository.save(member);
+
+		Community community = CommunityFixtures.community(member);
+		communityRepository.save(community);
+
+		Associate associate = AssociateFixtures.associate(member, community);
+		associateRepository.save(associate);
+
+		Associate registrant = AssociateFixtures.associate(member, community);
+		associateRepository.save(registrant);
+
+		associateStatsRepository.save(AssociateStats.builder()
+			.associate(associate)
+			.lastAttendedAt(LocalDateTime.now().minusDays(1))
+			.consecutiveAttendanceDays(14)
+			.build());
+
+		// when
+		achievementService.attendance(community.getId(), associate.getId());
+
+		// then
+		Thread.sleep(1000);
+		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(1L, associate.getId()))
 			.isTrue();
 	}
 
@@ -998,20 +1018,26 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 	@DisplayName("가입 전용 업적")
 	void associateExclusiveTest() throws InterruptedException {
 		// given
-		Long kakaoId = 1L;
-		String name = "오준수";
-		String email = "test@test.com";
-		LocalDate birthday = LocalDate.of(1999, 10, 13);
+		Member member = Member.builder()
+			.name("준수")
+			.email("test")
+			.birthday(LocalDate.of(1999,10,13))
+			.kakaoId(1L)
+			.build();
+		memberRepository.save(member);
+
+		Community community = CommunityFixtures.community(member, "SSAFY 12기 12반");
+		communityRepository.save(community);
+
+		Associate associate = AssociateFixtures.associate(member, community);
+		associateRepository.save(associate);
 
 		// when
-		MemberSignUpResponse response = memberService.signUp(kakaoId, name, email, birthday);
-
-		JwtToken jwtToken = response.token();
-		MemberClaim memberClaim = jwtTokenProvider.extractMemberClaim(jwtToken.accessToken());
+		achievementService.exclusive(community.getId(), associate.getId());
 
 		// then
 		Thread.sleep(1000);
-		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(22L, memberClaim.associateId()))
+		assertThat(achievementAssociateRepository.existsByAchievementIdAndAssociateId(22L, associate.getId()))
 			.isTrue();
 	}
 

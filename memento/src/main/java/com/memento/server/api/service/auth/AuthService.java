@@ -62,9 +62,6 @@ public class AuthService {
 					.build();
 				JwtToken token = jwtTokenProvider.createToken(memberClaim);
 
-				achievementEventPublisher.publishSignInAchievement(SignInAchievementEvent.builder()
-					.associateId(associate.getId())
-					.build());
 				return AuthMemberResponse.builder()
 					.memberId(member.getId())
 					.name(member.getName())

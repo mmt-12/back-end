@@ -50,4 +50,30 @@ public class AchievementController {
 		achievementService.create(currentAssociateId, request.content());
 		return ResponseEntity.ok().build();
 	}
+
+	@PostMapping("/achievements/exclusive")
+	public ResponseEntity<Void> exclusive(
+		@CommunityId Long currentCommunityId,
+		@AssociateId Long currentAssociateId,
+		@PathVariable Long communityId
+	){
+		if (!currentCommunityId.equals(communityId)) {
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
+		}
+		achievementService.exclusive(currentCommunityId, currentAssociateId);
+		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/achievements/attendance")
+	public ResponseEntity<Void> attendance(
+		@CommunityId Long currentCommunityId,
+		@AssociateId Long currentAssociateId,
+		@PathVariable Long communityId
+	){
+		if (!currentCommunityId.equals(communityId)) {
+			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
+		}
+		achievementService.attendance(currentCommunityId, currentAssociateId);
+		return ResponseEntity.ok().build();
+	}
 }
