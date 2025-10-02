@@ -55,6 +55,7 @@ public class JwtTokenProvider {
 			.sign(Algorithm.HMAC512(jwtProperties.secret()));
 
 		String refreshToken = JWT.create()
+			.withClaim("memberId", memberClaim.memberId())
 			.withExpiresAt(refreshTokenExpiresAt)
 			.sign(Algorithm.HMAC512(jwtProperties.secret()));
 
@@ -67,14 +68,14 @@ public class JwtTokenProvider {
 			.build();
 	}
 
-	public boolean validateToken(String token) {
+	public boolean isNotValidateToken(String token) {
 		try {
 			JWTVerifier verifier = JWT.require(Algorithm.HMAC512(jwtProperties.secret())).acceptLeeway(5).build();
 			verifier.verify(token);
-			return true;
+			return false;
 		} catch (JWTVerificationException e) {
 			log.info("토큰 검증 실패: {}", e.getMessage());
-			return false;
+			return true;
 		}
 	}
 

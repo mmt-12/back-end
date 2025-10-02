@@ -71,7 +71,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
 		String token = resolveToken(request);
 
-		if (!StringUtils.hasText(token) || !jwtTokenProvider.validateToken(token)) {
+		if (!StringUtils.hasText(token) || jwtTokenProvider.isNotValidateToken(token)) {
 			SecurityContextHolder.clearContext();
 			response.sendError(SC_UNAUTHORIZED, "토큰이 없거나 검증에 실패했습니다.");
 			return;
