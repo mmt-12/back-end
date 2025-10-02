@@ -111,7 +111,7 @@ public enum ErrorCodes implements ErrorCode {
 	STATS_NOT_FOUND(BAD_REQUEST, 15000, "참여자의 업적 기록이 존재하지 않습니다."),
 
 	FCMTOKEN_DUPLICATE(BAD_REQUEST, 16000, "이미 저장된 fcm token입니다."),
-	FCMTOKEN_TOO_LONG(BAD_REQUEST, 16001, "fcm token의 길이가 4096를 넘어갑니다."),
+	FCMTOKEN_TOO_LONG(BAD_REQUEST, 16001, "fcm token의 길이가 512를 넘어갑니다."),
 
 	;
 	private final HttpStatus status;

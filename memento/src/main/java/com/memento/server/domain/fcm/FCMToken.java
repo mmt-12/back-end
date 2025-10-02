@@ -39,7 +39,7 @@ public class FCMToken extends BaseEntity {
 	@GeneratedValue(strategy = IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, length = 4096, unique = true)
+	@Column(nullable = false, length = 512, unique = true)
 	private String token;
 
 	@ManyToOne(fetch = LAZY)
@@ -47,7 +47,7 @@ public class FCMToken extends BaseEntity {
 	private Associate associate;
 
 	public static FCMToken create(String token, Associate associate) {
-		if(token.length() > 4096) {
+		if(token.length() > 512) {
 			throw new MementoException(FCMTOKEN_TOO_LONG);
 		}
 		return FCMToken.builder().token(token).associate(associate).build();

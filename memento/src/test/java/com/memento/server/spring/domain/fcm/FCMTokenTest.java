@@ -34,7 +34,7 @@ public class FCMTokenTest {
 	@DisplayName("토큰 길이가 4096을 초과하면 예외가 발생한다.")
 	void createFCMTokenWithTooLongToken() {
 		// given
-		String tooLongToken = "a".repeat(4097);
+		String tooLongToken = "a".repeat(513);
 		Associate associate = AssociateFixtures.associate();
 
 		// when & then
@@ -48,7 +48,7 @@ public class FCMTokenTest {
 	@DisplayName("정확히 4096 길이의 토큰은 정상적으로 생성된다.")
 	void createFCMTokenWithMaxLength() {
 		// given
-		String maxLengthToken = "a".repeat(4096);
+		String maxLengthToken = "a".repeat(512);
 		Associate associate = AssociateFixtures.associate();
 
 		// when
@@ -56,6 +56,6 @@ public class FCMTokenTest {
 
 		// then
 		assertThat(fcmToken).isNotNull();
-		assertThat(fcmToken.getToken()).hasSize(4096);
+		assertThat(fcmToken.getToken()).hasSize(512);
 	}
 }

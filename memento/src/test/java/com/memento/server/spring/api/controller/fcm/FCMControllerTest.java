@@ -105,13 +105,13 @@ public class FCMControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
-	@DisplayName("FCM 토큰 저장 시 token 길이는 4096자를 초과할 수 없다.")
+	@DisplayName("FCM 토큰 저장 시 token 길이는 512자를 초과할 수 없다.")
 	void saveFCMTokenWithTooLongToken() throws Exception {
 		// given
 		long communityId = 1L;
 		long associateId = 1L;
 		long memberId = 1L;
-		String tooLongToken = "a".repeat(4097);
+		String tooLongToken = "a".repeat(513);
 		SaveFCMTokenRequest request = SaveFCMTokenRequest.builder()
 			.token(tooLongToken)
 			.build();

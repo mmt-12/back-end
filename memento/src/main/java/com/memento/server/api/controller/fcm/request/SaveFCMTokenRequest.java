@@ -7,7 +7,7 @@ import lombok.Builder;
 @Builder
 public record SaveFCMTokenRequest(
 	@NotBlank(message = "token 값은 필수 입니다.")
-	@Size(max = 4096)
+	@Size(max = 512)
 	String token
 ) {
 }
