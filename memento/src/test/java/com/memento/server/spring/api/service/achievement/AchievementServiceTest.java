@@ -45,6 +45,7 @@ public class AchievementServiceTest extends IntegrationsTestSupport {
 
 	@Autowired
 	protected AchievementRepository achievementRepository;
+
 	@Autowired
 	private AchievementAssociateRepository achievementAssociateRepository;
 

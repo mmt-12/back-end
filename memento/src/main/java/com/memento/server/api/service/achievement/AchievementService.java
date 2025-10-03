@@ -14,7 +14,9 @@ import com.memento.server.domain.achievement.AchievementAssociateRepository;
 import com.memento.server.domain.achievement.AchievementRepository;
 import com.memento.server.domain.achievement.CommonAchievementEvent;
 import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.community.AssociateExclusiveAchievementEvent;
 import com.memento.server.domain.community.AssociateRepository;
+import com.memento.server.domain.community.SignInAchievementEvent;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -66,5 +68,19 @@ public class AchievementService {
 			default:
 				throw new MementoException(ErrorCodes.ACHIEVEMENT_NOT_EXISTENCE);
 		}
+	}
+
+	public void exclusive(Long communityId, Long associateId) {
+		Associate associate = validAssociate(communityId, associateId);
+		if(associate.getCommunity().getName().equals("SSAFY 12기 12반")){
+			achievementEventPublisher.publishAssociateExclusiveAchievement(AssociateExclusiveAchievementEvent.from(associate.getId(), associate.getMember().getBirthday()));
+		}
+	}
+
+	public void attendance(Long communityId, Long currentAssociateId) {
+		Associate associate = validAssociate(communityId, currentAssociateId);
+		achievementEventPublisher.publishSignInAchievement(SignInAchievementEvent.builder()
+			.associateId(associate.getId())
+			.build());
 	}
 }

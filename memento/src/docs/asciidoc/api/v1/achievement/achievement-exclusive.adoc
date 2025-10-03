@@ -1,0 +1,10 @@
+[[achievement-exclusive-test]]
+=== 전용 업적 API
+
+==== HTTP Request
+include::{snippets}/achievement-exclusive-test/http-request.adoc[]
+NOTE: 요청이 필요하지 않습니다.
+
+==== HTTP Response
+include::{snippets}/achievement-exclusive-test/http-response.adoc[]
+NOTE: 응답이 존재하지 않습니다.

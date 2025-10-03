@@ -112,4 +112,38 @@ public class AchievementControllerDocsTest extends RestDocsSupport {
 				)
 			));
 	}
+
+	@Test
+	@DisplayName("전용 업적 API")
+	void exclusiveTest() throws Exception{
+		// given
+		setAuthentication(1L, 1L, 1L);
+
+		long communityId = 1L;
+
+		doNothing().when(achievementService).exclusive(anyLong(), anyLong());
+		// when & then
+		mockMvc.perform(
+				post(PATH + "/achievements/exclusive", communityId))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andDo(document("achievement-exclusive-test"));
+	}
+
+	@Test
+	@DisplayName("출석 업적 API")
+	void attendanceTest() throws Exception{
+		// given
+		setAuthentication(1L, 1L, 1L);
+
+		long communityId = 1L;
+
+		doNothing().when(achievementService).attendance(anyLong(), anyLong());
+		// when & then
+		mockMvc.perform(
+				post(PATH + "/achievements/attendance", communityId))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andDo(document("achievement-attendance-test"));
+	}
 }

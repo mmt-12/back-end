@@ -1,8 +1,18 @@
 package com.memento.server.spring.api.controller.achievement;
 
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -12,13 +22,14 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.memento.server.api.controller.achievement.dto.CreateAchievementRequest;
 import com.memento.server.api.controller.achievement.dto.SearchAchievementResponse;
 import com.memento.server.domain.achievement.AchievementType;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
 
 public class AchievementControllerTest extends ControllerTestSupport {
 
-	public static final String PATH = "/api/v1/communities/{communityId}/associates/{associateId}/achievements";
+	public static final String PATH = "/api/v1/communities/{communityId}";
 
 	@Test
 	@DisplayName("업적을 조회한다.")
@@ -43,7 +54,7 @@ public class AchievementControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(
-				get(PATH, communityId, associateId)
+				get(PATH + "/associates/{associateId}/achievements", communityId, associateId)
 					.with(withJwt(1L, 1L, 1L)))
 			.andDo(print())
 			.andExpect(status().isOk());
@@ -72,7 +83,7 @@ public class AchievementControllerTest extends ControllerTestSupport {
 
 		// when & then
 		mockMvc.perform(
-				get(PATH, communityId, associateId)
+				get(PATH + "/associates/{associateId}/achievements", communityId, associateId)
 					.with(withJwt(1L, 1L, 2L)))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -81,4 +92,53 @@ public class AchievementControllerTest extends ControllerTestSupport {
 			.andExpect(jsonPath("$.message").value("다른 그룹의 요청입니다."));
 	}
 
+	@Test
+	@DisplayName("업적 생성 API")
+	void createTest() throws Exception{
+		// given
+		long communityId = 1L;
+		CreateAchievementRequest request = CreateAchievementRequest.builder()
+			.content("HOME")
+			.build();
+
+		doNothing().when(achievementService).create(anyLong(), eq("HOME"));
+		// when & then
+		mockMvc.perform(
+				post(PATH + "/achievements", communityId)
+					.with(withJwt(1L, 1L, 1L))
+					.content(objectMapper.writeValueAsString(request))
+					.contentType(APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("전용 업적 API")
+	void exclusiveTest() throws Exception{
+		// given
+		long communityId = 1L;
+
+		doNothing().when(achievementService).exclusive(anyLong(), anyLong());
+		// when & then
+		mockMvc.perform(
+				post(PATH + "/achievements/exclusive", communityId)
+					.with(withJwt(1L, 1L, 1L)))
+			.andDo(print())
+			.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("출석 업적 API")
+	void attendanceTest() throws Exception{
+		// given
+		long communityId = 1L;
+
+		doNothing().when(achievementService).attendance(anyLong(), anyLong());
+		// when & then
+		mockMvc.perform(
+				post(PATH + "/achievements/attendance", communityId)
+					.with(withJwt(1L, 1L, 1L)))
+			.andDo(print())
+			.andExpect(status().isOk());
+	}
 }
