@@ -9,7 +9,7 @@ public enum NotificationType {
 
 	MEMORY("참여한 새로운 기억 생성"),
 	REACTION("내 포스트에 리액션"),
-	POST("기억에 내 포스트 등록"),
+	POST("기억에 새 포스트 등록"),
 	ACHIEVE("업적 달성"),
 	GUESTBOOK("익명의 방명록 작성"),
 	MBTI("새로운 mbti 테스트"),
