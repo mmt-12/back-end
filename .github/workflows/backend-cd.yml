@@ -14,7 +14,6 @@ on:
         options: ["dev", "prod"]
 
 concurrency:
-  # separate queues per ref; dev/prod won’t cancel each other if refs differ
   group: backend-cd-${{ github.ref }}
   cancel-in-progress: true
 
@@ -32,23 +31,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
       - name: Ensure gradlew is executable
         run: chmod +x gradlew
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: gradle/actions/setup-gradle@v3
+        with: { build-root-directory: memento }
 
-      - name: Set up Java 21 (Temurin)
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          build-root-directory: memento
-
-      - name: Build WAR
-        run: ./gradlew clean test war --no-daemon
+      - name: Build JAR (bootJar → jar fallback)
+        run: |
+          ./gradlew clean test bootJar --no-daemon || ./gradlew clean test jar --no-daemon
+          # normalize name to app.jar
+          mkdir -p out && cp build/libs/*.jar out/app.jar
 
       - name: Prepare metadata
         id: meta
@@ -65,11 +59,11 @@ jobs:
           printf "%s\n" "${{ secrets.KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
-      - name: Upload WAR via scp
+      - name: Upload JAR via scp
         run: |
           scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
-            memento/build/libs/*.war \
-            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/tmp/app.war.${{ steps.meta.outputs.RELEASE_ID }}"
+            out/app.jar \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/tmp/app.jar.${{ steps.meta.outputs.RELEASE_ID }}"
 
       - name: Run remote deploy (dev)
         run: |
@@ -92,23 +86,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
       - name: Ensure gradlew is executable
         run: chmod +x gradlew
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: gradle/actions/setup-gradle@v3
+        with: { build-root-directory: memento }
 
-      - name: Set up Java 21 (Temurin)
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          build-root-directory: memento
-
-      - name: Build WAR
-        run: ./gradlew clean test war --no-daemon
+      - name: Build JAR (bootJar → jar fallback)
+        run: |
+          ./gradlew clean test bootJar --no-daemon || ./gradlew clean test jar --no-daemon
+          mkdir -p out && cp build/libs/*.jar out/app.jar
 
       - name: Prepare metadata
         id: meta
@@ -125,11 +113,11 @@ jobs:
           printf "%s\n" "${{ secrets.KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
-      - name: Upload WAR via scp
+      - name: Upload JAR via scp
         run: |
           scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
-            memento/build/libs/*.war \
-            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/tmp/app.war.${{ steps.meta.outputs.RELEASE_ID }}"
+            out/app.jar \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/tmp/app.jar.${{ steps.meta.outputs.RELEASE_ID }}"
 
       - name: Run remote deploy (prod)
         run: |
