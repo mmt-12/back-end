@@ -28,20 +28,26 @@ jobs:
     defaults:
       run:
         working-directory: memento
+    env:
+      SSH_PORT: ${{ secrets.SSH_PORT }} # optional; if unset defaults to 22 in the steps
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Ensure gradlew is executable
         run: chmod +x gradlew
-      - uses: actions/setup-java@v4
+
+      - name: Set up Java 21 (Temurin)
+        uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 21 }
-      - uses: gradle/actions/setup-gradle@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
         with: { build-root-directory: memento }
 
       - name: Build JAR (bootJar → jar fallback)
         run: |
-          ./gradlew clean bootJar --no-daemon -x test -x asciidoctor || ./gradlew clean jar --no-daemon -x test -x asciidoctor
-          # normalize name to app.jar
+          ./gradlew clean test bootJar --no-daemon || ./gradlew clean test jar --no-daemon
           mkdir -p out && cp build/libs/*.jar out/app.jar
 
       - name: Prepare metadata
@@ -53,21 +59,27 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Add known_hosts
+      - name: Add known_hosts (supports custom port if present)
         run: |
           mkdir -p ~/.ssh
           printf "%s\n" "${{ secrets.KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
+      - name: Test SSH connectivity
+        run: |
+          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -p "${SSH_PORT:-22}" \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+            "echo Connected as \$(whoami) on \$(hostname)"
+
       - name: Upload JAR via scp
         run: |
-          scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
+          scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -P "${SSH_PORT:-22}" \
             out/app.jar \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/tmp/app.jar.${{ steps.meta.outputs.RELEASE_ID }}"
 
       - name: Run remote deploy (dev)
         run: |
-          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
+          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -p "${SSH_PORT:-22}" \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
             "mkdir -p ~/apps/backend/releases/${{ steps.meta.outputs.RELEASE_ID }} && \
              ~/apps/backend/deploy_backend.sh dev ${{ steps.meta.outputs.RELEASE_ID }} 180"
@@ -83,19 +95,26 @@ jobs:
     defaults:
       run:
         working-directory: memento
+    env:
+      SSH_PORT: ${{ secrets.SSH_PORT }}
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Ensure gradlew is executable
         run: chmod +x gradlew
-      - uses: actions/setup-java@v4
+
+      - name: Set up Java 21 (Temurin)
+        uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 21 }
-      - uses: gradle/actions/setup-gradle@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
         with: { build-root-directory: memento }
 
       - name: Build JAR (bootJar → jar fallback)
         run: |
-          ./gradlew clean bootJar --no-daemon -x test -x asciidoctor || ./gradlew clean jar --no-daemon -x test -x asciidoctor
+          ./gradlew clean test bootJar --no-daemon || ./gradlew clean test jar --no-daemon
           mkdir -p out && cp build/libs/*.jar out/app.jar
 
       - name: Prepare metadata
@@ -107,21 +126,27 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Add known_hosts
+      - name: Add known_hosts (supports custom port if present)
         run: |
           mkdir -p ~/.ssh
           printf "%s\n" "${{ secrets.KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
+      - name: Test SSH connectivity
+        run: |
+          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -p "${SSH_PORT:-22}" \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+            "echo Connected as \$(whoami) on \$(hostname)"
+
       - name: Upload JAR via scp
         run: |
-          scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
+          scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -P "${SSH_PORT:-22}" \
             out/app.jar \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/tmp/app.jar.${{ steps.meta.outputs.RELEASE_ID }}"
 
       - name: Run remote deploy (prod)
         run: |
-          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
+          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -p "${SSH_PORT:-22}" \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
             "mkdir -p ~/apps/backend/releases/${{ steps.meta.outputs.RELEASE_ID }} && \
              ~/apps/backend/deploy_backend.sh prod ${{ steps.meta.outputs.RELEASE_ID }} 180"
