@@ -1,0 +1,138 @@
+name: backend-cd
+
+on:
+  push:
+    branches: ["develop", "main"]
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      env:
+        description: "Environment to deploy"
+        required: true
+        default: "dev"
+        type: choice
+        options: ["dev", "prod"]
+
+concurrency:
+  # separate queues per env so dev/prod won't cancel each other
+  group: backend-cd-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy_dev:
+    name: Deploy (dev)
+    runs-on: ubuntu-latest
+    environment: dev
+    if: >
+      github.event_name == 'workflow_dispatch' && inputs.env == 'dev' ||
+      github.ref == 'refs/heads/develop'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build WAR
+        run: ./gradlew clean test war --no-daemon
+
+      - name: Prepare metadata
+        id: meta
+        run: echo "RELEASE_ID=$(date -u +%Y%m%d%H%M%S)-${GITHUB_SHA::7}-dev" >> $GITHUB_OUTPUT
+
+      - name: Start ssh-agent and add key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          printf "%s\n" "${{ secrets.KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Upload WAR via scp
+        run: |
+          scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
+            build/libs/*.war \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/tmp/app.war.${{ steps.meta.outputs.RELEASE_ID }}"
+
+      # Optional: ensure the deploy script is present/updated (idempotent)
+      # - name: Ensure deploy script exists
+      #   run: |
+      #     scp scripts/deploy_backend.sh "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/apps/backend/deploy_backend.sh"
+      #     ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
+      #       "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+      #       "chmod 750 ~/apps/backend/deploy_backend.sh"
+
+      - name: Run remote deploy (dev)
+        run: |
+          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+            "mkdir -p ~/apps/backend/releases/${{ steps.meta.outputs.RELEASE_ID }} && \
+             ~/apps/backend/deploy_backend.sh dev ${{ steps.meta.outputs.RELEASE_ID }} 180"
+
+  deploy_prod:
+    name: Deploy (prod)
+    runs-on: ubuntu-latest
+    environment: prod
+    if: >
+      github.event_name == 'workflow_dispatch' && inputs.env == 'prod' ||
+      startsWith(github.ref, 'refs/heads/main') ||
+      startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build WAR
+        run: ./gradlew clean test war --no-daemon
+
+      - name: Prepare metadata
+        id: meta
+        run: echo "RELEASE_ID=$(date -u +%Y%m%d%H%M%S)-${GITHUB_SHA::7}-prod" >> $GITHUB_OUTPUT
+
+      - name: Start ssh-agent and add key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          printf "%s\n" "${{ secrets.KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Upload WAR via scp
+        run: |
+          scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
+            build/libs/*.war \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/tmp/app.war.${{ steps.meta.outputs.RELEASE_ID }}"
+
+      # Optional: ensure the deploy script is present/updated (idempotent)
+      # - name: Ensure deploy script exists
+      #   run: |
+      #     scp scripts/deploy_backend.sh "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/apps/backend/deploy_backend.sh"
+      #     ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
+      #       "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+      #       "chmod 750 ~/apps/backend/deploy_backend.sh"
+
+      - name: Run remote deploy (prod)
+        run: |
+          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+            "mkdir -p ~/apps/backend/releases/${{ steps.meta.outputs.RELEASE_ID }} && \
+             ~/apps/backend/deploy_backend.sh prod ${{ steps.meta.outputs.RELEASE_ID }} 180"
