@@ -67,19 +67,19 @@ jobs:
 
       - name: Test SSH connectivity
         run: |
-          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -p "${SSH_PORT:-22}" \
+          ssh \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
             "echo Connected as \$(whoami) on \$(hostname)"
 
       - name: Upload JAR via scp
         run: |
-          scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -P "${SSH_PORT:-22}" \
+          scp -O -P "${SSH_PORT:-22}" \
             out/app.jar \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/tmp/app.jar.${{ steps.meta.outputs.RELEASE_ID }}"
 
       - name: Run remote deploy (dev)
         run: |
-          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -p "${SSH_PORT:-22}" \
+          ssh \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
             "mkdir -p ~/apps/backend/releases/${{ steps.meta.outputs.RELEASE_ID }} && \
              ~/apps/backend/deploy_backend.sh dev ${{ steps.meta.outputs.RELEASE_ID }} 180"
@@ -134,19 +134,19 @@ jobs:
 
       - name: Test SSH connectivity
         run: |
-          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -p "${SSH_PORT:-22}" \
+          ssh \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
             "echo Connected as \$(whoami) on \$(hostname)"
 
       - name: Upload JAR via scp
         run: |
-          scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -P "${SSH_PORT:-22}" \
+          scp -O -P "${SSH_PORT:-22}" \
             out/app.jar \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/tmp/app.jar.${{ steps.meta.outputs.RELEASE_ID }}"
 
       - name: Run remote deploy (prod)
         run: |
-          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -p "${SSH_PORT:-22}" \
+          ssh \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
             "mkdir -p ~/apps/backend/releases/${{ steps.meta.outputs.RELEASE_ID }} && \
              ~/apps/backend/deploy_backend.sh prod ${{ steps.meta.outputs.RELEASE_ID }} 180"
