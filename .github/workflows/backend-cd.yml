@@ -14,8 +14,8 @@ on:
         options: ["dev", "prod"]
 
 concurrency:
-  # separate queues per env so dev/prod won't cancel each other
-  group: backend-cd-${{ github.workflow }}-${{ github.ref }}
+  # separate queues per ref; dev/prod won’t cancel each other if refs differ
+  group: backend-cd-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -26,8 +26,15 @@ jobs:
     if: >
       github.event_name == 'workflow_dispatch' && inputs.env == 'dev' ||
       github.ref == 'refs/heads/develop'
+    defaults:
+      run:
+        working-directory: memento
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Ensure gradlew is executable
+        run: chmod +x gradlew
 
       - name: Set up Java 21 (Temurin)
         uses: actions/setup-java@v4
@@ -37,6 +44,8 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
+        with:
+          build-root-directory: memento
 
       - name: Build WAR
         run: ./gradlew clean test war --no-daemon
@@ -59,16 +68,8 @@ jobs:
       - name: Upload WAR via scp
         run: |
           scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
-            build/libs/*.war \
+            memento/build/libs/*.war \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/tmp/app.war.${{ steps.meta.outputs.RELEASE_ID }}"
-
-      # Optional: ensure the deploy script is present/updated (idempotent)
-      # - name: Ensure deploy script exists
-      #   run: |
-      #     scp scripts/deploy_backend.sh "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/apps/backend/deploy_backend.sh"
-      #     ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
-      #       "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
-      #       "chmod 750 ~/apps/backend/deploy_backend.sh"
 
       - name: Run remote deploy (dev)
         run: |
@@ -85,9 +86,15 @@ jobs:
       github.event_name == 'workflow_dispatch' && inputs.env == 'prod' ||
       startsWith(github.ref, 'refs/heads/main') ||
       startsWith(github.ref, 'refs/tags/v')
+    defaults:
+      run:
+        working-directory: memento
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Ensure gradlew is executable
+        run: chmod +x gradlew
 
       - name: Set up Java 21 (Temurin)
         uses: actions/setup-java@v4
@@ -97,6 +104,8 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
+        with:
+          build-root-directory: memento
 
       - name: Build WAR
         run: ./gradlew clean test war --no-daemon
@@ -119,16 +128,8 @@ jobs:
       - name: Upload WAR via scp
         run: |
           scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
-            build/libs/*.war \
+            memento/build/libs/*.war \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/tmp/app.war.${{ steps.meta.outputs.RELEASE_ID }}"
-
-      # Optional: ensure the deploy script is present/updated (idempotent)
-      # - name: Ensure deploy script exists
-      #   run: |
-      #     scp scripts/deploy_backend.sh "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:~/apps/backend/deploy_backend.sh"
-      #     ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
-      #       "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
-      #       "chmod 750 ~/apps/backend/deploy_backend.sh"
 
       - name: Run remote deploy (prod)
         run: |
