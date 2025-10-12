@@ -39,6 +39,17 @@ jobs:
         with:
           build-root-directory: memento
 
+      - name: Write Firebase service account (if provided)
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+        run: |
+          mkdir -p src/main/resources
+          if [ -n "${FIREBASE_CONFIG:-}" ]; then
+            printf '%s' "${FIREBASE_CONFIG}" > src/main/resources/memento-serviceAccountKey.json
+          else
+            echo '{}' > src/main/resources/memento-serviceAccountKey.json
+          fi
+
       - name: Build & test (bootJar → jar fallback)
         run: |
           ./gradlew clean bootJar --no-daemon -x test -x asciidoctor || ./gradlew clean jar --no-daemon -x test -x asciidoctor
@@ -72,6 +83,18 @@ jobs:
       - uses: gradle/actions/setup-gradle@v3
         with:
           build-root-directory: memento
+
+      - name: Write Firebase service account (if provided)
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+        run: |
+          mkdir -p src/main/resources
+          if [ -n "${FIREBASE_CONFIG:-}" ]; then
+            printf '%s' "${FIREBASE_CONFIG}" > src/main/resources/memento-serviceAccountKey.json
+          else
+            echo '{}' > src/main/resources/memento-serviceAccountKey.json
+          fi
+
       - name: Build (bootJar → jar fallback)
         run: |
           ./gradlew clean bootJar --no-daemon -x test -x asciidoctor || ./gradlew clean jar --no-daemon -x test -x asciidoctor
