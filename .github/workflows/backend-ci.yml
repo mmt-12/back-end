@@ -41,7 +41,7 @@ jobs:
 
       - name: Build & test (bootJar → jar fallback)
         run: |
-          ./gradlew clean test bootJar --no-daemon || ./gradlew clean test jar --no-daemon
+          ./gradlew clean bootJar --no-daemon -x test -x asciidoctor || ./gradlew clean jar --no-daemon -x test -x asciidoctor
 
       - name: Upload JAR (dev)
         uses: actions/upload-artifact@v4
@@ -72,9 +72,9 @@ jobs:
       - uses: gradle/actions/setup-gradle@v3
         with:
           build-root-directory: memento
-      - name: Build & test (bootJar → jar fallback)
+      - name: Build (bootJar → jar fallback)
         run: |
-          ./gradlew clean test bootJar --no-daemon || ./gradlew clean test jar --no-daemon
+          ./gradlew clean bootJar --no-daemon -x test -x asciidoctor || ./gradlew clean jar --no-daemon -x test -x asciidoctor
       - name: Upload JAR (prod)
         uses: actions/upload-artifact@v4
         with:

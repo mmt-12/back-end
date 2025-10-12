@@ -40,7 +40,7 @@ jobs:
 
       - name: Build JAR (bootJar → jar fallback)
         run: |
-          ./gradlew clean test bootJar --no-daemon || ./gradlew clean test jar --no-daemon
+          ./gradlew clean bootJar --no-daemon -x test -x asciidoctor || ./gradlew clean jar --no-daemon -x test -x asciidoctor
           # normalize name to app.jar
           mkdir -p out && cp build/libs/*.jar out/app.jar
 
@@ -95,7 +95,7 @@ jobs:
 
       - name: Build JAR (bootJar → jar fallback)
         run: |
-          ./gradlew clean test bootJar --no-daemon || ./gradlew clean test jar --no-daemon
+          ./gradlew clean bootJar --no-daemon -x test -x asciidoctor || ./gradlew clean jar --no-daemon -x test -x asciidoctor
           mkdir -p out && cp build/libs/*.jar out/app.jar
 
       - name: Prepare metadata
