@@ -92,7 +92,9 @@ jobs:
         run: |
           ssh \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
-            "mkdir -p ~/apps/backend/releases/${{ steps.meta.outputs.RELEASE_ID }} && \
+            "
+            chmod 777 /tmp/app.jar.${{ steps.meta.outputs.RELEASE_ID }} && \
+            mkdir -p ~/apps/backend/releases/${{ steps.meta.outputs.RELEASE_ID }} && \
              ~/apps/backend/deploy_backend.sh dev ${{ steps.meta.outputs.RELEASE_ID }} 180"
 
   deploy_prod:
