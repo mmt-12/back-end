@@ -1,4 +1,5 @@
 name: backend-cd
+
 on:
   push:
     branches: ["develop", "main"]
@@ -74,6 +75,12 @@ jobs:
           mkdir -p ~/.ssh
           printf "%s\n" "${{ secrets.KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
+
+      - name: Test SSH connectivity
+        run: |
+          ssh \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+            "echo Connected as \$(whoami) on \$(hostname)"
 
       - name: Upload JAR via scp
         run: |
