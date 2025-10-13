@@ -1,5 +1,4 @@
 name: backend-cd
-
 on:
   push:
     branches: ["develop", "main"]
