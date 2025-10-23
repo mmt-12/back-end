@@ -33,9 +33,7 @@ public class CommentControllerTest extends ControllerTestSupport {
 		long memberId = 1L;
 		long postId = 1L;
 		long memoryId = 1L;
-		EmojiCommentCreateRequest request = EmojiCommentCreateRequest.builder()
-			.emojiId(1L)
-			.build();
+		EmojiCommentCreateRequest request = EmojiCommentCreateRequest.from(1L);
 
 		doNothing().when(commentService).createEmojiComment(any());
 
@@ -61,7 +59,7 @@ public class CommentControllerTest extends ControllerTestSupport {
 		long memberId = 1L;
 		long postId = 1L;
 		long memoryId = 1L;
-		EmojiCommentCreateRequest request = EmojiCommentCreateRequest.builder().build();
+		EmojiCommentCreateRequest request = EmojiCommentCreateRequest.from(null);
 
 		doNothing().when(commentService).createEmojiComment(any());
 
@@ -92,9 +90,7 @@ public class CommentControllerTest extends ControllerTestSupport {
 		long memberId = 1L;
 		long postId = 1L;
 		long memoryId = 1L;
-		VoiceCommentCreateRequest request = VoiceCommentCreateRequest.builder()
-			.voiceId(1L)
-			.build();
+		VoiceCommentCreateRequest request = VoiceCommentCreateRequest.from(1L);
 
 		doNothing().when(commentService).createVoiceComment(any());
 
@@ -120,7 +116,7 @@ public class CommentControllerTest extends ControllerTestSupport {
 		long memberId = 1L;
 		long postId = 1L;
 		long memoryId = 1L;
-		VoiceCommentCreateRequest request = VoiceCommentCreateRequest.builder().build();
+		VoiceCommentCreateRequest request = VoiceCommentCreateRequest.from(null);
 
 		doNothing().when(commentService).createVoiceComment(any());
 
