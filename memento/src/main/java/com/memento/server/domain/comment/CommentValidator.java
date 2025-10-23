@@ -1,4 +1,4 @@
-package com.memento.server.utility.validation.comment;
+package com.memento.server.domain.comment;
 
 import static com.memento.server.common.error.ErrorCodes.COMMENT_ASSOCIATE_REQUIRED;
 import static com.memento.server.common.error.ErrorCodes.COMMENT_POST_REQUIRED;
