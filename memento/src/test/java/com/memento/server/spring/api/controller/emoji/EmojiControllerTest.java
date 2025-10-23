@@ -185,7 +185,7 @@ public class EmojiControllerTest extends ControllerTestSupport {
 		Long nextCursor = cursor + size;
 		boolean hasNext = true;
 
-		EmojiResponse emojiResponse = EmojiResponse.of(EmojiFixtures.emoji());
+		EmojiResponse emojiResponse = EmojiResponse.from(EmojiFixtures.emoji());
 		EmojiListResponse response = EmojiListResponse.of(List.of(emojiResponse), nextCursor, hasNext);
 
 		given(emojiService.getEmoji(any(EmojiListQueryRequest.class)))
