@@ -13,13 +13,13 @@ public record VoiceResponse(
 	VoiceAuthorResponse author
 ) {
 
-	public static VoiceResponse of(Voice voice) {
+	public static VoiceResponse from(Voice voice) {
 		return VoiceResponse.builder()
-			.id(voice.getId())
-			.name(voice.getName())
-			.url(voice.getUrl())
-			.author(VoiceAuthorResponse.of(voice.getAssociate()))
-			.build();
+				.id(voice.getId())
+				.name(voice.getName())
+				.url(voice.getUrl())
+				.author(VoiceAuthorResponse.from(voice.getAssociate()))
+				.build();
 	}
 
 	@QueryProjection

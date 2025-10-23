@@ -293,7 +293,7 @@ public class VoiceControllerTest extends ControllerTestSupport {
 		Long nextCursor = cursor + size;
 		boolean hasNext = true;
 
-		VoiceResponse voiceResponse = VoiceResponse.of(VoiceFixtures.permanentVoice());
+		VoiceResponse voiceResponse = VoiceResponse.from(VoiceFixtures.permanentVoice());
 		VoiceListResponse response = VoiceListResponse.of(List.of(voiceResponse), nextCursor, hasNext);
 
 		given(voiceService.getVoices(any(VoiceListQueryRequest.class)))
