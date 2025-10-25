@@ -1,4 +1,4 @@
-package com.memento.server.utility.validation.emoji;
+package com.memento.server.domain.emoji;
 
 import static com.memento.server.common.error.ErrorCodes.EMOJI_ASSOCIATE_REQUIRED;
 import static com.memento.server.common.error.ErrorCodes.EMOJI_NAME_BLANK;

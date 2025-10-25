@@ -1,4 +1,4 @@
-package com.memento.server.utility.validation.voice;
+package com.memento.server.domain.voice;
 
 import static com.memento.server.common.error.ErrorCodes.VOICE_ASSOCIATE_REQUIRED;
 import static com.memento.server.common.error.ErrorCodes.VOICE_NAME_BLANK;

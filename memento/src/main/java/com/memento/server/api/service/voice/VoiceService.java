@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.minio.MinioService;
 import com.memento.server.api.service.voice.dto.request.PermanentVoiceCreateServiceRequest;
-import com.memento.server.api.service.voice.dto.request.TemporaryVoiceCreateServiceRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceListQueryRequest;
 import com.memento.server.api.service.voice.dto.request.VoiceRemoveRequest;
 import com.memento.server.api.service.voice.dto.response.VoiceListResponse;
@@ -36,10 +35,6 @@ public class VoiceService {
 	private final AssociateRepository associateRepository;
 	private final MinioService minioService;
 	private final AchievementEventPublisher achievementEventPublisher;
-
-	public Long createTemporaryVoice(TemporaryVoiceCreateServiceRequest request) {
-		return null;
-	}
 
 	@Transactional
 	public void createPermanentVoice(PermanentVoiceCreateServiceRequest request) {

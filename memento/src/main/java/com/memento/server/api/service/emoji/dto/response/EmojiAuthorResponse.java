@@ -12,7 +12,7 @@ public record EmojiAuthorResponse(
 	String imageUrl
 ) {
 
-	public static EmojiAuthorResponse of(Associate associate) {
+	public static EmojiAuthorResponse from(Associate associate) {
 		return EmojiAuthorResponse.builder()
 			.id(associate.getId())
 			.nickname(associate.getNickname())

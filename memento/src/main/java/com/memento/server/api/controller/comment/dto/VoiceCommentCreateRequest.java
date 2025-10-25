@@ -11,6 +11,12 @@ public record VoiceCommentCreateRequest(
 	Long voiceId
 ) {
 
+	public static VoiceCommentCreateRequest from(Long voiceId) {
+		return VoiceCommentCreateRequest.builder()
+				.voiceId(voiceId)
+				.build();
+	}
+
 	public VoiceCommentCreateServiceRequest toServiceRequest(Long postId, Long associateId) {
 		return VoiceCommentCreateServiceRequest.builder()
 			.voiceId(voiceId)

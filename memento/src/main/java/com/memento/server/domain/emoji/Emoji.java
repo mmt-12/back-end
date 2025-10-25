@@ -1,6 +1,6 @@
 package com.memento.server.domain.emoji;
 
-import static com.memento.server.utility.validation.emoji.EmojiValidator.*;
+import static com.memento.server.domain.emoji.EmojiValidator.*;
 import static jakarta.persistence.ConstraintMode.NO_CONSTRAINT;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
