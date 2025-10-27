@@ -14,8 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.annotation.AssociateId;
 import com.memento.server.annotation.CommunityId;
-import com.memento.server.api.controller.guestBook.dto.CreateGuestBookRequest;
-import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
+import com.memento.server.api.controller.guestBook.dto.request.CreateGuestBookRequest;
+import com.memento.server.api.service.guestBook.dto.response.SearchGuestBookResponse;
 import com.memento.server.api.service.guestBook.GuestBookService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
@@ -47,7 +47,7 @@ public class GuestBookController {
 	}
 
 	@PostMapping("/bubble")
-	public ResponseEntity<Void> creatBubble(
+	public ResponseEntity<Void> createTemporary(
 		@CommunityId Long currentCommunityId,
 		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
@@ -58,7 +58,7 @@ public class GuestBookController {
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
-		guestBookService.createBubble(communityId, currentAssociateId, associateId, voice);
+		guestBookService.createTemporary(communityId, currentAssociateId, associateId, voice);
 		return ResponseEntity.ok().build();
 	}
 
