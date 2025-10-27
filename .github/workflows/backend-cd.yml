@@ -29,7 +29,7 @@ jobs:
       run:
         working-directory: memento
     env:
-      SSH_PORT: ${{ secrets.SSH_PORT }} # optional; if unset defaults to 22 in the steps
+      SSH_PORT: ${{ secrets.SSH_PORT }}
 
     steps:
       - uses: actions/checkout@v4
@@ -44,6 +44,17 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
         with: { build-root-directory: memento }
+
+      - name: Write Firebase service account (if provided)
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+        run: |
+          mkdir -p src/main/resources
+          if [ -n "${FIREBASE_CONFIG:-}" ]; then
+            printf '%s' "${FIREBASE_CONFIG}" > src/main/resources/memento-serviceAccountKey.json
+          else
+            echo '{}' > src/main/resources/memento-serviceAccountKey.json
+          fi
 
       - name: Build JAR (bootJar → jar fallback)
         run: |
@@ -67,21 +78,23 @@ jobs:
 
       - name: Test SSH connectivity
         run: |
-          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -p "${SSH_PORT:-22}" \
+          ssh \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
             "echo Connected as \$(whoami) on \$(hostname)"
 
       - name: Upload JAR via scp
         run: |
-          scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -P "${SSH_PORT:-22}" \
+          scp -O -P "${SSH_PORT:-22}" \
             out/app.jar \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/tmp/app.jar.${{ steps.meta.outputs.RELEASE_ID }}"
 
       - name: Run remote deploy (dev)
         run: |
-          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -p "${SSH_PORT:-22}" \
+          ssh \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
-            "mkdir -p ~/apps/backend/releases/${{ steps.meta.outputs.RELEASE_ID }} && \
+            "
+            chmod 777 /tmp/app.jar.${{ steps.meta.outputs.RELEASE_ID }} && \
+            mkdir -p ~/apps/backend/releases/${{ steps.meta.outputs.RELEASE_ID }} && \
              ~/apps/backend/deploy_backend.sh dev ${{ steps.meta.outputs.RELEASE_ID }} 180"
 
   deploy_prod:
@@ -112,6 +125,17 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with: { build-root-directory: memento }
 
+      - name: Write Firebase service account (if provided)
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+        run: |
+          mkdir -p src/main/resources
+          if [ -n "${FIREBASE_CONFIG:-}" ]; then
+            printf '%s' "${FIREBASE_CONFIG}" > src/main/resources/memento-serviceAccountKey.json
+          else
+            echo '{}' > src/main/resources/memento-serviceAccountKey.json
+          fi
+
       - name: Build JAR (bootJar → jar fallback)
         run: |
           ./gradlew clean bootJar --no-daemon -x test -x asciidoctor || ./gradlew clean jar --no-daemon -x test -x asciidoctor
@@ -134,19 +158,19 @@ jobs:
 
       - name: Test SSH connectivity
         run: |
-          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -p "${SSH_PORT:-22}" \
+          ssh \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
             "echo Connected as \$(whoami) on \$(hostname)"
 
       - name: Upload JAR via scp
         run: |
-          scp -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -P "${SSH_PORT:-22}" \
+          scp -O -P "${SSH_PORT:-22}" \
             out/app.jar \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/tmp/app.jar.${{ steps.meta.outputs.RELEASE_ID }}"
 
       - name: Run remote deploy (prod)
         run: |
-          ssh -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes -p "${SSH_PORT:-22}" \
+          ssh \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
             "mkdir -p ~/apps/backend/releases/${{ steps.meta.outputs.RELEASE_ID }} && \
              ~/apps/backend/deploy_backend.sh prod ${{ steps.meta.outputs.RELEASE_ID }} 180"
