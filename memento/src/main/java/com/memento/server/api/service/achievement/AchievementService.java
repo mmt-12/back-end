@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.memento.server.api.service.achievement.dto.response.SearchAchievementResponse;
-import com.memento.server.api.service.achievement.dto.SearchAchievementDto;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.achievement.AchievementRepository;

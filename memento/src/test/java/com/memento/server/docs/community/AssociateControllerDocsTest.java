@@ -35,8 +35,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.memento.server.api.controller.community.AssociateController;
-import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
-import com.memento.server.api.controller.community.dto.UpdateAssociateRequest;
+import com.memento.server.api.service.community.dto.response.SearchAssociateResponse;
+import com.memento.server.api.controller.community.dto.request.UpdateAssociateRequest;
 import com.memento.server.api.controller.community.dto.AssociateListResponse;
 import com.memento.server.api.controller.community.dto.AssociateListResponse.AssociateResponse;
 import com.memento.server.api.controller.community.dto.AssociateListResponse.AssociateResponse.AchievementResponse;

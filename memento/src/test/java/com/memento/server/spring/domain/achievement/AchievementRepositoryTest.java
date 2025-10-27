@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.memento.server.achievement.AchievementFixtures;
-import com.memento.server.api.service.achievement.dto.SearchAchievementDto;
 import com.memento.server.api.service.achievement.dto.response.SearchAchievementResponse;
 import com.memento.server.associate.AssociateFixtures;
 import com.memento.server.community.CommunityFixtures;

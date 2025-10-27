@@ -1,4 +1,4 @@
-package com.memento.server.api.controller.community.dto;
+package com.memento.server.api.controller.community.dto.request;
 
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
