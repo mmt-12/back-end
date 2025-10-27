@@ -1,8 +1,12 @@
 package com.memento.server.client.sse;
 
+import java.util.Map;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import com.memento.server.domain.achievement.Achievement;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,5 +26,29 @@ public class SseService {
 				sseEmitterRepository.remove(associateId);
 			}
 		});
+	}
+
+	public void sendAchievementSse(Long associateId, Achievement achievement) {
+		SseEmitter emitter = sseEmitterRepository.get(associateId);
+		if (emitter == null) return;
+
+		try {
+			Map<String, Object> data = Map.of(
+				"type", "ACHIEVE",
+				"value", Map.of(
+					"id", achievement.getId(),
+					"name", achievement.getName(),
+					"criteria", achievement.getCriteria(),
+					"type", achievement.getType().name()
+				)
+			);
+
+			emitter.send(SseEmitter.event()
+				.name("message")
+				.data(data)
+			);
+		} catch (Exception e) {
+			sseEmitterRepository.remove(associateId);
+		}
 	}
 }
