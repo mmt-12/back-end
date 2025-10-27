@@ -1,9 +1,5 @@
 package com.memento.server.api.controller.profileImage;
 
-import javax.annotation.Nullable;
-
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.annotation.AssociateId;
 import com.memento.server.annotation.CommunityId;
-import com.memento.server.api.controller.profileImage.dto.SearchProfileImageResponse;
+import com.memento.server.api.service.profileImage.dto.response.SearchProfileImageResponse;
 import com.memento.server.api.service.profileImage.ProfileImageService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;

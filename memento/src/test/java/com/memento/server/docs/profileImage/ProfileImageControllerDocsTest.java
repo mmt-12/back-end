@@ -29,12 +29,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.memento.server.api.controller.profileImage.ProfileImageController;
-import com.memento.server.api.controller.profileImage.dto.SearchProfileImageResponse;
+import com.memento.server.api.service.profileImage.dto.response.SearchProfileImageResponse;
 import com.memento.server.api.service.profileImage.ProfileImageService;
 import com.memento.server.docs.RestDocsSupport;
 

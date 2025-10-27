@@ -14,7 +14,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.memento.server.api.controller.profileImage.dto.SearchProfileImageResponse;
+import com.memento.server.api.service.profileImage.dto.response.SearchProfileImageResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.profileImage.ProfileImageService;

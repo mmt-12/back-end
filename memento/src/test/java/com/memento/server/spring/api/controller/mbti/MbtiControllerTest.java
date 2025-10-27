@@ -14,8 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.memento.server.api.controller.mbti.dto.CreateMbtiRequest;
-import com.memento.server.api.controller.mbti.dto.SearchMbtiResponse;
+import com.memento.server.api.controller.mbti.dto.request.CreateMbtiRequest;
+import com.memento.server.api.service.mbti.dto.response.SearchMbtiResponse;
 import com.memento.server.domain.mbti.Mbti;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
 

@@ -1,8 +1,7 @@
-package com.memento.server.api.controller.mbti.dto;
+package com.memento.server.api.controller.mbti.dto.request;
 
 import com.memento.server.domain.mbti.Mbti;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
