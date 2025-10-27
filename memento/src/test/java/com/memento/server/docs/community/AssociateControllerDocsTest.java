@@ -34,7 +34,6 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.memento.server.api.controller.achievement.dto.SearchAchievementResponse;
 import com.memento.server.api.controller.community.AssociateController;
 import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
 import com.memento.server.api.controller.community.dto.UpdateAssociateRequest;
@@ -43,7 +42,6 @@ import com.memento.server.api.controller.community.dto.AssociateListResponse.Ass
 import com.memento.server.api.controller.community.dto.AssociateListResponse.AssociateResponse.AchievementResponse;
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.api.service.community.AssociateService;
-import com.memento.server.domain.achievement.AchievementType;
 
 public class AssociateControllerDocsTest extends RestDocsSupport {
 

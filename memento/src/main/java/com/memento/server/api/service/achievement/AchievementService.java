@@ -4,13 +4,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.memento.server.api.controller.achievement.dto.SearchAchievementResponse;
+import com.memento.server.api.service.achievement.dto.response.SearchAchievementResponse;
 import com.memento.server.api.service.achievement.dto.SearchAchievementDto;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
-import com.memento.server.domain.achievement.Achievement;
-import com.memento.server.domain.achievement.AchievementAssociate;
-import com.memento.server.domain.achievement.AchievementAssociateRepository;
 import com.memento.server.domain.achievement.AchievementRepository;
 import com.memento.server.domain.achievement.CommonAchievementEvent;
 import com.memento.server.domain.community.Associate;
@@ -42,28 +39,15 @@ public class AchievementService {
 	public SearchAchievementResponse search(Long communityId, Long associateId) {
 		Associate associate = validAssociate(communityId, associateId);
 
-		List<SearchAchievementDto> achievements = achievementRepository.findAllWithObtainedRecord(associate.getId());
+		List<SearchAchievementResponse.Achievement> achievements = achievementRepository.findAllWithObtainedRecord(associate.getId());
 
-		List<SearchAchievementResponse.Achievement> achievementList = achievements.stream()
-			.map(dto -> SearchAchievementResponse.Achievement.builder()
-					.id(dto.id())
-					.name(dto.name())
-					.criteria(dto.criteria())
-					.isObtained(dto.isObtained())
-					.type(dto.type())
-					.build()
-			)
-			.toList();
-
-		return SearchAchievementResponse.builder()
-			.achievements(achievementList)
-			.build();
+		return SearchAchievementResponse.from(achievements);
 	}
 
 	public void create(Long associateId, String content) {
 		switch (content){
 			case "HOME":
-				achievementEventPublisher.publishCommonAchievement(CommonAchievementEvent.from(associateId, 15L));
+				achievementEventPublisher.publishCommonAchievement(CommonAchievementEvent.of(associateId, 15L));
 				break;
 			default:
 				throw new MementoException(ErrorCodes.ACHIEVEMENT_NOT_EXISTENCE);
@@ -79,8 +63,6 @@ public class AchievementService {
 
 	public void attendance(Long communityId, Long currentAssociateId) {
 		Associate associate = validAssociate(communityId, currentAssociateId);
-		achievementEventPublisher.publishSignInAchievement(SignInAchievementEvent.builder()
-			.associateId(associate.getId())
-			.build());
+		achievementEventPublisher.publishSignInAchievement(SignInAchievementEvent.from(associate.getId()));
 	}
 }

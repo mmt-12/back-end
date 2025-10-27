@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.memento.server.achievement.AchievementFixtures;
 import com.memento.server.api.service.achievement.dto.SearchAchievementDto;
+import com.memento.server.api.service.achievement.dto.response.SearchAchievementResponse;
 import com.memento.server.associate.AssociateFixtures;
 import com.memento.server.community.CommunityFixtures;
 import com.memento.server.domain.achievement.Achievement;
@@ -68,12 +69,12 @@ public class AchievementRepositoryTest extends IntegrationsTestSupport {
 		achievementAssociateRepository.save(achievementAssociate);
 
 		// when
-		List<SearchAchievementDto> list = achievementRepository.findAllWithObtainedRecord(associate.getId());
+		List<SearchAchievementResponse.Achievement> list = achievementRepository.findAllWithObtainedRecord(associate.getId());
 
 		// then
-		assertThat(list.get(0).id()).isEqualTo(achievement2.getId());
+		assertThat(list.get(0).getId()).isEqualTo(achievement2.getId());
 		assertThat(list.get(0).isObtained()).isFalse();
-		assertThat(list.get(1).id()).isEqualTo(achievement1.getId());
+		assertThat(list.get(1).getId()).isEqualTo(achievement1.getId());
 		assertThat(list.get(1).isObtained()).isTrue();
 	}
 }
