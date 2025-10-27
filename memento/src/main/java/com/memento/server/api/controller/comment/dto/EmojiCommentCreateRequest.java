@@ -11,6 +11,12 @@ public record EmojiCommentCreateRequest(
 	Long emojiId
 ) {
 
+	public static EmojiCommentCreateRequest from(Long emojiId) {
+		return EmojiCommentCreateRequest.builder()
+				.emojiId(emojiId)
+				.build();
+	}
+
 	public EmojiCommentCreateServiceRequest toServiceRequest(Long postId, Long associateId) {
 		return EmojiCommentCreateServiceRequest.builder()
 			.emojiId(emojiId)

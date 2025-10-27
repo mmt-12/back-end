@@ -68,9 +68,9 @@ public class CommentService {
 			ReactionFCM.of(
 				associate.getNickname(),
 				associate.getId(),
-				post.getAssociate().getId(),
 				post.getMemory().getId(),
-				post.getId()));
+				post.getId(),
+				post.getAssociate().getId()));
 	}
 
 	@Transactional
@@ -92,9 +92,9 @@ public class CommentService {
 			ReactionFCM.of(
 				associate.getNickname(),
 				associate.getId(),
-				post.getAssociate().getId(),
 				post.getMemory().getId(),
-				post.getId()));
+				post.getId(),
+				post.getAssociate().getId()));
 	}
 
 	@Transactional
@@ -115,9 +115,9 @@ public class CommentService {
 			ReactionFCM.of(
 				associate.getNickname(),
 				associate.getId(),
-				post.getAssociate().getId(),
 				post.getMemory().getId(),
-				post.getId()));
+				post.getId(),
+				post.getAssociate().getId()));
 	}
 
 	@Transactional

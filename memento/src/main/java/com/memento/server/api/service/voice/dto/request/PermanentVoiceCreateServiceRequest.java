@@ -10,4 +10,12 @@ public record PermanentVoiceCreateServiceRequest(
 	Long associateId,
 	MultipartFile voice
 ) {
+
+	public static PermanentVoiceCreateServiceRequest of(String name, Long associateId, MultipartFile voice) {
+		return PermanentVoiceCreateServiceRequest.builder()
+				.name(name)
+				.associateId(associateId)
+				.voice(voice)
+				.build();
+	}
 }

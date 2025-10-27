@@ -106,7 +106,7 @@ public class EmojiControllerDocsTest extends RestDocsSupport {
 		Long nextCursor = cursor + size;
 		boolean hasNext = true;
 
-		EmojiResponse emojiResponse = EmojiResponse.of(EmojiFixtures.emojiWithId());
+		EmojiResponse emojiResponse = EmojiResponse.from(EmojiFixtures.emojiWithId());
 		EmojiListResponse response = EmojiListResponse.of(List.of(emojiResponse), nextCursor, hasNext);
 
 		given(emojiService.getEmoji(any(EmojiListQueryRequest.class)))

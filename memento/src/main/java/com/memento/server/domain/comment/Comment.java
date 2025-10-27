@@ -1,9 +1,9 @@
 package com.memento.server.domain.comment;
 
 import static com.memento.server.domain.comment.CommentType.*;
-import static com.memento.server.utility.validation.comment.CommentValidator.validateAssociate;
-import static com.memento.server.utility.validation.comment.CommentValidator.validatePost;
-import static com.memento.server.utility.validation.comment.CommentValidator.validateUrl;
+import static com.memento.server.domain.comment.CommentValidator.validateAssociate;
+import static com.memento.server.domain.comment.CommentValidator.validatePost;
+import static com.memento.server.domain.comment.CommentValidator.validateUrl;
 import static jakarta.persistence.ConstraintMode.NO_CONSTRAINT;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;

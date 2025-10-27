@@ -12,7 +12,7 @@ public record VoiceAuthorResponse(
 	String imageUrl
 ) {
 
-	public static VoiceAuthorResponse of(Associate associate) {
+	public static VoiceAuthorResponse from(Associate associate) {
 		return VoiceAuthorResponse.builder()
 			.id(associate.getId())
 			.nickname(associate.getNickname())

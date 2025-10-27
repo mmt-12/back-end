@@ -1,6 +1,6 @@
 package com.memento.server.domain.voice;
 
-import static com.memento.server.utility.validation.voice.VoiceValidator.*;
+import static com.memento.server.domain.voice.VoiceValidator.*;
 import static jakarta.persistence.ConstraintMode.NO_CONSTRAINT;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
