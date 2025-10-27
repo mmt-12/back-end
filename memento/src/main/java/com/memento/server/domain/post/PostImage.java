@@ -5,6 +5,9 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.memento.server.common.BaseEntity;
@@ -46,4 +49,12 @@ public class PostImage extends BaseEntity {
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "post_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Post post;
+
+	public static PostImage create(String url, Post post, Hash hash){
+		return PostImage.builder()
+			.url(url)
+			.post(post)
+			.hash(hash)
+			.build();
+	}
 }

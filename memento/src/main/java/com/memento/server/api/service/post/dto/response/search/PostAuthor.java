@@ -1,6 +1,4 @@
-package com.memento.server.api.controller.post.dto.read;
-
-import java.util.List;
+package com.memento.server.api.service.post.dto.response.search;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,5 +7,5 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @AllArgsConstructor
-public class TemporaryVoice extends Reaction{
+public class PostAuthor extends Author{
 }

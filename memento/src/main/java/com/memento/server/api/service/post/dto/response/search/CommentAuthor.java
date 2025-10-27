@@ -1,4 +1,4 @@
-package com.memento.server.api.controller.post.dto.read;
+package com.memento.server.api.service.post.dto.response.search;
 
 import java.time.LocalDateTime;
 
@@ -19,7 +19,7 @@ public class CommentAuthor extends Author{
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	LocalDateTime createdAt;
 
-	public static CommentAuthor from(PostCommentDto dto) {
+	public static CommentAuthor type(PostCommentDto dto) {
 		Associate associate = dto.getAssociate();
 		return CommentAuthor.builder()
 			.id(associate.getId())
