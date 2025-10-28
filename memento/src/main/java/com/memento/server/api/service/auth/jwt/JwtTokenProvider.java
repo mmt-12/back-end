@@ -34,11 +34,7 @@ public class JwtTokenProvider {
 			.withExpiresAt(accessTokenExpiresAt)
 			.sign(Algorithm.HMAC512(jwtProperties.secret()));
 
-		return JwtToken.builder()
-			.grantType(jwtProperties.grantType())
-			.accessToken(accessToken)
-			.accessTokenExpiresAt(accessTokenExpiresAt)
-			.build();
+		return JwtToken.of(jwtProperties, accessToken, accessTokenExpiresAt);
 	}
 
 	public JwtToken createToken(MemberClaim memberClaim) {
@@ -59,13 +55,7 @@ public class JwtTokenProvider {
 			.withExpiresAt(refreshTokenExpiresAt)
 			.sign(Algorithm.HMAC512(jwtProperties.secret()));
 
-		return JwtToken.builder()
-			.grantType(jwtProperties.grantType())
-			.accessToken(accessToken)
-			.accessTokenExpiresAt(accessTokenExpiresAt)
-			.refreshToken(refreshToken)
-			.refreshTokenExpiresAt(refreshTokenExpiresAt)
-			.build();
+		return JwtToken.of(jwtProperties, accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt);
 	}
 
 	public boolean isNotValidateToken(String token) {
