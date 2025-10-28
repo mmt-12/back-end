@@ -51,21 +51,13 @@ public class AuthService {
 				Associate associate = associateRepository.findByMemberIdAndDeletedAtIsNull(member.getId())
 					.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_FOUND));
 
-				MemberClaim memberClaim = MemberClaim.builder()
-					.memberId(member.getId())
-					.communityId(associate.getCommunity().getId())
-					.associateId(associate.getId())
-					.isMember(true)
-					.build();
+				MemberClaim memberClaim = MemberClaim.of(member, associate);
 				JwtToken token = jwtTokenProvider.createToken(memberClaim);
 
 				return AuthMemberResponse.of(member.getId(), member.getName(), token);
 			})
 			.orElseGet(() -> {
-				MemberClaim memberClaim = MemberClaim.builder()
-					.memberId(kakaoId)
-					.isMember(false)
-					.build();
+				MemberClaim memberClaim = MemberClaim.from(kakaoId);
 				JwtToken token = jwtTokenProvider.createTempToken(memberClaim);
 
 				return AuthGuestResponse.of(kakaoId, openIdPayload.email(), token);
@@ -83,7 +75,7 @@ public class AuthService {
 		Associate associate = associateRepository.findByMemberIdAndDeletedAtIsNull(member.getId())
 			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_FOUND));
 
-		MemberClaim memberClaim = MemberClaim.from(member, associate);
+		MemberClaim memberClaim = MemberClaim.of(member, associate);
 		JwtToken token = jwtTokenProvider.createToken(memberClaim);
 		return AuthMemberResponse.of(member.getId(), member.getName(), token);
 	}
