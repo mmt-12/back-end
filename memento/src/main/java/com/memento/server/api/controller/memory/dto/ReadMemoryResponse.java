@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.memento.server.api.service.memory.dto.Author;
+import com.memento.server.api.service.memory.dto.MemoryItem;
 import com.memento.server.domain.event.Event;
 import com.memento.server.domain.event.Location;
 import com.memento.server.domain.event.Period;
@@ -32,6 +33,15 @@ public record ReadMemoryResponse(
 		String nickname,
 		AchievementResponse achievement
 	) {
+		public static AuthorResponse of(MemoryItem.AssociateDto associate, MemoryItem.AchievementDto achievement) {
+			return AuthorResponse.builder()
+				.id(associate.id())
+				.imageUrl(associate.profileImageUrl())
+				.nickname(associate.nickname())
+				.achievement(achievement == null ? null : AchievementResponse.from(achievement))
+				.build();
+		}
+
 		@Builder
 		public record AchievementResponse(
 			Long id,
@@ -44,9 +54,16 @@ public record ReadMemoryResponse(
 					.name(achievement.name())
 					.build();
 			}
+
+			public static AchievementResponse from(MemoryItem.AchievementDto achievement) {
+				return AchievementResponse.builder()
+					.id(achievement.id())
+					.name(achievement.name())
+					.build();
+			}
 		}
 
-		public static AuthorResponse from(Author author) {
+		public static AuthorResponse of(Author author) {
 			return AuthorResponse.builder()
 				.id(author.id())
 				.imageUrl(author.imageUrl())
@@ -65,6 +82,13 @@ public record ReadMemoryResponse(
 			return PeriodResponse.builder()
 				.startTime(period.getStartTime())
 				.endTime(period.getEndTime())
+				.build();
+		}
+
+		public static PeriodResponse from(MemoryItem.PeriodDto period) {
+			return PeriodResponse.builder()
+				.startTime(period.startTime())
+				.endTime(period.endTime())
 				.build();
 		}
 	}
@@ -86,9 +110,19 @@ public record ReadMemoryResponse(
 				.code(location.getCode())
 				.build();
 		}
+
+		public static LocationResponse from(MemoryItem.LocationDto location) {
+			return LocationResponse.builder()
+				.address(location.address())
+				.name(location.name())
+				.latitude(location.latitude().floatValue())
+				.longitude(location.longitude().floatValue())
+				.code(location.code())
+				.build();
+		}
 	}
 
-	public static ReadMemoryResponse from(
+	public static ReadMemoryResponse of(
 		Memory memory,
 		List<PostImage> images,
 		Long associateCount,
@@ -112,7 +146,25 @@ public record ReadMemoryResponse(
 			.memberAmount(Math.toIntExact(associateCount))
 			.pictureAmount(images.size())
 			.pictures(pictures)
-			.author(AuthorResponse.from(author))
+			.author(AuthorResponse.of(author))
+			.build();
+	}
+
+	public static ReadMemoryResponse of(
+		MemoryItem memory,
+		List<String> pictures,
+		Integer associateCount
+	) {
+		return ReadMemoryResponse.builder()
+			.id(memory.id())
+			.title(memory.title())
+			.description(memory.description())
+			.period(PeriodResponse.from(memory.period()))
+			.location(LocationResponse.from(memory.location()))
+			.memberAmount(Math.toIntExact(associateCount))
+			.pictureAmount(pictures.size())
+			.pictures(pictures)
+			.author(AuthorResponse.of(memory.associate(), memory.achievement()))
 			.build();
 	}
 }

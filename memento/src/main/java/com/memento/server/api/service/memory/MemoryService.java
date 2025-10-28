@@ -19,8 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
 import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
 import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
+import com.memento.server.api.controller.memory.dto.ReadMemoryListRequest;
+import com.memento.server.api.controller.memory.dto.ReadMemoryListResponse;
 import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.fcm.FCMEventPublisher;
@@ -80,10 +80,10 @@ public class MemoryService {
 				.build())
 			.build();
 
-		return ReadMemoryResponse.from(memory, images, associateCount, author);
+		return ReadMemoryResponse.of(memory, images, associateCount, author);
 	}
 
-	public ReadAllMemoryResponse readAll(Long communityId, ReadAllMemoryRequest request) {
+	public ReadMemoryListResponse readAll(Long communityId, ReadMemoryListRequest request) {
 		Long cursor = request.cursor();
 		Integer size = request.size();
 		String keyword = request.keyword();
@@ -120,7 +120,7 @@ public class MemoryService {
 		List<PostImage> images = postImageRepository.findAllByMemoryIds(memoryIds);
 		List<MemoryAssociateCount> associateCounts = memoryAssociateRepository.countAssociatesByMemoryIds(memoryIds);
 
-		return ReadAllMemoryResponse.from(memories, images, associateCounts, hasNext, nextCursor);
+		return ReadMemoryListResponse.of(memories, images, associateCounts, hasNext, nextCursor);
 	}
 
 	@Transactional
