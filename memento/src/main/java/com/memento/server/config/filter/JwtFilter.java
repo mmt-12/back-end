@@ -86,8 +86,7 @@ public class JwtFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		MemberPrincipal memberPrincipal = new MemberPrincipal(memberClaim.memberId(), memberClaim.associateId(),
-			memberClaim.communityId());
+		MemberPrincipal memberPrincipal = MemberPrincipal.from(memberClaim);
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
 			memberPrincipal, null, memberPrincipal.getAuthorities());
 		SecurityContextHolder.getContext().setAuthentication(authenticationToken);
