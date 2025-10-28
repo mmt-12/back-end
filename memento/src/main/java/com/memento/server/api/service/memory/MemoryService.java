@@ -70,15 +70,7 @@ public class MemoryService {
 
 		Associate associate = memory.getEvent().getAssociate();
 		Achievement achievement = associate.getAchievement();
-		Author author = Author.builder()
-			.id(associate.getId())
-			.nickname(associate.getNickname())
-			.imageUrl(associate.getProfileImageUrl())
-			.achievement(achievement == null ? null : Author.Achievement.builder()
-				.id(achievement.getId())
-				.name(achievement.getName())
-				.build())
-			.build();
+		Author author = Author.of(associate, achievement);
 
 		return ReadMemoryResponse.of(memory, images, associateCount, author);
 	}
