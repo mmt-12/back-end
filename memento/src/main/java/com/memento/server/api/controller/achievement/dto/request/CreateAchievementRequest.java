@@ -1,4 +1,4 @@
-package com.memento.server.api.controller.achievement.dto;
+package com.memento.server.api.controller.achievement.dto.request;
 
 import lombok.Builder;
 

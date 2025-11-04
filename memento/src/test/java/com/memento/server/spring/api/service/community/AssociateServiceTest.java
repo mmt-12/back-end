@@ -17,7 +17,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import com.memento.server.achievement.AchievementFixtures;
 import com.memento.server.api.controller.community.dto.AssociateListResponse;
-import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
+import com.memento.server.api.service.community.dto.response.SearchAssociateResponse;
 import com.memento.server.api.service.community.AssociateService;
 import com.memento.server.associate.AssociateFixtures;
 import com.memento.server.common.exception.MementoException;

@@ -14,7 +14,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
+import com.memento.server.api.service.guestBook.dto.response.SearchGuestBookResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.guestBook.GuestBookService;
@@ -272,7 +272,7 @@ public class GuestBookServiceTest extends IntegrationsTestSupport {
 			.willReturn(url);
 
 		// when
-		guestBookService.createBubble(community.getId(), register.getId(), associate.getId(), file);
+		guestBookService.createTemporary(community.getId(), register.getId(), associate.getId(), file);
 
 		// then
 		GuestBook guestBook = guestBookRepository.findAll().get(0);

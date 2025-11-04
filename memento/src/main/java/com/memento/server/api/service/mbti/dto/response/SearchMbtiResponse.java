@@ -1,4 +1,4 @@
-package com.memento.server.api.controller.mbti.dto;
+package com.memento.server.api.service.mbti.dto.response;
 
 import com.memento.server.api.service.mbti.dto.MbtiSearchDto;
 

@@ -16,8 +16,8 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
-import com.memento.server.api.controller.community.dto.UpdateAssociateRequest;
+import com.memento.server.api.service.community.dto.response.SearchAssociateResponse;
+import com.memento.server.api.controller.community.dto.request.UpdateAssociateRequest;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
 
 public class AssociateControllerTest extends ControllerTestSupport {

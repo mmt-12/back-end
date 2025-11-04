@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.memento.server.annotation.AssociateId;
 import com.memento.server.annotation.CommunityId;
 import com.memento.server.api.controller.community.dto.AssociateListResponse;
-import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
-import com.memento.server.api.controller.community.dto.UpdateAssociateRequest;
+import com.memento.server.api.service.community.dto.response.SearchAssociateResponse;
+import com.memento.server.api.controller.community.dto.request.UpdateAssociateRequest;
 import com.memento.server.api.service.community.AssociateService;
 import com.memento.server.common.exception.MementoException;
 

@@ -1,4 +1,4 @@
-package com.memento.server.api.controller.post.dto.read;
+package com.memento.server.api.service.post.dto.response.search;
 
 import lombok.Builder;
 

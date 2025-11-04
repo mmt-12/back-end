@@ -1,7 +1,6 @@
 package com.memento.server.docs.mbti;
 
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -26,8 +25,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.memento.server.api.controller.mbti.MbtiController;
-import com.memento.server.api.controller.mbti.dto.CreateMbtiRequest;
-import com.memento.server.api.controller.mbti.dto.SearchMbtiResponse;
+import com.memento.server.api.controller.mbti.dto.request.CreateMbtiRequest;
+import com.memento.server.api.service.mbti.dto.response.SearchMbtiResponse;
 import com.memento.server.api.service.mbti.MbtiService;
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.domain.mbti.Mbti;

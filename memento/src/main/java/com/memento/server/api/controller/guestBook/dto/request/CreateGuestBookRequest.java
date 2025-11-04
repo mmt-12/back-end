@@ -1,4 +1,4 @@
-package com.memento.server.api.controller.guestBook.dto;
+package com.memento.server.api.controller.guestBook.dto.request;
 
 import com.memento.server.domain.guestBook.GuestBookType;
 

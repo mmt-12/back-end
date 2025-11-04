@@ -1,4 +1,4 @@
-package com.memento.server.api.controller.post.dto;
+package com.memento.server.api.controller.post.dto.request;
 
 import java.util.List;
 

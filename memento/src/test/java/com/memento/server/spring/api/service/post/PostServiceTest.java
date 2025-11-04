@@ -21,8 +21,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.memento.server.api.controller.post.dto.SearchAllPostResponse;
-import com.memento.server.api.controller.post.dto.SearchPostResponse;
+import com.memento.server.api.service.post.dto.response.SearchAllPostResponse;
+import com.memento.server.api.service.post.dto.response.SearchPostResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.post.PostService;
@@ -435,18 +435,18 @@ public class PostServiceTest extends IntegrationsTestSupport {
 		SearchPostResponse.Comment commentsDto2 = secondPost.comments();
 
 		// EMOJI 순서 확인
-		List<com.memento.server.api.controller.post.dto.read.Emoji> emojis = commentsDto.getEmojis();
+		List<com.memento.server.api.service.post.dto.response.search.Emoji> emojis = commentsDto.getEmojis();
 		assertThat(emojis).hasSize(2);
 		assertThat(emojis.get(0).getUrl()).isEqualTo("emoji5.png");
 		assertThat(emojis.get(1).getUrl()).isEqualTo("emoji4.png");
 
-		List<com.memento.server.api.controller.post.dto.read.Emoji> emojis2 = commentsDto2.getEmojis();
+		List<com.memento.server.api.service.post.dto.response.search.Emoji> emojis2 = commentsDto2.getEmojis();
 		assertThat(emojis2).hasSize(2);
 		assertThat(emojis2.get(0).getCount()).isEqualTo(3);
 		assertThat(emojis2.get(0).getUrl()).isEqualTo("emoji1.png");
 
 		// VOICE 순서 확인
-		List<com.memento.server.api.controller.post.dto.read.Voice> voices = commentsDto.getVoices();
+		List<com.memento.server.api.service.post.dto.response.search.Voice> voices = commentsDto.getVoices();
 		assertThat(voices).hasSize(1);
 		assertThat(voices.get(0).getUrl()).isEqualTo("test.mp3");
 

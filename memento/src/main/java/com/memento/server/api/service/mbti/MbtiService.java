@@ -3,7 +3,7 @@ package com.memento.server.api.service.mbti;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.memento.server.api.controller.mbti.dto.SearchMbtiResponse;
+import com.memento.server.api.service.mbti.dto.response.SearchMbtiResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.fcm.dto.event.MbtiFCM;
@@ -51,12 +51,8 @@ public class MbtiService {
 			return;
 		}
 
-		mbtiTestRepository.save(MbtiTest.builder()
-			.fromAssociate(fromAssociate)
-			.toAssociate(toAssociate)
-			.mbti(mbti)
-			.build());
-		achievementEventPublisher.publishMbtiAchievement(MbtiAchievementEvent.from(fromAssociate.getId(), toAssociate.getId()));
+		mbtiTestRepository.save(MbtiTest.create(fromAssociate, toAssociate, mbti));
+		achievementEventPublisher.publishMbtiAchievement(MbtiAchievementEvent.of(fromAssociate.getId(), toAssociate.getId()));
 		fcmEventPublisher.publishNotification(MbtiFCM.from(toAssociate.getId()));
 	}
 
