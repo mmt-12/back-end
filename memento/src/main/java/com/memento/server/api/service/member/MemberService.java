@@ -19,7 +19,6 @@ import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.fcm.dto.event.AssociateFCM;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
-import com.memento.server.domain.community.AssociateExclusiveAchievementEvent;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.AssociateStats;
 import com.memento.server.domain.community.AssociateStatsRepository;
@@ -63,7 +62,7 @@ public class MemberService {
 				.lastAttendedAt(LocalDateTime.now())
 			.build());
 
-		MemberClaim memberClaim = MemberClaim.from(member, associate);
+		MemberClaim memberClaim = MemberClaim.of(member, associate);
 		JwtToken token = jwtTokenProvider.createToken(memberClaim);
 
 		fcmEventPublisher.publishNotification(AssociateFCM.from(associate.getNickname(), community.getId(), associate.getId()));

@@ -6,10 +6,16 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.memento.server.api.service.auth.jwt.MemberClaim;
+
+import lombok.Builder;
+
+@Builder
 public record MemberPrincipal(
 	Long memberId,
 	Long associateId,
-	Long communityId) implements UserDetails {
+	Long communityId
+) implements UserDetails {
 
 	@Override
 	public String getUsername() {
@@ -24,5 +30,13 @@ public record MemberPrincipal(
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return List.of();
+	}
+
+	public static MemberPrincipal from(MemberClaim memberClaim) {
+		return MemberPrincipal.builder()
+			.memberId(memberClaim.memberId())
+			.associateId(memberClaim.associateId())
+			.communityId(memberClaim.communityId())
+			.build();
 	}
 }

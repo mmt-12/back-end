@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import lombok.Builder;
 
 @Builder
-public record ReadAllMemoryRequest(
+public record ReadMemoryListRequest(
 	Long cursor,
 	Integer size,
 	String keyword,

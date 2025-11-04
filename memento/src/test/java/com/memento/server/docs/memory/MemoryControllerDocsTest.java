@@ -31,10 +31,7 @@ import com.memento.server.api.controller.memory.MemoryController;
 import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
 import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
 import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse.LocationResponse;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse.MemoryResponse.PeriodResponse;
+import com.memento.server.api.controller.memory.dto.ReadMemoryListResponse;
 import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
 import com.memento.server.api.service.memory.MemoryService;
 import com.memento.server.docs.RestDocsSupport;
@@ -139,20 +136,20 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 		// given
 		setAuthentication(1L, 1L, 1L);
 		when(memoryService.readAll(any(), any())).thenReturn(
-			ReadAllMemoryResponse.builder()
+			ReadMemoryListResponse.builder()
 				.nextCursor(3L)
 				.hasNext(true)
 				.memories(
 					List.of(
-						MemoryResponse.builder()
+						ReadMemoryResponse.builder()
 							.id(1L)
 							.title("일평 mt")
 							.description("우리가 함께 마신 소주와 수영장 물을 추억하며")
-							.period(PeriodResponse.builder()
+							.period(ReadMemoryResponse.PeriodResponse.builder()
 								.startTime(LocalDateTime.of(2025, 6, 20, 10, 30))
 								.endTime(LocalDateTime.of(2025, 6, 21, 12, 30))
 								.build())
-							.location(LocationResponse.builder()
+							.location(ReadMemoryResponse.LocationResponse.builder()
 								.latitude(36.34512323F)
 								.longitude(138.7712322F)
 								.code(16335)
@@ -173,11 +170,11 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 								"https://aws.s3.memento/8",
 								"https://aws.s3.memento/9"
 							))
-							.author(ReadAllMemoryResponse.MemoryResponse.AuthorResponse.builder()
+							.author(ReadMemoryResponse.AuthorResponse.builder()
 								.id(1L)
 								.nickname("nickname")
 								.imageUrl("https://aws.s3.memento/1")
-								.achievement(ReadAllMemoryResponse.MemoryResponse.AuthorResponse.AchievementResponse.builder()
+								.achievement(ReadMemoryResponse.AuthorResponse.AchievementResponse.builder()
 									.id(1L)
 									.name("achievement")
 									.build())
