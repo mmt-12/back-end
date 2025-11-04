@@ -48,11 +48,9 @@ import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
 import com.memento.server.domain.emoji.Emoji;
 import com.memento.server.domain.emoji.EmojiRepository;
-import com.memento.server.domain.event.Event;
-import com.memento.server.domain.event.EventRepository;
+import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
-import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.domain.post.Post;
 import com.memento.server.domain.post.PostRepository;
@@ -60,9 +58,8 @@ import com.memento.server.domain.voice.Voice;
 import com.memento.server.domain.voice.VoiceRepository;
 import com.memento.server.emoji.EmojiFixtures;
 import com.memento.server.voice.VoiceFixtures;
-import com.memento.server.event.EventFixtures;
-import com.memento.server.member.MemberFixtures;
 import com.memento.server.memory.MemoryFixtures;
+import com.memento.server.member.MemberFixtures;
 import com.memento.server.post.PostFixtures;
 import com.memento.server.spring.api.service.IntegrationsTestSupport;
 
@@ -87,9 +84,6 @@ public class CommentServiceTest extends IntegrationsTestSupport {
 	private VoiceRepository voiceRepository;
 
 	@Autowired
-	private EventRepository eventRepository;
-
-	@Autowired
 	private MemoryRepository memoryRepository;
 
 	@Autowired
@@ -112,7 +106,6 @@ public class CommentServiceTest extends IntegrationsTestSupport {
 		commentRepository.deleteAllInBatch();
 		postRepository.deleteAllInBatch();
 		memoryRepository.deleteAllInBatch();
-		eventRepository.deleteAllInBatch();
 		emojiRepository.deleteAllInBatch();
 		voiceRepository.deleteAllInBatch();
 		associateRepository.deleteAllInBatch();
@@ -434,7 +427,6 @@ public class CommentServiceTest extends IntegrationsTestSupport {
 		Member member,
 		Community community,
 		Associate associate,
-		Event event,
 		Memory memory,
 		Post post,
 		Emoji emoji,
@@ -448,8 +440,7 @@ public class CommentServiceTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		Community community = CommunityFixtures.community(member);
 		Associate associate = AssociateFixtures.associate(member, community);
-		Event event = EventFixtures.event(community, associate);
-		Memory memory = MemoryFixtures.memory(event);
+		Memory memory = MemoryFixtures.memory(community, associate);
 		Post post = PostFixtures.post(memory, associate);
 		Emoji emoji = EmojiFixtures.emoji(associate);
 		Voice permanentVoice = VoiceFixtures.permanentVoice(associate);
@@ -458,13 +449,12 @@ public class CommentServiceTest extends IntegrationsTestSupport {
 		Member savedMember = memberRepository.save(member);
 		Community savedCommunity = communityRepository.save(community);
 		Associate savedAssociate = associateRepository.save(associate);
-		Event savedEvent = eventRepository.save(event);
 		Memory savedMemory = memoryRepository.save(memory);
 		Post savedPost = postRepository.save(post);
 		Emoji savedEmoji = emojiRepository.save(emoji);
 		Voice savedPermanentVoice = voiceRepository.save(permanentVoice);
 		Voice savedTemporaryVoice = voiceRepository.save(temporaryVoice);
-		return new Fixtures(savedMember, savedCommunity, savedAssociate, savedEvent, savedMemory, savedPost, savedEmoji,
+		return new Fixtures(savedMember, savedCommunity, savedAssociate, savedMemory, savedPost, savedEmoji,
 			savedPermanentVoice, savedTemporaryVoice);
 	}
 

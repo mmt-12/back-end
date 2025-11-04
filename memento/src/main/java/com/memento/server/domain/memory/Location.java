@@ -1,4 +1,4 @@
-package com.memento.server.domain.event;
+package com.memento.server.domain.memory;
 
 import static lombok.AccessLevel.PROTECTED;
 

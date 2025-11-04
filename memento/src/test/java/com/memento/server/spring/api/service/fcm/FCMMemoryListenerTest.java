@@ -32,7 +32,7 @@ import com.memento.server.common.exception.MementoException;
 
 @SpringBootTest
 @ExtendWith(OutputCaptureExtension.class)
-public class FCMEventListenerTest {
+public class FCMMemoryListenerTest {
 
 	@Autowired
 	private FCMEventListener fcmEventListener;
