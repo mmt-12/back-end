@@ -116,11 +116,10 @@ CREATE TABLE IF NOT EXISTS achievement_associate (
     KEY fk_achievement_associate_associate (associate_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =====================================================
--- Events and Memories
--- =====================================================
 
-CREATE TABLE IF NOT EXISTS events (
+-- Events table removed; Memory now holds all fields
+
+CREATE TABLE IF NOT EXISTS memories (
     id BIGINT NOT NULL AUTO_INCREMENT,
     title VARCHAR(102) NOT NULL,
     description VARCHAR(510) NOT NULL,
@@ -139,21 +138,11 @@ CREATE TABLE IF NOT EXISTS events (
     modified_at DATETIME(6) NULL,
     deleted_at DATETIME(6) NULL,
     PRIMARY KEY (id),
-    KEY fk_events_community (community_id),
-    KEY fk_events_associate (associate_id),
-    KEY idx_events_title (title),
-    KEY idx_events_start_time (start_time),
-    KEY idx_events_location (latitude, longitude)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS memories (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    event_id BIGINT NOT NULL,
-    created_at DATETIME(6) NOT NULL,
-    modified_at DATETIME(6) NULL,
-    deleted_at DATETIME(6) NULL,
-    PRIMARY KEY (id),
-    UNIQUE KEY uk_memories_event (event_id),
+    KEY fk_memories_community (community_id),
+    KEY fk_memories_associate (associate_id),
+    KEY idx_memories_title (title),
+    KEY idx_memories_start_time (start_time),
+    KEY idx_memories_location (latitude, longitude),
     KEY idx_memories_active (deleted_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
