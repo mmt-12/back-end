@@ -15,20 +15,16 @@ import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
-import com.memento.server.domain.event.Event;
-import com.memento.server.domain.event.EventRepository;
+import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
-import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.domain.post.Post;
 import com.memento.server.domain.post.PostRepository;
-import com.memento.server.event.EventFixtures;
-import com.memento.server.member.MemberFixtures;
 import com.memento.server.memory.MemoryFixtures;
+import com.memento.server.member.MemberFixtures;
 import com.memento.server.post.PostFixtures;
 import com.memento.server.spring.api.service.IntegrationsTestSupport;
-import com.memento.server.spring.domain.comment.CommentRepositoryTest;
 
 import jakarta.persistence.EntityManager;
 
@@ -46,9 +42,6 @@ public class PostRepositoryTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private AssociateRepository associateRepository;
-
-	@Autowired
-	private EventRepository eventRepository;
 
 	@Autowired
 	private MemoryRepository memoryRepository;
@@ -109,7 +102,6 @@ public class PostRepositoryTest extends IntegrationsTestSupport {
 		Member member,
 		Community community,
 		Associate associate,
-		Event event,
 		Memory memory
 	) {
 
@@ -119,16 +111,13 @@ public class PostRepositoryTest extends IntegrationsTestSupport {
 		Member member = MemberFixtures.member();
 		Community community = CommunityFixtures.community(member);
 		Associate associate = AssociateFixtures.associate(member, community);
-		Event event = EventFixtures.event(community, associate);
-		Memory memory = MemoryFixtures.memory(event);
-
+		Memory memory = MemoryFixtures.memory(community, associate);
 
 		Member savedMember = memberRepository.save(member);
 		Community savedCommunity = communityRepository.save(community);
 		Associate savedAssociate = associateRepository.save(associate);
-		Event savedEvent = eventRepository.save(event);
 		Memory savedMemory = memoryRepository.save(memory);
 
-		return new Fixtures(savedMember, savedCommunity, savedAssociate, savedEvent, savedMemory);
+		return new Fixtures(savedMember, savedCommunity, savedAssociate, savedMemory);
 	}
 }

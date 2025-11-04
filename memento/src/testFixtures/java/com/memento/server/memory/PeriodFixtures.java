@@ -1,8 +1,8 @@
-package com.memento.server.event;
+package com.memento.server.memory;
 
 import java.time.LocalDateTime;
 
-import com.memento.server.domain.event.Period;
+import com.memento.server.domain.memory.Period;
 
 public class PeriodFixtures {
 

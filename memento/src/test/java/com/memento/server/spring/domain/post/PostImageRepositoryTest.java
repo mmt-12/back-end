@@ -15,13 +15,11 @@ import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
-import com.memento.server.domain.event.Event;
-import com.memento.server.domain.event.EventRepository;
-import com.memento.server.domain.event.Location;
-import com.memento.server.domain.event.Period;
+import com.memento.server.domain.memory.Memory;
+import com.memento.server.domain.memory.Location;
+import com.memento.server.domain.memory.Period;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
-import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.domain.post.Hash;
 import com.memento.server.domain.post.Post;
@@ -42,9 +40,6 @@ class PostImageRepositoryTest extends IntegrationsTestSupport {
 	private MemoryRepository memoryRepository;
 
 	@Autowired
-	private EventRepository eventRepository;
-
-	@Autowired
 	private MemberRepository memberRepository;
 
 	@Autowired
@@ -61,7 +56,7 @@ class PostImageRepositoryTest extends IntegrationsTestSupport {
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
-		Event event = eventRepository.save(Event.builder()
+		Memory memory = memoryRepository.save(Memory.builder()
 			.title("추억")
 			.description("설명")
 			.location(Location.builder()
@@ -78,7 +73,6 @@ class PostImageRepositoryTest extends IntegrationsTestSupport {
 			.community(community)
 			.associate(associate)
 			.build());
-		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
 
 		Post post1 = postRepository.save(Post.builder().content("포스트1").memory(memory).associate(associate).build());
 		Post post2 = postRepository.save(Post.builder().content("포스트2").memory(memory).associate(associate).build());
@@ -104,7 +98,7 @@ class PostImageRepositoryTest extends IntegrationsTestSupport {
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
-		Event event = eventRepository.save(Event.builder()
+		Memory memory = memoryRepository.save(Memory.builder()
 			.title("추억")
 			.description("설명")
 			.location(Location.builder()
@@ -121,7 +115,6 @@ class PostImageRepositoryTest extends IntegrationsTestSupport {
 			.community(community)
 			.associate(associate)
 			.build());
-		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
 
 		Post post = postRepository.save(Post.builder().content("포스트").memory(memory).associate(associate).build());
 

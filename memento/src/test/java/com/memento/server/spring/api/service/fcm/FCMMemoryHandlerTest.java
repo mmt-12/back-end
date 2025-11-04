@@ -45,13 +45,11 @@ import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
-import com.memento.server.domain.event.Event;
-import com.memento.server.domain.event.EventRepository;
-import com.memento.server.domain.event.Location;
-import com.memento.server.domain.event.Period;
+import com.memento.server.domain.memory.Memory;
+import com.memento.server.domain.memory.Location;
+import com.memento.server.domain.memory.Period;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
-import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.memory.MemoryAssociate;
 import com.memento.server.domain.memory.MemoryAssociateRepository;
 import com.memento.server.domain.memory.MemoryRepository;
@@ -62,7 +60,7 @@ import com.memento.server.domain.post.Post;
 import com.memento.server.domain.post.PostRepository;
 import com.memento.server.spring.api.service.IntegrationsTestSupport;
 
-public class FCMEventHandlerTest extends IntegrationsTestSupport {
+public class FCMMemoryHandlerTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private FCMEventHandler fcmEventHandler;
@@ -86,9 +84,6 @@ public class FCMEventHandlerTest extends IntegrationsTestSupport {
 	private CommunityRepository communityRepository;
 
 	@Autowired
-	private EventRepository eventRepository;
-
-	@Autowired
 	private MemoryAssociateRepository memoryAssociateRepository;
 
 	@Autowired
@@ -107,7 +102,6 @@ public class FCMEventHandlerTest extends IntegrationsTestSupport {
 		postRepository.deleteAllInBatch();
 		memoryAssociateRepository.deleteAllInBatch();
 		memoryRepository.deleteAllInBatch();
-		eventRepository.deleteAllInBatch();
 		associateRepository.deleteAllInBatch();
 		communityRepository.deleteAllInBatch();
 		memberRepository.deleteAllInBatch();
@@ -293,7 +287,7 @@ public class FCMEventHandlerTest extends IntegrationsTestSupport {
 
 		notifications.forEach(notification -> {
 			assertThat(notification.getTitle()).isEqualTo(POST.getTitle());
-			assertThat(notification.getContent()).contains(fixtures.event.getTitle() + "에 새로운 포스트가 올라왔어요");
+			assertThat(notification.getContent()).contains(fixtures.memory.getTitle() + "에 새로운 포스트가 올라왔어요");
 			assertThat(notification.getType()).isEqualTo(POST);
 		});
 
@@ -438,8 +432,7 @@ public class FCMEventHandlerTest extends IntegrationsTestSupport {
 		Associate actor = associateRepository.save(Associate.create("액터", member1, community));
 		Associate receiver = associateRepository.save(Associate.create("수신자", member2, community));
 
-		Event event = eventRepository.save(createTestEvent(community, actor));
-		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
+		Memory memory = memoryRepository.save(createTestEvent(community, actor));
 		Post post = postRepository.save(Post.builder()
 			.content("테스트 포스트")
 			.memory(memory)
@@ -450,7 +443,6 @@ public class FCMEventHandlerTest extends IntegrationsTestSupport {
 			.actor(actor)
 			.receiver(receiver)
 			.community(community)
-			.event(event)
 			.memory(memory)
 			.post(post)
 			.build();
@@ -490,8 +482,7 @@ public class FCMEventHandlerTest extends IntegrationsTestSupport {
 		Associate member1Associate = associateRepository.save(Associate.create("멤버1", member2, community));
 		Associate member2Associate = associateRepository.save(Associate.create("멤버2", member3, community));
 
-		Event event = eventRepository.save(createTestEvent(community, actor));
-		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
+		Memory memory = memoryRepository.save(createTestEvent(community, actor));
 
 		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(actor).build());
 		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(member1Associate).build());
@@ -500,7 +491,6 @@ public class FCMEventHandlerTest extends IntegrationsTestSupport {
 		return FCMTestFixtures.builder()
 			.actor(actor)
 			.community(community)
-			.event(event)
 			.memory(memory)
 			.member1(member1Associate)
 			.member2(member2Associate)
@@ -541,8 +531,8 @@ public class FCMEventHandlerTest extends IntegrationsTestSupport {
 			.build();
 	}
 
-	private Event createTestEvent(Community community, Associate associate) {
-		return Event.builder()
+	private Memory createTestEvent(Community community, Associate associate) {
+		return Memory.builder()
 			.title("테스트 이벤트")
 			.description("테스트 설명")
 			.location(Location.builder()
@@ -569,7 +559,6 @@ public class FCMEventHandlerTest extends IntegrationsTestSupport {
 		public Associate member2;
 		public Associate newMember;
 		public Community community;
-		public Event event;
 		public Memory memory;
 		public Post post;
 
@@ -586,7 +575,7 @@ public class FCMEventHandlerTest extends IntegrationsTestSupport {
 				.member2(this.member2)
 				.newMember(this.newMember)
 				.community(this.community)
-				.event(this.event)
+				.event(this.memory)
 				.memory(this.memory)
 				.post(this.post);
 		}
@@ -599,7 +588,6 @@ public class FCMEventHandlerTest extends IntegrationsTestSupport {
 			private Associate member2;
 			private Associate newMember;
 			private Community community;
-			private Event event;
 			private Memory memory;
 			private Post post;
 
@@ -638,8 +626,8 @@ public class FCMEventHandlerTest extends IntegrationsTestSupport {
 				return this;
 			}
 
-			public FCMTestFixturesBuilder event(Event event) {
-				this.event = event;
+			public FCMTestFixturesBuilder event(Memory memory) {
+				this.memory = memory;
 				return this;
 			}
 
@@ -662,7 +650,6 @@ public class FCMEventHandlerTest extends IntegrationsTestSupport {
 				fixtures.member2 = this.member2;
 				fixtures.newMember = this.newMember;
 				fixtures.community = this.community;
-				fixtures.event = this.event;
 				fixtures.memory = this.memory;
 				fixtures.post = this.post;
 				return fixtures;
