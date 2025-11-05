@@ -180,7 +180,7 @@ public class MemoryService {
 
 		List<MemoryAssociate> deleteList = new ArrayList<>();
 		for (MemoryAssociate associate : associates) {
-			Long associateId = associate.getId();
+			Long associateId = associate.getAssociate().getId();
 			checked.add(associateId);
 			if (request.associates().contains(associateId))
 				continue;
