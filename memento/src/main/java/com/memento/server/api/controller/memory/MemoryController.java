@@ -78,7 +78,7 @@ public class MemoryController {
 		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long memoryId,
-		CreateUpdateMemoryRequest request
+		@RequestBody CreateUpdateMemoryRequest request
 	) {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(COMMUNITY_NOT_MATCH);
