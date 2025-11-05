@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
+import com.memento.server.api.controller.memory.dto.response.ReadMemoryResponse;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
 
 public class ControllerAuthTest extends ControllerTestSupport {

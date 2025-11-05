@@ -9,9 +9,9 @@ import java.math.BigDecimal;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest.LocationRequest;
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest.PeriodRequest;
+import com.memento.server.api.controller.memory.dto.request.CreateUpdateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.request.CreateUpdateMemoryRequest.LocationRequest;
+import com.memento.server.api.controller.memory.dto.request.CreateUpdateMemoryRequest.PeriodRequest;
 import com.memento.server.common.BaseEntity;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.Community;

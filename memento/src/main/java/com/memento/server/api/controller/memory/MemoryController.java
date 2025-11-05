@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.memento.server.annotation.AssociateId;
 import com.memento.server.annotation.CommunityId;
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
-import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
-import com.memento.server.api.controller.memory.dto.ReadMemoryListRequest;
-import com.memento.server.api.controller.memory.dto.ReadMemoryListResponse;
-import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
+import com.memento.server.api.controller.memory.dto.request.CreateUpdateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.request.ReadMemoryListRequest;
+import com.memento.server.api.controller.memory.dto.response.CreateUpdateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.response.DownloadImagesResponse;
+import com.memento.server.api.controller.memory.dto.response.ReadMemoryListResponse;
+import com.memento.server.api.controller.memory.dto.response.ReadMemoryResponse;
 import com.memento.server.api.service.memory.MemoryService;
 import com.memento.server.common.exception.MementoException;
 

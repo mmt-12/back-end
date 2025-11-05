@@ -30,11 +30,14 @@ import org.springframework.http.MediaType;
 import com.memento.server.api.controller.achievement.dto.response.AchievementResponse;
 import com.memento.server.api.controller.community.dto.response.AssociateResponse;
 import com.memento.server.api.controller.memory.MemoryController;
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
-import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
-import com.memento.server.api.controller.memory.dto.ReadMemoryListResponse;
-import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
+import com.memento.server.api.controller.memory.dto.request.CreateUpdateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.response.CreateUpdateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.response.DownloadImagesResponse;
+import com.memento.server.api.controller.memory.dto.response.LocationResponse;
+import com.memento.server.api.controller.memory.dto.response.PeriodResponse;
+import com.memento.server.api.controller.memory.dto.response.ReadMemoryListResponse;
+import com.memento.server.api.controller.memory.dto.response.ReadMemoryResponse;
+import com.memento.server.api.controller.post.dto.response.AuthorResponse;
 import com.memento.server.api.service.memory.MemoryService;
 import com.memento.server.docs.RestDocsSupport;
 
@@ -59,11 +62,11 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 				.id(1L)
 				.title("일평 mt")
 				.description("우리가 함께 마신 소주와 수영장 물을 추억하며")
-				.period(ReadMemoryResponse.PeriodResponse.builder()
+				.period(PeriodResponse.builder()
 					.startTime(LocalDateTime.of(2025, 6, 20, 10, 30))
 					.endTime(LocalDateTime.of(2025, 6, 21, 12, 30))
 					.build())
-				.location(ReadMemoryResponse.LocationResponse.builder()
+				.location(LocationResponse.builder()
 					.latitude(36.34512323F)
 					.longitude(138.7712322F)
 					.code(16335)
@@ -84,11 +87,11 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 					"https://aws.s3.memento/8",
 					"https://aws.s3.memento/9"
 				))
-				.author(ReadMemoryResponse.AuthorResponse.builder()
+				.author(AuthorResponse.builder()
 					.id(1L)
 					.nickname("nickname")
 					.imageUrl("https://aws.s3.memento/1")
-					.achievement(ReadMemoryResponse.AuthorResponse.AchievementResponse.builder()
+					.achievement(AchievementResponse.builder()
 						.id(1L)
 						.name("achievement")
 						.build())
@@ -167,11 +170,11 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 							.id(1L)
 							.title("일평 mt")
 							.description("우리가 함께 마신 소주와 수영장 물을 추억하며")
-							.period(ReadMemoryResponse.PeriodResponse.builder()
+							.period(PeriodResponse.builder()
 								.startTime(LocalDateTime.of(2025, 6, 20, 10, 30))
 								.endTime(LocalDateTime.of(2025, 6, 21, 12, 30))
 								.build())
-							.location(ReadMemoryResponse.LocationResponse.builder()
+							.location(LocationResponse.builder()
 								.latitude(36.34512323F)
 								.longitude(138.7712322F)
 								.code(16335)
@@ -192,11 +195,11 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 								"https://aws.s3.memento/8",
 								"https://aws.s3.memento/9"
 							))
-							.author(ReadMemoryResponse.AuthorResponse.builder()
+							.author(AuthorResponse.builder()
 								.id(1L)
 								.nickname("nickname")
 								.imageUrl("https://aws.s3.memento/1")
-								.achievement(ReadMemoryResponse.AuthorResponse.AchievementResponse.builder()
+								.achievement(AchievementResponse.builder()
 									.id(1L)
 									.name("achievement")
 									.build())

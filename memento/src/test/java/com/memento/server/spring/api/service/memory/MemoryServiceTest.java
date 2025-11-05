@@ -20,12 +20,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
-import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
-import com.memento.server.api.controller.memory.dto.ReadMemoryListRequest;
-import com.memento.server.api.controller.memory.dto.ReadMemoryListResponse;
-import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
+import com.memento.server.api.controller.memory.dto.request.CreateUpdateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.request.ReadMemoryListRequest;
+import com.memento.server.api.controller.memory.dto.response.CreateUpdateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.response.DownloadImagesResponse;
+import com.memento.server.api.controller.memory.dto.response.ReadMemoryListResponse;
+import com.memento.server.api.controller.memory.dto.response.ReadMemoryResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.memory.MemoryService;
