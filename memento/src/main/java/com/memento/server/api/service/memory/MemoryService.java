@@ -175,16 +175,16 @@ public class MemoryService {
 
 		event.update(request);
 
-		List<MemoryAssociate> associates = memoryAssociateRepository.findAllByMemoryAndDeletedAtIsNull(memory);
+		List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemoryAndDeletedAtIsNull(memory);
 		List<Long> checked = new ArrayList<>();
 
 		List<MemoryAssociate> deleteList = new ArrayList<>();
-		for (MemoryAssociate associate : associates) {
-			Long associateId = associate.getAssociate().getId();
+		for (MemoryAssociate memoryAssociate : memoryAssociates) {
+			Long associateId = memoryAssociate.getAssociate().getId();
 			checked.add(associateId);
 			if (request.associates().contains(associateId))
 				continue;
-			deleteList.add(associate);
+			deleteList.add(memoryAssociate);
 		}
 		memoryAssociateRepository.deleteAll(deleteList);
 
