@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.memento.server.api.controller.community.dto.AssociateListResponse;
+import com.memento.server.api.controller.community.dto.response.CommunityAssociateListResponse;
 import com.memento.server.api.controller.member.dto.CommunityListResponse;
 import com.memento.server.api.service.community.dto.response.SearchAssociateResponse;
 import com.memento.server.common.error.ErrorCodes;
@@ -30,7 +30,7 @@ public class AssociateService {
 	private final CommunityRepository communityRepository;
 	private final AchievementRepository achievementRepository;
 
-	public AssociateListResponse searchAll(
+	public CommunityAssociateListResponse searchAll(
 		Long communityId,
 		String keyword
 	) {
@@ -38,7 +38,7 @@ public class AssociateService {
 			.orElseThrow(() -> new MementoException(COMMUNITY_NOT_FOUND));
 		List<Associate> associates = associateRepository.findAllByCommunityIdAndKeyword(communityId, keyword);
 
-		return AssociateListResponse.from(associates, community);
+		return CommunityAssociateListResponse.from(associates, community);
 	}
 
 	public CommunityListResponse searchAllMyAssociate(Long memberId) {

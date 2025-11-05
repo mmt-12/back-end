@@ -27,6 +27,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
+import com.memento.server.api.controller.achievement.dto.response.AchievementResponse;
+import com.memento.server.api.controller.community.dto.response.AssociateResponse;
 import com.memento.server.api.controller.memory.MemoryController;
 import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
 import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
@@ -91,6 +93,18 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 						.name("achievement")
 						.build())
 					.build())
+				.associates(List.of(
+					AssociateResponse.builder()
+						.id(5L)
+						.imageUrl(null)
+						.nickname("최성환")
+						.introduction("최성환입니다.")
+						.achievement(AchievementResponse.builder()
+							.id(1L)
+							.name("업적")
+							.build())
+						.build()
+				))
 				.build()
 		);
 
@@ -119,13 +133,21 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("location.address").description("장소 주소"),
 					fieldWithPath("memberAmount").description("기억 참여자 수"),
 					fieldWithPath("pictureAmount").description("기억 사진 수"),
-					fieldWithPath("pictures").description("사진 url 목록"),
+					fieldWithPath("pictures[]").description("사진 url 목록"),
 					subsectionWithPath("author").description("작성자 정보"),
 					fieldWithPath("author.id").description("작성자의 참여 아이디"),
 					fieldWithPath("author.nickname").description("작성자 닉네임"),
 					subsectionWithPath("author.achievement").description("작성자 업적"),
 					fieldWithPath("author.achievement.id").description("업적 아이디"),
-					fieldWithPath("author.achievement.name").description("업적 이름")
+					fieldWithPath("author.achievement.name").description("업적 이름"),
+					subsectionWithPath("associates[]").description("기억 참여자 목록"),
+					fieldWithPath("associates[].id").description("참여자 아이디"),
+					fieldWithPath("associates[].imageUrl").description("참여자 프로필 이미지 url"),
+					fieldWithPath("associates[].nickname").description("참여자 닉네임"),
+					fieldWithPath("associates[].introduction").description("참여자 소개"),
+					subsectionWithPath("associates[].achievement").description("참여자 업적"),
+					fieldWithPath("associates[].achievement.id").description("업적 아이디"),
+					fieldWithPath("associates[].achievement.name").description("업적 이름")
 				)
 			));
 	}

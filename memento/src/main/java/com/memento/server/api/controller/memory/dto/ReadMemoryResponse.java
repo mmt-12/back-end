@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.memento.server.api.controller.community.dto.response.AssociateResponse;
 import com.memento.server.api.service.memory.dto.Author;
 import com.memento.server.api.service.memory.dto.MemoryItem;
 import com.memento.server.domain.community.Associate;
@@ -26,7 +27,7 @@ public record ReadMemoryResponse(
 	Integer pictureAmount,
 	List<String> pictures,
 	AuthorResponse author,
-	List<Associate> associates
+	List<AssociateResponse> associates
 ) {
 	@Builder
 	public record AuthorResponse(
@@ -150,7 +151,7 @@ public record ReadMemoryResponse(
 			.pictureAmount(images.size())
 			.pictures(pictures)
 			.author(AuthorResponse.of(author))
-			.associates(associates)
+			.associates(AssociateResponse.from(associates))
 			.build();
 	}
 
