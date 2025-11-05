@@ -27,12 +27,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
+import com.memento.server.api.controller.achievement.dto.response.AchievementResponse;
+import com.memento.server.api.controller.community.dto.response.AssociateResponse;
 import com.memento.server.api.controller.memory.MemoryController;
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
-import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
-import com.memento.server.api.controller.memory.dto.ReadMemoryListResponse;
-import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
+import com.memento.server.api.controller.memory.dto.request.CreateUpdateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.response.CreateUpdateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.response.DownloadImagesResponse;
+import com.memento.server.api.controller.memory.dto.response.LocationResponse;
+import com.memento.server.api.controller.memory.dto.response.PeriodResponse;
+import com.memento.server.api.controller.memory.dto.response.ReadMemoryListResponse;
+import com.memento.server.api.controller.memory.dto.response.ReadMemoryResponse;
+import com.memento.server.api.controller.post.dto.response.AuthorResponse;
 import com.memento.server.api.service.memory.MemoryService;
 import com.memento.server.docs.RestDocsSupport;
 
@@ -57,11 +62,11 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 				.id(1L)
 				.title("일평 mt")
 				.description("우리가 함께 마신 소주와 수영장 물을 추억하며")
-				.period(ReadMemoryResponse.PeriodResponse.builder()
+				.period(PeriodResponse.builder()
 					.startTime(LocalDateTime.of(2025, 6, 20, 10, 30))
 					.endTime(LocalDateTime.of(2025, 6, 21, 12, 30))
 					.build())
-				.location(ReadMemoryResponse.LocationResponse.builder()
+				.location(LocationResponse.builder()
 					.latitude(36.34512323F)
 					.longitude(138.7712322F)
 					.code(16335)
@@ -82,15 +87,27 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 					"https://aws.s3.memento/8",
 					"https://aws.s3.memento/9"
 				))
-				.author(ReadMemoryResponse.AuthorResponse.builder()
+				.author(AuthorResponse.builder()
 					.id(1L)
 					.nickname("nickname")
 					.imageUrl("https://aws.s3.memento/1")
-					.achievement(ReadMemoryResponse.AuthorResponse.AchievementResponse.builder()
+					.achievement(AchievementResponse.builder()
 						.id(1L)
 						.name("achievement")
 						.build())
 					.build())
+				.associates(List.of(
+					AssociateResponse.builder()
+						.id(5L)
+						.imageUrl(null)
+						.nickname("최성환")
+						.introduction("최성환입니다.")
+						.achievement(AchievementResponse.builder()
+							.id(1L)
+							.name("업적")
+							.build())
+						.build()
+				))
 				.build()
 		);
 
@@ -119,13 +136,21 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("location.address").description("장소 주소"),
 					fieldWithPath("memberAmount").description("기억 참여자 수"),
 					fieldWithPath("pictureAmount").description("기억 사진 수"),
-					fieldWithPath("pictures").description("사진 url 목록"),
+					fieldWithPath("pictures[]").description("사진 url 목록"),
 					subsectionWithPath("author").description("작성자 정보"),
 					fieldWithPath("author.id").description("작성자의 참여 아이디"),
 					fieldWithPath("author.nickname").description("작성자 닉네임"),
 					subsectionWithPath("author.achievement").description("작성자 업적"),
 					fieldWithPath("author.achievement.id").description("업적 아이디"),
-					fieldWithPath("author.achievement.name").description("업적 이름")
+					fieldWithPath("author.achievement.name").description("업적 이름"),
+					subsectionWithPath("associates[]").description("기억 참여자 목록"),
+					fieldWithPath("associates[].id").description("참여자 아이디"),
+					fieldWithPath("associates[].imageUrl").description("참여자 프로필 이미지 url"),
+					fieldWithPath("associates[].nickname").description("참여자 닉네임"),
+					fieldWithPath("associates[].introduction").description("참여자 소개"),
+					subsectionWithPath("associates[].achievement").description("참여자 업적"),
+					fieldWithPath("associates[].achievement.id").description("업적 아이디"),
+					fieldWithPath("associates[].achievement.name").description("업적 이름")
 				)
 			));
 	}
@@ -145,11 +170,11 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 							.id(1L)
 							.title("일평 mt")
 							.description("우리가 함께 마신 소주와 수영장 물을 추억하며")
-							.period(ReadMemoryResponse.PeriodResponse.builder()
+							.period(PeriodResponse.builder()
 								.startTime(LocalDateTime.of(2025, 6, 20, 10, 30))
 								.endTime(LocalDateTime.of(2025, 6, 21, 12, 30))
 								.build())
-							.location(ReadMemoryResponse.LocationResponse.builder()
+							.location(LocationResponse.builder()
 								.latitude(36.34512323F)
 								.longitude(138.7712322F)
 								.code(16335)
@@ -170,11 +195,11 @@ public class MemoryControllerDocsTest extends RestDocsSupport {
 								"https://aws.s3.memento/8",
 								"https://aws.s3.memento/9"
 							))
-							.author(ReadMemoryResponse.AuthorResponse.builder()
+							.author(AuthorResponse.builder()
 								.id(1L)
 								.nickname("nickname")
 								.imageUrl("https://aws.s3.memento/1")
-								.achievement(ReadMemoryResponse.AuthorResponse.AchievementResponse.builder()
+								.achievement(AchievementResponse.builder()
 									.id(1L)
 									.name("achievement")
 									.build())

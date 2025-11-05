@@ -16,7 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.memento.server.achievement.AchievementFixtures;
-import com.memento.server.api.controller.community.dto.AssociateListResponse;
+import com.memento.server.api.controller.community.dto.response.CommunityAssociateListResponse;
 import com.memento.server.api.service.community.dto.response.SearchAssociateResponse;
 import com.memento.server.api.service.community.AssociateService;
 import com.memento.server.associate.AssociateFixtures;
@@ -91,13 +91,13 @@ public class AssociateServiceTest{
 		Associate associate11 = associateRepository.save(Associate.create("카카", member11, community));
 
 		// when
-		AssociateListResponse associateListResponse = associateService.searchAll(community.getId(), "");
+		CommunityAssociateListResponse communityAssociateListResponse = associateService.searchAll(community.getId(), "");
 
 		// then
-		assertThat(associateListResponse.communityName()).isEqualTo(community.getName());
-		assertThat(associateListResponse.associates().size()).isEqualTo(11);
-		assertThat(associateListResponse.associates().getFirst().nickname()).isEqualTo(associate11.getNickname());
-		assertThat(associateListResponse.associates().getLast().nickname()).isEqualTo(associate1.getNickname());
+		assertThat(communityAssociateListResponse.communityName()).isEqualTo(community.getName());
+		assertThat(communityAssociateListResponse.associates().size()).isEqualTo(11);
+		assertThat(communityAssociateListResponse.associates().getFirst().nickname()).isEqualTo(associate11.getNickname());
+		assertThat(communityAssociateListResponse.associates().getLast().nickname()).isEqualTo(associate1.getNickname());
 	}
 
 	@Test
@@ -111,12 +111,12 @@ public class AssociateServiceTest{
 		Associate associate2 = associateRepository.save(Associate.create("아아아", member2, community));
 
 		// when
-		AssociateListResponse associateListResponse = associateService.searchAll(community.getId(), "홍홍");
+		CommunityAssociateListResponse communityAssociateListResponse = associateService.searchAll(community.getId(), "홍홍");
 
 		// then
-		assertThat(associateListResponse.communityName()).isEqualTo(community.getName());
-		assertThat(associateListResponse.associates().size()).isEqualTo(1);
-		assertThat(associateListResponse.associates().getFirst().nickname()).isEqualTo(associate1.getNickname());
+		assertThat(communityAssociateListResponse.communityName()).isEqualTo(community.getName());
+		assertThat(communityAssociateListResponse.associates().size()).isEqualTo(1);
+		assertThat(communityAssociateListResponse.associates().getFirst().nickname()).isEqualTo(associate1.getNickname());
 	}
 
 	@Test

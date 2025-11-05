@@ -25,7 +25,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.request.CreateUpdateMemoryRequest;
 import com.memento.server.api.service.achievement.AchievementService;
 import com.memento.server.api.service.comment.CommentService;
 import com.memento.server.api.service.comment.dto.request.EmojiCommentCreateServiceRequest;

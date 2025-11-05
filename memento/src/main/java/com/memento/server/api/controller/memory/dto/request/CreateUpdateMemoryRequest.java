@@ -1,4 +1,4 @@
-package com.memento.server.api.controller.memory.dto;
+package com.memento.server.api.controller.memory.dto.request;
 
 import java.time.LocalDateTime;
 import java.util.List;

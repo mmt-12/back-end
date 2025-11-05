@@ -1,4 +1,4 @@
-package com.memento.server.api.controller.memory.dto;
+package com.memento.server.api.controller.memory.dto.response;
 
 import java.util.ArrayList;
 import java.util.HashMap;
