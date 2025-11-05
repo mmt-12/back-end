@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.memento.server.api.service.memory.dto.Author;
 import com.memento.server.api.service.memory.dto.MemoryItem;
+import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.event.Event;
 import com.memento.server.domain.event.Location;
 import com.memento.server.domain.event.Period;
@@ -24,7 +25,8 @@ public record ReadMemoryResponse(
 	Integer memberAmount,
 	Integer pictureAmount,
 	List<String> pictures,
-	AuthorResponse author
+	AuthorResponse author,
+	List<Associate> associates
 ) {
 	@Builder
 	public record AuthorResponse(
@@ -120,6 +122,36 @@ public record ReadMemoryResponse(
 				.code(location.code())
 				.build();
 		}
+	}
+
+	public static ReadMemoryResponse of(
+		Memory memory,
+		List<PostImage> images,
+		Long associateCount,
+		Author author,
+		List<Associate> associates
+	) {
+		Event event = memory.getEvent();
+		List<String> pictures = new ArrayList<>();
+
+		for (PostImage image : images) {
+			pictures.add(image.getUrl());
+			if (pictures.size() >= 9)
+				break;
+		}
+
+		return ReadMemoryResponse.builder()
+			.id(memory.getId())
+			.title(event.getTitle())
+			.description(event.getDescription())
+			.period(PeriodResponse.from(event.getPeriod()))
+			.location(LocationResponse.from(event.getLocation()))
+			.memberAmount(Math.toIntExact(associateCount))
+			.pictureAmount(images.size())
+			.pictures(pictures)
+			.author(AuthorResponse.of(author))
+			.associates(associates)
+			.build();
 	}
 
 	public static ReadMemoryResponse of(

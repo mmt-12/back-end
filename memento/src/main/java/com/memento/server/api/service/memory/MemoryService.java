@@ -71,8 +71,13 @@ public class MemoryService {
 		Associate associate = memory.getEvent().getAssociate();
 		Achievement achievement = associate.getAchievement();
 		Author author = Author.of(associate, achievement);
+		List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemoryAndDeletedAtIsNull(memory);
+		List<Associate> associates = new ArrayList<>();
+		for (MemoryAssociate memoryAssociate : memoryAssociates) {
+			associates.add(memoryAssociate.getAssociate());
+		}
 
-		return ReadMemoryResponse.of(memory, images, associateCount, author);
+		return ReadMemoryResponse.of(memory, images, associateCount, author, associates);
 	}
 
 	public ReadMemoryListResponse readAll(Long communityId, ReadMemoryListRequest request) {
