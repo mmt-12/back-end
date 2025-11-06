@@ -13,18 +13,20 @@ import com.memento.server.api.service.memory.dto.MemoryItem;
 
 public interface MemoryRepository extends JpaRepository<Memory, Long> {
 
+	int countByAssociateIdAndDeletedAtNull(Long associateId);
+
 	@Query("""
 		SELECT new com.memento.server.api.service.memory.dto.MemoryItem(
 		    m.id,
-		    e.title,
-		    e.description,
-		    e.period.startTime,
-		    e.period.endTime,
-		    e.location.latitude,
-		    e.location.longitude,
-		    e.location.code,
-		    e.location.name,
-		    e.location.address,
+		    m.title,
+		    m.description,
+		    m.period.startTime,
+		    m.period.endTime,
+		    m.location.latitude,
+		    m.location.longitude,
+		    m.location.code,
+		    m.location.name,
+		    m.location.address,
 		    a.id,
 		    a.nickname,
 		    a.profileImageUrl,
@@ -32,13 +34,12 @@ public interface MemoryRepository extends JpaRepository<Memory, Long> {
 		    ach.name
 		)
 		FROM Memory m
-		JOIN m.event e
-		JOIN e.associate a
+		JOIN m.associate a
 		LEFT JOIN a.achievement ach
-		WHERE e.community.id = :communityId
-			AND (:keyword IS NULL OR e.title LIKE CONCAT('%', :keyword, '%'))
-			AND (:startDate IS NULL OR e.period.startTime >= :startDate)
-			AND (:endDate IS NULL OR e.period.endTime <= :endDate)
+		WHERE m.community.id = :communityId
+			AND (:keyword IS NULL OR m.title LIKE CONCAT('%', :keyword, '%'))
+			AND (:startDate IS NULL OR m.period.startTime >= :startDate)
+			AND (:endDate IS NULL OR m.period.endTime <= :endDate)
 			AND (:cursor IS NULL OR m.id < :cursor)
 			AND m.deletedAt IS NULL
 		ORDER BY m.id DESC
@@ -53,12 +54,4 @@ public interface MemoryRepository extends JpaRepository<Memory, Long> {
 	);
 
 	Optional<Memory> findByIdAndDeletedAtIsNull(Long id);
-
-	@Query("""
-		SELECT m
-		FROM Memory m
-		JOIN FETCH m.event e
-		WHERE m.id = :id AND m.deletedAt IS NULL
-		""")
-	Optional<Memory> findByIdWithEventAndDeletedAtIsNull(@Param("id") Long id);
 }

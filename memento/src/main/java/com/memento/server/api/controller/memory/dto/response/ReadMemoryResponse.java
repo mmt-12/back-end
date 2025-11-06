@@ -8,7 +8,6 @@ import com.memento.server.api.controller.post.dto.response.AuthorResponse;
 import com.memento.server.api.service.memory.dto.Author;
 import com.memento.server.api.service.memory.dto.MemoryItem;
 import com.memento.server.domain.community.Associate;
-import com.memento.server.domain.event.Event;
 import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.post.PostImage;
 
@@ -35,7 +34,6 @@ public record ReadMemoryResponse(
 		Author author,
 		List<Associate> associates
 	) {
-		Event event = memory.getEvent();
 		List<String> pictures = new ArrayList<>();
 
 		for (PostImage image : images) {
@@ -46,10 +44,10 @@ public record ReadMemoryResponse(
 
 		return ReadMemoryResponse.builder()
 			.id(memory.getId())
-			.title(event.getTitle())
-			.description(event.getDescription())
-			.period(PeriodResponse.from(event.getPeriod()))
-			.location(LocationResponse.from(event.getLocation()))
+			.title(memory.getTitle())
+			.description(memory.getDescription())
+			.period(PeriodResponse.from(memory.getPeriod()))
+			.location(LocationResponse.from(memory.getLocation()))
 			.memberAmount(Math.toIntExact(associateCount))
 			.pictureAmount(images.size())
 			.pictures(pictures)

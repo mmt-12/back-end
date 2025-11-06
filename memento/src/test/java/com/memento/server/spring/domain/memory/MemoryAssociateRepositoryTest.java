@@ -15,13 +15,11 @@ import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
-import com.memento.server.domain.event.Event;
-import com.memento.server.domain.event.EventRepository;
-import com.memento.server.domain.event.Location;
-import com.memento.server.domain.event.Period;
+import com.memento.server.domain.memory.Memory;
+import com.memento.server.domain.memory.Location;
+import com.memento.server.domain.memory.Period;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
-import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.memory.MemoryAssociate;
 import com.memento.server.domain.memory.MemoryAssociateRepository;
 import com.memento.server.domain.memory.MemoryRepository;
@@ -35,9 +33,6 @@ class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
 
     @Autowired
     private MemoryRepository memoryRepository;
-
-    @Autowired
-    private EventRepository eventRepository;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -58,7 +53,7 @@ class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
         Associate associate2 = associateRepository.save(Associate.create("다른어소시에이트", member2, community));
 
-        Event event = eventRepository.save(Event.builder()
+        Memory memory = memoryRepository.save(Memory.builder()
             .title("단일 추억")
             .description("단일 추억에 대한 설명입니다.")
             .location(Location.builder()
@@ -75,7 +70,6 @@ class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
             .community(community)
             .associate(associate)
             .build());
-        Memory memory = memoryRepository.save(Memory.builder().event(event).build());
         memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate).build());
         memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate2).build());
 
@@ -95,7 +89,7 @@ class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
         Associate associate2 = associateRepository.save(Associate.create("다른어소시에이트", member, community));
 
-        Event event = eventRepository.save(Event.builder()
+        Memory memory = memoryRepository.save(Memory.builder()
             .title("단일 추억")
             .description("단일 추억에 대한 설명입니다.")
             .location(Location.builder()
@@ -112,7 +106,6 @@ class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
             .community(community)
             .associate(associate)
             .build());
-        Memory memory = memoryRepository.save(Memory.builder().event(event).build());
         memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate).build());
         MemoryAssociate deletedAssociate = memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate2).build());
         memoryAssociateRepository.delete(deletedAssociate);
@@ -145,7 +138,7 @@ class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
-        Event event = eventRepository.save(Event.builder()
+        Memory memory = memoryRepository.save(Memory.builder()
             .title("기존 추억")
             .description("기존 추억에 대한 설명입니다.")
             .location(Location.builder()
@@ -162,7 +155,6 @@ class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
             .community(community)
             .associate(associate)
             .build());
-        Memory memory = memoryRepository.save(Memory.builder().event(event).build());
         memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate).build());
 
         // when
@@ -184,7 +176,7 @@ class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
         Associate associate2 = associateRepository.save(Associate.create("다른어소시에이트", member2, community));
 
-        Event event = eventRepository.save(Event.builder()
+        Memory memory = memoryRepository.save(Memory.builder()
             .title("기존 추억")
             .description("기존 추억에 대한 설명입니다.")
             .location(Location.builder()
@@ -201,7 +193,6 @@ class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
             .community(community)
             .associate(associate)
             .build());
-        Memory memory = memoryRepository.save(Memory.builder().event(event).build());
         memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate).build());
         memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate2).build());
 

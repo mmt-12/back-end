@@ -1,8 +1,8 @@
 package com.memento.server.api.controller.memory.dto.response;
 
 import com.memento.server.api.service.memory.dto.MemoryItem;
-import com.memento.server.domain.event.Location;
 
+import com.memento.server.domain.memory.Location;
 import lombok.Builder;
 
 @Builder

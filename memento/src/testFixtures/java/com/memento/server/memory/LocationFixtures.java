@@ -1,8 +1,8 @@
-package com.memento.server.event;
+package com.memento.server.memory;
 
 import java.math.BigDecimal;
 
-import com.memento.server.domain.event.Location;
+import com.memento.server.domain.memory.Location;
 
 public class LocationFixtures {
 

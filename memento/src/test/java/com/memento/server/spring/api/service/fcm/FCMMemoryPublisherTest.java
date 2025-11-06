@@ -14,7 +14,7 @@ import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.fcm.dto.event.MemoryFCM;
 
 @ExtendWith(MockitoExtension.class)
-public class FCMEventPublisherTest {
+public class FCMMemoryPublisherTest {
 
 	@Mock
 	private ApplicationEventPublisher applicationEventPublisher;

@@ -1,9 +1,9 @@
 package com.memento.server.api.controller.memory.dto.response;
 
+import com.memento.server.domain.memory.Period;
 import java.time.LocalDateTime;
 
 import com.memento.server.api.service.memory.dto.MemoryItem;
-import com.memento.server.domain.event.Period;
 
 import lombok.Builder;
 

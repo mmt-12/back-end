@@ -19,13 +19,11 @@ import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
-import com.memento.server.domain.event.Event;
-import com.memento.server.domain.event.EventRepository;
-import com.memento.server.domain.event.Location;
-import com.memento.server.domain.event.Period;
+import com.memento.server.domain.memory.Memory;
+import com.memento.server.domain.memory.Location;
+import com.memento.server.domain.memory.Period;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
-import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.spring.api.service.IntegrationsTestSupport;
 
@@ -33,9 +31,6 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
 
     @Autowired
     private MemoryRepository memoryRepository;
-
-    @Autowired
-    private EventRepository eventRepository;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -53,8 +48,8 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
         Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
-        Event event = eventRepository.save(
-            Event.builder()
+        Memory memory = memoryRepository.save(
+            Memory.builder()
                 .title("추억1")
                 .description("내용1")
                 .location(Location.builder()
@@ -71,7 +66,6 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
                 .community(community)
                 .associate(associate)
                 .build());
-        Memory memory = memoryRepository.save(Memory.builder().event(event).build());
 
         // when
         Optional<Memory> foundMemory = memoryRepository.findByIdAndDeletedAtIsNull(memory.getId());
@@ -88,8 +82,8 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
         Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
-        Event event = eventRepository.save(
-            Event.builder()
+        Memory memory = memoryRepository.save(
+            Memory.builder()
                 .title("추억1")
                 .description("내용1")
                 .location(Location.builder()
@@ -106,7 +100,6 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
                 .community(community)
                 .associate(associate)
                 .build());
-        Memory memory = memoryRepository.save(Memory.builder().event(event).build());
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
@@ -130,8 +123,8 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
         Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
-        Event event = eventRepository.save(
-            Event.builder()
+        Memory memory = memoryRepository.save(
+            Memory.builder()
                 .title("Keyword")
                 .description("내용1")
                 .location(Location.builder()
@@ -148,7 +141,6 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
                 .community(community)
                 .associate(associate)
                 .build());
-        Memory memory = memoryRepository.save(Memory.builder().event(event).build());
 
         Pageable pageable = PageRequest.of(0, 10);
 
@@ -174,8 +166,8 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
         Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
-        Event event = eventRepository.save(
-            Event.builder()
+        Memory memory = memoryRepository.save(
+            Memory.builder()
                 .title("keyword")
                 .description("내용1")
                 .location(Location.builder()
@@ -192,7 +184,6 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
                 .community(community)
                 .associate(associate)
                 .build());
-        Memory memory = memoryRepository.save(Memory.builder().event(event).build());
         Pageable pageable = PageRequest.of(0, 10);
 
         // when

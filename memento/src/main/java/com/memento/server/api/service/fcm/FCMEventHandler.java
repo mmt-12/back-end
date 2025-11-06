@@ -244,13 +244,13 @@ public class FCMEventHandler {
 	}
 
 	public void handlePostNotification(PostFCM event) {
-		Memory memory = memoryRepository.findByIdWithEventAndDeletedAtIsNull(event.memoryId())
+		Memory memory = memoryRepository.findByIdAndDeletedAtIsNull(event.memoryId())
 			.orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
 		List<Associate> associates = memoryAssociateRepository.findAssociatesByMemoryIdAndDeletedAtIsNull(
 			event.memoryId());
 
 		String title = POST.getTitle();
-		String content = createPostMessageContent(memory.getEvent().getTitle());
+		String content = createPostMessageContent(memory.getTitle());
 		List<Notification> notificationList = associates.stream()
 			.filter(associate -> !associate.getId().equals(event.makePostAssociateId()))
 			.map(associate -> Notification.builder()

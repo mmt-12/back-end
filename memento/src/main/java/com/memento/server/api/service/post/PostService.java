@@ -150,7 +150,7 @@ public class PostService {
 		Memory memory = memoryRepository.findByIdAndDeletedAtIsNull(memoryId)
 			.orElseThrow(() -> new MementoException(ErrorCodes.MEMORY_NOT_FOUND));
 
-		if(!memory.getEvent().getCommunity().getId().equals(communityId)){
+		if(!memory.getCommunity().getId().equals(communityId)){
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 

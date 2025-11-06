@@ -1,5 +1,6 @@
 package com.memento.server.api.service.achievement;
 
+import com.memento.server.domain.memory.MemoryRepository;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,7 +36,6 @@ import com.memento.server.domain.community.AssociateStatsRepository;
 import com.memento.server.domain.community.SignInAchievementEvent;
 import com.memento.server.domain.emoji.Emoji;
 import com.memento.server.domain.emoji.EmojiRepository;
-import com.memento.server.domain.event.EventRepository;
 import com.memento.server.domain.guestBook.GuestBook;
 import com.memento.server.domain.guestBook.GuestBookAchievementEvent;
 import com.memento.server.domain.guestBook.GuestBookExclusiveAchievementEvent;
@@ -65,7 +65,7 @@ public class AchievementEventListener {
 	private final ProfileImageRepository profileImageRepository;
 	private final MbtiTestRepository mbtiTestRepository;
 	private final GuestBookRepository guestBookRepository;
-	private final EventRepository eventRepository;
+	private final MemoryRepository memoryRepository;
 	private final MemoryAssociateRepository memoryAssociateRepository;
 	private final PostImageRepository postImageRepository;
 	private final EmojiRepository emojiRepository;
@@ -251,7 +251,7 @@ public class AchievementEventListener {
 			case CREATE:
 				AssociateStats stats = associateStatsRepository.findByAssociateId(event.associateIds().getFirst())
 					.orElseThrow(() -> new MementoException(ErrorCodes.STATS_NOT_FOUND));
-				int count = stats.updateCreatedMemoryCount(eventRepository.countByAssociateIdAndDeletedAtNull(event.associateIds().getFirst()));
+				int count = stats.updateCreatedMemoryCount(memoryRepository.countByAssociateIdAndDeletedAtNull(event.associateIds().getFirst()));
 				// 민들레? 노브랜드?
 				if(!achievementAssociateRepository.existsByAchievementIdAndAssociateId(12L, event.associateIds().getFirst())
 					&& count >= 10){

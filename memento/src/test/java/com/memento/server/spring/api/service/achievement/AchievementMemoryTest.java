@@ -56,8 +56,7 @@ import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
 import com.memento.server.domain.emoji.Emoji;
 import com.memento.server.domain.emoji.EmojiRepository;
-import com.memento.server.domain.event.Event;
-import com.memento.server.domain.event.EventRepository;
+import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.guestBook.GuestBookRepository;
 import com.memento.server.domain.guestBook.GuestBookType;
 import com.memento.server.domain.mbti.Mbti;
@@ -65,7 +64,6 @@ import com.memento.server.domain.mbti.MbtiTest;
 import com.memento.server.domain.mbti.MbtiTestRepository;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
-import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.memory.MemoryRepository;
 import com.memento.server.domain.notification.NotificationRepository;
 import com.memento.server.domain.post.Hash;
@@ -76,15 +74,14 @@ import com.memento.server.domain.post.PostRepository;
 import com.memento.server.domain.profileImage.ProfileImage;
 import com.memento.server.domain.profileImage.ProfileImageRepository;
 import com.memento.server.emoji.EmojiFixtures;
-import com.memento.server.event.EventFixtures;
-import com.memento.server.member.MemberFixtures;
 import com.memento.server.memory.MemoryFixtures;
+import com.memento.server.member.MemberFixtures;
 import com.memento.server.post.PostFixtures;
 import com.memento.server.spring.api.service.IntegrationsTestSupport;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class AchievementEventTest extends IntegrationsTestSupport {
+public class AchievementMemoryTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private ProfileImageService profileImageService;
@@ -121,9 +118,6 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 
 	@Autowired
 	private MemoryService memoryService;
-
-	@Autowired
-	private EventRepository eventRepository;
 
 	@Autowired
 	private MemoryRepository memoryRepository;
@@ -169,7 +163,6 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 		postImageRepository.deleteAll();
 		postRepository.deleteAll();
 		memoryRepository.deleteAll();
-		eventRepository.deleteAll();
 		mbtiTestRepository.deleteAll();
 		profileImageRepository.deleteAll();
 		associateStatsRepository.deleteAll();
@@ -802,10 +795,7 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 			.associate(associate)
 			.build());
 
-		Event event = EventFixtures.event(community, associate);
-		eventRepository.save(event);
-
-		Memory memory = MemoryFixtures.memory(event);
+		Memory memory = MemoryFixtures.memory(community, associate);
 		memoryRepository.save(memory);
 
 		Post post = PostFixtures.post(memory, associate);
@@ -941,10 +931,7 @@ public class AchievementEventTest extends IntegrationsTestSupport {
 			.associate(associate)
 			.build());
 
-		Event event = EventFixtures.event(community, associate);
-		eventRepository.save(event);
-
-		Memory memory = MemoryFixtures.memory(event);
+		Memory memory = MemoryFixtures.memory(community, associate);
 		memoryRepository.save(memory);
 
 		Post post = PostFixtures.post(memory, associate);
