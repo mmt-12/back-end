@@ -88,3 +88,7 @@ file:
     post:
       max-total-size-bytes: 524288000 # 500MB
       max-file-count: 20
+
+server:
+  tomcat:
+    max-part-count: 20

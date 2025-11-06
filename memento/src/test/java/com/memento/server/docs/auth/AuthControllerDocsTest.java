@@ -53,7 +53,7 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 			.refreshToken("refresh-token-456")
 			.refreshTokenExpiresAt(new Date())
 			.build();
-		AuthResponse response = new AuthMemberResponse(123L, "name", jwtToken);
+		AuthResponse response = AuthMemberResponse.of(123L, "name", jwtToken);
 		when(authService.refreshToken(any())).thenReturn(response);
 
 		// when & then
@@ -105,7 +105,7 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 			.accessToken("access-token-123")
 			.accessTokenExpiresAt(new Date())
 			.build();
-		AuthResponse response = new AuthGuestResponse(123L, "email@naver.com", jwtToken);
+		AuthResponse response = AuthGuestResponse.of(123L, "email@naver.com", jwtToken);
 
 		when(authService.handleAuthorizationCallback("code123")).thenReturn(response);
 
@@ -143,7 +143,7 @@ public class AuthControllerDocsTest extends RestDocsSupport {
 			.refreshToken("refresh-token-456")
 			.refreshTokenExpiresAt(new Date())
 			.build();
-		AuthResponse response = new AuthMemberResponse(123L, "name", jwtToken);
+		AuthResponse response = AuthMemberResponse.of(123L, "name", jwtToken);
 
 		when(authService.handleAuthorizationCallback("code123")).thenReturn(response);
 

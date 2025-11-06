@@ -3,15 +3,13 @@ package com.memento.server.api.service.community;
 import static com.memento.server.common.error.ErrorCodes.COMMUNITY_NOT_FOUND;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.memento.server.api.controller.community.dto.AssociateListResponse;
+import com.memento.server.api.controller.community.dto.response.CommunityAssociateListResponse;
 import com.memento.server.api.controller.member.dto.CommunityListResponse;
-import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
+import com.memento.server.api.service.community.dto.response.SearchAssociateResponse;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.achievement.Achievement;
@@ -32,7 +30,7 @@ public class AssociateService {
 	private final CommunityRepository communityRepository;
 	private final AchievementRepository achievementRepository;
 
-	public AssociateListResponse searchAll(
+	public CommunityAssociateListResponse searchAll(
 		Long communityId,
 		String keyword
 	) {
@@ -40,7 +38,7 @@ public class AssociateService {
 			.orElseThrow(() -> new MementoException(COMMUNITY_NOT_FOUND));
 		List<Associate> associates = associateRepository.findAllByCommunityIdAndKeyword(communityId, keyword);
 
-		return AssociateListResponse.from(associates, community);
+		return CommunityAssociateListResponse.from(associates, community);
 	}
 
 	public CommunityListResponse searchAllMyAssociate(Long memberId) {
@@ -64,18 +62,7 @@ public class AssociateService {
 
 		Achievement achievement = associate.getAchievement();
 
-		return SearchAssociateResponse.builder()
-			.nickname(associate.getNickname())
-			.achievement(achievement != null ?
-				SearchAssociateResponse.Achievement.builder()
-					.id(achievement.getId())
-					.name(achievement.getName())
-					.build()
-				: null)
-			.imageUrl(associate.getProfileImageUrl())
-			.introduction(associate.getIntroduction())
-			.birthday(associate.getMember().getBirthday())
-			.build();
+		return SearchAssociateResponse.of(associate, achievement);
 	}
 
 	@Transactional

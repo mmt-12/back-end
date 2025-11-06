@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.memento.server.api.controller.profileImage.dto.SearchProfileImageResponse;
+import com.memento.server.api.service.profileImage.dto.response.SearchProfileImageResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.fcm.dto.event.NewImageFCM;
@@ -52,13 +52,9 @@ public class ProfileImageService {
 		Associate registrant = validAssociate(communityId, registrantId);
 
 		String url = minioService.createFile(image, MinioProperties.FileType.PROFILE_IMAGE);
-		profileImageRepository.save(ProfileImage.builder()
-				.url(url)
-				.associate(associate)
-				.registrant(registrant)
-				.build());
-		achievementEventPublisher.publishProfileImageAchievement(ProfileImageAchievementEvent.from(associateId, ProfileImageAchievementEvent.Type.REGISTERED));
-		achievementEventPublisher.publishProfileImageAchievement(ProfileImageAchievementEvent.from(registrantId, ProfileImageAchievementEvent.Type.UPLOADED));
+		profileImageRepository.save(ProfileImage.create(url, associate, registrant));
+		achievementEventPublisher.publishProfileImageAchievement(ProfileImageAchievementEvent.of(associateId, ProfileImageAchievementEvent.Type.REGISTERED));
+		achievementEventPublisher.publishProfileImageAchievement(ProfileImageAchievementEvent.of(registrantId, ProfileImageAchievementEvent.Type.UPLOADED));
 		fcmEventPublisher.publishNotification(NewImageFCM.from(associateId));
 	}
 
@@ -93,17 +89,9 @@ public class ProfileImageService {
 		}
 
 		List<SearchProfileImageResponse.ProfileImage> profileImages = profileImageList.stream().limit(size)
-			.map(p -> SearchProfileImageResponse.ProfileImage.builder()
-				.id(p.getId())
-				.url(p.getUrl())
-				.isRegister(Objects.equals(p.getRegistrant().getId(), currentAssociate.getId()))
-				.build())
+			.map(p -> SearchProfileImageResponse.ProfileImage.type(p, currentAssociate))
 			.toList();
 
-		return SearchProfileImageResponse.builder()
-			.profileImages(profileImages)
-			.nextCursor(lastCursor)
-			.hasNext(hasNext)
-			.build();
+		return SearchProfileImageResponse.from(profileImages, lastCursor, hasNext);
 	}
 }

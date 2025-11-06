@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.memento.server.annotation.AssociateId;
 import com.memento.server.annotation.CommunityId;
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
-import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
-import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
+import com.memento.server.api.controller.memory.dto.request.CreateUpdateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.request.ReadMemoryListRequest;
+import com.memento.server.api.controller.memory.dto.response.CreateUpdateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.response.DownloadImagesResponse;
+import com.memento.server.api.controller.memory.dto.response.ReadMemoryListResponse;
+import com.memento.server.api.controller.memory.dto.response.ReadMemoryResponse;
 import com.memento.server.api.service.memory.MemoryService;
 import com.memento.server.common.exception.MementoException;
 
@@ -33,10 +33,10 @@ public class MemoryController {
 	private final MemoryService memoryService;
 
 	@GetMapping
-	public ResponseEntity<ReadAllMemoryResponse> read(
+	public ResponseEntity<ReadMemoryListResponse> read(
 		@CommunityId Long currentCommunityId,
 		@PathVariable Long communityId,
-		ReadAllMemoryRequest request
+		ReadMemoryListRequest request
 	) {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(COMMUNITY_NOT_MATCH);
@@ -78,7 +78,7 @@ public class MemoryController {
 		@AssociateId Long currentAssociateId,
 		@PathVariable Long communityId,
 		@PathVariable Long memoryId,
-		CreateUpdateMemoryRequest request
+		@RequestBody CreateUpdateMemoryRequest request
 	) {
 		if (!currentCommunityId.equals(communityId)) {
 			throw new MementoException(COMMUNITY_NOT_MATCH);

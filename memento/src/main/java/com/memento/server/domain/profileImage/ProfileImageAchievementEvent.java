@@ -17,7 +17,7 @@ public record ProfileImageAchievementEvent(Long associateId,
 		private final String displayName;
 	}
 
-	public static ProfileImageAchievementEvent from(Long associateId, Type type) {
+	public static ProfileImageAchievementEvent of(Long associateId, Type type) {
 		return ProfileImageAchievementEvent.builder()
 			.associateId(associateId)
 			.type(type)

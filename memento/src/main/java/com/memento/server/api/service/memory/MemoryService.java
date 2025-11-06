@@ -16,12 +16,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
-import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
-import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
+import com.memento.server.api.controller.memory.dto.request.CreateUpdateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.request.ReadMemoryListRequest;
+import com.memento.server.api.controller.memory.dto.response.CreateUpdateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.response.DownloadImagesResponse;
+import com.memento.server.api.controller.memory.dto.response.ReadMemoryListResponse;
+import com.memento.server.api.controller.memory.dto.response.ReadMemoryResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.fcm.dto.event.MemoryFCM;
@@ -33,11 +33,9 @@ import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
-import com.memento.server.domain.event.Event;
-import com.memento.server.domain.event.EventRepository;
-import com.memento.server.domain.event.Location;
-import com.memento.server.domain.event.Period;
 import com.memento.server.domain.memory.Memory;
+import com.memento.server.domain.memory.Location;
+import com.memento.server.domain.memory.Period;
 import com.memento.server.domain.memory.MemoryAchievementEvent;
 import com.memento.server.domain.memory.MemoryAssociate;
 import com.memento.server.domain.memory.MemoryAssociateRepository;
@@ -57,7 +55,6 @@ public class MemoryService {
 	private final MemoryAssociateRepository memoryAssociateRepository;
 	private final PostImageRepository postImageRepository;
 	private final CommunityRepository communityRepository;
-	private final EventRepository eventRepository;
 	private final AssociateRepository associateRepository;
 	private final AchievementEventPublisher achievementEventPublisher;
 	private final FCMEventPublisher fcmEventPublisher;
@@ -68,22 +65,19 @@ public class MemoryService {
 		List<PostImage> images = postImageRepository.findAllByMemoryId(memoryId);
 		Long associateCount = memoryAssociateRepository.countAssociatesByMemoryId(memoryId);
 
-		Associate associate = memory.getEvent().getAssociate();
+		Associate associate = memory.getAssociate();
 		Achievement achievement = associate.getAchievement();
-		Author author = Author.builder()
-			.id(associate.getId())
-			.nickname(associate.getNickname())
-			.imageUrl(associate.getProfileImageUrl())
-			.achievement(achievement == null ? null : Author.Achievement.builder()
-				.id(achievement.getId())
-				.name(achievement.getName())
-				.build())
-			.build();
+		Author author = Author.of(associate, achievement);
+		List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemoryAndDeletedAtIsNull(memory);
+		List<Associate> associates = new ArrayList<>();
+		for (MemoryAssociate memoryAssociate : memoryAssociates) {
+			associates.add(memoryAssociate.getAssociate());
+		}
 
-		return ReadMemoryResponse.from(memory, images, associateCount, author);
+		return ReadMemoryResponse.of(memory, images, associateCount, author, associates);
 	}
 
-	public ReadAllMemoryResponse readAll(Long communityId, ReadAllMemoryRequest request) {
+	public ReadMemoryListResponse readAll(Long communityId, ReadMemoryListRequest request) {
 		Long cursor = request.cursor();
 		Integer size = request.size();
 		String keyword = request.keyword();
@@ -120,7 +114,7 @@ public class MemoryService {
 		List<PostImage> images = postImageRepository.findAllByMemoryIds(memoryIds);
 		List<MemoryAssociateCount> associateCounts = memoryAssociateRepository.countAssociatesByMemoryIds(memoryIds);
 
-		return ReadAllMemoryResponse.from(memories, images, associateCounts, hasNext, nextCursor);
+		return ReadMemoryListResponse.of(memories, images, associateCounts, hasNext, nextCursor);
 	}
 
 	@Transactional
@@ -130,7 +124,7 @@ public class MemoryService {
 		Community community = communityRepository.findByIdAndDeletedAtIsNull(communityId)
 			.orElseThrow(() -> new MementoException(COMMUNITY_NOT_FOUND));
 
-		Event event = eventRepository.save(Event.builder()
+		Memory memory = memoryRepository.save(Memory.builder()
 			.title(request.title())
 			.description(request.description())
 			.location(Location.builder()
@@ -146,10 +140,6 @@ public class MemoryService {
 				.build())
 			.community(community)
 			.associate(associate)
-			.build());
-
-		Memory memory = memoryRepository.save(Memory.builder()
-			.event(event)
 			.build());
 
 		List<Associate> associates = associateRepository.findAllByIdInAndDeletedAtIsNull(request.associates());
@@ -176,23 +166,22 @@ public class MemoryService {
 		Long memoryId
 	) {
 		Memory memory = memoryRepository.findByIdAndDeletedAtIsNull(memoryId).orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
-		Event event = memory.getEvent();
-		if (!event.getAssociate().getId().equals(currentAssociateId)) {
+		if (!memory.getAssociate().getId().equals(currentAssociateId)) {
 			throw new MementoException(MEMORY_NOT_AUTHOR);
 		}
 
-		event.update(request);
+		memory.update(request);
 
-		List<MemoryAssociate> associates = memoryAssociateRepository.findAllByMemoryAndDeletedAtIsNull(memory);
+		List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemoryAndDeletedAtIsNull(memory);
 		List<Long> checked = new ArrayList<>();
 
 		List<MemoryAssociate> deleteList = new ArrayList<>();
-		for (MemoryAssociate associate : associates) {
-			Long associateId = associate.getId();
+		for (MemoryAssociate memoryAssociate : memoryAssociates) {
+			Long associateId = memoryAssociate.getAssociate().getId();
 			checked.add(associateId);
 			if (request.associates().contains(associateId))
 				continue;
-			deleteList.add(associate);
+			deleteList.add(memoryAssociate);
 		}
 		memoryAssociateRepository.deleteAll(deleteList);
 
@@ -220,8 +209,7 @@ public class MemoryService {
 	@Transactional
 	public void delete(Long memoryId, Long currentAssociateId) {
 		Memory memory = memoryRepository.findByIdAndDeletedAtIsNull(memoryId).orElseThrow(() -> new MementoException(MEMORY_NOT_FOUND));
-		Event event = memory.getEvent();
-		if (!event.getAssociate().getId().equals(currentAssociateId)) {
+		if (!memory.getAssociate().getId().equals(currentAssociateId)) {
 			throw new MementoException(MEMORY_NOT_AUTHOR);
 		}
 

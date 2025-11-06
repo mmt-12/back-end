@@ -8,14 +8,14 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
-import static org.springframework.restdocs.payload.JsonFieldType.STRING;
-import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -25,7 +25,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
@@ -34,16 +33,14 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.memento.server.api.controller.achievement.dto.SearchAchievementResponse;
+import com.memento.server.api.controller.achievement.dto.response.AchievementResponse;
 import com.memento.server.api.controller.community.AssociateController;
-import com.memento.server.api.controller.community.dto.SearchAssociateResponse;
-import com.memento.server.api.controller.community.dto.UpdateAssociateRequest;
-import com.memento.server.api.controller.community.dto.AssociateListResponse;
-import com.memento.server.api.controller.community.dto.AssociateListResponse.AssociateResponse;
-import com.memento.server.api.controller.community.dto.AssociateListResponse.AssociateResponse.AchievementResponse;
-import com.memento.server.docs.RestDocsSupport;
+import com.memento.server.api.controller.community.dto.request.UpdateAssociateRequest;
+import com.memento.server.api.controller.community.dto.response.AssociateResponse;
+import com.memento.server.api.controller.community.dto.response.CommunityAssociateListResponse;
 import com.memento.server.api.service.community.AssociateService;
-import com.memento.server.domain.achievement.AchievementType;
+import com.memento.server.api.service.community.dto.response.SearchAssociateResponse;
+import com.memento.server.docs.RestDocsSupport;
 
 public class AssociateControllerDocsTest extends RestDocsSupport {
 
@@ -104,7 +101,7 @@ public class AssociateControllerDocsTest extends RestDocsSupport {
 		// given
 		setAuthentication(1L, 1L, 1L);
 		when(associateService.searchAll(any(), any())).thenReturn(
-			AssociateListResponse.builder()
+			CommunityAssociateListResponse.builder()
 				.communityName("SSAFY 12기 12반")
 				.associates(
 					List.of(

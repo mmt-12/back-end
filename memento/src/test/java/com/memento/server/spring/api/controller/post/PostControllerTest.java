@@ -25,8 +25,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 
-import com.memento.server.api.controller.post.dto.CreatePostRequest;
-import com.memento.server.api.controller.post.dto.UpdatePostRequest;
+import com.memento.server.api.controller.post.dto.request.CreatePostRequest;
+import com.memento.server.api.controller.post.dto.request.UpdatePostRequest;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
 
 public class PostControllerTest extends ControllerTestSupport {

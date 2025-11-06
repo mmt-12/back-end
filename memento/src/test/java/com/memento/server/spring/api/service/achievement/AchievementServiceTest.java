@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.memento.server.achievement.AchievementFixtures;
-import com.memento.server.api.controller.achievement.dto.SearchAchievementResponse;
+import com.memento.server.api.service.achievement.dto.response.SearchAchievementResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.achievement.AchievementService;
 import com.memento.server.associate.AssociateFixtures;
@@ -82,9 +82,9 @@ public class AchievementServiceTest extends IntegrationsTestSupport {
 		SearchAchievementResponse response = achievementService.search(community.getId(), associate.getId());
 
 		// then
-		assertThat(response.achievements()).hasSize(2);
-		assertThat(response.achievements().get(0).getName()).isEqualTo("achievement");
-		assertThat(response.achievements().get(1).isObtained()).isFalse();
+		assertThat(response.getAchievements()).hasSize(2);
+		assertThat(response.getAchievements().get(0).getName()).isEqualTo("achievement");
+		assertThat(response.getAchievements().get(1).isObtained()).isFalse();
 	}
 
 	@Test
@@ -116,7 +116,7 @@ public class AchievementServiceTest extends IntegrationsTestSupport {
 		SearchAchievementResponse response = achievementService.search(community.getId(), associate.getId());
 
 		// then
-		assertThat(response.achievements().get(0).isObtained()).isTrue();
-		assertThat(response.achievements().get(1).isObtained()).isFalse();
+		assertThat(response.getAchievements().get(0).isObtained()).isTrue();
+		assertThat(response.getAchievements().get(1).isObtained()).isFalse();
 	}
 }

@@ -9,7 +9,7 @@ public record MbtiAchievementEvent(
 ) {
 
 
-	public static MbtiAchievementEvent from(Long fromAssociateId, Long toAssociateId) {
+	public static MbtiAchievementEvent of(Long fromAssociateId, Long toAssociateId) {
 		return MbtiAchievementEvent.builder()
 			.fromAssociateId(fromAssociateId)
 			.toAssociateId(toAssociateId)

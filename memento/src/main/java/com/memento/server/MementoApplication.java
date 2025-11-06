@@ -9,7 +9,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class MementoApplication {
 
 	public static void main(String[] args) {
+		System.setProperty("org.apache.tomcat.util.http.fileupload.fileCountMax", "20");
+		System.out.println(System.getProperty("org.apache.tomcat.util.http.fileupload.fileCountMax"));
 		SpringApplication.run(MementoApplication.class, args);
 	}
-
 }

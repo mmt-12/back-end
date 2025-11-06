@@ -10,6 +10,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.memento.server.common.BaseEntity;
 import com.memento.server.domain.community.Associate;
+import com.memento.server.domain.emoji.Emoji;
+import com.memento.server.domain.voice.Voice;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -52,4 +54,38 @@ public class GuestBook extends BaseEntity {
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "associate_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Associate associate;
+
+	public static GuestBook createText(Associate associate, String content, GuestBookType type){
+		return GuestBook.builder()
+			.associate(associate)
+			.content(content)
+			.type(type)
+			.build();
+	}
+
+	public static GuestBook createVoice(Associate associate, Voice voice, GuestBookType type){
+		return GuestBook.builder()
+			.associate(associate)
+			.content(voice.getUrl())
+			.name(voice.getName())
+			.type(type)
+			.build();
+	}
+
+	public static GuestBook createEmoji(Associate associate, Emoji emoji, GuestBookType type){
+		return GuestBook.builder()
+			.associate(associate)
+			.content(emoji.getUrl())
+			.name(emoji.getName())
+			.type(type)
+			.build();
+	}
+
+	public static GuestBook createTemporary(Associate associate, String url){
+		return GuestBook.builder()
+			.associate(associate)
+			.content(url)
+			.type(GuestBookType.VOICE)
+			.build();
+	}
 }

@@ -2,8 +2,6 @@ package com.memento.server.api.controller.post;
 
 import java.util.List;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,10 +16,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.memento.server.annotation.AssociateId;
 import com.memento.server.annotation.CommunityId;
-import com.memento.server.api.controller.post.dto.CreatePostRequest;
-import com.memento.server.api.controller.post.dto.SearchAllPostResponse;
-import com.memento.server.api.controller.post.dto.SearchPostResponse;
-import com.memento.server.api.controller.post.dto.UpdatePostRequest;
+import com.memento.server.api.controller.post.dto.request.CreatePostRequest;
+import com.memento.server.api.service.post.dto.response.SearchAllPostResponse;
+import com.memento.server.api.service.post.dto.response.SearchPostResponse;
+import com.memento.server.api.controller.post.dto.request.UpdatePostRequest;
 import com.memento.server.api.service.post.PostService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;

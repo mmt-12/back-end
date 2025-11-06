@@ -47,4 +47,12 @@ public class ProfileImage extends BaseEntity {
 	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "registrant_id", nullable = false, foreignKey = @ForeignKey(NO_CONSTRAINT))
 	private Associate registrant;
+
+	public static ProfileImage create(String url, Associate associate, Associate registrant) {
+		return ProfileImage.builder()
+			.url(url)
+			.associate(associate)
+			.registrant(registrant)
+			.build();
+	}
 }

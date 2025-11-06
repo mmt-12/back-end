@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.memento.server.annotation.AssociateId;
 import com.memento.server.annotation.CommunityId;
-import com.memento.server.api.controller.achievement.dto.CreateAchievementRequest;
-import com.memento.server.api.controller.achievement.dto.SearchAchievementResponse;
+import com.memento.server.api.controller.achievement.dto.request.CreateAchievementRequest;
+import com.memento.server.api.service.achievement.dto.response.SearchAchievementResponse;
 import com.memento.server.api.service.achievement.AchievementService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;

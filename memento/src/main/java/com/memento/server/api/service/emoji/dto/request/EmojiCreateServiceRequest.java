@@ -10,4 +10,12 @@ public record EmojiCreateServiceRequest(
 	Long associateId,
 	MultipartFile emoji
 ) {
+
+	public static EmojiCreateServiceRequest of(String name, Long associateId, MultipartFile emoji) {
+		return EmojiCreateServiceRequest.builder()
+				.name(name)
+				.associateId(associateId)
+				.emoji(emoji)
+				.build();
+	}
 }

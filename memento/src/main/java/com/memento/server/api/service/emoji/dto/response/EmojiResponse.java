@@ -13,12 +13,12 @@ public record EmojiResponse(
 	EmojiAuthorResponse author
 ) {
 
-	public static EmojiResponse of(Emoji emoji) {
+	public static EmojiResponse from(Emoji emoji) {
 		return EmojiResponse.builder()
 			.id(emoji.getId())
 			.name(emoji.getName())
 			.url(emoji.getUrl())
-			.author(EmojiAuthorResponse.of(emoji.getAssociate()))
+			.author(EmojiAuthorResponse.from(emoji.getAssociate()))
 			.build();
 	}
 

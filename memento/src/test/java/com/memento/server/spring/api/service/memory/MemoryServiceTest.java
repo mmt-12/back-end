@@ -20,12 +20,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryRequest;
-import com.memento.server.api.controller.memory.dto.CreateUpdateMemoryResponse;
-import com.memento.server.api.controller.memory.dto.DownloadImagesResponse;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryRequest;
-import com.memento.server.api.controller.memory.dto.ReadAllMemoryResponse;
-import com.memento.server.api.controller.memory.dto.ReadMemoryResponse;
+import com.memento.server.api.controller.memory.dto.request.CreateUpdateMemoryRequest;
+import com.memento.server.api.controller.memory.dto.request.ReadMemoryListRequest;
+import com.memento.server.api.controller.memory.dto.response.CreateUpdateMemoryResponse;
+import com.memento.server.api.controller.memory.dto.response.DownloadImagesResponse;
+import com.memento.server.api.controller.memory.dto.response.ReadMemoryListResponse;
+import com.memento.server.api.controller.memory.dto.response.ReadMemoryResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.memory.MemoryService;
@@ -34,13 +34,11 @@ import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
 import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
-import com.memento.server.domain.event.Event;
-import com.memento.server.domain.event.EventRepository;
-import com.memento.server.domain.event.Location;
-import com.memento.server.domain.event.Period;
+import com.memento.server.domain.memory.Memory;
+import com.memento.server.domain.memory.Location;
+import com.memento.server.domain.memory.Period;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
-import com.memento.server.domain.memory.Memory;
 import com.memento.server.domain.memory.MemoryAssociate;
 import com.memento.server.domain.memory.MemoryAssociateRepository;
 import com.memento.server.domain.memory.MemoryRepository;
@@ -78,9 +76,6 @@ class MemoryServiceTest {
 	private AssociateRepository associateRepository;
 
 	@Autowired
-	private EventRepository eventRepository;
-
-	@Autowired
 	private TransactionTemplate transactionTemplate;
 
 	@MockitoBean
@@ -98,7 +93,6 @@ class MemoryServiceTest {
 		memberRepository.deleteAllInBatch();
 		communityRepository.deleteAllInBatch();
 		associateRepository.deleteAllInBatch();
-		eventRepository.deleteAllInBatch();
 	}
 
 	@Test
@@ -109,8 +103,8 @@ class MemoryServiceTest {
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
-		Event event = eventRepository.save(
-			Event.builder()
+		Memory memory = memoryRepository.save(
+			Memory.builder()
 				.title("단일 기억")
 				.description("단일 기억에 대한 설명")
 				.location(Location.builder()
@@ -127,7 +121,6 @@ class MemoryServiceTest {
 				.community(community)
 				.associate(associate)
 				.build());
-		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
 
 		Post post = postRepository.save(Post.builder().content("포스트").memory(memory).associate(associate).build());
 		postImageRepository.save(PostImage.builder().url("image1.jpg").hash(Hash.builder().hash("hash1").build()).post(post).build());
@@ -172,8 +165,8 @@ class MemoryServiceTest {
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
-		Event event1 = eventRepository.save(
-			Event.builder()
+		Memory memory1 = memoryRepository.save(
+			Memory.builder()
 				.title("추억1")
 				.description("내용1")
 				.location(Location.builder()
@@ -190,7 +183,7 @@ class MemoryServiceTest {
 				.community(community)
 				.associate(associate)
 				.build());
-		Event event2 = eventRepository.save(Event.builder()
+		Memory memory2 = memoryRepository.save(Memory.builder()
 			.title("추억2")
 			.description("내용2")
 			.location(Location.builder()
@@ -207,7 +200,7 @@ class MemoryServiceTest {
 			.community(community)
 			.associate(associate)
 			.build());
-		Event event3 = eventRepository.save(Event.builder()
+		Memory memory3 = memoryRepository.save(Memory.builder()
 			.title("추억3")
 			.description("내용3")
 			.location(Location.builder()
@@ -224,10 +217,6 @@ class MemoryServiceTest {
 			.community(community)
 			.associate(associate)
 			.build());
-
-		Memory memory1 = memoryRepository.save(Memory.builder().event(event1).build());
-		Memory memory2 = memoryRepository.save(Memory.builder().event(event2).build());
-		Memory memory3 = memoryRepository.save(Memory.builder().event(event3).build());
 
 		Post post1 = postRepository.save(Post.builder().content("포스트1").memory(memory1).associate(associate).build());
 		Post post2 = postRepository.save(Post.builder().content("포스트2").memory(memory2).associate(associate).build());
@@ -246,14 +235,14 @@ class MemoryServiceTest {
 		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory2).associate(associate).build());
 
 		// when
-		ReadAllMemoryRequest request = ReadAllMemoryRequest.builder()
+		ReadMemoryListRequest request = ReadMemoryListRequest.builder()
 			.cursor(null)
 			.size(10)
 			.keyword(null)
 			.startTime(null)
 			.endTime(null)
 			.build();
-		ReadAllMemoryResponse response = memoryService.readAll(community.getId(), request);
+		ReadMemoryListResponse response = memoryService.readAll(community.getId(), request);
 
 		// then
 		assertThat(response.memories()).hasSize(3);
@@ -281,8 +270,8 @@ class MemoryServiceTest {
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
-		Event event1 = eventRepository.save(
-			Event.builder()
+		Memory memory1 = memoryRepository.save(
+			Memory.builder()
 				.title("추억1")
 				.description("내용1")
 				.location(Location.builder()
@@ -299,7 +288,7 @@ class MemoryServiceTest {
 				.community(community)
 				.associate(associate)
 				.build());
-		Event event2 = eventRepository.save(Event.builder()
+		Memory memory2 = memoryRepository.save(Memory.builder()
 			.title("추억2")
 			.description("내용2")
 			.location(Location.builder()
@@ -316,7 +305,7 @@ class MemoryServiceTest {
 			.community(community)
 			.associate(associate)
 			.build());
-		Event event3 = eventRepository.save(Event.builder()
+		Memory memory3 = memoryRepository.save(Memory.builder()
 			.title("추억3")
 			.description("내용3")
 			.location(Location.builder()
@@ -333,7 +322,7 @@ class MemoryServiceTest {
 			.community(community)
 			.associate(associate)
 			.build());
-		Event event4 = eventRepository.save(Event.builder()
+		Memory memory4 = memoryRepository.save(Memory.builder()
 			.title("추억4")
 			.description("내용4")
 			.location(Location.builder()
@@ -347,7 +336,7 @@ class MemoryServiceTest {
 			.community(community)
 			.associate(associate)
 			.build());
-		Event event5 = eventRepository.save(Event.builder()
+		Memory memory5 = memoryRepository.save(Memory.builder()
 			.title("추억5")
 			.description("내용5")
 			.location(Location.builder()
@@ -362,21 +351,15 @@ class MemoryServiceTest {
 			.associate(associate)
 			.build());
 
-		Memory memory1 = memoryRepository.save(Memory.builder().event(event1).build());
-		Memory memory2 = memoryRepository.save(Memory.builder().event(event2).build());
-		Memory memory3 = memoryRepository.save(Memory.builder().event(event3).build());
-		Memory memory4 = memoryRepository.save(Memory.builder().event(event4).build());
-		Memory memory5 = memoryRepository.save(Memory.builder().event(event5).build());
-
 		// when
-		ReadAllMemoryRequest request1 = ReadAllMemoryRequest.builder()
+		ReadMemoryListRequest request1 = ReadMemoryListRequest.builder()
 			.cursor(null)
 			.size(2)
 			.keyword(null)
 			.startTime(null)
 			.endTime(null)
 			.build();
-		ReadAllMemoryResponse response1 = memoryService.readAll(community.getId(), request1);
+		ReadMemoryListResponse response1 = memoryService.readAll(community.getId(), request1);
 
 		// then
 		assertThat(response1.memories()).hasSize(2);
@@ -386,14 +369,14 @@ class MemoryServiceTest {
 		assertThat(response1.nextCursor()).isEqualTo(memory4.getId());
 
 		// when
-		ReadAllMemoryRequest request2 = ReadAllMemoryRequest.builder()
+		ReadMemoryListRequest request2 = ReadMemoryListRequest.builder()
 			.cursor(response1.nextCursor())
 			.size(2)
 			.keyword(null)
 			.startTime(null)
 			.endTime(null)
 			.build();
-		ReadAllMemoryResponse response2 = memoryService.readAll(community.getId(), request2);
+		ReadMemoryListResponse response2 = memoryService.readAll(community.getId(), request2);
 
 		// then
 		assertThat(response2.memories()).hasSize(2);
@@ -403,14 +386,14 @@ class MemoryServiceTest {
 		assertThat(response2.nextCursor()).isEqualTo(memory2.getId());
 
 		// when
-		ReadAllMemoryRequest request3 = ReadAllMemoryRequest.builder()
+		ReadMemoryListRequest request3 = ReadMemoryListRequest.builder()
 			.cursor(response2.nextCursor())
 			.size(2)
 			.keyword(null)
 			.startTime(null)
 			.endTime(null)
 			.build();
-		ReadAllMemoryResponse response3 = memoryService.readAll(community.getId(), request3);
+		ReadMemoryListResponse response3 = memoryService.readAll(community.getId(), request3);
 
 		// then
 		assertThat(response3.memories()).hasSize(1);
@@ -427,8 +410,8 @@ class MemoryServiceTest {
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
-		Event event1 = eventRepository.save(
-			Event.builder()
+		Memory memory1 = memoryRepository.save(
+			Memory.builder()
 				.title("여행 추억")
 				.description("제주도 여행")
 				.location(Location.builder()
@@ -442,7 +425,7 @@ class MemoryServiceTest {
 				.community(community)
 				.associate(associate)
 				.build());
-		Event event2 = eventRepository.save(Event.builder()
+		Memory memory2 = memoryRepository.save(Memory.builder()
 			.title("친구들과의 추억")
 			.description("강릉 바다")
 			.location(Location.builder()
@@ -456,7 +439,7 @@ class MemoryServiceTest {
 			.community(community)
 			.associate(associate)
 			.build());
-		Event event3 = eventRepository.save(Event.builder()
+		Memory memory3 = memoryRepository.save(Memory.builder()
 			.title("가족 여행")
 			.description("부산 해운대")
 			.location(Location.builder()
@@ -471,19 +454,15 @@ class MemoryServiceTest {
 			.associate(associate)
 			.build());
 
-		memoryRepository.save(Memory.builder().event(event1).build());
-		memoryRepository.save(Memory.builder().event(event2).build());
-		memoryRepository.save(Memory.builder().event(event3).build());
-
 		// when
-		ReadAllMemoryRequest request = ReadAllMemoryRequest.builder()
+		ReadMemoryListRequest request = ReadMemoryListRequest.builder()
 			.cursor(null)
 			.size(10)
 			.keyword("여행")
 			.startTime(null)
 			.endTime(null)
 			.build();
-		ReadAllMemoryResponse response = memoryService.readAll(community.getId(), request);
+		ReadMemoryListResponse response = memoryService.readAll(community.getId(), request);
 
 		// then
 		assertThat(response.memories()).hasSize(2);
@@ -499,8 +478,8 @@ class MemoryServiceTest {
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
-		Event event1 = eventRepository.save(
-			Event.builder()
+		Memory memory1 = memoryRepository.save(
+			Memory.builder()
 				.title("추억1")
 				.description("내용1")
 				.location(Location.builder()
@@ -517,7 +496,7 @@ class MemoryServiceTest {
 				.community(community)
 				.associate(associate)
 				.build());
-		Event event2 = eventRepository.save(Event.builder()
+		Memory memory2 = memoryRepository.save(Memory.builder()
 			.title("추억2")
 			.description("내용2")
 			.location(Location.builder()
@@ -534,7 +513,7 @@ class MemoryServiceTest {
 			.community(community)
 			.associate(associate)
 			.build());
-		Event event3 = eventRepository.save(Event.builder()
+		Memory memory3 = memoryRepository.save(Memory.builder()
 			.title("추억3")
 			.description("내용3")
 			.location(Location.builder()
@@ -551,7 +530,7 @@ class MemoryServiceTest {
 			.community(community)
 			.associate(associate)
 			.build());
-		Event event4 = eventRepository.save(Event.builder()
+		Memory memory4 = memoryRepository.save(Memory.builder()
 			.title("추억4")
 			.description("내용4")
 			.location(Location.builder()
@@ -569,22 +548,17 @@ class MemoryServiceTest {
 			.associate(associate)
 			.build());
 
-		Memory memory1 = memoryRepository.save(Memory.builder().event(event1).build());
-		Memory memory2 = memoryRepository.save(Memory.builder().event(event2).build());
-		Memory memory3 = memoryRepository.save(Memory.builder().event(event3).build());
-		Memory memory4 = memoryRepository.save(Memory.builder().event(event4).build());
-
 		// when
 		LocalDate startDate = LocalDate.now().minusDays(1);
 		LocalDate endDate = LocalDate.now();
-		ReadAllMemoryRequest request = ReadAllMemoryRequest.builder()
+		ReadMemoryListRequest request = ReadMemoryListRequest.builder()
 			.cursor(null)
 			.size(10)
 			.keyword(null)
 			.startTime(startDate)
 			.endTime(endDate)
 			.build();
-		ReadAllMemoryResponse response = memoryService.readAll(community.getId(), request);
+		ReadMemoryListResponse response = memoryService.readAll(community.getId(), request);
 
 		// then
 		assertThat(response.memories()).hasSize(3);
@@ -632,10 +606,10 @@ class MemoryServiceTest {
 
 		transactionTemplate.execute(status -> {
 			Memory foundMemory = memoryRepository.findByIdAndDeletedAtIsNull(response.memoryId()).orElseThrow();
-			assertThat(foundMemory.getEvent().getTitle()).isEqualTo("새로운 추억");
-			assertThat(foundMemory.getEvent().getDescription()).isEqualTo("새로운 추억에 대한 설명입니다.");
-			assertThat(foundMemory.getEvent().getLocation().getAddress()).isEqualTo("테스트 주소");
-			assertThat(foundMemory.getEvent().getPeriod().getStartTime()).isEqualTo(
+			assertThat(foundMemory.getTitle()).isEqualTo("새로운 추억");
+			assertThat(foundMemory.getDescription()).isEqualTo("새로운 추억에 대한 설명입니다.");
+			assertThat(foundMemory.getLocation().getAddress()).isEqualTo("테스트 주소");
+			assertThat(foundMemory.getPeriod().getStartTime()).isEqualTo(
 				LocalDateTime.of(2024, 8, 1, 10, 0));
 
 			List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemoryAndDeletedAtIsNull(
@@ -737,7 +711,7 @@ class MemoryServiceTest {
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 		Associate otherAssociate = associateRepository.save(Associate.create("다른어소시에이트", member, community));
 
-		Event event = eventRepository.save(Event.builder()
+		Memory memory = memoryRepository.save(Memory.builder()
 			.title("기존 추억")
 			.description("기존 추억에 대한 설명입니다.")
 			.location(Location.builder()
@@ -754,7 +728,6 @@ class MemoryServiceTest {
 			.community(community)
 			.associate(associate)
 			.build());
-		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
 		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate).build());
 
 		CreateUpdateMemoryRequest.LocationRequest updatedLocationRequest = CreateUpdateMemoryRequest.LocationRequest.builder()
@@ -787,10 +760,10 @@ class MemoryServiceTest {
 
 		transactionTemplate.execute(status -> {
 			Memory foundMemory = memoryRepository.findByIdAndDeletedAtIsNull(response.memoryId()).orElseThrow();
-			assertThat(foundMemory.getEvent().getTitle()).isEqualTo("수정된 추억");
-			assertThat(foundMemory.getEvent().getDescription()).isEqualTo("수정된 추억에 대한 설명입니다.");
-			assertThat(foundMemory.getEvent().getLocation().getAddress()).isEqualTo("수정된 주소");
-			assertThat(foundMemory.getEvent().getPeriod().getStartTime()).isEqualTo(LocalDateTime.of(2024, 9, 1, 10, 0));
+			assertThat(foundMemory.getTitle()).isEqualTo("수정된 추억");
+			assertThat(foundMemory.getDescription()).isEqualTo("수정된 추억에 대한 설명입니다.");
+			assertThat(foundMemory.getLocation().getAddress()).isEqualTo("수정된 주소");
+			assertThat(foundMemory.getPeriod().getStartTime()).isEqualTo(LocalDateTime.of(2024, 9, 1, 10, 0));
 
 			List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemoryAndDeletedAtIsNull(
 				foundMemory);
@@ -811,7 +784,7 @@ class MemoryServiceTest {
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 		Associate otherAssociate = associateRepository.save(Associate.create("다른어소시에이트", member, community));
 
-		Event event = eventRepository.save(Event.builder()
+		Memory memory = memoryRepository.save(Memory.builder()
 			.title("기존 추억")
 			.description("기존 추억에 대한 설명입니다.")
 			.location(Location.builder()
@@ -828,7 +801,6 @@ class MemoryServiceTest {
 			.community(community)
 			.associate(associate)
 			.build());
-		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
 		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(associate).build());
 
 		CreateUpdateMemoryRequest.LocationRequest updatedLocationRequest = CreateUpdateMemoryRequest.LocationRequest.builder()
@@ -861,10 +833,10 @@ class MemoryServiceTest {
 
 		transactionTemplate.execute(status -> {
 			Memory foundMemory = memoryRepository.findByIdAndDeletedAtIsNull(response.memoryId()).orElseThrow();
-			assertThat(foundMemory.getEvent().getTitle()).isEqualTo("수정된 추억");
-			assertThat(foundMemory.getEvent().getDescription()).isEqualTo("수정된 추억에 대한 설명입니다.");
-			assertThat(foundMemory.getEvent().getLocation().getAddress()).isEqualTo("수정된 주소");
-			assertThat(foundMemory.getEvent().getPeriod().getStartTime()).isEqualTo(LocalDateTime.of(2024, 9, 1, 10, 0));
+			assertThat(foundMemory.getTitle()).isEqualTo("수정된 추억");
+			assertThat(foundMemory.getDescription()).isEqualTo("수정된 추억에 대한 설명입니다.");
+			assertThat(foundMemory.getLocation().getAddress()).isEqualTo("수정된 주소");
+			assertThat(foundMemory.getPeriod().getStartTime()).isEqualTo(LocalDateTime.of(2024, 9, 1, 10, 0));
 
 			List<MemoryAssociate> memoryAssociates = memoryAssociateRepository.findAllByMemoryAndDeletedAtIsNull(
 				foundMemory);
@@ -925,7 +897,7 @@ class MemoryServiceTest {
 		Associate authorAssociate = associateRepository.save(Associate.create("작성자어소시에이트", member, community));
 		Associate otherAssociate = associateRepository.save(Associate.create("다른어소시에이트", member, community));
 
-		Event event = eventRepository.save(Event.builder()
+		Memory memory = memoryRepository.save(Memory.builder()
 			.title("기존 추억")
 			.description("기존 추억에 대한 설명입니다.")
 			.location(Location.builder()
@@ -942,7 +914,6 @@ class MemoryServiceTest {
 			.community(community)
 			.associate(authorAssociate)
 			.build());
-		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
 		memoryAssociateRepository.save(MemoryAssociate.builder().memory(memory).associate(authorAssociate).build());
 
 		CreateUpdateMemoryRequest.LocationRequest updatedLocationRequest = CreateUpdateMemoryRequest.LocationRequest.builder()
@@ -983,7 +954,7 @@ class MemoryServiceTest {
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
-		Event event = eventRepository.save(Event.builder()
+		Memory memory = memoryRepository.save(Memory.builder()
 			.title("삭제할 추억")
 			.description("삭제될 추억입니다.")
 			.location(Location.builder()
@@ -1000,7 +971,6 @@ class MemoryServiceTest {
 			.community(community)
 			.associate(associate)
 			.build());
-		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
 
 		// when
 		memoryService.delete(memory.getId(), associate.getId());
@@ -1034,7 +1004,7 @@ class MemoryServiceTest {
 		Associate authorAssociate = associateRepository.save(Associate.create("작성자어소시에이트", member, community));
 		Associate otherAssociate = associateRepository.save(Associate.create("다른어소시에이트", member, community));
 
-		Event event = eventRepository.save(Event.builder()
+		Memory memory = memoryRepository.save(Memory.builder()
 			.title("삭제할 추억")
 			.description("삭제될 추억입니다.")
 			.location(Location.builder()
@@ -1051,7 +1021,6 @@ class MemoryServiceTest {
 			.community(community)
 			.associate(authorAssociate)
 			.build());
-		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
 
 		// when // then
 		assertThatThrownBy(() -> memoryService.delete(memory.getId(), otherAssociate.getId()))
@@ -1070,7 +1039,7 @@ class MemoryServiceTest {
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
-		Event event = eventRepository.save(Event.builder()
+		Memory memory = memoryRepository.save(Memory.builder()
 			.title("이미지 다운로드 추억")
 			.description("이미지 다운로드 테스트입니다.")
 			.location(Location.builder()
@@ -1087,7 +1056,6 @@ class MemoryServiceTest {
 			.community(community)
 			.associate(associate)
 			.build());
-		Memory memory = memoryRepository.save(Memory.builder().event(event).build());
 
 		Post post = postRepository.save(Post.builder().content("이미지 포스트").memory(memory).associate(associate).build());
 

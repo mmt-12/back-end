@@ -44,8 +44,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.memento.server.api.controller.guestBook.GuestBookController;
-import com.memento.server.api.controller.guestBook.dto.CreateGuestBookRequest;
-import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
+import com.memento.server.api.controller.guestBook.dto.request.CreateGuestBookRequest;
+import com.memento.server.api.service.guestBook.dto.response.SearchGuestBookResponse;
 import com.memento.server.api.service.guestBook.GuestBookService;
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.domain.guestBook.GuestBookType;

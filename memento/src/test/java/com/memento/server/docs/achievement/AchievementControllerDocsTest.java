@@ -27,8 +27,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.memento.server.api.controller.achievement.AchievementController;
-import com.memento.server.api.controller.achievement.dto.CreateAchievementRequest;
-import com.memento.server.api.controller.achievement.dto.SearchAchievementResponse;
+import com.memento.server.api.controller.achievement.dto.request.CreateAchievementRequest;
+import com.memento.server.api.service.achievement.dto.response.SearchAchievementResponse;
 import com.memento.server.api.service.achievement.AchievementService;
 import com.memento.server.docs.RestDocsSupport;
 import com.memento.server.domain.achievement.AchievementType;

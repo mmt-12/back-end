@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.memento.server.api.controller.guestBook.dto.SearchGuestBookResponse;
+import com.memento.server.api.service.guestBook.dto.response.SearchGuestBookResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.fcm.dto.event.GuestBookFCM;
@@ -60,29 +60,15 @@ public class GuestBookService {
 
 		GuestBook guestBook = null;
 		if(type.equals(GuestBookType.TEXT)){
-			guestBook = GuestBook.builder()
-				.associate(associate)
-				.content(content)
-				.type(type)
-				.build();
+			guestBook = GuestBook.createText(associate, content, type);
 		}else if(type.equals(GuestBookType.VOICE)){
 			Voice voice = voiceRepository.findByIdAndDeletedAtIsNull(contentId)
 				.orElseThrow(() -> new MementoException(ErrorCodes.VOICE_NOT_FOUND));
-			guestBook = GuestBook.builder()
-				.associate(associate)
-				.content(voice.getUrl())
-				.name(voice.getName())
-				.type(type)
-				.build();
+			guestBook = GuestBook.createVoice(associate, voice, type);
 		}else{
 			Emoji emoji = emojiRepository.findByIdAndDeletedAtIsNull(contentId)
 				.orElseThrow(() -> new MementoException(ErrorCodes.EMOJI_NOT_FOUND));
-			guestBook = GuestBook.builder()
-				.associate(associate)
-				.content(emoji.getUrl())
-				.name(emoji.getName())
-				.type(type)
-				.build();
+			guestBook = GuestBook.createEmoji(associate, emoji, type);
 		}
 		
 		GuestBook result = guestBookRepository.save(guestBook);
@@ -103,17 +89,13 @@ public class GuestBookService {
 	}
 
 	@Transactional
-	public void createBubble(Long communityId, Long registerId,Long associateId, MultipartFile voice) {
+	public void createTemporary(Long communityId, Long registerId,Long associateId, MultipartFile voice) {
 		Associate register = validAssociate(communityId, registerId);
 		Associate associate = validAssociate(communityId, associateId);
 
 		String url = saveVoice(associate, voice);
 
-		GuestBook result = guestBookRepository.save(GuestBook.builder()
-				.associate(associate)
-				.content(url)
-				.type(GuestBookType.VOICE)
-				.build());
+		GuestBook result = guestBookRepository.save(GuestBook.createTemporary(associate, url));
 
 		achievementEventPublisher.publishGuestBookAchievement(GuestBookAchievementEvent.from(associateId, result.getId(), GuestBookAchievementEvent.Type.COUNT));
 		if(associate.getCommunity().getId() == 1L){
@@ -146,20 +128,10 @@ public class GuestBookService {
 		}
 
 		List<SearchGuestBookResponse.GuestBook> guestBooks = guestBookList.stream().limit(size)
-			.map(g -> SearchGuestBookResponse.GuestBook.builder()
-				.id(g.getId())
-				.type(g.getType())
-				.content(g.getContent())
-				.name(g.getName())
-				.createdAt(g.getCreatedAt())
-				.build())
+			.map(SearchGuestBookResponse.GuestBook::type)
 			.toList();
 
-		return SearchGuestBookResponse.builder()
-			.guestBooks(guestBooks)
-			.nextCursor(lastCursor)
-			.hasNext(hasNext)
-			.build();
+		return SearchGuestBookResponse.of(guestBooks, lastCursor, hasNext);
 	}
 
 	@Transactional
@@ -173,10 +145,6 @@ public class GuestBookService {
 	public String saveVoice(Associate associate, MultipartFile voice) {
 		String url = minioService.createFile(voice, MinioProperties.FileType.VOICE);
 
-		return voiceRepository.save(Voice.builder()
-			.associate(associate)
-			.url(url)
-			.temporary(true)
-			.build()).getUrl();
+		return voiceRepository.save(Voice.createTemporary(url, associate)).getUrl();
 	}
 }

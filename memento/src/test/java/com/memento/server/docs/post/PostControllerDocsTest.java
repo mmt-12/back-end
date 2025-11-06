@@ -41,16 +41,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.memento.server.api.controller.post.PostController;
-import com.memento.server.api.controller.post.dto.CreatePostRequest;
-import com.memento.server.api.controller.post.dto.SearchAllPostResponse;
-import com.memento.server.api.controller.post.dto.SearchPostResponse;
-import com.memento.server.api.controller.post.dto.UpdatePostRequest;
-import com.memento.server.api.controller.post.dto.read.Achievement;
-import com.memento.server.api.controller.post.dto.read.CommentAuthor;
-import com.memento.server.api.controller.post.dto.read.Emoji;
-import com.memento.server.api.controller.post.dto.read.PostAuthor;
-import com.memento.server.api.controller.post.dto.read.TemporaryVoice;
-import com.memento.server.api.controller.post.dto.read.Voice;
+import com.memento.server.api.controller.post.dto.request.CreatePostRequest;
+import com.memento.server.api.service.post.dto.response.SearchAllPostResponse;
+import com.memento.server.api.service.post.dto.response.SearchPostResponse;
+import com.memento.server.api.controller.post.dto.request.UpdatePostRequest;
+import com.memento.server.api.service.post.dto.response.search.Achievement;
+import com.memento.server.api.service.post.dto.response.search.CommentAuthor;
+import com.memento.server.api.service.post.dto.response.search.Emoji;
+import com.memento.server.api.service.post.dto.response.search.PostAuthor;
+import com.memento.server.api.service.post.dto.response.search.TemporaryVoice;
+import com.memento.server.api.service.post.dto.response.search.Voice;
 import com.memento.server.api.service.post.PostService;
 import com.memento.server.docs.RestDocsSupport;
 

@@ -19,14 +19,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.memento.server.api.controller.post.dto.SearchAllPostResponse;
-import com.memento.server.api.controller.post.dto.SearchPostResponse;
-import com.memento.server.api.controller.post.dto.read.Achievement;
-import com.memento.server.api.controller.post.dto.read.CommentAuthor;
-import com.memento.server.api.controller.post.dto.read.Emoji;
-import com.memento.server.api.controller.post.dto.read.PostAuthor;
-import com.memento.server.api.controller.post.dto.read.TemporaryVoice;
-import com.memento.server.api.controller.post.dto.read.Voice;
+import com.memento.server.api.service.post.dto.response.SearchAllPostResponse;
+import com.memento.server.api.service.post.dto.response.SearchPostResponse;
+import com.memento.server.api.service.post.dto.response.search.Achievement;
+import com.memento.server.api.service.post.dto.response.search.CommentAuthor;
+import com.memento.server.api.service.post.dto.response.search.Emoji;
+import com.memento.server.api.service.post.dto.response.search.PostAuthor;
+import com.memento.server.api.service.post.dto.response.search.TemporaryVoice;
+import com.memento.server.api.service.post.dto.response.search.Voice;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.fcm.dto.event.PostFCM;
@@ -150,7 +150,7 @@ public class PostService {
 		Memory memory = memoryRepository.findByIdAndDeletedAtIsNull(memoryId)
 			.orElseThrow(() -> new MementoException(ErrorCodes.MEMORY_NOT_FOUND));
 
-		if(!memory.getEvent().getCommunity().getId().equals(communityId)){
+		if(!memory.getCommunity().getId().equals(communityId)){
 			throw new MementoException(ErrorCodes.COMMUNITY_NOT_MATCH);
 		}
 
@@ -241,19 +241,12 @@ public class PostService {
 				String url = entry.getKey();
 				List<PostCommentDto> dtoList = entry.getValue();
 				List<CommentAuthor> authors = dtoList.stream()
-					.map(CommentAuthor::from)
+					.map(CommentAuthor::type)
 					.toList();
 				boolean isInvolved = dtoList.stream()
 					.anyMatch(dto -> dto.getAssociate().getId().equals(associate.getId()));
 
-				return Emoji.builder()
-					.id(dtoList.get(0).getReactionId())
-					.url(url)
-					.name(dtoList.get(0).getName())
-					.authors(authors)
-					.count(dtoList.size())
-					.isInvolved(isInvolved)
-					.build();
+				return Emoji.of(dtoList, url, authors, isInvolved);
 			})
 			.sorted(Comparator.comparing(Emoji::getCount).reversed())
 			.collect(Collectors.toList());
@@ -269,19 +262,12 @@ public class PostService {
 				String url = entry.getKey();
 				List<PostCommentDto> dtoList = entry.getValue();
 				List<CommentAuthor> authors = dtoList.stream()
-					.map(CommentAuthor::from)
+					.map(CommentAuthor::type)
 					.toList();
 				boolean isInvolved = dtoList.stream()
 					.anyMatch(dto -> dto.getAssociate().getId().equals(associate.getId()));
 
-				return Voice.builder()
-					.id(dtoList.get(0).getReactionId())
-					.url(url)
-					.name(dtoList.get(0).getName())
-					.authors(authors)
-					.count(dtoList.size())
-					.isInvolved(isInvolved)
-					.build();
+				return Voice.of(dtoList, url, authors, isInvolved);
 			})
 			.sorted(Comparator.comparing(Voice::getCount).reversed())
 			.collect(Collectors.toList());
@@ -297,45 +283,18 @@ public class PostService {
 				String url = entry.getKey();
 				List<PostCommentDto> dtoList = entry.getValue();
 				List<CommentAuthor> authors = dtoList.stream()
-					.map(CommentAuthor::from)
+					.map(CommentAuthor::type)
 					.toList();
 
-				return TemporaryVoice.builder()
-					.id(dtoList.get(0).getReactionId())
-					.url(url)
-					.name(dtoList.get(0).getName())
-					.authors(authors)
-					.count(dtoList.size())
-					.build();
+				return TemporaryVoice.of(dtoList, url, authors);
 			})
 			.sorted(Comparator.comparing(TemporaryVoice::getCount).reversed())
 			.collect(Collectors.toList());
 
-		// === CommentResponse ===
-		SearchPostResponse.Comment commentsResponse = SearchPostResponse.Comment.builder()
-			.emojis(emojis)
-			.voices(voices)
-			.temporaryVoices(temporaryVoices)
-			.build();
+		SearchPostResponse.Comment commentsResponse = SearchPostResponse.Comment.of(
+			emojis, voices, temporaryVoices);
 
-		// === 최종 Response ===
-		return SearchPostResponse.builder()
-			.id(post.getId())
-			.createdAt(post.getCreatedAt())
-			.author(PostAuthor.builder()
-				.id(post.getAssociate().getId())
-				.imageUrl(post.getAssociate().getProfileImageUrl())
-				.nickname(post.getAssociate().getNickname())
-				.achievement(post.getAssociate().getAchievement() == null ? null :
-					Achievement.builder()
-						.id(post.getAssociate().getAchievement().getId())
-						.name(post.getAssociate().getAchievement().getName())
-						.build())
-				.build())
-			.content(post.getContent())
-			.pictures(images.stream().map(PostImage::getUrl).toList())
-			.comments(commentsResponse)
-			.build();
+		return SearchPostResponse.of(post, images, commentsResponse);
 	}
 
 	public List<PostImage> saveImages(Post post, List<MultipartFile> pictures) {
@@ -390,24 +349,12 @@ public class PostService {
 			Hash hash = hashes.get(i);
 
 			if (existingMap.containsKey(hash)) {
-				images.add(PostImage.builder()
-					.url(existingMap.get(hash).get(0).getUrl())
-					.post(post)
-					.hash(hash)
-					.build());
+				images.add(PostImage.create(existingMap.get(hash).get(0).getUrl(), post, hash));
 			} else if (hashToImage.containsKey(hash)) {
-				images.add(PostImage.builder()
-					.url(hashToImage.get(hash).getUrl())
-					.post(post)
-					.hash(hash)
-					.build());
+				images.add(PostImage.create(hashToImage.get(hash).getUrl(), post, hash));
 			} else {
 				String url = minioService.createFile(image, MinioProperties.FileType.POST);
-				PostImage newImage = PostImage.builder()
-					.url(url)
-					.post(post)
-					.hash(hash)
-					.build();
+				PostImage newImage = PostImage.create(url, post, hash);
 
 				hashToImage.put(hash, newImage);
 				images.add(newImage);

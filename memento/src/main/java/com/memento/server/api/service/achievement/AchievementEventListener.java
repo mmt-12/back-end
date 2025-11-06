@@ -1,5 +1,6 @@
 package com.memento.server.api.service.achievement;
 
+import com.memento.server.domain.memory.MemoryRepository;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,11 +15,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.fcm.dto.event.AchievementFCM;
-import com.memento.server.client.sse.SseEmitterRepository;
+import com.memento.server.client.sse.SseService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.achievement.Achievement;
@@ -36,7 +36,6 @@ import com.memento.server.domain.community.AssociateStatsRepository;
 import com.memento.server.domain.community.SignInAchievementEvent;
 import com.memento.server.domain.emoji.Emoji;
 import com.memento.server.domain.emoji.EmojiRepository;
-import com.memento.server.domain.event.EventRepository;
 import com.memento.server.domain.guestBook.GuestBook;
 import com.memento.server.domain.guestBook.GuestBookAchievementEvent;
 import com.memento.server.domain.guestBook.GuestBookExclusiveAchievementEvent;
@@ -66,14 +65,14 @@ public class AchievementEventListener {
 	private final ProfileImageRepository profileImageRepository;
 	private final MbtiTestRepository mbtiTestRepository;
 	private final GuestBookRepository guestBookRepository;
-	private final EventRepository eventRepository;
+	private final MemoryRepository memoryRepository;
 	private final MemoryAssociateRepository memoryAssociateRepository;
 	private final PostImageRepository postImageRepository;
 	private final EmojiRepository emojiRepository;
 	private final VoiceRepository voiceRepository;
 	private final CommentRepository commentRepository;
-	private final SseEmitterRepository sseEmitterRepository;
 	private final FCMEventPublisher fcmEventPublisher;
+	private final SseService sseService;
 
 	private void getAchievement(Long associateId, Long achievementId){
 		Associate associate = associateRepository.findByIdAndDeletedAtNull(associateId)
@@ -86,7 +85,7 @@ public class AchievementEventListener {
 			.achievement(achievement)
 			.associate(associate)
 			.build());
-		sendAchievementSse(associate.getId(), achievement);
+		sseService.sendAchievementSse(associate.getId(), achievement);
 		fcmEventPublisher.publishNotification(AchievementFCM.of(associate.getId()));
 
 		// 업적헌터#kill
@@ -101,37 +100,13 @@ public class AchievementEventListener {
 					.achievement(lastAchievement)
 					.associate(associate)
 					.build());
-				sendAchievementSse(associate.getId(), lastAchievement);
+				sseService.sendAchievementSse(associate.getId(), lastAchievement);
 				fcmEventPublisher.publishNotification(AchievementFCM.of(associate.getId()));
 			}
 		}
 	}
 
-	private void sendAchievementSse(Long associateId, Achievement achievement) {
-		SseEmitter emitter = sseEmitterRepository.get(associateId);
-		if (emitter == null) return;
-
-		try {
-			Map<String, Object> data = Map.of(
-				"type", "ACHIEVE",
-				"value", Map.of(
-					"id", achievement.getId(),
-					"name", achievement.getName(),
-					"criteria", achievement.getCriteria(),
-					"type", achievement.getType().name()
-				)
-			);
-
-			emitter.send(SseEmitter.event()
-				.name("message")
-				.data(data)
-			);
-		} catch (Exception e) {
-			sseEmitterRepository.remove(associateId);
-		}
-	}
-
-	@Async
+	@Async("achievement")
 	@EventListener
 	public void handleCommonAchievement(CommonAchievementEvent event){
 		Long achievementId = event.achievementId();
@@ -141,7 +116,7 @@ public class AchievementEventListener {
 		}
 	}
 
-	@Async
+	@Async("achievement")
 	@EventListener
 	public void handleSignInAchievement(SignInAchievementEvent event) {
 		AssociateStats stats = associateStatsRepository.findByAssociateId(event.associateId())
@@ -167,7 +142,7 @@ public class AchievementEventListener {
 		}
 	}
 
-	@Async
+	@Async("achievement")
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void handleProfileImageAchievement(ProfileImageAchievementEvent event){
@@ -197,7 +172,7 @@ public class AchievementEventListener {
 		}
 	}
 
-	@Async
+	@Async("achievement")
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void handleMbtiAchievement(MbtiAchievementEvent event) {
@@ -238,7 +213,7 @@ public class AchievementEventListener {
 
 	}
 
-	@Async
+	@Async("achievement")
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void handleGuestBookAchievement(GuestBookAchievementEvent event) {
@@ -268,7 +243,7 @@ public class AchievementEventListener {
 		}
 	}
 
-	@Async
+	@Async("achievement")
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void handleMemoryAchievement(MemoryAchievementEvent event) {
@@ -276,7 +251,7 @@ public class AchievementEventListener {
 			case CREATE:
 				AssociateStats stats = associateStatsRepository.findByAssociateId(event.associateIds().getFirst())
 					.orElseThrow(() -> new MementoException(ErrorCodes.STATS_NOT_FOUND));
-				int count = stats.updateCreatedMemoryCount(eventRepository.countByAssociateIdAndDeletedAtNull(event.associateIds().getFirst()));
+				int count = stats.updateCreatedMemoryCount(memoryRepository.countByAssociateIdAndDeletedAtNull(event.associateIds().getFirst()));
 				// 민들레? 노브랜드?
 				if(!achievementAssociateRepository.existsByAchievementIdAndAssociateId(12L, event.associateIds().getFirst())
 					&& count >= 10){
@@ -315,13 +290,13 @@ public class AchievementEventListener {
 	}
 
 	//13일의 금요일 검증
-	public boolean isFridayThe13th(LocalDate date) {
+	private boolean isFridayThe13th(LocalDate date) {
 		if (date == null) return false;
 		return date.getDayOfMonth() == 13
 			&& date.getDayOfWeek() == DayOfWeek.FRIDAY;
 	}
 
-	@Async
+	@Async("achievement")
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void handlePostImageAchievement(PostImageAchievementEvent event) {
@@ -336,7 +311,7 @@ public class AchievementEventListener {
 		}
 	}
 
-	@Async
+	@Async("achievement")
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void handleReactionAchievement(ReactionAchievementEvent event) {
@@ -389,7 +364,7 @@ public class AchievementEventListener {
 	}
 
 	// 가입 전용 업적
-	@Async
+	@Async("achievement")
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void handleAssociateExclusiveAchievement(AssociateExclusiveAchievementEvent event){
@@ -428,7 +403,7 @@ public class AchievementEventListener {
 	}
 
 	// guestBook 전용 업적
-	@Async
+	@Async("achievement")
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void handleGuestBookExclusiveAchievement(GuestBookExclusiveAchievementEvent event) {

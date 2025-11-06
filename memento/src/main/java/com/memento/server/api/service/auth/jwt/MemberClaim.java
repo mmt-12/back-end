@@ -12,12 +12,28 @@ public record MemberClaim(
 	Long communityId,
 	Boolean isMember
 ) {
-	public static MemberClaim from(Member member, Associate associate) {
+	public static MemberClaim of(Member member, Associate associate) {
 		return MemberClaim.builder()
 			.memberId(member.getId())
 			.associateId(associate.getId())
 			.communityId(associate.getCommunity().getId())
 			.isMember(true)
+			.build();
+	}
+
+	public static MemberClaim from(Long kakaoId) {
+		return MemberClaim.builder()
+			.memberId(kakaoId)
+			.isMember(false)
+			.build();
+	}
+
+	public static MemberClaim from(Long memberId, Long associateId, Long communityId, Boolean isMember) {
+		return MemberClaim.builder()
+			.memberId(memberId)
+			.associateId(associateId)
+			.communityId(communityId)
+			.isMember(isMember)
 			.build();
 	}
 }

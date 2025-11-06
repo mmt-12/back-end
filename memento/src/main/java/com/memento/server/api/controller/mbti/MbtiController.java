@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.memento.server.annotation.AssociateId;
 import com.memento.server.annotation.CommunityId;
-import com.memento.server.api.controller.mbti.dto.CreateMbtiRequest;
-import com.memento.server.api.controller.mbti.dto.SearchMbtiResponse;
+import com.memento.server.api.controller.mbti.dto.request.CreateMbtiRequest;
+import com.memento.server.api.service.mbti.dto.response.SearchMbtiResponse;
 import com.memento.server.api.service.mbti.MbtiService;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;

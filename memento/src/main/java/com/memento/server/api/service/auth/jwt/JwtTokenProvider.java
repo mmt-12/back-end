@@ -34,11 +34,7 @@ public class JwtTokenProvider {
 			.withExpiresAt(accessTokenExpiresAt)
 			.sign(Algorithm.HMAC512(jwtProperties.secret()));
 
-		return JwtToken.builder()
-			.grantType(jwtProperties.grantType())
-			.accessToken(accessToken)
-			.accessTokenExpiresAt(accessTokenExpiresAt)
-			.build();
+		return JwtToken.of(jwtProperties, accessToken, accessTokenExpiresAt);
 	}
 
 	public JwtToken createToken(MemberClaim memberClaim) {
@@ -59,13 +55,7 @@ public class JwtTokenProvider {
 			.withExpiresAt(refreshTokenExpiresAt)
 			.sign(Algorithm.HMAC512(jwtProperties.secret()));
 
-		return JwtToken.builder()
-			.grantType(jwtProperties.grantType())
-			.accessToken(accessToken)
-			.accessTokenExpiresAt(accessTokenExpiresAt)
-			.refreshToken(refreshToken)
-			.refreshTokenExpiresAt(refreshTokenExpiresAt)
-			.build();
+		return JwtToken.of(jwtProperties, accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt);
 	}
 
 	public boolean isNotValidateToken(String token) {
@@ -83,11 +73,11 @@ public class JwtTokenProvider {
 		String payloadString = JWT.decode(token).getPayload();
 		String payload = new String(Base64.getUrlDecoder().decode(payloadString));
 		Map map = JsonMapper.readValue(payload, Map.class);
-		return MemberClaim.builder()
-			.memberId(map.get("memberId") != null ? ((Number)map.get("memberId")).longValue() : null)
-			.associateId(map.get("associateId") != null ? ((Number)map.get("associateId")).longValue() : null)
-			.communityId(map.get("communityId") != null ? ((Number)map.get("communityId")).longValue() : null)
-			.isMember((Boolean) map.get("isMember"))
-			.build();
+		return MemberClaim.from(
+			map.get("memberId") != null ? ((Number)map.get("memberId")).longValue() : null,
+			map.get("associateId") != null ? ((Number)map.get("associateId")).longValue() : null,
+			map.get("communityId") != null ? ((Number)map.get("communityId")).longValue() : null,
+			map.get("isMember") != null && (Boolean)map.get("isMember")
+		);
 	}
 }

@@ -54,4 +54,12 @@ public class MbtiTest extends BaseEntity {
 	public void updateMbti(Mbti mbti) {
 		this.mbti = mbti;
 	}
+
+	public static MbtiTest create(Associate fromAssociate, Associate toAssociate, Mbti mbti) {
+		return MbtiTest.builder()
+			.fromAssociate(fromAssociate)
+			.toAssociate(toAssociate)
+			.mbti(mbti)
+			.build();
+	}
 }
