@@ -1,8 +1,10 @@
 package com.memento.server.api.service.member;
 
+import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_DUPLICATE;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_SECRET_INVALID;
+import static com.memento.server.common.error.ErrorCodes.SING_IN_FAIL;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,11 +14,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.memento.server.api.controller.auth.dto.AuthMemberResponse;
+import com.memento.server.api.controller.auth.dto.AuthResponse;
 import com.memento.server.api.controller.member.dto.MemberNormalSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
 import com.memento.server.api.controller.member.dto.MemberSignUpResultRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResultResponse;
+import com.memento.server.api.controller.member.dto.SignInRequest;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
@@ -140,6 +145,25 @@ public class MemberService {
 
 		fcmEventPublisher.publishNotification(
 			AssociateFCM.from(associate.getNickname(), community.getId(), associate.getId()));
+	}
+
+	public AuthResponse signIn(SignInRequest request) {
+		Member member = memberRepository.findByEmail(request.email())
+			.orElseThrow(() -> new MementoException(MEMBER_NOT_FOUND));
+
+		boolean matches = passwordEncoder.matches(request.password(), member.getPassword());
+		if (!matches) {
+			throw new MementoException(SING_IN_FAIL);
+		}
+
+		// 커뮤니티 자동 선택
+		Associate associate = associateRepository.findByMemberIdAndDeletedAtIsNull(member.getId())
+			.orElseThrow(() -> new MementoException(ASSOCIATE_NOT_FOUND));
+
+		MemberClaim memberClaim = MemberClaim.of(member, associate);
+		JwtToken token = jwtTokenProvider.createToken(memberClaim);
+
+		return AuthMemberResponse.of(member.getId(), member.getName(), token);
 	}
 
 	@Transactional

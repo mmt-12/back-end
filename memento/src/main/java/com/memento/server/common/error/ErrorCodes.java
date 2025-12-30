@@ -114,6 +114,8 @@ public enum ErrorCodes implements ErrorCode {
 	FCMTOKEN_DUPLICATE(BAD_REQUEST, 16000, "이미 저장된 fcm token입니다."),
 	FCMTOKEN_TOO_LONG(BAD_REQUEST, 16001, "fcm token의 길이가 512를 넘어갑니다."),
 
+	SING_IN_FAIL(BAD_REQUEST, 17000, "로그인 정보가 올바르지 않습니다."),
+
 	;
 	private final HttpStatus status;
 	private final int code;

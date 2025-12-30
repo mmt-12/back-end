@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.memento.server.annotation.MemberId;
+import com.memento.server.api.controller.auth.dto.AuthResponse;
 import com.memento.server.api.controller.member.dto.CommunityListResponse;
 import com.memento.server.api.controller.member.dto.MemberNormalSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
@@ -16,6 +17,7 @@ import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
 import com.memento.server.api.controller.member.dto.MemberSignUpResultRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResultResponse;
 import com.memento.server.api.controller.member.dto.MemberUpdateRequest;
+import com.memento.server.api.controller.member.dto.SignInRequest;
 import com.memento.server.api.service.community.AssociateService;
 import com.memento.server.api.service.member.MemberService;
 
@@ -46,6 +48,11 @@ public class MemberController {
 	public ResponseEntity<Void> signUpResult(@RequestBody MemberSignUpResultRequest request) {
 		memberService.signUpResult(request);
 		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/signin")
+	public ResponseEntity<AuthResponse> singIn(@RequestBody SignInRequest request) {
+		return ResponseEntity.ok(memberService.signIn(request));
 	}
 
 	@PutMapping
