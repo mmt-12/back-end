@@ -9,6 +9,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -120,7 +122,7 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("name").type(STRING).description("이름"),
 					fieldWithPath("email").type(STRING).description("이메일"),
 					fieldWithPath("birthday").type(ARRAY).description("생일 (\"YYYY-MM-DD\""),
-					fieldWithPath("secret").type(ARRAY).description("암호")
+					fieldWithPath("secret").type(STRING).description("암호")
 				),
 				responseFields(
 					fieldWithPath("memberId").description("사용자 ID"),
@@ -154,9 +156,9 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 					fieldWithPath("name").type(STRING).description("이름"),
 					fieldWithPath("email").type(STRING).description("이메일"),
 					fieldWithPath("birthday").type(ARRAY).description("생일 (\"YYYY-MM-DD\""),
-					fieldWithPath("password").type(ARRAY).description("비밀번호"),
-					fieldWithPath("secret").type(ARRAY).description("암호"),
-					fieldWithPath("fcmToken").type(ARRAY).description("fcm 토큰")
+					fieldWithPath("password").type(STRING).description("비밀번호"),
+					fieldWithPath("secret").type(STRING).description("암호"),
+					fieldWithPath("fcmToken").type(STRING).description("fcm 토큰")
 				)
 			));
 	}
@@ -177,8 +179,8 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestFields(
-					fieldWithPath("memberId").type(STRING).description("회원 아이디"),
-					fieldWithPath("isReject").type(STRING).description("거절 여부")
+					fieldWithPath("memberId").type(NUMBER).description("회원 아이디"),
+					fieldWithPath("isReject").type(BOOLEAN).description("거절 여부")
 				)
 			));
 	}

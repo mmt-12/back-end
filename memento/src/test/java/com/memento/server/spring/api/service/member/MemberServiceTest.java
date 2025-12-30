@@ -4,6 +4,7 @@ import static com.memento.server.common.error.ErrorCodes.MEMBER_DUPLICATE;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static reactor.core.publisher.Mono.when;
 
 import java.time.LocalDate;
 
@@ -115,6 +116,7 @@ class MemberServiceTest {
 			.name(name)
 			.email(email)
 			.birthday(birthday)
+			.secret("오렌지")
 			.build();
 
 		// when
@@ -141,6 +143,7 @@ class MemberServiceTest {
 			.name(name)
 			.email(email)
 			.birthday(birthday)
+			.secret("오렌지")
 			.build();
 		memberRepository.save(Member.createKakao(name, email, birthday, kakaoId));
 

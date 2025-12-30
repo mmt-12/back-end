@@ -39,11 +39,11 @@ public class MemberControllerTest extends ControllerTestSupport {
 			.build();
 		MemberSignUpResponse memberSignUpResponse = new MemberSignUpResponse(1L, "name", jwtToken);
 
-		when(memberService.signUp(any(), any(), any(), any())).thenReturn(memberSignUpResponse);
+		when(memberService.signUp(any(), any())).thenReturn(memberSignUpResponse);
 
 		// when && then
 		mockMvc.perform(
-				post("/api/v1/members")
+				post("/api/v1/members/signup/kakao")
 					.with(withJwt(1L, null, null))
 					.content(objectMapper.writeValueAsString(request))
 					.contentType(APPLICATION_JSON))
