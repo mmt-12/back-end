@@ -10,6 +10,7 @@ public record MemberNormalSignUpRequest(
 	String email,
 	String password,
 	LocalDate birthday,
-	String secret
+	String secret,
+	String fcmToken
 ) {
 }

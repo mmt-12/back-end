@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.memento.server.api.controller.member.dto.CommunityListResponse;
+import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.community.AssociateService;
@@ -110,9 +111,14 @@ class MemberServiceTest {
 		String name = "홍길동";
 		String email = "hong@test.com";
 		LocalDate birthday = LocalDate.of(1990, 1, 1);
+		MemberSignUpRequest request = MemberSignUpRequest.builder()
+			.name(name)
+			.email(email)
+			.birthday(birthday)
+			.build();
 
 		// when
-		MemberSignUpResponse response = memberService.signUp(kakaoId, name, email, birthday);
+		MemberSignUpResponse response = memberService.signUp(kakaoId, request);
 
 		// then
 		Member saved = memberRepository.findByKakaoIdAndDeletedAtIsNull(kakaoId).orElseThrow();
@@ -128,11 +134,19 @@ class MemberServiceTest {
 	void signup_withDuplicate_throwsException() {
 		// given
 		Long kakaoId = 1001L;
-		memberRepository.save(Member.createKakao("홍길동", "hong@test.com", LocalDate.of(1990, 1, 1), kakaoId));
+		String name = "홍길동";
+		String email = "hong@test.com";
+		LocalDate birthday = LocalDate.of(1990, 1, 1);
+		MemberSignUpRequest request = MemberSignUpRequest.builder()
+			.name(name)
+			.email(email)
+			.birthday(birthday)
+			.build();
+		memberRepository.save(Member.createKakao(name, email, birthday, kakaoId));
 
 		// when & then
 		assertThatThrownBy(() ->
-			memberService.signUp(kakaoId, "아무개", "any@test.com", LocalDate.of(1995, 5, 5))
+			memberService.signUp(kakaoId, request)
 		)
 			.isInstanceOf(MementoException.class)
 			.satisfies(ex -> {

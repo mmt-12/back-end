@@ -9,7 +9,6 @@ public record MemberSignUpRequest(
 	String name,
 	String email,
 	LocalDate birthday,
-	String secret,
-	String fcmToken
+	String secret
 ) {
 }

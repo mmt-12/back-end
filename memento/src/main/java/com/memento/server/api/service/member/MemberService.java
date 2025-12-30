@@ -6,7 +6,6 @@ import static com.memento.server.common.error.ErrorCodes.MEMBER_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_SECRET_INVALID;
 import static com.memento.server.common.error.ErrorCodes.SING_IN_FAIL;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -20,7 +19,6 @@ import com.memento.server.api.controller.member.dto.MemberNormalSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
 import com.memento.server.api.controller.member.dto.MemberSignUpResultRequest;
-import com.memento.server.api.controller.member.dto.MemberSignUpResultResponse;
 import com.memento.server.api.controller.member.dto.SignInRequest;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.auth.jwt.JwtToken;

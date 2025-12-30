@@ -15,7 +15,6 @@ import com.memento.server.api.controller.member.dto.MemberNormalSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
 import com.memento.server.api.controller.member.dto.MemberSignUpResultRequest;
-import com.memento.server.api.controller.member.dto.MemberSignUpResultResponse;
 import com.memento.server.api.controller.member.dto.MemberUpdateRequest;
 import com.memento.server.api.controller.member.dto.SignInRequest;
 import com.memento.server.api.service.community.AssociateService;
@@ -61,6 +60,7 @@ public class MemberController {
 		return ResponseEntity.ok().build();
 	}
 
+	// todo 지금 안씀
 	@GetMapping("/associates")
 	public ResponseEntity<CommunityListResponse> searchAllAssociate(@MemberId Long memberId) {
 		return ResponseEntity.ok(associateService.searchAllMyAssociate(memberId));
