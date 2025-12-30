@@ -12,6 +12,6 @@ public class MemberFixtures {
 	private static final Long KAKAO_ID = 1L;
 
 	public static Member member() {
-		return Member.create(NAME, EMAIL, BIRTHDAY, KAKAO_ID);
+		return Member.createKakao(NAME, EMAIL, BIRTHDAY, KAKAO_ID);
 	}
 }

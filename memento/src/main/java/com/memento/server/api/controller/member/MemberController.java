@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.memento.server.annotation.MemberId;
 import com.memento.server.api.controller.member.dto.CommunityListResponse;
+import com.memento.server.api.controller.member.dto.MemberNormalSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
 import com.memento.server.api.controller.member.dto.MemberUpdateRequest;
@@ -26,11 +27,16 @@ public class MemberController {
 	private final MemberService memberService;
 	private final AssociateService associateService;
 
-	@PostMapping
+	@PostMapping("/signup/kakao")
 	public ResponseEntity<MemberSignUpResponse> signUp(@MemberId Long kakaoId,
 		@RequestBody MemberSignUpRequest request) {
 		return ResponseEntity.ok(
-			memberService.signUp(kakaoId, request.name(), request.email(), request.birthday()));
+			memberService.signUp(kakaoId, request));
+	}
+
+	@PostMapping("/signup/normal")
+	public ResponseEntity<MemberSignUpResponse> normalSignUp(@RequestBody MemberNormalSignUpRequest request) {
+		return ResponseEntity.ok(memberService.normalSignUp(request));
 	}
 
 	@PutMapping

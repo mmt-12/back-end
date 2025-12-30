@@ -5,11 +5,11 @@ import java.time.LocalDate;
 import lombok.Builder;
 
 @Builder
-public record MemberSignUpRequest(
+public record MemberNormalSignUpRequest(
 	String name,
 	String email,
+	String password,
 	LocalDate birthday,
-	String secret,
-	String fcmToken
+	String secret
 ) {
 }

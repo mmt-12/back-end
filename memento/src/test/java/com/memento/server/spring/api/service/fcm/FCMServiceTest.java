@@ -246,7 +246,7 @@ public class FCMServiceTest extends IntegrationsTestSupport {
 	void saveFCMToken() {
 		// given
 		Member member = memberRepository.save(
-			Member.create("회원", "member@test.com", LocalDate.of(1990, 1, 1), 1001L));
+			Member.createKakao("회원", "member@test.com", LocalDate.of(1990, 1, 1), 1001L));
 		Community community = communityRepository.save(Community.create("테스트 커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("참여자", member, community));
 
@@ -269,7 +269,7 @@ public class FCMServiceTest extends IntegrationsTestSupport {
 	void saveDuplicateFCMToken() {
 		// given
 		Member member = memberRepository.save(
-			Member.create("회원", "member@test.com", LocalDate.of(1990, 1, 1), 1001L));
+			Member.createKakao("회원", "member@test.com", LocalDate.of(1990, 1, 1), 1001L));
 		Community community = communityRepository.save(Community.create("테스트 커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("참여자", member, community));
 
@@ -307,7 +307,7 @@ public class FCMServiceTest extends IntegrationsTestSupport {
 
 	private FCMTestFixtures createSingleReceiverFixtures() {
 		Member member = memberRepository.save(
-			Member.create("수신자", "receiver@test.com", LocalDate.of(1990, 1, 1), 1001L));
+			Member.createKakao("수신자", "receiver@test.com", LocalDate.of(1990, 1, 1), 1001L));
 		Community community = communityRepository.save(Community.create("테스트 커뮤니티", member));
 		Associate receiver = associateRepository.save(Associate.create("수신자", member, community));
 		FCMToken fcmToken = fcmTokenRepository.save(FCMToken.builder()
@@ -323,9 +323,9 @@ public class FCMServiceTest extends IntegrationsTestSupport {
 
 	private FCMTestFixtures createMultipleReceiverFixtures() {
 		Member member1 = memberRepository.save(
-			Member.create("수신자1", "receiver1@test.com", LocalDate.of(1990, 1, 1), 1001L));
+			Member.createKakao("수신자1", "receiver1@test.com", LocalDate.of(1990, 1, 1), 1001L));
 		Member member2 = memberRepository.save(
-			Member.create("수신자2", "receiver2@test.com", LocalDate.of(1990, 1, 1), 1002L));
+			Member.createKakao("수신자2", "receiver2@test.com", LocalDate.of(1990, 1, 1), 1002L));
 
 		Community community = communityRepository.save(Community.create("테스트 커뮤니티", member1));
 
@@ -351,7 +351,7 @@ public class FCMServiceTest extends IntegrationsTestSupport {
 
 	private FCMTestFixtures createReceiverWithoutToken() {
 		Member member = memberRepository.save(
-			Member.create("수신자", "receiver@test.com", LocalDate.of(1990, 1, 1), 1001L));
+			Member.createKakao("수신자", "receiver@test.com", LocalDate.of(1990, 1, 1), 1001L));
 		Community community = communityRepository.save(Community.create("테스트 커뮤니티", member));
 		Associate receiver = associateRepository.save(Associate.create("수신자", member, community));
 

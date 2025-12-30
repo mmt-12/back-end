@@ -66,17 +66,17 @@ public class AssociateServiceTest{
 	@DisplayName("커뮤니티 참여자 목록 조회")
 	void searchAll() {
 		// given
-		Member member1 = memberRepository.save(Member.create("김가가", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
-		Member member2 = memberRepository.save(Member.create("김나나", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
-		Member member3 = memberRepository.save(Member.create("김다다", "muge@test.com", LocalDate.of(1990, 1, 1), 1003L));
-		Member member4 = memberRepository.save(Member.create("김라라", "muge@test.com", LocalDate.of(1990, 1, 1), 1004L));
-		Member member5 = memberRepository.save(Member.create("김마마", "muge@test.com", LocalDate.of(1990, 1, 1), 1005L));
-		Member member6 = memberRepository.save(Member.create("김바바", "muge@test.com", LocalDate.of(1990, 1, 1), 1006L));
-		Member member7 = memberRepository.save(Member.create("김사사", "muge@test.com", LocalDate.of(1990, 1, 1), 1007L));
-		Member member8 = memberRepository.save(Member.create("김아아", "muge@test.com", LocalDate.of(1990, 1, 1), 1008L));
-		Member member9 = memberRepository.save(Member.create("김자자", "muge@test.com", LocalDate.of(1990, 1, 1), 1009L));
-		Member member10 = memberRepository.save(Member.create("김차차", "muge@test.com", LocalDate.of(1990, 1, 1), 1010L));
-		Member member11 = memberRepository.save(Member.create("김카카", "muge@test.com", LocalDate.of(1990, 1, 1), 1011L));
+		Member member1 = memberRepository.save(Member.createKakao("김가가", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
+		Member member2 = memberRepository.save(Member.createKakao("김나나", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
+		Member member3 = memberRepository.save(Member.createKakao("김다다", "muge@test.com", LocalDate.of(1990, 1, 1), 1003L));
+		Member member4 = memberRepository.save(Member.createKakao("김라라", "muge@test.com", LocalDate.of(1990, 1, 1), 1004L));
+		Member member5 = memberRepository.save(Member.createKakao("김마마", "muge@test.com", LocalDate.of(1990, 1, 1), 1005L));
+		Member member6 = memberRepository.save(Member.createKakao("김바바", "muge@test.com", LocalDate.of(1990, 1, 1), 1006L));
+		Member member7 = memberRepository.save(Member.createKakao("김사사", "muge@test.com", LocalDate.of(1990, 1, 1), 1007L));
+		Member member8 = memberRepository.save(Member.createKakao("김아아", "muge@test.com", LocalDate.of(1990, 1, 1), 1008L));
+		Member member9 = memberRepository.save(Member.createKakao("김자자", "muge@test.com", LocalDate.of(1990, 1, 1), 1009L));
+		Member member10 = memberRepository.save(Member.createKakao("김차차", "muge@test.com", LocalDate.of(1990, 1, 1), 1010L));
+		Member member11 = memberRepository.save(Member.createKakao("김카카", "muge@test.com", LocalDate.of(1990, 1, 1), 1011L));
 		Community community = communityRepository.save(Community.create("comm", member1));
 		Associate associate1 = associateRepository.save(Associate.create("가가", member1, community));
 		Associate associate2 = associateRepository.save(Associate.create("나나", member2, community));
@@ -104,8 +104,8 @@ public class AssociateServiceTest{
 	@DisplayName("키워드로 커뮤니티 참여자 목록을 조회한다.")
 	void searchAll_withKeyword() {
 		// given
-		Member member1 = memberRepository.save(Member.create("홍길동", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
-		Member member2 = memberRepository.save(Member.create("아무개", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
+		Member member1 = memberRepository.save(Member.createKakao("홍길동", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
+		Member member2 = memberRepository.save(Member.createKakao("아무개", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
 		Community community = communityRepository.save(Community.create("comm", member1));
 		Associate associate1 = associateRepository.save(Associate.create("홍홍홍", member1, community));
 		Associate associate2 = associateRepository.save(Associate.create("아아아", member2, community));

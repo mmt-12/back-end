@@ -2,14 +2,18 @@ package com.memento.server.api.service.member;
 
 import static com.memento.server.common.error.ErrorCodes.MEMBER_DUPLICATE;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_NOT_FOUND;
+import static com.memento.server.common.error.ErrorCodes.MEMBER_SECRET_INVALID;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.memento.server.api.controller.member.dto.MemberNormalSignUpRequest;
+import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.auth.jwt.JwtToken;
@@ -41,31 +45,90 @@ public class MemberService {
 	private final FCMEventPublisher fcmEventPublisher;
 	private final AchievementEventPublisher achievementEventPublisher;
 	private final AssociateStatsRepository associateStatsRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
-	public MemberSignUpResponse signUp(Long kakaoId, String name, String email, LocalDate birthday) {
+	public MemberSignUpResponse signUp(Long kakaoId, MemberSignUpRequest request) {
+		// secret 검사
+		if (!request.secret().equals("오렌지")) {
+			throw new MementoException(MEMBER_SECRET_INVALID);
+		}
+
+		// email 중복 검사
 		Optional<Member> memberOptional = memberRepository.findByKakaoIdAndDeletedAtIsNull(kakaoId);
 		if (memberOptional.isPresent()) {
 			throw new MementoException(MEMBER_DUPLICATE);
 		}
 
-		Member member = memberRepository.save(Member.create(name, email, birthday, kakaoId));
+		// 동일인물 검사
+		Optional<Member> memberBirthdayOptional = memberRepository.findByBirthday(request.birthday());
+		if (memberBirthdayOptional.isPresent()) {
+			throw new MementoException(MEMBER_DUPLICATE);
+		}
+
+		Member member = memberRepository.save(
+			Member.createKakao(request.name(), request.email(), request.birthday(), kakaoId));
 
 		// 커뮤니티 자동 가입
 		Optional<Community> communityOptional = communityRepository.findByIdAndDeletedAtIsNull(1L);
 		Community community = communityOptional.orElse(
 			communityRepository.save(Community.create("SSAFY 12기 12반", member)));
-		Associate associate = associateRepository.save(Associate.create(name, member, community));
+		Associate associate = associateRepository.save(Associate.create(request.name(), member, community));
 		associateStatsRepository.save(AssociateStats.builder()
-				.associate(associate)
-				.consecutiveAttendanceDays(1)
-				.lastAttendedAt(LocalDateTime.now())
+			.associate(associate)
+			.consecutiveAttendanceDays(1)
+			.lastAttendedAt(LocalDateTime.now())
 			.build());
 
 		MemberClaim memberClaim = MemberClaim.of(member, associate);
 		JwtToken token = jwtTokenProvider.createToken(memberClaim);
 
-		fcmEventPublisher.publishNotification(AssociateFCM.from(associate.getNickname(), community.getId(), associate.getId()));
+		fcmEventPublisher.publishNotification(
+			AssociateFCM.from(associate.getNickname(), community.getId(), associate.getId()));
+		return MemberSignUpResponse.from(member, token);
+	}
+
+	@Transactional
+	public MemberSignUpResponse normalSignUp(MemberNormalSignUpRequest request) {
+		// secret 검사
+		if (!request.secret().equals("오렌지")) {
+			throw new MementoException(MEMBER_SECRET_INVALID);
+		}
+
+		// email 중복 검사
+		Optional<Member> memberEmailOptional = memberRepository.findByEmail(request.email());
+		if (memberEmailOptional.isPresent()) {
+			throw new MementoException(MEMBER_DUPLICATE);
+		}
+
+		// 동일인물 검사
+		Optional<Member> memberBirthdayOptional = memberRepository.findByBirthday(request.birthday());
+		if (memberBirthdayOptional.isPresent()) {
+			throw new MementoException(MEMBER_DUPLICATE);
+		}
+
+		// 비밀번호 암호화
+		String encodedPassword = passwordEncoder.encode(request.password());
+
+		Member member = memberRepository.save(
+			Member.createNormal(request.name(), encodedPassword, request.email(), request.birthday()));
+
+		// 커뮤니티 자동 가입
+		Optional<Community> communityOptional = communityRepository.findByIdAndDeletedAtIsNull(1L);
+		Community community = communityOptional.orElse(
+			communityRepository.save(Community.create("SSAFY 12기 12반", member)));
+		Associate associate = associateRepository.save(Associate.create(request.name(), member, community));
+		associateStatsRepository.save(AssociateStats.builder()
+			.associate(associate)
+			.consecutiveAttendanceDays(1)
+			.lastAttendedAt(LocalDateTime.now())
+			.build());
+
+		MemberClaim memberClaim = MemberClaim.of(member, associate);
+		JwtToken token = jwtTokenProvider.createToken(memberClaim);
+
+		fcmEventPublisher.publishNotification(
+			AssociateFCM.from(associate.getNickname(), community.getId(), associate.getId()));
 		return MemberSignUpResponse.from(member, token);
 	}
 

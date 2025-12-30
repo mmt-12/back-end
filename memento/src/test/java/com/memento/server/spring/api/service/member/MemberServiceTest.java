@@ -63,10 +63,10 @@ class MemberServiceTest {
 	@DisplayName("커뮤니티 목록을 조회한다.")
 	void searchAllMyCommunities() {
 		// given
-		Member member = memberRepository.save(Member.create("김가가", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
-		Member member2 = memberRepository.save(Member.create("김나나", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
-		Member member3 = memberRepository.save(Member.create("김다다", "muge@test.com", LocalDate.of(1990, 1, 1), 1003L));
-		Member member4 = memberRepository.save(Member.create("김라라", "muge@test.com", LocalDate.of(1990, 1, 1), 1004L));
+		Member member = memberRepository.save(Member.createKakao("김가가", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
+		Member member2 = memberRepository.save(Member.createKakao("김나나", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
+		Member member3 = memberRepository.save(Member.createKakao("김다다", "muge@test.com", LocalDate.of(1990, 1, 1), 1003L));
+		Member member4 = memberRepository.save(Member.createKakao("김라라", "muge@test.com", LocalDate.of(1990, 1, 1), 1004L));
 		Community community = communityRepository.save(Community.create("comm", member));
 		Community community2 = communityRepository.save(Community.create("comm2", member2));
 		Community community3 = communityRepository.save(Community.create("comm3", member3));
@@ -87,10 +87,10 @@ class MemberServiceTest {
 	@DisplayName("어느 커뮤니티에도 가입하지 않고 커뮤니티 목록을 조회한다.")
 	void searchAllMyCommunities_empty() {
 		// given
-		Member member = memberRepository.save(Member.create("김가가", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
-		Member member2 = memberRepository.save(Member.create("김나나", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
-		Member member3 = memberRepository.save(Member.create("김다다", "muge@test.com", LocalDate.of(1990, 1, 1), 1003L));
-		Member member4 = memberRepository.save(Member.create("김라라", "muge@test.com", LocalDate.of(1990, 1, 1), 1004L));
+		Member member = memberRepository.save(Member.createKakao("김가가", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
+		Member member2 = memberRepository.save(Member.createKakao("김나나", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
+		Member member3 = memberRepository.save(Member.createKakao("김다다", "muge@test.com", LocalDate.of(1990, 1, 1), 1003L));
+		Member member4 = memberRepository.save(Member.createKakao("김라라", "muge@test.com", LocalDate.of(1990, 1, 1), 1004L));
 		Community community2 = communityRepository.save(Community.create("comm2", member2));
 		Community community3 = communityRepository.save(Community.create("comm3", member3));
 		Community community4 = communityRepository.save(Community.create("comm4", member4));
@@ -128,7 +128,7 @@ class MemberServiceTest {
 	void signup_withDuplicate_throwsException() {
 		// given
 		Long kakaoId = 1001L;
-		memberRepository.save(Member.create("홍길동", "hong@test.com", LocalDate.of(1990, 1, 1), kakaoId));
+		memberRepository.save(Member.createKakao("홍길동", "hong@test.com", LocalDate.of(1990, 1, 1), kakaoId));
 
 		// when & then
 		assertThatThrownBy(() ->
@@ -145,7 +145,7 @@ class MemberServiceTest {
 	@DisplayName("회원 정보를 수정한다.")
 	void update() {
 		// given
-		Member member = memberRepository.save(Member.create("홍길동", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
+		Member member = memberRepository.save(Member.createKakao("홍길동", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
 
 		// when
 		memberService.update(member.getId(), "김철수", "kim@test.com");

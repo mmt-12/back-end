@@ -99,7 +99,7 @@ class MemoryServiceTest {
 	@DisplayName("단일 기억을 조회한다.")
 	void read_success() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
@@ -161,7 +161,7 @@ class MemoryServiceTest {
 	@DisplayName("모든 기억을 조회한다.")
 	void readAll() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
@@ -266,7 +266,7 @@ class MemoryServiceTest {
 	@DisplayName("커서 기반으로 기억을 조회한다.")
 	void readAll_withCursor() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1001L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1001L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
@@ -406,7 +406,7 @@ class MemoryServiceTest {
 	@DisplayName("키워드로 기억을 조회한다.")
 	void readAll_withKeyword() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1002L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1002L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
@@ -474,7 +474,7 @@ class MemoryServiceTest {
 	@DisplayName("기간으로 기억을 조회한다.")
 	void readAll_withDateRange() throws NoSuchFieldException, IllegalAccessException {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1003L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1003L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
@@ -571,7 +571,7 @@ class MemoryServiceTest {
 	@DisplayName("기억을 생성한다.")
 	void createMemory_success() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1004L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1004L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 		Associate otherAssociate = associateRepository.save(Associate.create("다른어소시에이트", member, community));
@@ -626,7 +626,7 @@ class MemoryServiceTest {
 	@DisplayName("존재하지 않는 참여자로 기억을 생성하면 예외가 발생한다.")
 	void createMemory_associateNotFound() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1005L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1005L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
@@ -666,7 +666,7 @@ class MemoryServiceTest {
 	@DisplayName("존재하지 않는 커뮤니티로 기억을 생성하면 예외가 발생한다.")
 	void createMemory_communityNotFound() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1006L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1006L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
@@ -706,7 +706,7 @@ class MemoryServiceTest {
 	@DisplayName("기억을 수정한다. - 참여자 추가")
 	void updateMemory_success_associate_add() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 		Associate otherAssociate = associateRepository.save(Associate.create("다른어소시에이트", member, community));
@@ -779,7 +779,7 @@ class MemoryServiceTest {
 	@DisplayName("기억을 수정한다. - 참여자 감소")
 	void updateMemory_success_associate_remove() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 		Associate otherAssociate = associateRepository.save(Associate.create("다른어소시에이트", member, community));
@@ -852,7 +852,7 @@ class MemoryServiceTest {
 	@DisplayName("존재하지 않는 기억을 수정하면 예외가 발생한다.")
 	void updateMemory_memoryNotFound() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1008L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1008L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
@@ -892,7 +892,7 @@ class MemoryServiceTest {
 	@DisplayName("기억의 작성자가 아닌 경우 기억을 수정하면 예외가 발생한다.")
 	void updateMemory_notAuthor() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1009L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1009L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate authorAssociate = associateRepository.save(Associate.create("작성자어소시에이트", member, community));
 		Associate otherAssociate = associateRepository.save(Associate.create("다른어소시에이트", member, community));
@@ -950,7 +950,7 @@ class MemoryServiceTest {
 	@DisplayName("기억을 삭제한다.")
 	void deleteMemory_success() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1010L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1010L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
@@ -999,7 +999,7 @@ class MemoryServiceTest {
 	@DisplayName("기억의 작성자가 아닌 경우 기억을 삭제하면 예외가 발생한다.")
 	void deleteMemory_notAuthor() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1011L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1011L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate authorAssociate = associateRepository.save(Associate.create("작성자어소시에이트", member, community));
 		Associate otherAssociate = associateRepository.save(Associate.create("다른어소시에이트", member, community));
@@ -1035,7 +1035,7 @@ class MemoryServiceTest {
 	@DisplayName("기억에 연결된 이미지를 다운로드한다.")
 	void downloadImages_success() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1012L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1012L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 

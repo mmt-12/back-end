@@ -47,8 +47,8 @@ class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
     @DisplayName("단일 메모리 ID로 연관된 Associate 수를 조회한다")
     void countAssociatesByMemoryId_단일_메모리_ID로_연관된_Associate_수를_조회한다() {
         // given
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1009L));
-        Member member2 = memberRepository.save(Member.create("테스트멤버2", "test@test.com", LocalDate.of(1990, 1, 1), 1010L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1009L));
+        Member member2 = memberRepository.save(Member.createKakao("테스트멤버2", "test@test.com", LocalDate.of(1990, 1, 1), 1010L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
         Associate associate2 = associateRepository.save(Associate.create("다른어소시에이트", member2, community));
@@ -84,7 +84,7 @@ class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
     @DisplayName("삭제된 연관 관계는 단일 메모리 ID로 조회되지 않는다.")
     void countAssociatesByMemoryId_삭제된_연관_관계는_조회되지_않는다() {
         // given
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1011L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1011L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
         Associate associate2 = associateRepository.save(Associate.create("다른어소시에이트", member, community));
@@ -134,7 +134,7 @@ class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
     @DisplayName("메모리와 삭제되지 않은 상태로 메모리 연관 관계를 조회한다")
     void findAllByMemoryAndDeletedAtIsNull_메모리_연관_관계를_조회한다() {
         // given
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
@@ -170,8 +170,8 @@ class MemoryAssociateRepositoryTest extends IntegrationsTestSupport {
     @DisplayName("메모리 ID 목록으로 연관된 Associate 수를 조회한다")
     void countAssociatesByMemoryIds_연관된_Associate_수를_조회한다() {
         // given
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
-        Member member2 = memberRepository.save(Member.create("테스트멤버2", "test@test.com", LocalDate.of(1990, 1, 1), 1008L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+        Member member2 = memberRepository.save(Member.createKakao("테스트멤버2", "test@test.com", LocalDate.of(1990, 1, 1), 1008L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
         Associate associate2 = associateRepository.save(Associate.create("다른어소시에이트", member2, community));
