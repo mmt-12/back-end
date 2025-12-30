@@ -2,6 +2,7 @@ package com.memento.server.domain.member;
 
 import static com.memento.server.domain.member.MemberType.KAKAO;
 import static com.memento.server.domain.member.MemberType.NORMAL;
+import static com.memento.server.domain.member.MemberType.REJECT;
 import static com.memento.server.domain.member.MemberType.WAIT;
 import static com.memento.server.utility.validation.member.MemberValidator.validateBirthday;
 import static com.memento.server.utility.validation.member.MemberValidator.validateEmail;
@@ -109,5 +110,13 @@ public class Member extends BaseEntity {
 	public void update(String name, String email) {
 		this.name = name;
 		this.email = email;
+	}
+
+	public void signUpApprove() {
+		this.type = NORMAL;
+	}
+
+	public void signUpReject() {
+		this.type = REJECT;
 	}
 }

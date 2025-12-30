@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.memento.server.api.controller.member.dto.MemberNormalSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
+import com.memento.server.api.controller.member.dto.MemberSignUpResultRequest;
+import com.memento.server.api.controller.member.dto.MemberSignUpResultResponse;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
@@ -89,7 +91,7 @@ public class MemberService {
 	}
 
 	@Transactional
-	public MemberSignUpResponse normalSignUp(MemberNormalSignUpRequest request) {
+	public void normalSignUp(MemberNormalSignUpRequest request) {
 		// secret 검사
 		if (!request.secret().equals("오렌지")) {
 			throw new MementoException(MEMBER_SECRET_INVALID);
@@ -112,24 +114,32 @@ public class MemberService {
 
 		Member member = memberRepository.save(
 			Member.createNormal(request.name(), encodedPassword, request.email(), request.birthday()));
+	}
+
+	@Transactional
+	public void signUpResult(MemberSignUpResultRequest request) {
+		Member member = memberRepository.findByIdAndDeletedAtIsNull(request.memberId())
+			.orElseThrow(() -> new MementoException(MEMBER_NOT_FOUND));
+
+		if (request.isReject()) {
+			member.signUpReject();
+			return;
+		}
+		member.signUpApprove();
 
 		// 커뮤니티 자동 가입
 		Optional<Community> communityOptional = communityRepository.findByIdAndDeletedAtIsNull(1L);
 		Community community = communityOptional.orElse(
 			communityRepository.save(Community.create("SSAFY 12기 12반", member)));
-		Associate associate = associateRepository.save(Associate.create(request.name(), member, community));
+		Associate associate = associateRepository.save(Associate.create(member.getName(), member, community));
 		associateStatsRepository.save(AssociateStats.builder()
 			.associate(associate)
 			.consecutiveAttendanceDays(1)
 			.lastAttendedAt(LocalDateTime.now())
 			.build());
 
-		MemberClaim memberClaim = MemberClaim.of(member, associate);
-		JwtToken token = jwtTokenProvider.createToken(memberClaim);
-
 		fcmEventPublisher.publishNotification(
 			AssociateFCM.from(associate.getNickname(), community.getId(), associate.getId()));
-		return MemberSignUpResponse.from(member, token);
 	}
 
 	@Transactional

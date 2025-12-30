@@ -13,6 +13,8 @@ import com.memento.server.api.controller.member.dto.CommunityListResponse;
 import com.memento.server.api.controller.member.dto.MemberNormalSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
+import com.memento.server.api.controller.member.dto.MemberSignUpResultRequest;
+import com.memento.server.api.controller.member.dto.MemberSignUpResultResponse;
 import com.memento.server.api.controller.member.dto.MemberUpdateRequest;
 import com.memento.server.api.service.community.AssociateService;
 import com.memento.server.api.service.member.MemberService;
@@ -35,8 +37,15 @@ public class MemberController {
 	}
 
 	@PostMapping("/signup/normal")
-	public ResponseEntity<MemberSignUpResponse> normalSignUp(@RequestBody MemberNormalSignUpRequest request) {
-		return ResponseEntity.ok(memberService.normalSignUp(request));
+	public ResponseEntity<Void> normalSignUp(@RequestBody MemberNormalSignUpRequest request) {
+		memberService.normalSignUp(request);
+		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/signup/result")
+	public ResponseEntity<Void> signUpResult(@RequestBody MemberSignUpResultRequest request) {
+		memberService.signUpResult(request);
+		return ResponseEntity.ok().build();
 	}
 
 	@PutMapping
