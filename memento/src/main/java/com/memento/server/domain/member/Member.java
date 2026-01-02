@@ -50,7 +50,7 @@ public class Member extends BaseEntity {
 	@Column(name = "password", columnDefinition = "CHAR(64)", nullable = true)
 	private String password;
 
-	@Column(name = "email", length = 255, nullable = false)
+	@Column(name = "email", length = 255, unique = true, nullable = false)
 	private String email;
 
 	@Column(name = "birthday", nullable = true)
