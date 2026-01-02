@@ -2,6 +2,7 @@ package com.memento.server.api.service.member;
 
 import static com.memento.server.common.error.ErrorCodes.ASSOCIATE_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_DUPLICATE;
+import static com.memento.server.common.error.ErrorCodes.MEMBER_EMAIL_DUPLICATE;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_SECRET_INVALID;
 import static com.memento.server.common.error.ErrorCodes.SING_IN_FAIL;
@@ -51,6 +52,12 @@ public class MemberService {
 	private final AchievementEventPublisher achievementEventPublisher;
 	private final AssociateStatsRepository associateStatsRepository;
 	private final PasswordEncoder passwordEncoder;
+
+	public void checkDuplicateEmail(String email) {
+		if (memberRepository.existsByEmail(email)) {
+			throw new MementoException(MEMBER_EMAIL_DUPLICATE);
+		}
+	}
 
 	@Transactional
 	public MemberSignUpResponse signUp(Long kakaoId, MemberSignUpRequest request) {
