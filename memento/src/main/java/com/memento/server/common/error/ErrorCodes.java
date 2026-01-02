@@ -57,6 +57,7 @@ public enum ErrorCodes implements ErrorCode {
 	MEMBER_DUPLICATE(BAD_REQUEST, 4009, "이미 가입된 회원입니다."),
 	MEMBER_NOT_FOUND(BAD_REQUEST, 4010, "존재하지 않는 회원입니다."),
 	MEMBER_SECRET_INVALID(BAD_REQUEST, 4011, "올바르지 않은 암호입니다."),
+  MEMBER_EMAIL_DUPLICATE(BAD_REQUEST, 4012, "중복된 email입니다."),
 
 	COMMUNITY_NAME_REQUIRED(BAD_REQUEST, 5000, "커뮤니티 이름은 필수입니다."),
 	COMMUNITY_NAME_BLANK(BAD_REQUEST, 5001, "커뮤니티 이름은 공백일 수 없습니다."),
