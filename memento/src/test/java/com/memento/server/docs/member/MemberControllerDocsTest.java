@@ -2,6 +2,7 @@ package com.memento.server.docs.member;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -16,6 +17,8 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -43,6 +46,8 @@ import com.memento.server.api.controller.member.dto.SignInRequest;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.api.service.community.AssociateService;
 import com.memento.server.api.service.member.MemberService;
+import com.memento.server.common.error.ErrorCodes;
+import com.memento.server.common.exception.MementoException;
 import com.memento.server.docs.RestDocsSupport;
 
 public class MemberControllerDocsTest extends RestDocsSupport {
@@ -247,6 +252,55 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 				requestFields(
 					fieldWithPath("name").type(STRING).description("이름"),
 					fieldWithPath("email").type(STRING).description("이메일")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("이메일 중복 체크 - 사용 가능한 이메일")
+	void checkDuplicateEmail_success() throws Exception {
+		// given
+		String email = "available@example.com";
+		doNothing().when(memberService).checkDuplicateEmail(any());
+
+		// when & then
+		mockMvc.perform(get("/api/v1/members/check-email")
+				.param("email", email))
+			.andExpect(status().isOk())
+			.andDo(document("member-check-email",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				queryParameters(
+					parameterWithName("email").description("중복 체크할 이메일")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("이메일 중복 체크 - 중복된 이메일")
+	void checkDuplicateEmail_duplicate() throws Exception {
+		// given
+		String email = "duplicate@example.com";
+		doThrow(new MementoException(ErrorCodes.MEMBER_EMAIL_DUPLICATE))
+			.when(memberService).checkDuplicateEmail(any());
+
+		// when & then
+		mockMvc.perform(get("/api/v1/members/check-email")
+				.param("email", email))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.code").value(4012))
+			.andExpect(jsonPath("$.message").value("중복된 email입니다."))
+			.andDo(document("member-check-email-duplicate",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				queryParameters(
+					parameterWithName("email").description("중복 체크할 이메일")
+				),
+				responseFields(
+					fieldWithPath("status").type(STRING).description("HTTP 상태"),
+					fieldWithPath("code").type(NUMBER).description("에러 코드"),
+					fieldWithPath("message").type(STRING).description("에러 메시지"),
+					fieldWithPath("errors").type(ARRAY).description("필드 에러 목록")
 				)
 			));
 	}

@@ -1,8 +1,10 @@
 package com.memento.server.spring.api.service.member;
 
 import static com.memento.server.common.error.ErrorCodes.MEMBER_DUPLICATE;
+import static com.memento.server.common.error.ErrorCodes.MEMBER_EMAIL_DUPLICATE;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static reactor.core.publisher.Mono.when;
 
@@ -187,6 +189,33 @@ class MemberServiceTest {
 			.satisfies(ex -> {
 				MementoException me = (MementoException)ex;
 				assertThat(me.getErrorCode()).isEqualTo(MEMBER_NOT_FOUND);
+			});
+	}
+
+	@Test
+	@DisplayName("이메일 중복 체크 시 사용 가능한 이메일이면 예외가 발생하지 않는다.")
+	void checkDuplicateEmail_withAvailableEmail_success() {
+		// given
+		String email = "new@test.com";
+
+		// when & then
+		assertThatCode(() -> memberService.checkDuplicateEmail(email))
+			.doesNotThrowAnyException();
+	}
+
+	@Test
+	@DisplayName("이메일 중복 체크 시 이미 존재하는 이메일이면 MEMBER_EMAIL_DUPLICATE 예외가 발생한다.")
+	void checkDuplicateEmail_withDuplicateEmail_throwsException() {
+		// given
+		String email = "existing@test.com";
+		memberRepository.save(Member.createKakao("홍길동", email, LocalDate.of(1990, 1, 1), 1001L));
+
+		// when & then
+		assertThatThrownBy(() -> memberService.checkDuplicateEmail(email))
+			.isInstanceOf(MementoException.class)
+			.satisfies(ex -> {
+				MementoException me = (MementoException) ex;
+				assertThat(me.getErrorCode()).isEqualTo(MEMBER_EMAIL_DUPLICATE);
 			});
 	}
 }

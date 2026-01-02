@@ -45,4 +45,31 @@ class MemberRepositoryTest extends IntegrationsTestSupport {
 		assertThat(foundMember).isPresent();
 		assertThat(foundMember.get().getId()).isEqualTo(member.getId());
 	}
+
+	@Test
+	@DisplayName("이메일로 회원 존재 여부를 확인한다 - 존재하는 경우")
+	void existsByEmail_exists() {
+		// given
+		String email = "existing@test.com";
+		memberRepository.save(Member.createKakao("홍길동", email, LocalDate.of(1990, 1, 1), 1001L));
+
+		// when
+		boolean exists = memberRepository.existsByEmail(email);
+
+		// then
+		assertThat(exists).isTrue();
+	}
+
+	@Test
+	@DisplayName("이메일로 회원 존재 여부를 확인한다 - 존재하지 않는 경우")
+	void existsByEmail_notExists() {
+		// given
+		String email = "notexisting@test.com";
+
+		// when
+		boolean exists = memberRepository.existsByEmail(email);
+
+		// then
+		assertThat(exists).isFalse();
+	}
 }
