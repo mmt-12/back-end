@@ -210,7 +210,7 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
-			.andDo(document("member-signup-result",
+			.andDo(document("member-login-normal",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestFields(

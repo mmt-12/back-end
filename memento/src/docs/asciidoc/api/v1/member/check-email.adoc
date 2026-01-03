@@ -1,0 +1,16 @@
+[[member-check-email-test]]
+=== 이메일 중복 체크
+
+==== HTTP Request
+
+include::{snippets}/member-check-email/http-request.adoc[]
+include::{snippets}/member-check-email/query-parameters.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/member-check-email/http-response.adoc[]
+
+==== Error Response
+
+include::{snippets}/member-check-email-duplicate/http-response.adoc[]
+include::{snippets}/member-check-email-duplicate/response-fields.adoc[]

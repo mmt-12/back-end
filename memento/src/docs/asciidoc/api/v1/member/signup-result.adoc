@@ -1,0 +1,13 @@
+[[member-signup-result-test]]
+=== 일반 회원가입 승낙
+
+==== HTTP Request
+
+include::{snippets}/member-signup-result/http-request.adoc[]
+include::{snippets}/member-signup-result/request-fields.adoc[]
+
+NOTE: 거절 여부가 TRUE면 회원가입 거절입니다.
+
+==== HTTP Response
+
+include::{snippets}/member-signup-result/http-response.adoc[]
