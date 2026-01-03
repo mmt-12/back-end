@@ -60,7 +60,7 @@ public class SecurityConfig {
 				.requestMatchers("/api/v1/sign-in", "/api/v1/auth/redirect", "/api/v1/auth/refresh",
 					"/v1/sign-in", "/v1/auth/redirect", "/v1/auth/refresh", "/api/v1/health", "/v1/health",
 					"/api/v1/members/signup/normal", "/api/v1/members/signin",
-					"/v1/members/signup/normal", "/v1/members/signin").permitAll()
+					"/v1/members/signup/normal", "/v1/members/signin", "/api/v1/members/check-email").permitAll()
 				.requestMatchers("/error").permitAll()
 				.anyRequest().authenticated())
 			.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
