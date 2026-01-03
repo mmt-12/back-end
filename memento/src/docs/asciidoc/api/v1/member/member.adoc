@@ -22,3 +22,7 @@ include::login-normal.adoc[]
 '''
 
 include::signup-normal.adoc[]
+
+'''
+
+include::check-email.adoc[]
