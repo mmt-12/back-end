@@ -68,7 +68,6 @@ public class MemberControllerTest extends ControllerTestSupport {
 		// when & then
 		mockMvc.perform(
 				get("/api/v1/members/check-email")
-						.with(withJwt(1L, null, null))
 					.param("email", email))
 			.andDo(print())
 			.andExpect(status().isOk());
@@ -85,7 +84,6 @@ public class MemberControllerTest extends ControllerTestSupport {
 		// when & then
 		mockMvc.perform(
 				get("/api/v1/members/check-email")
-						.with(withJwt(1L, null, null))
 					.param("email", email))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
@@ -102,7 +100,6 @@ public class MemberControllerTest extends ControllerTestSupport {
 		// when & then
 		mockMvc.perform(
 				get("/api/v1/members/check-email")
-						.with(withJwt(1L, null, null))
 					.param("email", invalidEmail))
 			.andDo(print())
 			.andExpect(status().isBadRequest());
@@ -114,7 +111,6 @@ public class MemberControllerTest extends ControllerTestSupport {
 		// when & then
 		mockMvc.perform(
 				get("/api/v1/members/check-email")
-						.with(withJwt(1L, null, null))
 					.param("email", ""))
 			.andDo(print())
 			.andExpect(status().isBadRequest());
