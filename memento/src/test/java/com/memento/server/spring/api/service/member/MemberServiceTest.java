@@ -3,10 +3,13 @@ package com.memento.server.spring.api.service.member;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_DUPLICATE;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_EMAIL_DUPLICATE;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_NOT_FOUND;
+import static com.memento.server.common.error.ErrorCodes.MEMBER_SECRET_INVALID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static reactor.core.publisher.Mono.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 
@@ -18,19 +21,27 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.memento.server.api.controller.member.dto.CommunityListResponse;
+import com.memento.server.api.controller.member.dto.MemberNormalSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
+import com.memento.server.api.controller.member.dto.MemberSignUpResultRequest;
 import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.community.AssociateService;
+import com.memento.server.api.service.email.EmailEventPublisher;
+import com.memento.server.api.service.email.dto.event.SignupRequestEvent;
 import com.memento.server.api.service.fcm.FCMEventPublisher;
+import com.memento.server.api.service.fcm.dto.event.SignupResultFCM;
 import com.memento.server.api.service.member.MemberService;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
+import com.memento.server.domain.community.AssociateStatsRepository;
 import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
+import com.memento.server.domain.member.MemberType;
+import com.memento.server.domain.signup.SignupPendingRepository;
 
 @SpringBootTest
 class MemberServiceTest {
@@ -50,17 +61,36 @@ class MemberServiceTest {
 	@Autowired
 	private CommunityRepository communityRepository;
 
+	@Autowired
+	private AssociateStatsRepository associateStatsRepository;
+
+	@MockitoBean
+	private SignupPendingRepository signupPendingRepository;
+
 	@MockitoBean
 	private FCMEventPublisher fcmEventPublisher;
 
 	@MockitoBean
 	private AchievementEventPublisher achievementEventPublisher;
 
+	@MockitoBean
+	private EmailEventPublisher emailEventPublisher;
+
+	@MockitoBean
+	private org.springframework.mail.javamail.JavaMailSender javaMailSender;
+
+	@MockitoBean
+	private com.memento.server.api.service.email.EmailService emailService;
+
+	@MockitoBean
+	private com.memento.server.api.service.email.EmailEventListener emailEventListener;
+
 	@AfterEach
 	void afterEach() {
-		memberRepository.deleteAllInBatch();
+		associateStatsRepository.deleteAllInBatch();
 		associateRepository.deleteAllInBatch();
 		communityRepository.deleteAllInBatch();
+		memberRepository.deleteAllInBatch();
 	}
 
 	@Test
@@ -216,6 +246,177 @@ class MemberServiceTest {
 			.satisfies(ex -> {
 				MementoException me = (MementoException) ex;
 				assertThat(me.getErrorCode()).isEqualTo(MEMBER_EMAIL_DUPLICATE);
+			});
+	}
+
+	@Test
+	@DisplayName("일반 회원가입을 한다.")
+	void normalSignUp_success() {
+		// given
+		MemberNormalSignUpRequest request = MemberNormalSignUpRequest.builder()
+			.name("홍길동")
+			.email("hong@test.com")
+			.password("password123")
+			.birthday(LocalDate.of(1990, 1, 1))
+			.secret("오렌지")
+			.fcmToken("fcm-token-123")
+			.build();
+
+		// when
+		memberService.normalSignUp(request);
+
+		// then
+		Member saved = memberRepository.findByEmail("hong@test.com").orElseThrow();
+		assertThat(saved.getName()).isEqualTo("홍길동");
+		assertThat(saved.getType()).isEqualTo(MemberType.WAIT);
+
+		// Redis에 fcmToken이 저장되었는지 확인
+		verify(signupPendingRepository, times(1)).save(any(), any());
+
+		// 이메일 이벤트가 발행되었는지 확인
+		verify(emailEventPublisher, times(1)).publish(any(SignupRequestEvent.class));
+	}
+
+	@Test
+	@DisplayName("일반 회원가입 시 secret이 틀리면 MEMBER_SECRET_INVALID 예외가 발생한다.")
+	void normalSignUp_withInvalidSecret_throwsException() {
+		// given
+		MemberNormalSignUpRequest request = MemberNormalSignUpRequest.builder()
+			.name("홍길동")
+			.email("hong@test.com")
+			.password("password123")
+			.birthday(LocalDate.of(1990, 1, 1))
+			.secret("잘못된비밀")
+			.fcmToken("fcm-token-123")
+			.build();
+
+		// when & then
+		assertThatThrownBy(() -> memberService.normalSignUp(request))
+			.isInstanceOf(MementoException.class)
+			.satisfies(ex -> {
+				MementoException me = (MementoException) ex;
+				assertThat(me.getErrorCode()).isEqualTo(MEMBER_SECRET_INVALID);
+			});
+	}
+
+	@Test
+	@DisplayName("일반 회원가입 시 이메일이 중복되면 MEMBER_EMAIL_DUPLICATE 예외가 발생한다.")
+	void normalSignUp_withDuplicateEmail_throwsException() {
+		// given
+		memberRepository.save(Member.createKakao("기존회원", "hong@test.com", LocalDate.of(1990, 1, 1), 1001L));
+
+		MemberNormalSignUpRequest request = MemberNormalSignUpRequest.builder()
+			.name("홍길동")
+			.email("hong@test.com")
+			.password("password123")
+			.birthday(LocalDate.of(1995, 5, 5))
+			.secret("오렌지")
+			.fcmToken("fcm-token-123")
+			.build();
+
+		// when & then
+		assertThatThrownBy(() -> memberService.normalSignUp(request))
+			.isInstanceOf(MementoException.class)
+			.satisfies(ex -> {
+				MementoException me = (MementoException) ex;
+				assertThat(me.getErrorCode()).isEqualTo(MEMBER_EMAIL_DUPLICATE);
+			});
+	}
+
+	@Test
+	@DisplayName("일반 회원가입 시 생년월일이 중복되면 MEMBER_DUPLICATE 예외가 발생한다.")
+	void normalSignUp_withDuplicateBirthday_throwsException() {
+		// given
+		memberRepository.save(Member.createKakao("기존회원", "existing@test.com", LocalDate.of(1990, 1, 1), 1001L));
+
+		MemberNormalSignUpRequest request = MemberNormalSignUpRequest.builder()
+			.name("홍길동")
+			.email("hong@test.com")
+			.password("password123")
+			.birthday(LocalDate.of(1990, 1, 1))
+			.secret("오렌지")
+			.fcmToken("fcm-token-123")
+			.build();
+
+		// when & then
+		assertThatThrownBy(() -> memberService.normalSignUp(request))
+			.isInstanceOf(MementoException.class)
+			.satisfies(ex -> {
+				MementoException me = (MementoException) ex;
+				assertThat(me.getErrorCode()).isEqualTo(MEMBER_DUPLICATE);
+			});
+	}
+
+	@Test
+	@DisplayName("회원가입 승인 시 회원 상태가 NORMAL로 변경되고 커뮤니티에 가입된다.")
+	void signUpResult_accept_success() {
+		// given
+		Member member = memberRepository.save(
+			Member.createNormal("홍길동", "encodedPassword", "hong@test.com", LocalDate.of(1990, 1, 1)));
+
+		org.mockito.Mockito.when(signupPendingRepository.findByMemberId(member.getId()))
+			.thenReturn(java.util.Optional.of("fcm-token-123"));
+
+		MemberSignUpResultRequest request = new MemberSignUpResultRequest(member.getId(), false);
+
+		// when
+		memberService.signUpResult(request);
+
+		// then
+		Member updated = memberRepository.findByIdAndDeletedAtIsNull(member.getId()).orElseThrow();
+		assertThat(updated.getType()).isEqualTo(MemberType.NORMAL);
+
+		// Associate가 생성되었는지 확인
+		assertThat(associateRepository.findByMemberIdAndDeletedAtIsNull(member.getId())).isPresent();
+
+		// Redis에서 삭제되었는지 확인
+		verify(signupPendingRepository, times(1)).deleteByMemberId(member.getId());
+
+		// FCM 이벤트가 발행되었는지 확인 (AssociateFCM + SignupResultFCM)
+		verify(fcmEventPublisher, times(2)).publishNotification(any());
+	}
+
+	@Test
+	@DisplayName("회원가입 거절 시 회원 상태가 REJECT로 변경된다.")
+	void signUpResult_reject_success() {
+		// given
+		Member member = memberRepository.save(
+			Member.createNormal("홍길동", "encodedPassword", "hong@test.com", LocalDate.of(1990, 1, 1)));
+
+		org.mockito.Mockito.when(signupPendingRepository.findByMemberId(member.getId()))
+			.thenReturn(java.util.Optional.of("fcm-token-123"));
+
+		MemberSignUpResultRequest request = new MemberSignUpResultRequest(member.getId(), true);
+
+		// when
+		memberService.signUpResult(request);
+
+		// then
+		Member updated = memberRepository.findByIdAndDeletedAtIsNull(member.getId()).orElseThrow();
+		assertThat(updated.getType()).isEqualTo(MemberType.REJECT);
+
+		// Associate가 생성되지 않았는지 확인
+		assertThat(associateRepository.findByMemberIdAndDeletedAtIsNull(member.getId())).isEmpty();
+
+		// Redis에서 삭제되었는지 확인
+		verify(signupPendingRepository, times(1)).deleteByMemberId(member.getId());
+
+		// FCM 이벤트가 발행되었는지 확인 (SignupResultFCM만)
+		verify(fcmEventPublisher, times(1)).publishNotification(any(SignupResultFCM.class));
+	}
+
+	@Test
+	@DisplayName("회원가입 결과 처리 시 회원이 존재하지 않으면 MEMBER_NOT_FOUND 예외가 발생한다.")
+	void signUpResult_withInvalidMemberId_throwsException() {
+		// given
+		MemberSignUpResultRequest request = new MemberSignUpResultRequest(9999L, false);
+
+		// when & then
+		assertThatThrownBy(() -> memberService.signUpResult(request))
+			.isInstanceOf(MementoException.class)
+			.satisfies(ex -> {
+				MementoException me = (MementoException) ex;
+				assertThat(me.getErrorCode()).isEqualTo(MEMBER_NOT_FOUND);
 			});
 	}
 }

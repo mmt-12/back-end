@@ -20,8 +20,10 @@ import java.util.Date;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.memento.server.api.controller.member.dto.MemberNormalSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
+import com.memento.server.api.controller.member.dto.MemberSignUpResultRequest;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
 
@@ -114,5 +116,111 @@ public class MemberControllerTest extends ControllerTestSupport {
 					.param("email", ""))
 			.andDo(print())
 			.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	@DisplayName("일반 회원가입 API")
+	void normalSignUp_success() throws Exception {
+		// given
+		MemberNormalSignUpRequest request = MemberNormalSignUpRequest.builder()
+			.name("홍길동")
+			.email("hong@test.com")
+			.password("password123")
+			.birthday(LocalDate.of(1990, 1, 1))
+			.secret("오렌지")
+			.fcmToken("fcm-token-123")
+			.build();
+
+		doNothing().when(memberService).normalSignUp(any());
+
+		// when & then
+		mockMvc.perform(
+				post("/api/v1/members/signup/normal")
+					.content(objectMapper.writeValueAsString(request))
+					.contentType(APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("일반 회원가입 API - secret 틀림")
+	void normalSignUp_invalidSecret() throws Exception {
+		// given
+		MemberNormalSignUpRequest request = MemberNormalSignUpRequest.builder()
+			.name("홍길동")
+			.email("hong@test.com")
+			.password("password123")
+			.birthday(LocalDate.of(1990, 1, 1))
+			.secret("잘못된비밀")
+			.fcmToken("fcm-token-123")
+			.build();
+
+		doThrow(new MementoException(ErrorCodes.MEMBER_SECRET_INVALID))
+			.when(memberService).normalSignUp(any());
+
+		// when & then
+		mockMvc.perform(
+				post("/api/v1/members/signup/normal")
+					.content(objectMapper.writeValueAsString(request))
+					.contentType(APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.code").value(4011));
+	}
+
+	@Test
+	@DisplayName("회원가입 결과 API - 승인")
+	void signUpResult_accept() throws Exception {
+		// given
+		MemberSignUpResultRequest request = new MemberSignUpResultRequest(1L, false);
+
+		doNothing().when(memberService).signUpResult(any());
+
+		// when & then
+		mockMvc.perform(
+				post("/api/v1/members/signup/result")
+					.with(withJwt(1L, null, null))
+					.content(objectMapper.writeValueAsString(request))
+					.contentType(APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("회원가입 결과 API - 거절")
+	void signUpResult_reject() throws Exception {
+		// given
+		MemberSignUpResultRequest request = new MemberSignUpResultRequest(1L, true);
+
+		doNothing().when(memberService).signUpResult(any());
+
+		// when & then
+		mockMvc.perform(
+				post("/api/v1/members/signup/result")
+					.with(withJwt(1L, null, null))
+					.content(objectMapper.writeValueAsString(request))
+					.contentType(APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("회원가입 결과 API - 회원 없음")
+	void signUpResult_memberNotFound() throws Exception {
+		// given
+		MemberSignUpResultRequest request = new MemberSignUpResultRequest(9999L, false);
+
+		doThrow(new MementoException(ErrorCodes.MEMBER_NOT_FOUND))
+			.when(memberService).signUpResult(any());
+
+		// when & then
+		mockMvc.perform(
+				post("/api/v1/members/signup/result")
+					.with(withJwt(1L, null, null))
+					.content(objectMapper.writeValueAsString(request))
+					.contentType(APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.code").value(4010));
 	}
 }
