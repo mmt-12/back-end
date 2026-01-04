@@ -25,8 +25,11 @@ import com.memento.server.api.service.achievement.AchievementEventPublisher;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.api.service.auth.jwt.JwtTokenProvider;
 import com.memento.server.api.service.auth.jwt.MemberClaim;
+import com.memento.server.api.service.email.EmailEventPublisher;
+import com.memento.server.api.service.email.dto.event.SignupRequestEvent;
 import com.memento.server.api.service.fcm.FCMEventPublisher;
 import com.memento.server.api.service.fcm.dto.event.AssociateFCM;
+import com.memento.server.api.service.fcm.dto.event.SignupResultFCM;
 import com.memento.server.common.exception.MementoException;
 import com.memento.server.domain.community.Associate;
 import com.memento.server.domain.community.AssociateRepository;
@@ -36,6 +39,7 @@ import com.memento.server.domain.community.Community;
 import com.memento.server.domain.community.CommunityRepository;
 import com.memento.server.domain.member.Member;
 import com.memento.server.domain.member.MemberRepository;
+import com.memento.server.domain.signup.SignupPendingRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,6 +56,8 @@ public class MemberService {
 	private final AchievementEventPublisher achievementEventPublisher;
 	private final AssociateStatsRepository associateStatsRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final SignupPendingRepository signupPendingRepository;
+	private final EmailEventPublisher emailEventPublisher;
 
 	public void checkDuplicateEmail(String email) {
 		if (memberRepository.existsByEmail(email)) {
@@ -108,9 +114,8 @@ public class MemberService {
 		}
 
 		// email 중복 검사
-		Optional<Member> memberEmailOptional = memberRepository.findByEmail(request.email());
-		if (memberEmailOptional.isPresent()) {
-			throw new MementoException(MEMBER_DUPLICATE);
+		if (memberRepository.existsByEmail(request.email())) {
+			throw new MementoException(MEMBER_EMAIL_DUPLICATE);
 		}
 
 		// 동일인물 검사
@@ -122,8 +127,17 @@ public class MemberService {
 		// 비밀번호 암호화
 		String encodedPassword = passwordEncoder.encode(request.password());
 
+		// Member 저장 (상태: WAIT)
 		Member member = memberRepository.save(
 			Member.createNormal(request.name(), encodedPassword, request.email(), request.birthday()));
+
+		// Redis에 fcmToken 저장
+		signupPendingRepository.save(member.getId(), request.fcmToken());
+
+		// Admin에게 이메일 전송 (비동기)
+		emailEventPublisher.publish(
+			SignupRequestEvent.of(member.getId(), request.name(), request.email(), request.birthday())
+		);
 	}
 
 	@Transactional
@@ -131,10 +145,22 @@ public class MemberService {
 		Member member = memberRepository.findByIdAndDeletedAtIsNull(request.memberId())
 			.orElseThrow(() -> new MementoException(MEMBER_NOT_FOUND));
 
+		// Redis에서 fcmToken 조회
+		Optional<String> fcmTokenOptional = signupPendingRepository.findByMemberId(request.memberId());
+
 		if (request.isReject()) {
 			member.signUpReject();
+
+			// FCM으로 거절 알림 전송
+			fcmTokenOptional.ifPresent(fcmToken ->
+				fcmEventPublisher.publishNotification(SignupResultFCM.rejected(fcmToken))
+			);
+
+			// Redis에서 삭제
+			signupPendingRepository.deleteByMemberId(request.memberId());
 			return;
 		}
+
 		member.signUpApprove();
 
 		// 커뮤니티 자동 가입
@@ -148,8 +174,17 @@ public class MemberService {
 			.lastAttendedAt(LocalDateTime.now())
 			.build());
 
+		// 다른 멤버들에게 새 멤버 가입 알림
 		fcmEventPublisher.publishNotification(
 			AssociateFCM.from(associate.getNickname(), community.getId(), associate.getId()));
+
+		// FCM으로 승인 알림 전송
+		fcmTokenOptional.ifPresent(fcmToken ->
+			fcmEventPublisher.publishNotification(SignupResultFCM.accepted(fcmToken))
+		);
+
+		// Redis에서 삭제
+		signupPendingRepository.deleteByMemberId(request.memberId());
 	}
 
 	public AuthResponse signIn(SignInRequest request) {
