@@ -69,6 +69,17 @@ public class MemberController {
 		return ResponseEntity.ok().build();
 	}
 
+	@GetMapping("/signup/result")
+	public ResponseEntity<String> signUpResultByEmail(
+		@RequestParam("memberId") Long memberId,
+		@RequestParam("action") String action
+	) {
+		boolean isReject = "reject".equalsIgnoreCase(action);
+		memberService.signUpResult(new MemberSignUpResultRequest(memberId, isReject));
+		String message = isReject ? "회원가입이 거절되었습니다." : "회원가입이 승인되었습니다.";
+		return ResponseEntity.ok(message);
+	}
+
 	@PostMapping("/signin")
 	public ResponseEntity<AuthResponse> singIn(@RequestBody SignInRequest request) {
 		return ResponseEntity.ok(memberService.signIn(request));

@@ -10,7 +10,6 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
-import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -40,7 +39,6 @@ import com.memento.server.api.controller.member.dto.CommunityListResponse;
 import com.memento.server.api.controller.member.dto.MemberNormalSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
-import com.memento.server.api.controller.member.dto.MemberSignUpResultRequest;
 import com.memento.server.api.controller.member.dto.MemberUpdateRequest;
 import com.memento.server.api.controller.member.dto.SignInRequest;
 import com.memento.server.api.service.auth.jwt.JwtToken;
@@ -169,23 +167,22 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 	}
 	
 	@Test
-	@DisplayName("회원가입 수락")
-	void signUpResult() throws Exception {
+	@DisplayName("회원가입 결과 처리 (이메일 링크)")
+	void signUpResultByEmail() throws Exception {
 		// given
-		setAuthentication(1L, null, null);
-		MemberSignUpResultRequest request = new MemberSignUpResultRequest(1L, true);
+		doNothing().when(memberService).signUpResult(any());
 
 		// when & then
-		mockMvc.perform(post("/api/v1/members/signup/result")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
+		mockMvc.perform(get("/api/v1/members/signup/result")
+				.param("memberId", "1")
+				.param("action", "accept"))
 			.andExpect(status().isOk())
-			.andDo(document("member-signup-result",
+			.andDo(document("member-signup-result-email",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				requestFields(
-					fieldWithPath("memberId").type(NUMBER).description("회원 아이디"),
-					fieldWithPath("isReject").type(BOOLEAN).description("거절 여부")
+				queryParameters(
+					parameterWithName("memberId").description("회원 아이디"),
+					parameterWithName("action").description("처리 액션 (accept 또는 reject)")
 				)
 			));
 	}

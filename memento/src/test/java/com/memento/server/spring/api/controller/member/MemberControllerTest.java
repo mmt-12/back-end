@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import com.memento.server.api.controller.member.dto.MemberNormalSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
-import com.memento.server.api.controller.member.dto.MemberSignUpResultRequest;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.spring.api.controller.ControllerTestSupport;
 
@@ -169,58 +168,50 @@ public class MemberControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
-	@DisplayName("회원가입 결과 API - 승인")
-	void signUpResult_accept() throws Exception {
+	@DisplayName("회원가입 결과 API (GET) - 승인")
+	void signUpResultByEmail_accept() throws Exception {
 		// given
-		MemberSignUpResultRequest request = new MemberSignUpResultRequest(1L, false);
-
 		doNothing().when(memberService).signUpResult(any());
 
 		// when & then
 		mockMvc.perform(
-				post("/api/v1/members/signup/result")
-					.with(withJwt(1L, null, null))
-					.content(objectMapper.writeValueAsString(request))
-					.contentType(APPLICATION_JSON))
+				get("/api/v1/members/signup/result")
+					.param("memberId", "1")
+					.param("action", "accept"))
 			.andDo(print())
 			.andExpect(status().isOk());
 	}
 
 	@Test
-	@DisplayName("회원가입 결과 API - 거절")
-	void signUpResult_reject() throws Exception {
+	@DisplayName("회원가입 결과 API (GET) - 거절")
+	void signUpResultByEmail_reject() throws Exception {
 		// given
-		MemberSignUpResultRequest request = new MemberSignUpResultRequest(1L, true);
-
 		doNothing().when(memberService).signUpResult(any());
 
 		// when & then
 		mockMvc.perform(
-				post("/api/v1/members/signup/result")
-					.with(withJwt(1L, null, null))
-					.content(objectMapper.writeValueAsString(request))
-					.contentType(APPLICATION_JSON))
+				get("/api/v1/members/signup/result")
+					.param("memberId", "1")
+					.param("action", "reject"))
 			.andDo(print())
 			.andExpect(status().isOk());
 	}
 
 	@Test
-	@DisplayName("회원가입 결과 API - 회원 없음")
-	void signUpResult_memberNotFound() throws Exception {
+	@DisplayName("회원가입 결과 API (GET) - 회원 없음")
+	void signUpResultByEmail_memberNotFound() throws Exception {
 		// given
-		MemberSignUpResultRequest request = new MemberSignUpResultRequest(9999L, false);
-
 		doThrow(new MementoException(ErrorCodes.MEMBER_NOT_FOUND))
 			.when(memberService).signUpResult(any());
 
 		// when & then
 		mockMvc.perform(
-				post("/api/v1/members/signup/result")
-					.with(withJwt(1L, null, null))
-					.content(objectMapper.writeValueAsString(request))
-					.contentType(APPLICATION_JSON))
+				get("/api/v1/members/signup/result")
+					.param("memberId", "9999")
+					.param("action", "accept"))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.code").value(4010));
 	}
+
 }

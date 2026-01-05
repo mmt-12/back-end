@@ -98,11 +98,11 @@
         </table>
 
         <div class="button-container">
-            <a th:href="@{${baseUrl} + '/signup-result.html?memberId=' + ${memberId} + '&action=accept'}"
+            <a th:href="@{${baseUrl} + '/api/v1/members/signup/result?memberId=' + ${memberId} + '&action=accept'}"
                class="button accept-button">
                 Accept
             </a>
-            <a th:href="@{${baseUrl} + '/signup-result.html?memberId=' + ${memberId} + '&action=reject'}"
+            <a th:href="@{${baseUrl} + '/api/v1/members/signup/result?memberId=' + ${memberId} + '&action=reject'}"
                class="button reject-button">
                 Reject
             </a>
