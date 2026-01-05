@@ -1,0 +1,11 @@
+[[member-signup-normal-test]]
+=== 일반 회원가입
+
+==== HTTP Request
+
+include::{snippets}/member-signup-normal-test/http-request.adoc[]
+include::{snippets}/member-signup-normal-test/request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/member-signup-normal-test/http-response.adoc[]

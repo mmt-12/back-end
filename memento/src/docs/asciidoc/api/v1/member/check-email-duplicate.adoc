@@ -1,0 +1,11 @@
+[[member-check-email-test]]
+=== 이메일 중복 체크 - 중복된 이메일
+
+==== HTTP Request
+
+include::{snippets}/member-check-email-duplicate/http-request.adoc[]
+include::{snippets}/member-check-email-duplicate/query-parameters.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/member-check-email-duplicate/http-response.adoc[]

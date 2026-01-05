@@ -10,3 +10,19 @@ include::update.adoc[]
 '''
 
 include::community-list.adoc[]
+
+'''
+
+include::signup-result.adoc[]
+
+'''
+
+include::login-normal.adoc[]
+
+'''
+
+include::signup-normal.adoc[]
+
+'''
+
+include::check-email.adoc[]

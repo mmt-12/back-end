@@ -56,6 +56,8 @@ public enum ErrorCodes implements ErrorCode {
 	MEMBER_KAKAO_ID_REQUIRED(BAD_REQUEST, 4008, "카카오 ID는 필수입니다."),
 	MEMBER_DUPLICATE(BAD_REQUEST, 4009, "이미 가입된 회원입니다."),
 	MEMBER_NOT_FOUND(BAD_REQUEST, 4010, "존재하지 않는 회원입니다."),
+	MEMBER_SECRET_INVALID(BAD_REQUEST, 4011, "올바르지 않은 암호입니다."),
+  MEMBER_EMAIL_DUPLICATE(BAD_REQUEST, 4012, "중복된 email입니다."),
 
 	COMMUNITY_NAME_REQUIRED(BAD_REQUEST, 5000, "커뮤니티 이름은 필수입니다."),
 	COMMUNITY_NAME_BLANK(BAD_REQUEST, 5001, "커뮤니티 이름은 공백일 수 없습니다."),
@@ -112,6 +114,8 @@ public enum ErrorCodes implements ErrorCode {
 
 	FCMTOKEN_DUPLICATE(BAD_REQUEST, 16000, "이미 저장된 fcm token입니다."),
 	FCMTOKEN_TOO_LONG(BAD_REQUEST, 16001, "fcm token의 길이가 512를 넘어갑니다."),
+
+	SING_IN_FAIL(BAD_REQUEST, 17000, "로그인 정보가 올바르지 않습니다."),
 
 	;
 	private final HttpStatus status;

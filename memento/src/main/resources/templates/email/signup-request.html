@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Memento - 회원가입 요청</title>
+    <style>
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #333;
+            margin: 0;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .info-table th, .info-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .info-table th {
+            color: #666;
+            width: 30%;
+        }
+        .info-table td {
+            color: #333;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            margin: 0 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .accept-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .reject-button {
+            background-color: #f44336;
+            color: white;
+        }
+        .note {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Memento 회원가입 요청</h1>
+        </div>
+
+        <p>새로운 회원가입 요청이 있습니다.</p>
+
+        <table class="info-table">
+            <tr>
+                <th>이름</th>
+                <td th:text="${name}">홍길동</td>
+            </tr>
+            <tr>
+                <th>이메일</th>
+                <td th:text="${email}">example@email.com</td>
+            </tr>
+            <tr>
+                <th>생년월일</th>
+                <td th:text="${birthday}">2000-01-01</td>
+            </tr>
+        </table>
+
+        <div class="button-container">
+            <a th:href="@{${baseUrl} + '/api/v1/members/signup/result?memberId=' + ${memberId} + '&action=accept'}"
+               class="button accept-button">
+                Accept
+            </a>
+            <a th:href="@{${baseUrl} + '/api/v1/members/signup/result?memberId=' + ${memberId} + '&action=reject'}"
+               class="button reject-button">
+                Reject
+            </a>
+        </div>
+
+        <div class="note">
+            <p>* Accept 버튼을 클릭하면 회원가입이 승인되고, 해당 회원에게 알림이 전송됩니다.</p>
+            <p>* Reject 버튼을 클릭하면 회원가입이 거절되고, 해당 회원에게 알림이 전송됩니다.</p>
+        </div>
+    </div>
+</body>
+</html>

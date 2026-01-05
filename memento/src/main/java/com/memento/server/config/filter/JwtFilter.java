@@ -39,10 +39,16 @@ public class JwtFilter extends OncePerRequestFilter {
 		"/api/v1/auth/redirect",
 		"/api/v1/auth/refresh",
 		"/api/v1/health",
+		"/api/v1/members/signup/normal",
+		"/api/v1/members/signin",
+		"/api/v1/members/check-email",
+		"/api/v1/members/signup/result",
 		"/v1/sign-in",
 		"/v1/auth/redirect",
 		"/v1/auth/refresh",
 		"/v1/health",
+		"/v1/members/signup/normal",
+		"/v1/members/signin",
 		"/h2-console/**"
 	);
 

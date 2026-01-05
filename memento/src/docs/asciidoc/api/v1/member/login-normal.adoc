@@ -1,0 +1,12 @@
+[[member-login-normal-test]]
+=== 일반 로그인
+
+==== HTTP Request
+
+include::{snippets}/member-login-normal/http-request.adoc[]
+include::{snippets}/member-login-normal/request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/member-login-normal/http-response.adoc[]
+include::{snippets}/member-login-normal/response-fields.adoc[]

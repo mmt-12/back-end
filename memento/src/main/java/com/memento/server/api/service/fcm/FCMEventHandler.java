@@ -28,6 +28,7 @@ import com.memento.server.api.service.fcm.dto.event.MemoryFCM;
 import com.memento.server.api.service.fcm.dto.event.NewImageFCM;
 import com.memento.server.api.service.fcm.dto.event.PostFCM;
 import com.memento.server.api.service.fcm.dto.event.ReactionFCM;
+import com.memento.server.api.service.fcm.dto.event.SignupResultFCM;
 import com.memento.server.api.service.fcm.dto.request.AssociateData;
 import com.memento.server.api.service.fcm.dto.request.BasicData;
 import com.memento.server.api.service.fcm.dto.request.BirthdayData;
@@ -345,5 +346,20 @@ public class FCMEventHandler {
 
 	private String createAssociateMessageContent(String nickname) {
 		return String.format("%s님이 가입했어요. 방명록에 환영의 메세지를 남겨주세요!", nickname);
+	}
+
+	public void handleSignupResultNotification(SignupResultFCM event) {
+		String title;
+		String content;
+
+		if (event.isAccepted()) {
+			title = "회원가입 승인";
+			content = "회원가입이 승인되었습니다. 앱에서 로그인해주세요!";
+		} else {
+			title = "회원가입 거절";
+			content = "회원가입이 거절되었습니다.";
+		}
+
+		fcmService.sendToToken(event.fcmToken(), title, content);
 	}
 }

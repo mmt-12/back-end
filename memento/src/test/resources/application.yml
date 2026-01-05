@@ -1,0 +1,93 @@
+app:
+  base-url: http://localhost:8080
+  admin-email: test@test.com
+
+spring:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+  mail:
+    host: localhost
+    port: 587
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MYSQL;DATABASE_TO_UPPER=false;
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 500MB
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+logging:
+  level:
+    root: debug
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
+
+minio:
+  url: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  buckets:
+    post: post
+    voice: voice
+    emoji: emoji
+    profile-image: profile-image
+
+kakao:
+  client-id: fe04ce9a65fb945a0801f0191591b216
+  client-secret: udbuuoikdJcfwfaejKhLybgfbr99AR8S
+  redirect-uri: http://localhost:8080/redirect
+  kauth-host: https://kauth.kakao.com
+  kapi-host: https://kapi.kakao.com
+
+jwt:
+  grant-type: Bearer
+  secret: b21549c1ff19293e650d422d9c3591e07f8462c0ae65bfaec53c397f517f6c4b3ad39b8c1b27dfc60d48b62d0b96633e2b816815842fbb5316cfaa81f25f8898
+  access-token-expire-time: 3600000
+  refresh-token-expire-time: 604800000
+  temp-time: 1800000
+
+file:
+  upload:
+    voice:
+      max-size-bytes: 26214400 # 25MB
+      allowed-types:
+        - audio/mpeg
+        - audio/wav
+        - audio/mp4
+        - audio/aac
+        - audio/ogg
+        - audio/webm
+    image:
+      max-size-bytes: 26214400 # 25MB
+      allowed-types:
+        - image/jpeg
+        - image/jpg
+        - image/png
+        - image/gif
+        - image/webp
+    post:
+      max-total-size-bytes: 524288000 # 500MB
+      max-file-count: 20

@@ -15,6 +15,7 @@ import com.memento.server.api.service.fcm.dto.event.MemoryFCM;
 import com.memento.server.api.service.fcm.dto.event.NewImageFCM;
 import com.memento.server.api.service.fcm.dto.event.PostFCM;
 import com.memento.server.api.service.fcm.dto.event.ReactionFCM;
+import com.memento.server.api.service.fcm.dto.event.SignupResultFCM;
 
 import lombok.RequiredArgsConstructor;
 
@@ -68,5 +69,10 @@ public class FCMEventListener {
 	@TransactionalEventListener(phase = AFTER_COMMIT)
 	public void handleAssociateNotification(AssociateFCM event) {
 		eventHandler.handleAssociateNotification(event);
+	}
+
+	@TransactionalEventListener(phase = AFTER_COMMIT)
+	public void handleSignupResultNotification(SignupResultFCM event) {
+		eventHandler.handleSignupResultNotification(event);
 	}
 }

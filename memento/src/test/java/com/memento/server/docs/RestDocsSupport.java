@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.memento.server.common.exception.GlobalExceptionHandler;
 import com.memento.server.config.argumentResolver.AssociateIdArgumentResolver;
 import com.memento.server.config.argumentResolver.CommunityIdArgumentResolver;
 import com.memento.server.config.argumentResolver.MemberIdArgumentResolver;
@@ -31,6 +32,7 @@ public abstract class RestDocsSupport {
 	@BeforeEach
 	void setUp(RestDocumentationContextProvider provider) {
 		this.mockMvc = MockMvcBuilders.standaloneSetup(initController())
+			.setControllerAdvice(new GlobalExceptionHandler())
 			.setCustomArgumentResolvers(
 				new MemberIdArgumentResolver(),
 				new CommunityIdArgumentResolver(),

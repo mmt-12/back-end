@@ -59,7 +59,7 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
     @DisplayName("findByMemberIdAndDeletedAtIsNull")
     void findByMemberIdAndDeletedAtIsNull() {
         // given
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.builder()
             .nickname("Associate 1")
@@ -78,9 +78,9 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
     @DisplayName("포스트 생성자를 조회한다.")
     void findByPostId() {
         // given
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
-        Member member2 = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1008L));
-        Member member3 = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1009L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+        Member member2 = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1008L));
+        Member member3 = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1009L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
         Associate associate2 = associateRepository.save(Associate.create("테스트어소시에이트", member2, community));
@@ -124,9 +124,9 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
     @DisplayName("기억의 참여자들을 조회한다.")
     void findAllByMemoryId() {
         // given
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
-        Member member2 = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1008L));
-        Member member3 = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1009L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+        Member member2 = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1008L));
+        Member member3 = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1009L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
         Associate associate2 = associateRepository.save(Associate.create("테스트어소시에이트", member2, community));
@@ -164,7 +164,7 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
     @DisplayName("ID와 삭제되지 않은 상태로 연관 관계를 조회한다")
     void findByIdAndDeletedAtIsNull_ID와_삭제되지_않은_상태로_연관_관계를_조회한다() {
         // given
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.builder()
             .nickname("Associate 1")
@@ -184,7 +184,7 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
     @DisplayName("회원 ID와 삭제되지 않은 상태로 연관 관계 목록을 조회한다")
     void findAllByMemberIdAndDeletedAtIsNull_회원_ID와_삭제되지_않은_상태로_연관_관계_목록을_조회한다() {
         // given
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         associateRepository.save(Associate.builder()
             .nickname("Associate 1")
@@ -205,8 +205,8 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
     @DisplayName("커뮤니티 ID와 키워드로 연관 관계 목록을 조회한다")
     void findAllByCommunityIdIdAndKeywordWithCursor_커뮤니티_ID와_키워드로_연관_관계_목록을_조회한다() {
         // given
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
-        Member member2 = memberRepository.save(Member.create("테스트멤버2", "test@test.com", LocalDate.of(1990, 1, 1), 1008L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+        Member member2 = memberRepository.save(Member.createKakao("테스트멤버2", "test@test.com", LocalDate.of(1990, 1, 1), 1008L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         associateRepository.save(Associate.builder()
             .nickname("Associate 1")
@@ -236,8 +236,8 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
     @DisplayName("ID 목록과 삭제되지 않은 상태로 연관 관계 목록을 조회한다")
     void findAllByIdInAndDeletedAtIsNull_ID_목록과_삭제되지_않은_상태로_연관_관계_목록을_조회한다() {
         // given
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
-        Member member2 = memberRepository.save(Member.create("Apple", "test@test.com", LocalDate.of(1990, 1, 1), 1008L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+        Member member2 = memberRepository.save(Member.createKakao("Apple", "test@test.com", LocalDate.of(1990, 1, 1), 1008L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.builder()
             .nickname("Associate 1")
@@ -265,9 +265,9 @@ public class AssociateRepositoryTest extends IntegrationsTestSupport {
     @DisplayName("커뮤니티로 조회한다.")
     void findAllByCommunityId() {
         // given
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
-        Member member2 = memberRepository.save(Member.create("김나나", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
-        Member member3 = memberRepository.save(Member.create("김다다", "muge@test.com", LocalDate.of(1990, 1, 1), 1003L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1007L));
+        Member member2 = memberRepository.save(Member.createKakao("김나나", "muge@test.com", LocalDate.of(1990, 1, 1), 1002L));
+        Member member3 = memberRepository.save(Member.createKakao("김다다", "muge@test.com", LocalDate.of(1990, 1, 1), 1003L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Community community2 = communityRepository.save(Community.create("테스트커뮤니티", member2));
         associateRepository.save(Associate.create("나나", member, community));
