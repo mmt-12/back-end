@@ -59,7 +59,7 @@ public class SecurityConfig {
                 "/v1/health",
                 "/api/v1/members/signup/normal", "/api/v1/members/signin",
                 "/v1/members/signup/normal", "/v1/members/signin", "/api/v1/members/check-email",
-                "/api/v1/members/signup/result").permitAll()
+                "/api/v1/members/signup/page", "/api/v1/members/signup/result").permitAll()
             .requestMatchers("/error").permitAll()
             .anyRequest().authenticated())
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
