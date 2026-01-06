@@ -10,7 +10,6 @@ include::{snippets}/member-check-email/query-parameters.adoc[]
 
 include::{snippets}/member-check-email/http-response.adoc[]
 
-==== Error Response
+==== Response Fields
 
-include::{snippets}/member-check-email-duplicate/http-response.adoc[]
-include::{snippets}/member-check-email-duplicate/response-fields.adoc[]
+include::{snippets}/member-check-email/response-fields.adoc[]

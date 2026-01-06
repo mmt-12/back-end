@@ -1,5 +1,6 @@
 package com.memento.server.api.controller.member;
 
+import com.memento.server.api.controller.member.dto.EmailCheckResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +38,7 @@ public class MemberController {
 	private final AssociateService associateService;
 
 	@GetMapping("/check-email")
-	public ResponseEntity<Void> checkDuplicateEmail(
+	public ResponseEntity<EmailCheckResponse> checkDuplicateEmail(
 		@RequestParam("email")
 		@NotBlank(message = "이메일은 필수입니다.")
 		@Email(
@@ -46,8 +47,7 @@ public class MemberController {
 		)
 		String email
 	) {
-    memberService.checkDuplicateEmail(email);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(memberService.checkDuplicateEmail(email));
 	}
 
 	@PostMapping("/signup/kakao")

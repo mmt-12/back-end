@@ -7,6 +7,7 @@ import static com.memento.server.common.error.ErrorCodes.MEMBER_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_SECRET_INVALID;
 import static com.memento.server.common.error.ErrorCodes.SING_IN_FAIL;
 
+import com.memento.server.api.controller.member.dto.EmailCheckResponse;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -59,10 +60,11 @@ public class MemberService {
 	private final SignupPendingRepository signupPendingRepository;
 	private final EmailEventPublisher emailEventPublisher;
 
-	public void checkDuplicateEmail(String email) {
+	public EmailCheckResponse checkDuplicateEmail(String email) {
 		if (memberRepository.existsByEmail(email)) {
-			throw new MementoException(MEMBER_EMAIL_DUPLICATE);
+			return EmailCheckResponse.of(false);
 		}
+		return EmailCheckResponse.of(true);
 	}
 
 	@Transactional
