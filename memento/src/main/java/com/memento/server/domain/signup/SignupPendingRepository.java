@@ -1,6 +1,7 @@
 package com.memento.server.domain.signup;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -13,19 +14,38 @@ import lombok.RequiredArgsConstructor;
 public class SignupPendingRepository {
 
 	private static final String KEY_PREFIX = "signup:pending:";
+	private static final String FCM_TOKEN_FIELD = "fcmToken";
+	private static final String SECURITY_TOKEN_FIELD = "token";
 	private static final long TTL_DAYS = 7;
 
 	private final StringRedisTemplate redisTemplate;
 
-	public void save(Long memberId, String fcmToken) {
+	public String save(Long memberId, String fcmToken) {
 		String key = KEY_PREFIX + memberId;
-		redisTemplate.opsForValue().set(key, fcmToken, TTL_DAYS, TimeUnit.DAYS);
+		String securityToken = UUID.randomUUID().toString();
+
+		redisTemplate.opsForHash().put(key, FCM_TOKEN_FIELD, fcmToken);
+		redisTemplate.opsForHash().put(key, SECURITY_TOKEN_FIELD, securityToken);
+		redisTemplate.expire(key, TTL_DAYS, TimeUnit.DAYS);
+
+		return securityToken;
 	}
 
-	public Optional<String> findByMemberId(Long memberId) {
+	public Optional<String> findFcmTokenByMemberId(Long memberId) {
 		String key = KEY_PREFIX + memberId;
-		String fcmToken = redisTemplate.opsForValue().get(key);
-		return Optional.ofNullable(fcmToken);
+		Object fcmToken = redisTemplate.opsForHash().get(key, FCM_TOKEN_FIELD);
+		return Optional.ofNullable((String) fcmToken);
+	}
+
+	public Optional<String> findSecurityTokenByMemberId(Long memberId) {
+		String key = KEY_PREFIX + memberId;
+		Object token = redisTemplate.opsForHash().get(key, SECURITY_TOKEN_FIELD);
+		return Optional.ofNullable((String) token);
+	}
+
+	public boolean verifyToken(Long memberId, String token) {
+		Optional<String> storedToken = findSecurityTokenByMemberId(memberId);
+		return storedToken.isPresent() && storedToken.get().equals(token);
 	}
 
 	public void deleteByMemberId(Long memberId) {
