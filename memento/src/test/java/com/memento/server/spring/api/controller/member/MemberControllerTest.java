@@ -168,50 +168,75 @@ public class MemberControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
-	@DisplayName("회원가입 결과 API (GET) - 승인")
-	void signUpResultByEmail_accept() throws Exception {
+	@DisplayName("회원가입 결과 페이지 (GET) - HTML 반환")
+	void signUpPage_returnsHtml() throws Exception {
 		// given
-		doNothing().when(memberService).signUpResult(any());
+		when(templateEngine.process(any(String.class), any())).thenReturn("<html></html>");
 
 		// when & then
 		mockMvc.perform(
-				get("/api/v1/members/signup/result")
+				get("/api/v1/members/signup/page")
 					.param("memberId", "1")
-					.param("action", "accept"))
+					.param("action", "accept")
+					.param("token", "test-token-123"))
 			.andDo(print())
 			.andExpect(status().isOk());
 	}
 
 	@Test
-	@DisplayName("회원가입 결과 API (GET) - 거절")
-	void signUpResultByEmail_reject() throws Exception {
+	@DisplayName("회원가입 결과 API (POST) - 승인")
+	void signUpResult_accept() throws Exception {
 		// given
 		doNothing().when(memberService).signUpResult(any());
+		String requestBody = """
+			{"memberId": 1, "token": "test-token-123", "action": "accept"}
+			""";
 
 		// when & then
 		mockMvc.perform(
-				get("/api/v1/members/signup/result")
-					.param("memberId", "1")
-					.param("action", "reject"))
+				post("/api/v1/members/signup/result")
+					.content(requestBody)
+					.contentType(APPLICATION_JSON))
 			.andDo(print())
 			.andExpect(status().isOk());
 	}
 
 	@Test
-	@DisplayName("회원가입 결과 API (GET) - 회원 없음")
-	void signUpResultByEmail_memberNotFound() throws Exception {
+	@DisplayName("회원가입 결과 API (POST) - 거절")
+	void signUpResult_reject() throws Exception {
 		// given
-		doThrow(new MementoException(ErrorCodes.MEMBER_NOT_FOUND))
+		doNothing().when(memberService).signUpResult(any());
+		String requestBody = """
+			{"memberId": 1, "token": "test-token-123", "action": "reject"}
+			""";
+
+		// when & then
+		mockMvc.perform(
+				post("/api/v1/members/signup/result")
+					.content(requestBody)
+					.contentType(APPLICATION_JSON))
+			.andDo(print())
+			.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("회원가입 결과 API (POST) - 토큰 검증 실패")
+	void signUpResult_invalidToken() throws Exception {
+		// given
+		doThrow(new MementoException(ErrorCodes.SIGNUP_TOKEN_INVALID))
 			.when(memberService).signUpResult(any());
+		String requestBody = """
+			{"memberId": 1, "token": "invalid-token", "action": "accept"}
+			""";
 
 		// when & then
 		mockMvc.perform(
-				get("/api/v1/members/signup/result")
-					.param("memberId", "9999")
-					.param("action", "accept"))
+				post("/api/v1/members/signup/result")
+					.content(requestBody)
+					.contentType(APPLICATION_JSON))
 			.andDo(print())
 			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.code").value(4010));
+			.andExpect(jsonPath("$.code").value(18000));
 	}
 
 }

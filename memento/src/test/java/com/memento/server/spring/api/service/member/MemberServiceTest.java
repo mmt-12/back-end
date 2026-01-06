@@ -4,6 +4,7 @@ import static com.memento.server.common.error.ErrorCodes.MEMBER_DUPLICATE;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_EMAIL_DUPLICATE;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_SECRET_INVALID;
+import static com.memento.server.common.error.ErrorCodes.SIGNUP_TOKEN_INVALID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -354,11 +355,14 @@ class MemberServiceTest {
 		// given
 		Member member = memberRepository.save(
 			Member.createNormal("홍길동", "encodedPassword", "hong@test.com", LocalDate.of(1990, 1, 1)));
+		String token = "valid-token-123";
 
-		org.mockito.Mockito.when(signupPendingRepository.findByMemberId(member.getId()))
+		org.mockito.Mockito.when(signupPendingRepository.verifyToken(member.getId(), token))
+			.thenReturn(true);
+		org.mockito.Mockito.when(signupPendingRepository.findFcmTokenByMemberId(member.getId()))
 			.thenReturn(java.util.Optional.of("fcm-token-123"));
 
-		MemberSignUpResultRequest request = new MemberSignUpResultRequest(member.getId(), false);
+		MemberSignUpResultRequest request = new MemberSignUpResultRequest(member.getId(), token, "accept");
 
 		// when
 		memberService.signUpResult(request);
@@ -383,11 +387,14 @@ class MemberServiceTest {
 		// given
 		Member member = memberRepository.save(
 			Member.createNormal("홍길동", "encodedPassword", "hong@test.com", LocalDate.of(1990, 1, 1)));
+		String token = "valid-token-123";
 
-		org.mockito.Mockito.when(signupPendingRepository.findByMemberId(member.getId()))
+		org.mockito.Mockito.when(signupPendingRepository.verifyToken(member.getId(), token))
+			.thenReturn(true);
+		org.mockito.Mockito.when(signupPendingRepository.findFcmTokenByMemberId(member.getId()))
 			.thenReturn(java.util.Optional.of("fcm-token-123"));
 
-		MemberSignUpResultRequest request = new MemberSignUpResultRequest(member.getId(), true);
+		MemberSignUpResultRequest request = new MemberSignUpResultRequest(member.getId(), token, "reject");
 
 		// when
 		memberService.signUpResult(request);
@@ -407,17 +414,20 @@ class MemberServiceTest {
 	}
 
 	@Test
-	@DisplayName("회원가입 결과 처리 시 회원이 존재하지 않으면 MEMBER_NOT_FOUND 예외가 발생한다.")
-	void signUpResult_withInvalidMemberId_throwsException() {
+	@DisplayName("회원가입 결과 처리 시 토큰이 유효하지 않으면 SIGNUP_TOKEN_INVALID 예외가 발생한다.")
+	void signUpResult_withInvalidToken_throwsException() {
 		// given
-		MemberSignUpResultRequest request = new MemberSignUpResultRequest(9999L, false);
+		MemberSignUpResultRequest request = new MemberSignUpResultRequest(9999L, "invalid-token", "accept");
+
+		org.mockito.Mockito.when(signupPendingRepository.verifyToken(9999L, "invalid-token"))
+			.thenReturn(false);
 
 		// when & then
 		assertThatThrownBy(() -> memberService.signUpResult(request))
 			.isInstanceOf(MementoException.class)
 			.satisfies(ex -> {
 				MementoException me = (MementoException) ex;
-				assertThat(me.getErrorCode()).isEqualTo(MEMBER_NOT_FOUND);
+				assertThat(me.getErrorCode()).isEqualTo(SIGNUP_TOKEN_INVALID);
 			});
 	}
 }

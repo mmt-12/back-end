@@ -62,6 +62,7 @@ import static org.mockito.Mockito.when;
 })
 @Import({TestSecurityConfig.class, JwtTokenProvider.class})
 @EnableConfigurationProperties(JwtProperties.class)
+@org.springframework.test.context.TestPropertySource(properties = {"app.base-url=http://localhost:8080"})
 public abstract class ControllerTestSupport {
 
 	@Autowired
@@ -117,6 +118,9 @@ public abstract class ControllerTestSupport {
 
 	@MockitoBean
 	protected FCMService fcmService;
+
+	@MockitoBean
+	protected org.thymeleaf.spring6.SpringTemplateEngine templateEngine;
 
 	protected RequestPostProcessor withJwt(Long memberId, Long associateId, Long communityId) {
 		when(memberClaimValidator.isValid(any())).thenReturn(true);
