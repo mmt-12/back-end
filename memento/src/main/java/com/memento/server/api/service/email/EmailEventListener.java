@@ -23,7 +23,8 @@ public class EmailEventListener {
 			event.memberId(),
 			event.name(),
 			event.email(),
-			event.birthday()
+			event.birthday(),
+			event.token()
 		);
 	}
 }

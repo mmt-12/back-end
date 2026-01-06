@@ -1,15 +1,33 @@
-[[member-signup-result-email-test]]
-=== 회원가입 결과 처리 (이메일 링크)
+[[member-signup-page]]
+=== 회원가입 결과 페이지 (이메일 링크)
 
-관리자에게 발송된 이메일의 Accept/Reject 버튼 클릭 시 호출되는 API입니다.
+관리자에게 발송된 이메일의 Accept/Reject 버튼 클릭 시 리다이렉트되는 페이지입니다.
+이 페이지는 자동으로 POST 요청을 수행하여 회원가입 결과를 처리합니다.
 
 ==== HTTP Request
 
-include::{snippets}/member-signup-result-email/http-request.adoc[]
-include::{snippets}/member-signup-result-email/query-parameters.adoc[]
+include::{snippets}/member-signup-page/http-request.adoc[]
+include::{snippets}/member-signup-page/query-parameters.adoc[]
 
 NOTE: action 파라미터 값이 `accept`면 승인, `reject`면 거절입니다.
 
 ==== HTTP Response
 
-include::{snippets}/member-signup-result-email/http-response.adoc[]
+include::{snippets}/member-signup-page/http-response.adoc[]
+
+'''
+
+[[member-signup-result]]
+=== 회원가입 결과 처리 (POST)
+
+회원가입 승인/거절을 처리하는 API입니다.
+보안 토큰 검증을 통해 유효한 요청만 처리됩니다.
+
+==== HTTP Request
+
+include::{snippets}/member-signup-result/http-request.adoc[]
+include::{snippets}/member-signup-result/request-fields.adoc[]
+
+==== HTTP Response
+
+include::{snippets}/member-signup-result/http-response.adoc[]

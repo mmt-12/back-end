@@ -28,7 +28,7 @@ public class EmailService {
 	@Value("${app.base-url}")
 	private String baseUrl;
 
-	public void sendSignupRequestEmail(Long memberId, String name, String email, LocalDate birthday) {
+	public void sendSignupRequestEmail(Long memberId, String name, String email, LocalDate birthday, String token) {
 		try {
 			MimeMessage message = mailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -36,7 +36,7 @@ public class EmailService {
 			helper.setTo(adminEmail);
 			helper.setSubject("[Memento] 새로운 회원가입 요청 - " + name);
 
-			String htmlContent = buildSignupRequestEmailContent(memberId, name, email, birthday);
+			String htmlContent = buildSignupRequestEmailContent(memberId, name, email, birthday, token);
 			helper.setText(htmlContent, true);
 
 			mailSender.send(message);
@@ -46,13 +46,14 @@ public class EmailService {
 		}
 	}
 
-	private String buildSignupRequestEmailContent(Long memberId, String name, String email, LocalDate birthday) {
+	private String buildSignupRequestEmailContent(Long memberId, String name, String email, LocalDate birthday, String token) {
 		Context context = new Context();
 		context.setVariable("memberId", memberId);
 		context.setVariable("name", name);
 		context.setVariable("email", email);
 		context.setVariable("birthday", birthday);
 		context.setVariable("baseUrl", baseUrl);
+		context.setVariable("token", token);
 
 		return templateEngine.process("email/signup-request", context);
 	}

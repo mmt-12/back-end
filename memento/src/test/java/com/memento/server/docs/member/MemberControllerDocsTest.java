@@ -11,6 +11,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -51,10 +52,12 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 
 	private final MemberService memberService = mock(MemberService.class);
 	private final AssociateService associateService = mock(AssociateService.class);
+	private final org.thymeleaf.TemplateEngine templateEngine = mock(org.thymeleaf.TemplateEngine.class);
 
 	@Override
 	protected Object initController() {
-		return new MemberController(memberService, associateService);
+		when(templateEngine.process(any(String.class), any())).thenReturn("<html></html>");
+		return new MemberController(memberService, associateService, templateEngine);
 	}
 	
 	// todo 지금 안씀
@@ -157,7 +160,7 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 				requestFields(
 					fieldWithPath("name").type(STRING).description("이름"),
 					fieldWithPath("email").type(STRING).description("이메일"),
-					fieldWithPath("birthday").type(ARRAY).description("생일 (\"YYYY-MM-DD\""),
+					fieldWithPath("birthday").type(ARRAY).description("생일 \"YYYY-MM-DD\""),
 					fieldWithPath("password").type(STRING).description("비밀번호"),
 					fieldWithPath("secret").type(STRING).description("암호"),
 					fieldWithPath("fcmToken").type(STRING).description("fcm 토큰")
@@ -166,22 +169,43 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 	}
 	
 	@Test
-	@DisplayName("회원가입 결과 처리 (이메일 링크)")
-	void signUpResultByEmail() throws Exception {
-		// given
-		doNothing().when(memberService).signUpResult(any());
-
+	@DisplayName("회원가입 결과 페이지 (이메일 링크)")
+	void signUpPage() throws Exception {
 		// when & then
-		mockMvc.perform(get("/api/v1/members/signup/result")
+		mockMvc.perform(get("/api/v1/members/signup/page")
 				.param("memberId", "1")
-				.param("action", "accept"))
+				.param("action", "accept")
+				.param("token", "test-token-123"))
 			.andExpect(status().isOk())
-			.andDo(document("member-signup-result-email",
+			.andDo(document("member-signup-page",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				queryParameters(
 					parameterWithName("memberId").description("회원 아이디"),
-					parameterWithName("action").description("처리 액션 (accept 또는 reject)")
+					parameterWithName("action").description("처리 액션 (accept 또는 reject)"),
+					parameterWithName("token").description("보안 토큰")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("회원가입 결과 처리 (POST)")
+	void signUpResult() throws Exception {
+		// given
+		doNothing().when(memberService).signUpResult(any());
+
+		// when & then
+		mockMvc.perform(post("/api/v1/members/signup/result")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"memberId\": 1, \"token\": \"test-token-123\", \"action\": \"accept\"}"))
+			.andExpect(status().isOk())
+			.andDo(document("member-signup-result",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestFields(
+					fieldWithPath("memberId").type(NUMBER).description("회원 아이디"),
+					fieldWithPath("token").type(STRING).description("보안 토큰"),
+					fieldWithPath("action").type(STRING).description("처리 액션 (accept 또는 reject)")
 				)
 			));
 	}

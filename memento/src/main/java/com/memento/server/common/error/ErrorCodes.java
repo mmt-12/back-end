@@ -117,6 +117,8 @@ public enum ErrorCodes implements ErrorCode {
 
 	SING_IN_FAIL(BAD_REQUEST, 17000, "로그인 정보가 올바르지 않습니다."),
 
+	SIGNUP_TOKEN_INVALID(BAD_REQUEST, 18000, "유효하지 않은 회원가입 승인 요청입니다."),
+
 	;
 	private final HttpStatus status;
 	private final int code;
