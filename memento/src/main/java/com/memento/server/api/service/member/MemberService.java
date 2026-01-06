@@ -5,6 +5,7 @@ import static com.memento.server.common.error.ErrorCodes.MEMBER_DUPLICATE;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_EMAIL_DUPLICATE;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_NOT_FOUND;
 import static com.memento.server.common.error.ErrorCodes.MEMBER_SECRET_INVALID;
+import static com.memento.server.common.error.ErrorCodes.SIGNUP_TOKEN_INVALID;
 import static com.memento.server.common.error.ErrorCodes.SING_IN_FAIL;
 
 import com.memento.server.api.controller.member.dto.EmailCheckResponse;
@@ -133,22 +134,27 @@ public class MemberService {
 		Member member = memberRepository.save(
 			Member.createNormal(request.name(), encodedPassword, request.email(), request.birthday()));
 
-		// Redis에 fcmToken 저장
-		signupPendingRepository.save(member.getId(), request.fcmToken());
+		// Redis에 fcmToken과 보안 토큰 저장
+		String securityToken = signupPendingRepository.save(member.getId(), request.fcmToken());
 
 		// Admin에게 이메일 전송 (비동기)
 		emailEventPublisher.publish(
-			SignupRequestEvent.of(member.getId(), request.name(), request.email(), request.birthday())
+			SignupRequestEvent.of(member.getId(), request.name(), request.email(), request.birthday(), securityToken)
 		);
 	}
 
 	@Transactional
 	public void signUpResult(MemberSignUpResultRequest request) {
+		// 토큰 검증
+		if (!signupPendingRepository.verifyToken(request.memberId(), request.token())) {
+			throw new MementoException(SIGNUP_TOKEN_INVALID);
+		}
+
 		Member member = memberRepository.findByIdAndDeletedAtIsNull(request.memberId())
 			.orElseThrow(() -> new MementoException(MEMBER_NOT_FOUND));
 
 		// Redis에서 fcmToken 조회
-		Optional<String> fcmTokenOptional = signupPendingRepository.findByMemberId(request.memberId());
+		Optional<String> fcmTokenOptional = signupPendingRepository.findFcmTokenByMemberId(request.memberId());
 
 		if (request.isReject()) {
 			member.signUpReject();
