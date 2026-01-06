@@ -225,7 +225,7 @@ class MemberServiceTest {
 	}
 
 	@Test
-	@DisplayName("이메일 중복 체크 시 사용 가능한 이메일이면 isAvailable이 true를 반환한다.")
+	@DisplayName("이메일 중복 체크 시 사용 가능한 이메일이면 isDuplicate가 false를 반환한다.")
 	void checkDuplicateEmail_withAvailableEmail_success() {
 		// given
 		String email = "new@test.com";
@@ -234,12 +234,12 @@ class MemberServiceTest {
 		EmailCheckResponse response = memberService.checkDuplicateEmail(email);
 
 		// then
-		assertThat(response.isAvailable()).isTrue();
+		assertThat(response.isDuplicate()).isFalse();
 	}
 
 	@Test
-	@DisplayName("이메일 중복 체크 시 이미 존재하는 이메일이면 isAvailable이 false를 반환한다.")
-	void checkDuplicateEmail_withDuplicateEmail_returnsFalse() {
+	@DisplayName("이메일 중복 체크 시 이미 존재하는 이메일이면 isDuplicate가 true를 반환한다.")
+	void checkDuplicateEmail_withDuplicateEmail_returnsTrue() {
 		// given
 		String email = "existing@test.com";
 		memberRepository.save(Member.createKakao("홍길동", email, LocalDate.of(1990, 1, 1), 1001L));
@@ -248,7 +248,7 @@ class MemberServiceTest {
 		EmailCheckResponse response = memberService.checkDuplicateEmail(email);
 
 		// then
-		assertThat(response.isAvailable()).isFalse();
+		assertThat(response.isDuplicate()).isTrue();
 	}
 
 	@Test

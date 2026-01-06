@@ -62,10 +62,7 @@ public class MemberService {
 	private final EmailEventPublisher emailEventPublisher;
 
 	public EmailCheckResponse checkDuplicateEmail(String email) {
-		if (memberRepository.existsByEmail(email)) {
-			return EmailCheckResponse.of(false);
-		}
-		return EmailCheckResponse.of(true);
+        return EmailCheckResponse.of(memberRepository.existsByEmail(email));
 	}
 
 	@Transactional

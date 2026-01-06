@@ -1,10 +1,10 @@
 package com.memento.server.api.controller.member.dto;
 
 public record EmailCheckResponse(
-        boolean isAvailable
+        boolean isDuplicate
 ) {
 
-    public static EmailCheckResponse of(boolean isAvailable){
-        return new EmailCheckResponse(isAvailable);
+    public static EmailCheckResponse of(boolean isDuplicate){
+        return new EmailCheckResponse(isDuplicate);
     }
 }
