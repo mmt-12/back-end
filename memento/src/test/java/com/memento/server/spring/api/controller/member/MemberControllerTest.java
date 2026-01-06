@@ -65,22 +65,6 @@ public class MemberControllerTest extends ControllerTestSupport {
 	void checkDuplicateEmail_success() throws Exception {
 		// given
 		String email = "test@example.com";
-		when(memberService.checkDuplicateEmail(any())).thenReturn(EmailCheckResponse.of(true));
-
-		// when & then
-		mockMvc.perform(
-				get("/api/v1/members/check-email")
-					.param("email", email))
-			.andDo(print())
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.isAvailable").value(true));
-	}
-
-	@Test
-	@DisplayName("이메일 중복 체크 API - 중복된 이메일")
-	void checkDuplicateEmail_duplicate() throws Exception {
-		// given
-		String email = "existing@example.com";
 		when(memberService.checkDuplicateEmail(any())).thenReturn(EmailCheckResponse.of(false));
 
 		// when & then
@@ -89,7 +73,23 @@ public class MemberControllerTest extends ControllerTestSupport {
 					.param("email", email))
 			.andDo(print())
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.isAvailable").value(false));
+			.andExpect(jsonPath("$.isDuplicate").value(false));
+	}
+
+	@Test
+	@DisplayName("이메일 중복 체크 API - 중복된 이메일")
+	void checkDuplicateEmail_duplicate() throws Exception {
+		// given
+		String email = "existing@example.com";
+		when(memberService.checkDuplicateEmail(any())).thenReturn(EmailCheckResponse.of(true));
+
+		// when & then
+		mockMvc.perform(
+				get("/api/v1/members/check-email")
+					.param("email", email))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.isDuplicate").value(true));
 	}
 
 	@Test

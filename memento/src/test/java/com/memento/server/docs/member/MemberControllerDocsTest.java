@@ -281,13 +281,13 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 	void checkDuplicateEmail_success() throws Exception {
 		// given
 		String email = "available@example.com";
-		when(memberService.checkDuplicateEmail(any())).thenReturn(EmailCheckResponse.of(true));
+		when(memberService.checkDuplicateEmail(any())).thenReturn(EmailCheckResponse.of(false));
 
 		// when & then
 		mockMvc.perform(get("/api/v1/members/check-email")
 				.param("email", email))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.isAvailable").value(true))
+			.andExpect(jsonPath("$.isDuplicate").value(false))
 			.andDo(document("member-check-email",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
@@ -295,7 +295,7 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 					parameterWithName("email").description("중복 체크할 이메일")
 				),
 				responseFields(
-					fieldWithPath("isAvailable").type(BOOLEAN).description("사용 가능 여부 (true: 사용 가능, false: 중복)")
+					fieldWithPath("isDuplicate").type(BOOLEAN).description("중복 여부 (true: 중복, false: 사용 가능)")
 				)
 			));
 	}
