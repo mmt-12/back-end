@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.memento.server.api.controller.member.dto.CommunityListResponse;
+import com.memento.server.api.controller.member.dto.EmailCheckResponse;
 import com.memento.server.api.controller.member.dto.MemberNormalSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
@@ -223,30 +224,30 @@ class MemberServiceTest {
 	}
 
 	@Test
-	@DisplayName("이메일 중복 체크 시 사용 가능한 이메일이면 예외가 발생하지 않는다.")
+	@DisplayName("이메일 중복 체크 시 사용 가능한 이메일이면 isAvailable이 true를 반환한다.")
 	void checkDuplicateEmail_withAvailableEmail_success() {
 		// given
 		String email = "new@test.com";
 
-		// when & then
-		assertThatCode(() -> memberService.checkDuplicateEmail(email))
-			.doesNotThrowAnyException();
+		// when
+		EmailCheckResponse response = memberService.checkDuplicateEmail(email);
+
+		// then
+		assertThat(response.isAvailable()).isTrue();
 	}
 
 	@Test
-	@DisplayName("이메일 중복 체크 시 이미 존재하는 이메일이면 MEMBER_EMAIL_DUPLICATE 예외가 발생한다.")
-	void checkDuplicateEmail_withDuplicateEmail_throwsException() {
+	@DisplayName("이메일 중복 체크 시 이미 존재하는 이메일이면 isAvailable이 false를 반환한다.")
+	void checkDuplicateEmail_withDuplicateEmail_returnsFalse() {
 		// given
 		String email = "existing@test.com";
 		memberRepository.save(Member.createKakao("홍길동", email, LocalDate.of(1990, 1, 1), 1001L));
 
-		// when & then
-		assertThatThrownBy(() -> memberService.checkDuplicateEmail(email))
-			.isInstanceOf(MementoException.class)
-			.satisfies(ex -> {
-				MementoException me = (MementoException) ex;
-				assertThat(me.getErrorCode()).isEqualTo(MEMBER_EMAIL_DUPLICATE);
-			});
+		// when
+		EmailCheckResponse response = memberService.checkDuplicateEmail(email);
+
+		// then
+		assertThat(response.isAvailable()).isFalse();
 	}
 
 	@Test

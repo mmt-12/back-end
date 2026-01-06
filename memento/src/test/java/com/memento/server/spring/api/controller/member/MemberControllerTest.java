@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.memento.server.api.controller.member.dto.EmailCheckResponse;
 import com.memento.server.common.error.ErrorCodes;
 import com.memento.server.common.exception.MementoException;
 
@@ -64,14 +65,15 @@ public class MemberControllerTest extends ControllerTestSupport {
 	void checkDuplicateEmail_success() throws Exception {
 		// given
 		String email = "test@example.com";
-		doNothing().when(memberService).checkDuplicateEmail(any());
+		when(memberService.checkDuplicateEmail(any())).thenReturn(EmailCheckResponse.of(true));
 
 		// when & then
 		mockMvc.perform(
 				get("/api/v1/members/check-email")
 					.param("email", email))
 			.andDo(print())
-			.andExpect(status().isOk());
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.isAvailable").value(true));
 	}
 
 	@Test
@@ -79,17 +81,15 @@ public class MemberControllerTest extends ControllerTestSupport {
 	void checkDuplicateEmail_duplicate() throws Exception {
 		// given
 		String email = "existing@example.com";
-		doThrow(new MementoException(ErrorCodes.MEMBER_EMAIL_DUPLICATE))
-			.when(memberService).checkDuplicateEmail(any());
+		when(memberService.checkDuplicateEmail(any())).thenReturn(EmailCheckResponse.of(false));
 
 		// when & then
 		mockMvc.perform(
 				get("/api/v1/members/check-email")
 					.param("email", email))
 			.andDo(print())
-			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.code").value(4012))
-			.andExpect(jsonPath("$.message").value("중복된 email입니다."));
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.isAvailable").value(false));
 	}
 
 	@Test
