@@ -50,12 +50,13 @@ class EmailServiceTest {
 		String name = "홍길동";
 		String email = "hong@test.com";
 		LocalDate birthday = LocalDate.of(1990, 1, 1);
+		String token = "test-token-123";
 
 		when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
 		when(templateEngine.process(any(String.class), any(Context.class))).thenReturn("<html>test</html>");
 
 		// when
-		emailService.sendSignupRequestEmail(memberId, name, email, birthday);
+		emailService.sendSignupRequestEmail(memberId, name, email, birthday, token);
 
 		// then
 		verify(mailSender, times(1)).createMimeMessage();
