@@ -34,7 +34,9 @@ public class SecurityConfig {
         configuration.addAllowedOrigin("http://localhost:3000");
         configuration.addAllowedOrigin("http://localhost:8080");
         configuration.addAllowedOrigin("https://dev.memento.ai.kr");
+        configuration.addAllowedOrigin("https://dev.api.memento.ai.kr");
         configuration.addAllowedOrigin("https://memento.ai.kr");
+        configuration.addAllowedOrigin("https://api.memento.ai.kr");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
