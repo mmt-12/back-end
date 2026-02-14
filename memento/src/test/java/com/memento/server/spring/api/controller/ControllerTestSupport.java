@@ -1,9 +1,11 @@
 package com.memento.server.spring.api.controller;
 
+import com.memento.server.config.JwtAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
@@ -60,8 +62,9 @@ import static org.mockito.Mockito.when;
 	MemberController.class,
 	MemoryController.class
 })
-@Import({TestSecurityConfig.class, JwtTokenProvider.class})
+@Import({TestSecurityConfig.class, JwtTokenProvider.class, JwtAuthenticationEntryPoint.class})
 @EnableConfigurationProperties(JwtProperties.class)
+@TestPropertySource(properties = {"app.base-url=http://localhost:8080"})
 public abstract class ControllerTestSupport {
 
 	@Autowired
@@ -117,6 +120,9 @@ public abstract class ControllerTestSupport {
 
 	@MockitoBean
 	protected FCMService fcmService;
+
+	@MockitoBean
+	protected org.thymeleaf.spring6.SpringTemplateEngine templateEngine;
 
 	protected RequestPostProcessor withJwt(Long memberId, Long associateId, Long communityId) {
 		when(memberClaimValidator.isValid(any())).thenReturn(true);

@@ -413,7 +413,7 @@ public class FCMMemoryHandlerTest extends IntegrationsTestSupport {
 
 	private FCMTestFixtures createSingleReceiverTestFixtures() {
 		Member member = memberRepository.save(
-			Member.create("테스터", "test@example.com", LocalDate.of(1990, 1, 1), 1001L));
+			Member.createKakao("테스터", "test@example.com", LocalDate.of(1990, 1, 1), 1001L));
 		Community community = communityRepository.save(Community.create("테스트 커뮤니티", member));
 		Associate receiver = associateRepository.save(Associate.create("수신자", member, community));
 
@@ -425,9 +425,9 @@ public class FCMMemoryHandlerTest extends IntegrationsTestSupport {
 
 	private FCMTestFixtures createReactionTestFixtures() {
 		Member member1 = memberRepository.save(
-			Member.create("액터", "actor@example.com", LocalDate.of(1990, 1, 1), 1001L));
+			Member.createKakao("액터", "actor@example.com", LocalDate.of(1990, 1, 1), 1001L));
 		Member member2 = memberRepository.save(
-			Member.create("수신자", "receiver@example.com", LocalDate.of(1990, 1, 1), 1002L));
+			Member.createKakao("수신자", "receiver@example.com", LocalDate.of(1990, 1, 1), 1002L));
 		Community community = communityRepository.save(Community.create("테스트 커뮤니티", member1));
 		Associate actor = associateRepository.save(Associate.create("액터", member1, community));
 		Associate receiver = associateRepository.save(Associate.create("수신자", member2, community));
@@ -450,11 +450,11 @@ public class FCMMemoryHandlerTest extends IntegrationsTestSupport {
 
 	private FCMTestFixtures createBirthdayTestFixtures() {
 		Member member1 = memberRepository.save(
-			Member.create("생일자", "birthday@example.com", LocalDate.of(1990, 1, 1), 1001L));
+			Member.createKakao("생일자", "birthday@example.com", LocalDate.of(1990, 1, 1), 1001L));
 		Member member2 = memberRepository.save(
-			Member.create("멤버1", "member1@example.com", LocalDate.of(1990, 1, 1), 1002L));
+			Member.createKakao("멤버1", "member1@example.com", LocalDate.of(1990, 1, 1), 1002L));
 		Member member3 = memberRepository.save(
-			Member.create("멤버2", "member2@example.com", LocalDate.of(1990, 1, 1), 1003L));
+			Member.createKakao("멤버2", "member2@example.com", LocalDate.of(1990, 1, 1), 1003L));
 
 		Community community = communityRepository.save(Community.create("테스트 커뮤니티", member1));
 		Associate birthdayPerson = associateRepository.save(Associate.create("생일자", member1, community));
@@ -471,11 +471,11 @@ public class FCMMemoryHandlerTest extends IntegrationsTestSupport {
 
 	private FCMTestFixtures createMemoryTestFixtures() {
 		Member member1 = memberRepository.save(
-			Member.create("메모리생성자", "creator@example.com", LocalDate.of(1990, 1, 1), 1001L));
+			Member.createKakao("메모리생성자", "creator@example.com", LocalDate.of(1990, 1, 1), 1001L));
 		Member member2 = memberRepository.save(
-			Member.create("멤버1", "member1@example.com", LocalDate.of(1990, 1, 1), 1002L));
+			Member.createKakao("멤버1", "member1@example.com", LocalDate.of(1990, 1, 1), 1002L));
 		Member member3 = memberRepository.save(
-			Member.create("멤버2", "member2@example.com", LocalDate.of(1990, 1, 1), 1003L));
+			Member.createKakao("멤버2", "member2@example.com", LocalDate.of(1990, 1, 1), 1003L));
 
 		Community community = communityRepository.save(Community.create("테스트 커뮤니티", member1));
 		Associate actor = associateRepository.save(Associate.create("생성자", member1, community));
@@ -512,11 +512,11 @@ public class FCMMemoryHandlerTest extends IntegrationsTestSupport {
 
 	private FCMTestFixtures createAssociateTestFixtures() {
 		Member member1 = memberRepository.save(
-			Member.create("기존멤버1", "existing1@example.com", LocalDate.of(1990, 1, 1), 1001L));
+			Member.createKakao("기존멤버1", "existing1@example.com", LocalDate.of(1990, 1, 1), 1001L));
 		Member member2 = memberRepository.save(
-			Member.create("기존멤버2", "existing2@example.com", LocalDate.of(1990, 1, 1), 1002L));
+			Member.createKakao("기존멤버2", "existing2@example.com", LocalDate.of(1990, 1, 1), 1002L));
 		Member member3 = memberRepository.save(
-			Member.create("새멤버", "new@example.com", LocalDate.of(1990, 1, 1), 1003L));
+			Member.createKakao("새멤버", "new@example.com", LocalDate.of(1990, 1, 1), 1003L));
 
 		Community community = communityRepository.save(Community.create("테스트 커뮤니티", member1));
 		Associate existing1 = associateRepository.save(Associate.create("기존1", member1, community));

@@ -52,7 +52,7 @@ class PostImageRepositoryTest extends IntegrationsTestSupport {
 	@DisplayName("메모리 ID로 모든 포스트 이미지를 조회한다.")
 	void findAllByMemoryId_메모리_ID로_모든_포스트_이미지를_조회한다() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 
@@ -94,7 +94,7 @@ class PostImageRepositoryTest extends IntegrationsTestSupport {
 	@DisplayName("삭제된 포스트 이미지는 메모리 ID로 조회되지 않는다.")
 	void findAllByMemoryId_삭제된_이미지는_조회되지_않는다() {
 		// given
-		Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1001L));
+		Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1001L));
 		Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
 		Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
 

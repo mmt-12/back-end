@@ -45,7 +45,7 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
     @DisplayName("ID와 삭제되지 않은 상태로 메모리를 조회한다")
     void findByIdAndDeletedAtIsNull_메모리를_ID로_조회한다() {
         // given
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
         Memory memory = memoryRepository.save(
@@ -79,7 +79,7 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
     @DisplayName("조건에 따라 메모리 목록을 조회한다")
     void findAllByConditions_조건에_따라_메모리_목록을_조회한다() {
         // given
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
         Memory memory = memoryRepository.save(
@@ -120,7 +120,7 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
     @Test
     @DisplayName("조건에 따라 키워드로 메모리 목록을 조회한다")
     void findAllByConditions_키워드로_메모리_목록을_조회한다() {
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
         Memory memory = memoryRepository.save(
@@ -163,7 +163,7 @@ class MemoryRepositoryTest extends IntegrationsTestSupport {
     @DisplayName("조건에 따라 기간으로 메모리 목록을 조회한다")
     void findAllByConditions_기간으로_메모리_목록을_조회한다() {
         // given
-        Member member = memberRepository.save(Member.create("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
+        Member member = memberRepository.save(Member.createKakao("테스트멤버", "test@test.com", LocalDate.of(1990, 1, 1), 1000L));
         Community community = communityRepository.save(Community.create("테스트커뮤니티", member));
         Associate associate = associateRepository.save(Associate.create("테스트어소시에이트", member, community));
         Memory memory = memoryRepository.save(

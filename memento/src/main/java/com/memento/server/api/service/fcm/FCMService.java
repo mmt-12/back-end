@@ -74,6 +74,17 @@ public class FCMService {
 		}
 	}
 
+	public void sendToToken(String fcmToken, String title, String content) {
+		try {
+			sender.send(fcmToken, title, content, Map.of());
+		} catch (FirebaseMessagingException e) {
+			log.error("FCM 전송 실패 - Token: {}, ErrorCode: {}, Message: {}",
+				fcmToken.substring(0, Math.min(10, fcmToken.length())) + "...",
+				e.getMessagingErrorCode(),
+				e.getMessage());
+		}
+	}
+
 	private boolean isTokenInvalid(FirebaseMessagingException e) {
 		return e.getMessagingErrorCode() != null &&
 			(e.getMessagingErrorCode().name().equals("UNREGISTERED") ||

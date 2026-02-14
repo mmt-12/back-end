@@ -1,9 +1,9 @@
 package com.memento.server.config.filter;
 
-import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+import static com.memento.server.config.SecurityConstants.PUBLIC_PATHS;
+import static com.memento.server.config.SecurityConstants.PUBLIC_PATH_PATTERNS;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,81 +24,80 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * JWT 토큰 검증 필터
+ * - 토큰이 유효하면 SecurityContext에 인증 정보 설정
+ * - 토큰이 없거나 유효하지 않으면 SecurityContext를 설정하지 않음 (Spring Security가 처리)
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
-	private final JwtTokenProvider jwtTokenProvider;
-	private final MemberClaimValidator memberClaimValidator;
-	private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    private final JwtTokenProvider jwtTokenProvider;
+    private final MemberClaimValidator memberClaimValidator;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    private static final List<String> WHITELIST = List.of(
-		"/favicon.ico",
-		"/api/v1/sign-in",
-		"/api/v1/auth/redirect",
-		"/api/v1/auth/refresh",
-		"/api/v1/health",
-		"/v1/sign-in",
-		"/v1/auth/redirect",
-		"/v1/auth/refresh",
-		"/v1/health",
-		"/h2-console/**"
-	);
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String method = request.getMethod();
 
-	private boolean isWhitelisted(String path) {
-		return WHITELIST.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
-	}
+        // OPTIONS 요청은 CORS preflight이므로 필터 건너뜀
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            return true;
+        }
 
-	@Override
-	protected boolean shouldNotFilter(HttpServletRequest request) {
-		String path = request.getRequestURI();
-		return WHITELIST.stream().anyMatch(p -> pathMatcher.match(p, path))
-			|| path.contains(".well-known")
-			|| path.contains("com.chrome.devtools.json");
-	}
+        // 공개 경로는 필터 건너뜀
+        boolean isPublicPath = PUBLIC_PATHS.stream().anyMatch(p -> pathMatcher.match(p, path));
 
-	@Override
-	public void doFilterInternal(
-		@NotNull HttpServletRequest request,
-		@NotNull HttpServletResponse response,
-		@NotNull FilterChain chain
-	) throws IOException, ServletException {
-		// Ensure whitelist passes through regardless of token state
-		String path = request.getRequestURI();
-		if (isWhitelisted(path)) {
-			chain.doFilter(request, response);
-			return;
-		}
+        boolean isPublicPattern = PUBLIC_PATH_PATTERNS.stream().anyMatch(p -> pathMatcher.match(p, path));
 
-		String token = resolveToken(request);
+        // 개발 도구 관련 경로
+        boolean isDevToolPath = path.contains(".well-known") || path.contains("com.chrome.devtools.json");
 
-		if (!StringUtils.hasText(token) || jwtTokenProvider.isNotValidateToken(token)) {
-			SecurityContextHolder.clearContext();
-			response.sendError(SC_UNAUTHORIZED, "토큰이 없거나 검증에 실패했습니다.");
-			return;
-		}
+        return isPublicPath || isPublicPattern || isDevToolPath;
+    }
 
-		MemberClaim memberClaim = jwtTokenProvider.extractMemberClaim(token);
-		if (memberClaim.isMember() && !memberClaimValidator.isValid(memberClaim)) {
-			SecurityContextHolder.clearContext();
-			response.sendError(SC_UNAUTHORIZED, "MemberClaim 검증에 실패했습니다.");
-			return;
-		}
+    @Override
+    public void doFilterInternal(
+        @NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response,
+        @NotNull FilterChain chain
+    ) throws IOException, ServletException {
+        String token = resolveToken(request);
 
-		MemberPrincipal memberPrincipal = MemberPrincipal.from(memberClaim);
-		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-			memberPrincipal, null, memberPrincipal.getAuthorities());
-		SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        // 토큰이 없거나 유효하지 않으면 SecurityContext를 설정하지 않고 통과
+        // Spring Security가 인증되지 않은 요청으로 처리하여 AuthenticationEntryPoint 호출
+        if (!StringUtils.hasText(token) || jwtTokenProvider.isNotValidateToken(token)) {
+            SecurityContextHolder.clearContext();
+            chain.doFilter(request, response);
+            return;
+        }
 
-		chain.doFilter(request, response);
-	}
+        MemberClaim memberClaim = jwtTokenProvider.extractMemberClaim(token);
 
-	private String resolveToken(HttpServletRequest request) {
-		String bearerToken = request.getHeader("Authorization");
-		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-			return bearerToken.substring(7);
-		}
-		return null;
-	}
+        // MemberClaim 검증 실패 시에도 인증되지 않은 상태로 처리
+        if (memberClaim.isMember() && !memberClaimValidator.isValid(memberClaim)) {
+            SecurityContextHolder.clearContext();
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // 인증 성공 - SecurityContext에 인증 정보 설정
+        MemberPrincipal memberPrincipal = MemberPrincipal.from(memberClaim);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+            memberPrincipal, null, memberPrincipal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+        chain.doFilter(request, response);
+    }
+
+    private String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
 }

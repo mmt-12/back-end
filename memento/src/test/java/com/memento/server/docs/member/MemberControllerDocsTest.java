@@ -2,6 +2,7 @@ package com.memento.server.docs.member;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -9,11 +10,15 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -28,11 +33,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
+import com.memento.server.api.controller.auth.dto.AuthMemberResponse;
+import com.memento.server.api.controller.auth.dto.AuthResponse;
 import com.memento.server.api.controller.member.MemberController;
 import com.memento.server.api.controller.member.dto.CommunityListResponse;
+import com.memento.server.api.controller.member.dto.EmailCheckResponse;
+import com.memento.server.api.controller.member.dto.MemberNormalSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpRequest;
 import com.memento.server.api.controller.member.dto.MemberSignUpResponse;
 import com.memento.server.api.controller.member.dto.MemberUpdateRequest;
+import com.memento.server.api.controller.member.dto.SignInRequest;
 import com.memento.server.api.service.auth.jwt.JwtToken;
 import com.memento.server.api.service.community.AssociateService;
 import com.memento.server.api.service.member.MemberService;
@@ -42,12 +52,15 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 
 	private final MemberService memberService = mock(MemberService.class);
 	private final AssociateService associateService = mock(AssociateService.class);
+	private final org.thymeleaf.TemplateEngine templateEngine = mock(org.thymeleaf.TemplateEngine.class);
 
 	@Override
 	protected Object initController() {
-		return new MemberController(memberService, associateService);
+		when(templateEngine.process(any(String.class), any())).thenReturn("<html></html>");
+		return new MemberController(memberService, associateService, templateEngine);
 	}
-
+	
+	// todo 지금 안씀
 	@Test
 	@DisplayName("그룹 목록 조회")
 	void searchAll() throws Exception {
@@ -86,12 +99,12 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 	}
 
 	@Test
-	@DisplayName("회원가입")
+	@DisplayName("카카오 회원가입")
 	void signUp() throws Exception {
 		// given
 		setAuthentication(1L, null, null);
 		MemberSignUpRequest request = new MemberSignUpRequest("name", "email@naver.com",
-			LocalDate.of(2025, 8, 4));
+			LocalDate.of(2025, 8, 4), "오렌지");
 		JwtToken jwtToken = JwtToken.builder()
 			.grantType("Bearer")
 			.accessToken("access-token-123")
@@ -100,25 +113,129 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 			.refreshTokenExpiresAt(new Date())
 			.build();
 		MemberSignUpResponse response = new MemberSignUpResponse(1L, "name", jwtToken);
-		when(memberService.signUp(any(), any(), any(), any())).thenReturn(response);
+		when(memberService.signUp(any(), any())).thenReturn(response);
 
 		// when & then
-		mockMvc.perform(post("/api/v1/members")
+		mockMvc.perform(post("/api/v1/members/signup/kakao")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.memberId").value(1L))
-			.andExpect(jsonPath("$.name").value("name"))
-			.andExpect(jsonPath("$.token.grantType").value("Bearer"))
-			.andExpect(jsonPath("$.token.accessToken").value("access-token-123"))
-			.andExpect(jsonPath("$.token.refreshToken").value("refresh-token-456"))
 			.andDo(document("member-signup-test",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestFields(
 					fieldWithPath("name").type(STRING).description("이름"),
 					fieldWithPath("email").type(STRING).description("이메일"),
-					fieldWithPath("birthday").type(ARRAY).description("생일 (\"YYYY-MM-DD\"")
+					fieldWithPath("birthday").type(ARRAY).description("생일 (\"YYYY-MM-DD\""),
+					fieldWithPath("secret").type(STRING).description("암호")
+				),
+				responseFields(
+					fieldWithPath("memberId").description("사용자 ID"),
+					fieldWithPath("name").description("사용자 이름"),
+					subsectionWithPath("token").description("JWT 토큰 정보"),
+					fieldWithPath("token.grantType").description("토큰 타입"),
+					fieldWithPath("token.accessToken").description("액세스 토큰"),
+					fieldWithPath("token.accessTokenExpiresAt").description("액세스 토큰 만료 시각"),
+					fieldWithPath("token.refreshToken").description("리프레시 토큰"),
+					fieldWithPath("token.refreshTokenExpiresAt").description("리프레시 토큰 만료 시각")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("일반 회원가입")
+	void normalSignUp() throws Exception {
+		// given
+		MemberNormalSignUpRequest request = new MemberNormalSignUpRequest("name", "email@naver.com", "password",
+			LocalDate.of(2025, 8, 4), "오렌지", "fcm");
+
+		// when & then
+		mockMvc.perform(post("/api/v1/members/signup/normal")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andDo(document("member-signup-normal-test",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestFields(
+					fieldWithPath("name").type(STRING).description("이름"),
+					fieldWithPath("email").type(STRING).description("이메일"),
+					fieldWithPath("birthday").type(ARRAY).description("생일 \"YYYY-MM-DD\""),
+					fieldWithPath("password").type(STRING).description("비밀번호"),
+					fieldWithPath("secret").type(STRING).description("암호"),
+					fieldWithPath("fcmToken").type(STRING).description("fcm 토큰")
+				)
+			));
+	}
+	
+	@Test
+	@DisplayName("회원가입 결과 페이지 (이메일 링크)")
+	void signUpPage() throws Exception {
+		// when & then
+		mockMvc.perform(get("/api/v1/members/signup/page")
+				.param("memberId", "1")
+				.param("action", "accept")
+				.param("token", "test-token-123"))
+			.andExpect(status().isOk())
+			.andDo(document("member-signup-page",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				queryParameters(
+					parameterWithName("memberId").description("회원 아이디"),
+					parameterWithName("action").description("처리 액션 (accept 또는 reject)"),
+					parameterWithName("token").description("보안 토큰")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("회원가입 결과 처리 (POST)")
+	void signUpResult() throws Exception {
+		// given
+		doNothing().when(memberService).signUpResult(any());
+
+		// when & then
+		mockMvc.perform(post("/api/v1/members/signup/result")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"memberId\": 1, \"token\": \"test-token-123\", \"action\": \"accept\"}"))
+			.andExpect(status().isOk())
+			.andDo(document("member-signup-result",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestFields(
+					fieldWithPath("memberId").type(NUMBER).description("회원 아이디"),
+					fieldWithPath("token").type(STRING).description("보안 토큰"),
+					fieldWithPath("action").type(STRING).description("처리 액션 (accept 또는 reject)")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("일반로그인")
+	void singIn() throws Exception {
+		// given
+		SignInRequest request = new SignInRequest("email", "password");
+		JwtToken jwtToken = JwtToken.builder()
+			.grantType("Bearer")
+			.accessToken("access-token-123")
+			.accessTokenExpiresAt(new Date())
+			.refreshToken("refresh-token-456")
+			.refreshTokenExpiresAt(new Date())
+			.build();
+		AuthResponse response = AuthMemberResponse.of(123L, "name", jwtToken);
+		when(memberService.signIn(any())).thenReturn(response);
+
+		// when & then
+		mockMvc.perform(post("/api/v1/members/signin")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andDo(document("member-login-normal",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestFields(
+					fieldWithPath("email").type(STRING).description("이메일"),
+					fieldWithPath("password").type(STRING).description("비밀번호")
 				),
 				responseFields(
 					fieldWithPath("memberId").description("사용자 ID"),
@@ -158,4 +275,29 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 				)
 			));
 	}
+
+	@Test
+	@DisplayName("이메일 중복 체크")
+	void checkDuplicateEmail_success() throws Exception {
+		// given
+		String email = "available@example.com";
+		when(memberService.checkDuplicateEmail(any())).thenReturn(EmailCheckResponse.of(false));
+
+		// when & then
+		mockMvc.perform(get("/api/v1/members/check-email")
+				.param("email", email))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.isDuplicate").value(false))
+			.andDo(document("member-check-email",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				queryParameters(
+					parameterWithName("email").description("중복 체크할 이메일")
+				),
+				responseFields(
+					fieldWithPath("isDuplicate").type(BOOLEAN).description("중복 여부 (true: 중복, false: 사용 가능)")
+				)
+			));
+	}
+
 }

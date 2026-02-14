@@ -8,6 +8,7 @@ import lombok.Builder;
 public record MemberSignUpRequest(
 	String name,
 	String email,
-	LocalDate birthday
+	LocalDate birthday,
+	String secret
 ) {
 }
