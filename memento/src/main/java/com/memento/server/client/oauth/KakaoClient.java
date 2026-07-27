@@ -7,6 +7,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.memento.server.api.service.oauth.KakaoJwks;
 import com.memento.server.api.service.oauth.KakaoToken;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,13 @@ public class KakaoClient {
 			.queryParam("prompt", "select_account")
 			.build()
 			.toUriString();
+	}
+
+	public KakaoJwks getJwks() {
+		return restClient().get()
+			.uri(kakaoClientProperties.kauthHost() + "/.well-known/jwks.json")
+			.retrieve()
+			.body(KakaoJwks.class);
 	}
 
 	public KakaoToken getKakaoToken(String code) {
